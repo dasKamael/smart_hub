@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}a{color:#409CFF;text-decoration:none}a:hover{color:#0A84FF}button{font-family:inherit}code{font-family:ui-monospace,"SF Mono",Menlo,monospace}</style></helmet>
+<div style="max-width:1180px;margin:0 auto;padding:48px 32px 96px;display:flex;flex-direction:column;gap:56px">
+
+<header style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#409CFF">Smart Home Hub</div>
+<h1 style="margin:0;font-size:40px;font-weight:700;letter-spacing:-1px">UI Library</h1>
+<p style="margin:0;max-width:640px;font-size:17px;line-height:1.5;color:rgba(235,235,245,.6);text-wrap:pretty">Alle Bausteine des Hubs an einem Ort. Jeder Baustein nennt seinen Token-Namen, damit Design und Flutter-Code dieselbe Sprache sprechen.</p>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Farben</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Dunkle Flächen in vier Stufen, ein Akzent, wenige Statusfarben.</div></div>
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Flächen</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"></div><div style="font-size:14px;font-weight:600">Background</div><code style="font-size:12px;color:rgba(235,235,245,.6)">bg · #000000</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1C1C1E"></div><div style="font-size:14px;font-weight:600">Surface</div><code style="font-size:12px;color:rgba(235,235,245,.6)">surface · #1C1C1E</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#2C2C2E"></div><div style="font-size:14px;font-weight:600">Elevated</div><code style="font-size:12px;color:rgba(235,235,245,.6)">elevated · #2C2C2E</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#3A3A3C"></div><div style="font-size:14px;font-weight:600">Control</div><code style="font-size:12px;color:rgba(235,235,245,.6)">control · #3A3A3C</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#48484A"></div><div style="font-size:14px;font-weight:600">Control strong</div><code style="font-size:12px;color:rgba(235,235,245,.6)">controlStrong · #48484A</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#636366"></div><div style="font-size:14px;font-weight:600">Selected</div><code style="font-size:12px;color:rgba(235,235,245,.6)">selected · #636366</code></div>
+</div>
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5);padding-top:6px">Text</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1C1C1E;display:flex;align-items:center;padding:0 16px;font-size:20px;font-weight:700;color:#fff">Aa</div><div style="font-size:14px;font-weight:600">Primary</div><code style="font-size:12px;color:rgba(235,235,245,.6)">text · #FFFFFF</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1C1C1E;display:flex;align-items:center;padding:0 16px;font-size:20px;font-weight:700;color:rgba(235,235,245,.6)">Aa</div><div style="font-size:14px;font-weight:600">Secondary</div><code style="font-size:12px;color:rgba(235,235,245,.6)">text2 · EBEBF5 60%</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1C1C1E;display:flex;align-items:center;padding:0 16px;font-size:20px;font-weight:700;color:rgba(235,235,245,.45)">Aa</div><div style="font-size:14px;font-weight:600">Tertiary</div><code style="font-size:12px;color:rgba(235,235,245,.6)">text3 · EBEBF5 45%</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1C1C1E;display:flex;align-items:center;padding:0 16px"><div style="flex:1;height:0;border-top:0.5px solid rgba(84,84,88,.6)"></div></div><div style="font-size:14px;font-weight:600">Separator</div><code style="font-size:12px;color:rgba(235,235,245,.6)">separator · 545458 60%</code></div>
+</div>
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5);padding-top:6px">Akzent &amp; Status</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#0A84FF"></div><div style="font-size:14px;font-weight:600">Accent</div><code style="font-size:12px;color:rgba(235,235,245,.6)">accent · #0A84FF</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:rgba(10,132,255,.22);display:flex;align-items:center;padding:0 16px;font-size:17px;font-weight:700;color:#409CFF">Text</div><div style="font-size:14px;font-weight:600">Accent tint</div><code style="font-size:12px;color:rgba(235,235,245,.6)">accentTint · 22% / #409CFF</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#FF453A"></div><div style="font-size:14px;font-weight:600">Danger</div><code style="font-size:12px;color:rgba(235,235,245,.6)">danger · #FF453A / #FF6961</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#30D158"></div><div style="font-size:14px;font-weight:600">Success</div><code style="font-size:12px;color:rgba(235,235,245,.6)">success · #30D158</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:16px;background:#1DB954"></div><div style="font-size:14px;font-weight:600">Playing</div><code style="font-size:12px;color:rgba(235,235,245,.6)">playing · #1DB954</code></div>
+</div>
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5);padding-top:6px">Kalender</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:56px;border-radius:14px;background:rgba(255,159,10,.15);display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:600;color:#FF9F0A">Home</div><code style="font-size:12px;color:rgba(235,235,245,.6)">calHome · #FF9F0A</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:56px;border-radius:14px;background:rgba(10,132,255,.15);display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:600;color:#0A84FF">Work</div><code style="font-size:12px;color:rgba(235,235,245,.6)">calWork · #0A84FF</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:56px;border-radius:14px;background:rgba(48,209,88,.15);display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:600;color:#30D158">Personal</div><code style="font-size:12px;color:rgba(235,235,245,.6)">calPersonal · #30D158</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="height:56px;border-radius:14px;background:rgba(191,90,242,.15);display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:600;color:#BF5AF2">Health</div><code style="font-size:12px;color:rgba(235,235,245,.6)">calHealth · #BF5AF2</code></div>
+</div>
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5);padding-top:6px">Lichtfarben</div>
+<div style="display:flex;flex-wrap:wrap;gap:16px">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:20px;background:#FFB340;box-shadow:0 0 16px #FFB340aa"></div><code style="font-size:12px;color:rgba(235,235,245,.6)">warm · #FFB340</code></div>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:20px;background:#FFE08A;box-shadow:0 0 16px #FFE08Aaa"></div><code style="font-size:12px;color:rgba(235,235,245,.6)">soft · #FFE08A</code></div>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:20px;background:#FF9F6B;box-shadow:0 0 16px #FF9F6Baa"></div><code style="font-size:12px;color:rgba(235,235,245,.6)">sunset · #FF9F6B</code></div>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:20px;background:#BFE3FF;box-shadow:0 0 16px #BFE3FFaa"></div><code style="font-size:12px;color:rgba(235,235,245,.6)">cool · #BFE3FF</code></div>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:20px;background:#BF5AF2;box-shadow:0 0 16px #BF5AF2aa"></div><code style="font-size:12px;color:rgba(235,235,245,.6)">violet · #BF5AF2</code></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Typografie</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Eine Schriftfamilie. Hierarchie über Größe und Gewicht, nie über Farbe allein.</div></div>
+<div style="border-radius:26px;background:#1C1C1E;padding:8px 24px">
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">display</code><div style="font-size:46px;font-weight:700;letter-spacing:-1.5px;line-height:1.05">22°</div><code style="font-size:12px;color:rgba(235,235,245,.45)">46 · Bold · −1.5</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">pageTitle</code><div style="font-size:28px;font-weight:700;letter-spacing:-.6px">Floor plan</div><code style="font-size:12px;color:rgba(235,235,245,.45)">28 · Bold · −0.6</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">sectionTitle</code><div style="font-size:24px;font-weight:700;letter-spacing:-.4px">Up next</div><code style="font-size:12px;color:rgba(235,235,245,.45)">24 · Bold · −0.4</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">widgetTitle</code><div style="font-size:20px;font-weight:700">Plants</div><code style="font-size:12px;color:rgba(235,235,245,.45)">20 · Bold</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">body</code><div style="font-size:17px;font-weight:600">Call plumber about the kitchen sink</div><code style="font-size:12px;color:rgba(235,235,245,.45)">17 · Semibold</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">secondary</code><div style="font-size:15px;color:rgba(235,235,245,.6)">Office · On · 80%</div><code style="font-size:12px;color:rgba(235,235,245,.45)">15 · Regular · text2</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0;border-bottom:0.5px solid rgba(84,84,88,.6)"><code style="font-size:12px;color:rgba(235,235,245,.6)">label</code><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Overdue</div><code style="font-size:12px;color:rgba(235,235,245,.45)">13 · Semibold</code></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 170px;align-items:baseline;gap:16px;padding:14px 0"><code style="font-size:12px;color:rgba(235,235,245,.6)">micro</code><div style="font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:rgba(235,235,245,.6)">Mon 27</div><code style="font-size:12px;color:rgba(235,235,245,.45)">11 · Bold · Caps</code></div>
+</div>
+<div style="font-size:14px;line-height:1.5;color:rgba(235,235,245,.6);max-width:760px">Zahlen in Uhrzeiten, Prozent und Fortschritt immer mit <code>tabular-nums</code> (Flutter: <code>FontFeature.tabularFigures()</code>), damit nichts springt.</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Abstände &amp; Radien</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Größere Flächen bekommen größere Radien. Abstände nur aus dieser Skala.</div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+<div style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:12px">
+<div style="font-size:17px;font-weight:700">Abstände</div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:4px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s4 · Icon ↔ Text eng</code></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s8 · Chips, Listen-Zeilen</code></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:12px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s12 · Kacheln im Widget</code></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:16px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s16 · zwischen Karten</code></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:20px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s20 · Seitenabschnitte</code></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:24px;height:20px;background:#0A84FF;border-radius:2px"></div><code style="font-size:13px;color:rgba(235,235,245,.6)">s24 · Seitenrand</code></div>
+</div>
+<div style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:17px;font-weight:700">Radien</div>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:8px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">r8</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:12px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">r12</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:16px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">r16</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:20px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">r20</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:24px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">r24</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:56px;height:56px;border-radius:28px;background:#3A3A3C"></div><code style="font-size:11px;color:rgba(235,235,245,.6)">pill</code></div>
+</div>
+<div style="font-size:13px;line-height:1.5;color:rgba(235,235,245,.6)">r8 Thumbnails · r12 Slider, Events · r16 Zeilen, Tages-Kopf · r20 Raum-Kacheln · r24 Widgets · r26 Seitenkarten · pill Buttons, Marker</div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Buttons</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Pillenform. Mindesthöhe 36 px, Hauptaktionen 40–44 px.</div></div>
+<div style="border-radius:26px;background:#1C1C1E;padding:24px;display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><button style="height:42px;border:none;border-radius:21px;padding:0 18px;font-size:15px;font-weight:600;background:#0A84FF;color:#fff;cursor:pointer" style-active="transform:scale(.96)">Water now</button><code style="font-size:12px;color:rgba(235,235,245,.6)">ButtonPrimary</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><button style="height:42px;border:none;border-radius:21px;padding:0 18px;font-size:15px;font-weight:600;background:#2C2C2E;color:#fff;cursor:pointer" style-hover="background:#3A3A3C" style-active="transform:scale(.96)">Lights off</button><code style="font-size:12px;color:rgba(235,235,245,.6)">ButtonSecondary</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><button style="height:36px;border:none;border-radius:18px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer" style-hover="background:#3A3A3C">Remove</button><code style="font-size:12px;color:rgba(235,235,245,.6)">ButtonDestructive</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><button style="height:36px;border:none;border-radius:10px;padding:0 14px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Today</button><code style="font-size:12px;color:rgba(235,235,245,.6)">ButtonCompact</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="display:flex;gap:10px"><button style="width:44px;height:44px;border:none;border-radius:22px;background:#fff;color:#1C1C1E;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="16" viewBox="0 0 14 16"><path d="M3 1.5v13l10-6.5z" fill="currentColor"></path></svg></button><button style="width:44px;height:44px;border:none;border-radius:22px;background:#2C2C2E;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="14" viewBox="0 0 16 14"><path d="M1 1v12M15 1.5v11L5 7z" stroke="currentColor" stroke-width="2" fill="currentColor" stroke-linejoin="round"></path></svg></button></div><code style="font-size:12px;color:rgba(235,235,245,.6)">IconButton · light / dark</code></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Auswahl</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Tab-Leiste für Bereiche, Segmente für Ansichten, Chips für Ebenen und Filter.</div></div>
+<div style="border-radius:26px;background:radial-gradient(60% 120% at 20% 0%,rgba(61,114,194,.35),transparent 70%),radial-gradient(50% 120% at 90% 100%,rgba(42,147,132,.3),transparent 70%),#111;padding:28px 24px;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<nav style="position:relative;display:flex;gap:2px;padding:4px;border-radius:26px;background:rgba(255,255,255,.1);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:0.5px solid rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 24px rgba(0,0,0,.35)">
+<div style="position:absolute;top:4px;bottom:4px;width:74px;left:{{ tabX }};border-radius:22px;background:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);transition:left .45s cubic-bezier(.3,1.35,.5,1)"></div>
+<sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="5"><button onClick="{{ tb.go }}" style="position:relative;width:74px;height:44px;border:none;background:none;border-radius:22px;padding:0;white-space:nowrap;font-size:13px;font-weight:600;color:{{ tb.color }};cursor:pointer;transition:color .2s">{{ tb.name }}</button></sc-for>
+</nav>
+<code style="font-size:12px;color:rgba(235,235,245,.7)">GlassTabBar · gleitender Indikator mit Federkurve</code>
+</div>
+<div style="border-radius:26px;background:#1C1C1E;padding:24px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:3px;padding:3px;border-radius:13px;background:#2C2C2E;align-self:flex-start"><sc-for list="{{ segs }}" as="sg" hint-placeholder-count="2"><button onClick="{{ sg.pick }}" style="height:30px;border:none;border-radius:10px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;background:{{ sg.bg }};color:#fff;transition:background .2s">{{ sg.name }}</button></sc-for></div><code style="font-size:12px;color:rgba(235,235,245,.6)">SegmentedControl</code></div>
+<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ chips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.toggle }}" style="height:34px;border:none;border-radius:17px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.color }};transition:background .2s,color .2s">{{ c.name }}</button></sc-for></div><code style="font-size:12px;color:rgba(235,235,245,.6)">FilterChip · an / aus</code></div>
+<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:8px"><div style="width:30px;height:30px;border-radius:15px;background:#FFB340;box-shadow:0 0 0 2px #1C1C1E,0 0 0 4px #fff"></div><div style="width:30px;height:30px;border-radius:15px;background:#FFE08A"></div><div style="width:30px;height:30px;border-radius:15px;background:#FF9F6B"></div><div style="width:30px;height:30px;border-radius:15px;background:#BFE3FF"></div><div style="width:30px;height:30px;border-radius:15px;background:#BF5AF2"></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">ColorSwatch · gewählt mit Ring</code></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Regler</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Regler füllen sich mit der Gerätefarbe. Der Wert steht im Regler selbst.</div></div>
+<div style="border-radius:26px;background:#1C1C1E;padding:24px;display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<div style="display:flex;align-items:center;gap:14px"><div onClick="{{ toggleLight }}" style="width:48px;height:48px;border-radius:24px;background:{{ lampBg }};color:{{ lampFg }};box-shadow:{{ lampGlow }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s,box-shadow .25s,color .25s"><svg width="16" height="20" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></div><div><div style="font-size:17px;font-weight:700">Desk lamp</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ lampStatus }}</div></div></div>
+<code style="font-size:12px;color:rgba(235,235,245,.6)">PowerToggle · Tipp aufs Icon</code>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:260px;max-width:420px">
+<div onPointerDown="{{ bri.down }}" onPointerMove="{{ bri.move }}" onPointerUp="{{ bri.up }}" style="height:40px;border-radius:12px;background:#3A3A3C;position:relative;overflow:hidden;cursor:pointer;touch-action:none"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ briPct }};background:#FFB340"></div><div style="position:absolute;left:14px;top:0;bottom:0;display:flex;align-items:center;font-size:14px;font-weight:700;color:{{ briText }};pointer-events:none">{{ briLabel }}</div></div>
+<code style="font-size:12px;color:rgba(235,235,245,.6)">SliderBar · Helligkeit, Lautstärke</code>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:6px;width:240px"><div style="height:4px;border-radius:2px;background:rgba(255,255,255,.22);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:35%;background:#fff;border-radius:2px"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums"><span>1:14</span><span>-2:20</span></div></div>
+<code style="font-size:12px;color:rgba(235,235,245,.6)">ProgressBar · Wiedergabe</code>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Listen &amp; Zeilen</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Zeilen sind mindestens 52 px hoch und als Ganzes antippbar.</div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+<div style="border-radius:26px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:4px">
+<sc-for list="{{ todos }}" as="t" hint-placeholder-count="3"><div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:12px;min-height:52px;padding:0 6px;border-radius:14px;cursor:pointer" style-hover="background:#2C2C2E">
+<div style="width:24px;height:24px;flex:none;border-radius:12px;box-sizing:border-box;border:{{ t.ring }};background:{{ t.fill }};display:flex;align-items:center;justify-content:center;transition:background .2s"><svg width="12" height="10" viewBox="0 0 12 10" style="opacity:{{ t.checkOp }}"><path d="M1 5l3.5 3.5L11 1.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+<div style="flex:1;min-width:0;font-size:17px;font-weight:500;color:{{ t.color }};text-decoration:{{ t.deco }}">{{ t.title }}</div>
+<div style="height:22px;padding:0 8px;border-radius:7px;background:rgba(10,132,255,.22);display:flex;align-items:center;font-size:12px;font-weight:700;color:#409CFF;font-variant-numeric:tabular-nums">{{ t.time }}</div>
+</div></sc-for>
+<code style="font-size:12px;color:rgba(235,235,245,.6);padding:8px 6px 0">TodoRow · Checkbox + TimeChip</code>
+</div>
+<div style="border-radius:26px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:0 6px"><div style="width:40px;height:40px;flex:none;border-radius:12px;background:#3A3A3C;box-shadow:inset 0 0 0 2px #FF453A;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:rgba(235,235,245,.6)">F</div><div style="flex:1;min-width:0"><div style="font-size:17px;font-weight:600;color:#FF6961">Fiddle Leaf Fig</div><div style="font-size:14px;color:rgba(235,235,245,.6)">1 day overdue</div></div></div>
+<div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:0 6px"><div style="width:40px;height:40px;flex:none;border-radius:12px;background:#3A3A3C;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:rgba(235,235,245,.6)">B</div><div style="flex:1;min-width:0"><div style="font-size:17px;font-weight:600">Basil</div><div style="font-size:14px;color:rgba(235,235,245,.6)">Due today</div></div></div>
+<div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:0 6px;border-radius:14px;background:#2C2C2E"><div style="width:40px;height:40px;flex:none;border-radius:8px;background:#c76b4a"></div><div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#1DB954">Morning Light</div><div style="font-size:14px;color:rgba(235,235,245,.6)">Lumen Quartet</div></div><div style="font-size:14px;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">3:34</div></div>
+<code style="font-size:12px;color:rgba(235,235,245,.6);padding:8px 6px 0">PlantRow · überfällig / normal — TrackRow · aktiv</code>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Karten &amp; Widget-Größen</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Raster mit 170-px-Einheit und 16 px Abstand. Seitenkarten füllen die Vollansicht.</div></div>
+<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="width:170px;height:170px;border-radius:24px;background:#1C1C1E;padding:14px 16px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Plants</div><div><div style="font-size:36px;font-weight:700;letter-spacing:-1px">4</div><div style="font-size:13px;color:rgba(235,235,245,.6)">to water</div></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">S · 170×170 · r24</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="width:356px;max-width:100%;height:170px;border-radius:24px;background:#1C1C1E;padding:14px 18px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px"><div style="font-size:17px;font-weight:700">Home</div><div style="font-size:15px;color:rgba(235,235,245,.6)">Inhalt …</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">M · 356×170 · r24</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="width:356px;max-width:100%;height:356px;border-radius:24px;background:#1C1C1E;padding:18px;box-sizing:border-box"><div style="font-size:20px;font-weight:700">Lights</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">L · 356×356 · r24</code></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="width:728px;max-width:100%;height:170px;border-radius:24px;background:#1C1C1E;padding:18px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(235,235,245,.45)">XL · 728×356 (hier verkürzt)</div><code style="font-size:12px;color:rgba(235,235,245,.6)">XL · 728×356 · r24 — PageCard · r26, Padding 22</code></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Grundriss-Marker</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">44 px rund, Icon in der Gerätefarbe. Status über Ringe und kleine Badges, nie über Text.</div></div>
+<div style="border-radius:26px;background:#262628;padding:32px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:60px 16px;padding-top:48px">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:#FFB340;color:#1C1C1E;box-shadow:0 0 16px #FFB340aa;display:flex;align-items:center;justify-content:center"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Light · an</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:#3A3A3C;color:rgba(235,235,245,.6);box-shadow:0 0 0 2px rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Light · aus</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:#1E3524;color:#30D158;box-shadow:0 0 0 2px rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Plant · ok</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:#1E3524;color:#30D158;box-shadow:0 0 0 3px #0A84FF;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Plant · heute</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="position:relative;width:44px;height:44px;border-radius:22px;background:#1E3524;color:#30D158;box-shadow:0 0 0 3px #FF453A,0 0 0 7px rgba(255,69,58,.25);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg><div style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:9px;background:#FF453A;border:2px solid #262628;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center">!</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Plant · überfällig</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="position:relative;width:44px;height:44px;border-radius:22px;background:#2C2C2E;color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><svg width="15" height="19" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle><circle cx="7" cy="5" r="1.2" fill="currentColor"></circle></svg><div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;border-radius:7px;background:#30D158;border:2px solid #262628"></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Speaker · spielt</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:#2C2C2E;color:rgba(235,235,245,.5);box-shadow:0 0 0 2px rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><svg width="15" height="19" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle><circle cx="7" cy="5" r="1.2" fill="currentColor"></circle></svg></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Speaker · aus</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="position:relative;width:44px;height:44px;border-radius:22px;background:#FFB340;color:#1C1C1E;box-shadow:0 0 0 3px #fff,0 6px 18px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg><div style="position:absolute;top:52px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:9px;background:rgba(0,0,0,.8);font-size:12px;font-weight:600;color:#fff">Desk lamp</div></div><code style="font-size:12px;color:rgba(235,235,245,.6);margin-top:30px">ausgewählt</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="position:relative;width:44px;height:44px;border-radius:22px;background:#1E3524;color:#30D158;box-shadow:0 0 0 3px #0A84FF,0 0 0 9px rgba(10,132,255,.28);transform:scale(1.18);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg><div style="position:absolute;bottom:54px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:9px;background:#0A84FF;font-size:12px;font-weight:700;color:#fff">Group</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Drop-Ziel</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="position:relative;width:56px;height:56px"><div style="position:absolute;left:-2px;top:-4px;width:44px;height:44px;border-radius:22px;background:#2C2C2E;box-shadow:0 0 0 2px #262628;transform:scale(.8)"></div><div style="position:absolute;left:3px;top:1px;width:44px;height:44px;border-radius:22px;background:#FFB340;box-shadow:0 0 0 2px #262628;transform:scale(.9)"></div><div style="position:absolute;left:8px;top:8px;width:44px;height:44px;border-radius:22px;background:#1E3524;color:#30D158;box-shadow:0 0 0 2px #262628,0 4px 10px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></div><div style="position:absolute;bottom:-2px;right:-6px;min-width:22px;height:22px;box-sizing:border-box;padding:0 6px;border-radius:11px;background:#fff;color:#1C1C1E;border:2px solid #262628;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">3</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">Gruppe · Stack</code></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:22px;background:radial-gradient(circle,#2C2C2E 0 15px,transparent 15.5px),conic-gradient(from -90deg,#30D158 3deg 117deg,transparent 117deg 123deg,#FFB340 123deg 237deg,transparent 237deg 243deg,#fff 243deg 357deg,transparent 357deg);box-shadow:0 4px 12px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">3</div><code style="font-size:12px;color:rgba(235,235,245,.6)">Gruppe · Ring</code></div>
+</div>
+<div style="border-radius:26px;background:#1C1C1E;padding:22px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px;font-size:14px;line-height:1.5">
+<div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:700">Bewegen</div><div style="color:rgba(235,235,245,.6)">left/top 450 ms, Kurve <code>cubic-bezier(.3,1.25,.5,1)</code> – leichtes Nachfedern.</div></div>
+<div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:700">Ziehen</div><div style="color:rgba(235,235,245,.6)">Marker hebt sich auf 112 % mit weißem Ring und tiefem Schatten; folgt dem Finger ohne Verzögerung.</div></div>
+<div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:700">Gruppieren &amp; Auffächern</div><div style="color:rgba(235,235,245,.6)">Ziel wächst auf 118 %. Auffächern im Kreis, 35 ms Versatz pro Gerät. Blasen erscheinen mit Größen-Pop.</div></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.5px">Kalender &amp; Zeit</h2><div style="font-size:15px;color:rgba(235,235,245,.6)">Termine tragen die Farbe ihres Kalenders als Tönung, Text bleibt weiß.</div></div>
+<div style="border-radius:26px;background:#1C1C1E;padding:24px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="width:60px;height:60px;border-radius:15px;background:#2C2C2E;overflow:hidden;display:flex;flex-direction:column"><div style="height:18px;background:#0A84FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;letter-spacing:.5px">OCT</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:700">26</div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">DateBadge</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="display:flex;gap:6px"><div style="width:64px;height:46px;border-radius:12px;background:#0A84FF;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Today</div><div style="font-size:18px;font-weight:700;line-height:1.1">26</div></div><div style="width:64px;height:46px;border-radius:12px;background:#2C2C2E;color:rgba(235,235,245,.7);box-shadow:inset 0 0 0 2px #0A84FF;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Tue</div><div style="font-size:18px;font-weight:700;line-height:1.1">27</div></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">DayHeader · heute / gewählt</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:6px;width:200px"><div style="border-radius:10px;padding:6px 10px;background:rgba(10,132,255,.15)"><div style="font-size:16px;font-weight:600">Team sync</div><div style="font-size:14px;font-weight:600;color:#0A84FF">11:00–11:30 · Work</div></div><div style="border-radius:6px;padding:1px 6px;background:rgba(191,90,242,.25);display:flex;align-items:center;gap:4px;height:18px"><div style="font-size:12px;font-weight:600">Dentist</div><div style="font-size:11px;font-weight:600;color:#BF5AF2">08:00</div></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">EventCard · EventBlock kurz</code></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="position:relative;width:200px;height:20px;display:flex;align-items:center"><div style="position:absolute;left:0;right:0;height:2px;background:#FF453A"></div><div style="position:absolute;left:-3px;width:8px;height:8px;border-radius:4px;background:#FF453A"></div></div><code style="font-size:12px;color:rgba(235,235,245,.6)">NowLine</code></div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:10px;border-top:0.5px solid rgba(84,84,88,.6);padding-top:24px">
+<div style="font-size:17px;font-weight:700">Regeln</div>
+<ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7;color:rgba(235,235,245,.75);max-width:820px">
+<li>Blau nur für Auswahl, Hauptaktionen und „heute“. Rot nur für überfällig und Löschen.</li>
+<li>Tippflächen mindestens 44 px, auch wenn das Sichtbare kleiner ist.</li>
+<li>Eine Hauptaktion pro Karte. Weitere Aktionen als Secondary.</li>
+<li>Gerätezustand wird visuell gezeigt (Farbe, Schein, Badge), nicht als Textzeile.</li>
+<li>Auf Android ersetzt eine frei lizenzierte Schrift die Systemschrift – Größen und Gewichte dieser Skala bleiben gleich.</li>
+</ul>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: 0, seg: 0, chips: { Plants: true, Lights: true, Speakers: true, Glow: false }, on: true, bri: 80,
+    todos: [{ title: 'Call plumber', time: '09:30', done: true }, { title: 'Team sync', time: '11:00', done: false }, { title: 'Gym — leg day', time: '18:30', done: false }] };
+  slider(set) {
+    const val = e => { const b = e.currentTarget.getBoundingClientRect(); return Math.round(Math.min(100, Math.max(1, (e.clientX - b.left) / b.width * 100))); };
+    return { down: e => { e.currentTarget.setPointerCapture(e.pointerId); this.drag = true; set(val(e)); }, move: e => { if (this.drag) set(val(e)); }, up: () => { this.drag = false; } };
+  }
+  renderVals() {
+    const s = this.state;
+    return {
+      tabs: ['Plan', 'Lights', 'Music', 'Plants', 'Calendar'].map((n, i) => ({ name: n, color: i === s.tab ? '#fff' : 'rgba(235,235,245,.7)', go: () => this.setState({ tab: i }) })),
+      tabX: (4 + s.tab * 76) + 'px',
+      segs: ['Month', 'Week'].map((n, i) => ({ name: n, bg: i === s.seg ? '#636366' : 'transparent', pick: () => this.setState({ seg: i }) })),
+      chips: Object.keys(s.chips).map(k => ({ name: k, bg: s.chips[k] ? 'rgba(10,132,255,.22)' : '#2C2C2E', color: s.chips[k] ? '#409CFF' : 'rgba(235,235,245,.6)', toggle: () => this.setState(st => ({ chips: { ...st.chips, [k]: !st.chips[k] } })) })),
+      toggleLight: () => this.setState(st => ({ on: !st.on })),
+      lampBg: s.on ? '#FFB340' : '#3A3A3C', lampFg: s.on ? '#1C1C1E' : 'rgba(235,235,245,.6)', lampGlow: s.on ? '0 0 18px #FFB34088' : 'none', lampStatus: s.on ? 'On · ' + s.bri + '%' : 'Off',
+      bri: this.slider(v => this.setState({ bri: v, on: true })), briPct: (s.on ? s.bri : 0) + '%', briLabel: s.on ? s.bri + '%' : 'Off', briText: s.on && s.bri > 20 ? '#1C1C1E' : '#fff',
+      todos: s.todos.map((t, i) => ({ ...t, ring: t.done ? 'none' : '2px solid rgba(235,235,245,.3)', fill: t.done ? '#0A84FF' : 'transparent', checkOp: t.done ? 1 : 0,
+        color: t.done ? 'rgba(235,235,245,.4)' : '#fff', deco: t.done ? 'line-through' : 'none',
+        toggle: () => this.setState(st => ({ todos: st.todos.map((x, j) => j === i ? { ...x, done: !x.done } : x) })) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

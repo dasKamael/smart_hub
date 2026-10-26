@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><script src="./doc-page.js"></script><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;color:#1C1C1E;-webkit-font-smoothing:antialiased}a{color:#0A64D8;text-decoration:none}a:hover{color:#0A84FF}doc-page:not(:defined){visibility:hidden}</style></helmet>
+<doc-page size="a4" margin="0.8in">
+<div style="font-size:15px;line-height:1.6">
+
+<div style="font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:#0A64D8;margin-bottom:6px">Smart Home Hub · Android-Tablet</div>
+<h1 style="font-size:34px;line-height:1.15;letter-spacing:-.6px;margin:0 0 12px">Roadmap</h1>
+<p style="margin:0 0 8px;color:#3A3A3C">Eine native Flutter-App für ein Android-Tablet an der Wand. Im Mittelpunkt steht der Grundriss der Wohnung: Lichter, Lautsprecher und Pflanzen werden dort platziert, angezeigt und direkt bedient. Heute vorhanden sind Philips Hue und Sonos. Weitere Lampen wie Govee sollen ohne Umbau dazukommen können.</p>
+<p style="margin:0 0 28px;color:#6E6E73;font-size:13px">Stand: Oktober 2026 · Grundlage: Widget Kit, Floor Plan Editor, UI Library</p>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 10px">1. Grundsatzentscheidungen</h2>
+<table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.5;margin:0 0 28px">
+<thead><tr>
+<th style="text-align:left;padding:8px 10px 8px 0;border-bottom:1px solid #1C1C1E;width:22%">Bereich</th>
+<th style="text-align:left;padding:8px 10px;border-bottom:1px solid #1C1C1E;width:30%">Entscheidung</th>
+<th style="text-align:left;padding:8px 0 8px 10px;border-bottom:1px solid #1C1C1E">Begründung</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">App</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Flutter, Android, Kiosk-Modus</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Native Performance für Animationen und Drag &amp; Drop im Plan. Günstige Hardware, später auch iPad möglich.</td></tr>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">Geräte-Anbindung</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Home Assistant als Brücke</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Hue, Govee und Sonos laufen über eine einzige Schnittstelle. Neue Marken brauchen keinen neuen App-Code.</td></tr>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">Lichter</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Hue zuerst, dann Govee</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Hue ist vorhanden und stabil. Govee prüft danach, ob die Geräte-Abstraktion wirklich markenunabhängig ist.</td></tr>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">Audio</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Sonos über Home Assistant</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Wiedergabe, Lautstärke und Gruppen pro Lautsprecher ohne eigene Sonos-Anbindung.</td></tr>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">Daten</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Lokal in der App (drift)</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Grundriss, Positionen und Pflanzen gehören der App. Gerätezustände kommen live aus Home Assistant.</td></tr>
+<tr><td style="padding:8px 10px 8px 0;border-bottom:1px solid #D2D2D7;vertical-align:top;font-weight:600">Zustand</td><td style="padding:8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top">Riverpod</td><td style="padding:8px 0 8px 10px;border-bottom:1px solid #D2D2D7;vertical-align:top;color:#3A3A3C">Live-Updates aus der WebSocket-Verbindung landen direkt in den Widgets.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 10px">2. Architektur</h2>
+<figure style="margin:0 0 10px">
+<div style="display:grid;grid-template-columns:1fr;gap:8px;font-size:14px">
+<div style="border:1px solid #1C1C1E;border-radius:10px;padding:10px 14px"><strong>Flutter-App auf dem Tablet</strong><br><span style="color:#3A3A3C">Grundriss · Detailleiste · Dashboard-Widgets · lokale Datenbank</span></div>
+<div style="text-align:center;color:#6E6E73;font-size:13px">WebSocket-Schnittstelle (Zustände live, Befehle)</div>
+<div style="border:1px solid #1C1C1E;border-radius:10px;padding:10px 14px"><strong>Home Assistant</strong> <span style="color:#6E6E73">(Raspberry Pi 5 oder Mini-PC im Heimnetz)</span><br><span style="color:#3A3A3C">einheitliche Geräte: light.*, media_player.*, calendar.*, weather.*, todo.*</span></div>
+<div style="text-align:center;color:#6E6E73;font-size:13px">Integrationen</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+<div style="border:1px solid #D2D2D7;border-radius:10px;padding:8px 10px"><strong>Hue Bridge</strong><br><span style="color:#6E6E73;font-size:13px">lokal</span></div>
+<div style="border:1px solid #D2D2D7;border-radius:10px;padding:8px 10px"><strong>Govee</strong><br><span style="color:#6E6E73;font-size:13px">lokal (LAN) oder Cloud</span></div>
+<div style="border:1px solid #D2D2D7;border-radius:10px;padding:8px 10px"><strong>Sonos</strong><br><span style="color:#6E6E73;font-size:13px">lokal</span></div>
+<div style="border:1px solid #D2D2D7;border-radius:10px;padding:8px 10px"><strong>Dienste</strong><br><span style="color:#6E6E73;font-size:13px">Kalender, Wetter, News</span></div>
+</div>
+</div>
+<figcaption style="font-size:13px;color:#6E6E73;margin-top:8px">Abb. 1 – Die App kennt keine Marken, nur Geräte-Typen und deren Fähigkeiten.</figcaption>
+</figure>
+
+<h3 style="font-size:17px;margin:22px 0 6px">Geräte-Abstraktion: Fähigkeiten statt Marken</h3>
+<p style="margin:0 0 10px">Jedes Gerät im Plan ist mit einer Home-Assistant-Entität verknüpft. Die Detailleiste zeigt nur die Regler, die das Gerät meldet. So bekommt eine Govee-Lampe ohne Farbtemperatur automatisch keinen Farbtemperatur-Regler.</p>
+<table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.5;margin:0 0 28px">
+<thead><tr>
+<th style="text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid #1C1C1E">Fähigkeit</th>
+<th style="text-align:left;padding:7px 10px;border-bottom:1px solid #1C1C1E">Hue</th>
+<th style="text-align:left;padding:7px 10px;border-bottom:1px solid #1C1C1E">Govee</th>
+<th style="text-align:left;padding:7px 0 7px 10px;border-bottom:1px solid #1C1C1E">In der App</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7">An / Aus</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">ja</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">ja</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Tipp auf Marker oder Icon</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7">Helligkeit</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">ja</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">ja</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Schieberegler, steuert den Schein im Plan</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7">Farbe</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">je nach Lampe</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">je nach Modell</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Farbfelder, nur wenn unterstützt</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7">Farbtemperatur</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">je nach Lampe</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">je nach Modell</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Warm–kalt-Regler</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7">Szenen / Effekte</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">Hue-Szenen</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">eingeschränkt</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">eigene App-Szenen pro Raum, markenübergreifend</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 4px;break-before:page">3. Phasen</h2>
+<p style="margin:0 0 16px;color:#3A3A3C">Aufwand grob: S = wenige Abende, M = ein bis zwei Wochenenden, L = mehrere Wochen nebenbei.</p>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 0 · Fundament</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand S</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Home Assistant installieren, Hue Bridge und Sonos einbinden, Zugangs-Token für die App anlegen.</li>
+<li>Flutter-Projekt mit Tabs, Dunkel-Design aus dem Prototyp (Farben, Radien, Schrift) und Vollbild.</li>
+<li>WebSocket-Client mit automatischer Wiederverbindung und Offline-Anzeige.</li>
+<li>Kiosk-Betrieb: Lock-Task-Modus, Bildschirm bleibt an (wakelock_plus), Autostart.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">die App im Vollbild startet und alle Hue- und Sonos-Entitäten als Liste anzeigt.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 1 · Grundriss mit Testdaten</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand L</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Räume, Wände, Türen und offene Durchgänge aus dem JSON-Export des Floor Plan Editors (Einheit cm), gezeichnet mit CustomPainter.</li>
+<li>Marker für Licht, Lautsprecher und Pflanze; Ziehen und Ablegen, Raum-Erkennung über Path.contains.</li>
+<li>Gruppieren durch Ablegen auf einem anderen Gerät, Auffächern im Kreis, Bereich „Nicht platziert“.</li>
+<li>Animationen: Federn beim Bewegen, Abheben beim Ziehen, Einrasten in Gruppen.</li>
+<li>Positionen dauerhaft speichern.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">der Plan sich mit Testgeräten genauso bedienen lässt wie im Prototyp und Positionen einen Neustart überleben.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 2 · Hue-Lichter live</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand M</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Marker mit echten light-Entitäten verknüpfen; Zustand live über state_changed.</li>
+<li>Detailleiste: An/Aus, Helligkeit, Farbe – nur Regler, die das Gerät meldet.</li>
+<li>Lichtschein im Plan nach Farbe und Helligkeit, auf den Raum begrenzt.</li>
+<li>Raum-Aktion „Alle Lichter an/aus“.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">eine Änderung in der Hue-App innerhalb einer Sekunde im Plan sichtbar ist und umgekehrt.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 3 · Govee und weitere Lampen</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand S</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Govee in Home Assistant einbinden, bevorzugt lokal über LAN.</li>
+<li>Geräte-Auswahl beim Platzieren: alle light-Entitäten, gefiltert nach Raum oder Name.</li>
+<li>Markenübergreifende App-Szenen pro Raum (z. B. „Abend“ setzt Hue und Govee gemeinsam).</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">eine neue Lampe ohne Code-Änderung im Plan erscheint und bedienbar ist.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 4 · Pflanzen</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand M</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Pflanzen mit Name, Foto und Gießrhythmus in der lokalen Datenbank.</li>
+<li>Fällig und überfällig im Plan markieren; Gießen per Tipp, rückgängig machen möglich.</li>
+<li>Wochenansicht und Gießplan als eigener Tab.</li>
+<li>Optional: Bodenfeuchte-Sensoren (Zigbee) über Home Assistant statt fester Intervalle.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">alle echten Pflanzen platziert sind und die Fälligkeiten stimmen.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 5 · Sonos</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand M</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Lautsprecher mit media_player-Entitäten verknüpfen; Wiedergabe-Status am Marker.</li>
+<li>Detailleiste: aktueller Titel, Play/Pause, Lautstärke, Gruppe beitreten oder verlassen.</li>
+<li>Spotify über Sonos (Spotify Connect) und die Spotify-Integration von Home Assistant; Playlists und Bibliothek optional direkt über die Web API. Setzt Spotify Premium voraus.</li>
+<li>Kompakter Player im Dashboard, voller Player im Musik-Tab.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">Gruppen und Lautstärke pro Raum zuverlässig aus dem Plan steuerbar sind.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 22px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 6 · Dashboard-Widgets</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand M</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Kalender (Woche mit Zeitraster, Monat, Tagesdetail), To-dos, Wetter.</li>
+<li>News über RSS, Streaming-Buttons als Direktlinks in die jeweilige App.</li>
+<li>Widget-Größen S bis XL wie im Widget Kit.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">das Dashboard den Prototyp mit echten Daten abbildet.</span></p>
+</div>
+
+<div style="break-inside:avoid;margin:0 0 28px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #1C1C1E;padding-bottom:4px;margin-bottom:8px"><h3 style="font-size:17px;margin:0">Phase 7 · Grundriss-Editor und Ausbau</h3><span style="font-size:13px;font-weight:600;color:#6E6E73">Aufwand L</span></div>
+<ul style="margin:0 0 6px;padding-left:20px">
+<li>Floor Plan Editor in die App übernehmen (Design liegt vor): Räume, Rechtecke, Türen und Durchgänge zeichnen, Skizze als Unterlage, Einrasten am 10-cm-Raster.</li>
+<li>Weitere Geräte-Typen: Sensoren (Temperatur, Fenster), Steckdosen, Rollläden.</li>
+<li>Bewegungsmelder weckt das Display, Nachtmodus mit gedimmter Oberfläche.</li>
+</ul>
+<p style="margin:0;font-size:14px"><strong>Fertig, wenn:</strong> <span style="color:#3A3A3C">ein Umzug oder eine neue Wohnung ohne Code-Änderung abbildbar ist.</span></p>
+</div>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 10px">4. Meilensteine</h2>
+<table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.5;margin:0 0 28px">
+<thead><tr>
+<th style="text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid #1C1C1E;width:12%">#</th>
+<th style="text-align:left;padding:7px 10px;border-bottom:1px solid #1C1C1E;width:22%">Nach</th>
+<th style="text-align:left;padding:7px 0 7px 10px;border-bottom:1px solid #1C1C1E">Ergebnis</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7;font-weight:600">M1</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">Phase 1</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Der Plan läuft auf dem Tablet und fühlt sich fertig an – noch mit Testdaten.</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7;font-weight:600">M2</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">Phase 3</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Alle Lichter, Hue und Govee, live im Plan bedienbar. Ab hier täglich nutzbar.</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7;font-weight:600">M3</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">Phase 5</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Der Plan ist komplett: Lichter, Pflanzen und Sonos.</td></tr>
+<tr><td style="padding:7px 10px 7px 0;border-bottom:1px solid #D2D2D7;font-weight:600">M4</td><td style="padding:7px 10px;border-bottom:1px solid #D2D2D7">Phase 6</td><td style="padding:7px 0 7px 10px;border-bottom:1px solid #D2D2D7;color:#3A3A3C">Vollständiger Hub mit Dashboard.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 10px">5. Risiken und offene Punkte</h2>
+<ul style="margin:0 0 28px;padding-left:20px">
+<li><strong>Govee lokal:</strong> Die LAN-Steuerung muss pro Gerät in der Govee-App eingeschaltet werden, und nicht jedes Modell unterstützt sie. Vor dem Kauf neuer Lampen prüfen; sonst bleibt nur die langsamere Cloud-Anbindung.</li>
+<li><strong>Home Assistant als Abhängigkeit:</strong> Fällt der Server aus, ist der Plan nur lesbar. Die App zeigt das deutlich an und puffert den letzten Zustand.</li>
+<li><strong>Sonos-Gruppen:</strong> Gruppenwechsel brauchen einen Moment, bis alle Lautsprecher den neuen Zustand melden. Die Oberfläche sollte optimistisch reagieren und bei Fehlern zurückspringen.</li>
+<li><strong>Tablet-Akku im Dauerbetrieb:</strong> Laden über eine smarte Steckdose, die Home Assistant zwischen etwa 20 und 80 % schaltet.</li>
+<li><strong>Spotify-Entwicklerregeln:</strong> Seit 2026 brauchen Apps im Entwicklermodus ein Premium-Konto des Besitzers und sind auf 5 Nutzer begrenzt. Für einen Haushalt reicht das.</li>
+<li><strong>Datensicherung:</strong> Grundriss, Positionen und Pflanzen regelmäßig als JSON exportieren.</li>
+</ul>
+
+<h2 style="font-size:21px;letter-spacing:-.3px;margin:0 0 10px">6. Benötigte Hardware</h2>
+<ul style="margin:0;padding-left:20px">
+<li>Android-Tablet, 10–11 Zoll, mindestens 4 GB RAM, aktuelles Android</li>
+<li>Server für Home Assistant: Raspberry Pi 5 oder gebrauchter Mini-PC</li>
+<li>Smarte Steckdose für das Laden des Tablets</li>
+<li>Flache Wandhalterung und verdeckte Kabelführung</li>
+</ul>
+
+</div>
+</doc-page>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><script src="./image-slot.js"></script><style>body{margin:0;background:#cfcbc4;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}a{color:#0A84FF;text-decoration:none}a:hover{color:#409CFF}button{font-family:inherit}input{font-family:inherit}::-webkit-scrollbar{width:0;height:0}</style></helmet>
+<div style="min-height:100vh;display:flex;padding:32px;box-sizing:border-box">
+<div style="margin:auto;width:1194px;height:834px;flex:none;border-radius:44px;border:14px solid #111;box-shadow:0 30px 80px rgba(0,0,0,.3);overflow:hidden;position:relative;background:#000;color:#fff">
+<div style="position:absolute;inset:-80px;filter:blur(40px);opacity:.2;background:radial-gradient(38% 42% at 14% 18%,#e0794c 0%,transparent 70%),radial-gradient(36% 40% at 88% 12%,#3d72c2 0%,transparent 70%),radial-gradient(42% 44% at 52% 98%,#2a9384 0%,transparent 70%)"></div>
+<div style="position:relative;height:100%;box-sizing:border-box;padding:20px;display:flex;gap:16px">
+
+<section ref="{{ boxRef }}" style="position:relative;flex:1;min-width:0;border-radius:26px;background:#1C1C1E;overflow:hidden;user-select:none;-webkit-user-select:none">
+<div style="position:absolute;left:{{ sk.left }};top:{{ sk.top }};width:{{ sk.size }};height:{{ sk.size }};transform:rotate({{ sk.rot }});opacity:{{ sk.op }};pointer-events:{{ sk.pe }};z-index:{{ sk.z }};visibility:{{ sk.vis }};transition:transform .35s cubic-bezier(.3,1.25,.5,1)"><image-slot id="floorplan-sketch" fit="contain" placeholder="Drop a photo of your sketch" style="width:100%;height:100%"></image-slot></div>
+{{ canvas }}
+<div style="position:absolute;left:14px;bottom:14px;display:flex;gap:4px;padding:4px;border-radius:22px;background:rgba(44,44,46,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:5">
+<button onClick="{{ zoomOut }}" style="width:36px;height:36px;border:none;border-radius:18px;background:transparent;color:#fff;font-size:20px;cursor:pointer" style-hover="background:#3A3A3C">−</button>
+<button onClick="{{ zoomFit }}" style="height:36px;border:none;border-radius:18px;padding:0 12px;background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#3A3A3C">Fit</button>
+<button onClick="{{ zoomIn }}" style="width:36px;height:36px;border:none;border-radius:18px;background:transparent;color:#fff;font-size:20px;cursor:pointer" style-hover="background:#3A3A3C">+</button>
+</div>
+<div style="position:absolute;right:16px;bottom:18px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;z-index:5;pointer-events:none"><div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">1 m</div><div style="width:{{ meterPx }};height:6px;border:2px solid rgba(235,235,245,.6);border-top:none;box-sizing:border-box"></div></div>
+<div style="position:absolute;left:16px;top:14px;z-index:5;pointer-events:none;padding:6px 12px;border-radius:12px;background:rgba(44,44,46,.85);font-size:13px;font-weight:600;color:rgba(235,235,245,.8)">{{ hint }}</div>
+</section>
+
+<aside style="width:300px;flex:none;display:flex;flex-direction:column;gap:12px;min-height:0">
+<section style="border-radius:26px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column"><div style="font-size:22px;font-weight:700;letter-spacing:-.4px">Floor plan editor</div><div style="font-size:13px;color:rgba(235,235,245,.6)">Saved automatically on this device</div></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+<sc-for list="{{ tools }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.pick }}" style="height:58px;border:none;border-radius:14px;background:{{ t.bg }};color:{{ t.fg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:background .2s;font-size:12px;font-weight:600"><span style="font-size:17px;line-height:1">{{ t.glyph }}</span>{{ t.name }}</button></sc-for>
+</div>
+</section>
+
+<sc-if value="{{ hasSelRoom }}" hint-placeholder-val="{{ false }}"><section style="border-radius:26px;background:#1C1C1E;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Room</div>
+<input value="{{ selName }}" onChange="{{ onName }}" style="height:42px;border:none;border-radius:12px;background:#2C2C2E;color:#fff;font-size:17px;font-weight:600;padding:0 12px;outline:none"></input>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:15px;color:rgba(235,235,245,.6)">{{ selInfo }}</div><button onClick="{{ delSel }}" style="height:34px;border:none;border-radius:17px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer">Delete</button></div>
+</section></sc-if>
+
+<sc-if value="{{ hasSelDoor }}" hint-placeholder-val="{{ false }}"><section style="border-radius:26px;background:#1C1C1E;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Width in cm</div>
+<div style="display:flex;gap:3px;padding:3px;border-radius:13px;background:#2C2C2E"><sc-for list="{{ doorWidths }}" as="w" hint-placeholder-count="4"><button onClick="{{ w.pick }}" style="flex:1;height:30px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:{{ w.bg }};color:#fff">{{ w.name }}</button></sc-for></div>
+<div style="display:flex;gap:3px;padding:3px;border-radius:13px;background:#2C2C2E"><sc-for list="{{ doorKinds }}" as="k" hint-placeholder-count="2"><button onClick="{{ k.pick }}" style="flex:1;height:30px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:{{ k.bg }};color:#fff">{{ k.name }}</button></sc-for></div>
+<div style="display:flex;justify-content:flex-end"><button onClick="{{ delSel }}" style="height:34px;border:none;border-radius:17px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer">Delete</button></div>
+</section></sc-if>
+
+<section style="flex:1;min-height:0;border-radius:26px;background:#1C1C1E;padding:16px 10px 12px;display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 8px"><div style="font-size:17px;font-weight:700">Rooms</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ totalArea }}</div></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ roomList }}" as="r" hint-placeholder-count="6"><div onClick="{{ r.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;padding:0 10px;border-radius:12px;background:{{ r.bg }};cursor:pointer" style-hover="background:#2C2C2E"><div style="font-size:15px;font-weight:600;color:{{ r.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-size:14px;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums;flex:none">{{ r.area }}</div></div></sc-for>
+</div>
+</section>
+
+<section style="border-radius:26px;background:#1C1C1E;padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:15px;font-weight:700">Sketch underlay</div><button onClick="{{ rotateSketch }}" style="height:30px;border:none;border-radius:15px;padding:0 12px;font-size:13px;font-weight:600;background:#2C2C2E;color:#fff;cursor:pointer">Rotate 90°</button></div>
+<div onPointerDown="{{ opSlider.down }}" onPointerMove="{{ opSlider.move }}" onPointerUp="{{ opSlider.up }}" style="height:34px;border-radius:10px;background:#3A3A3C;position:relative;overflow:hidden;cursor:pointer;touch-action:none"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ skPct }};background:#fff"></div><div style="position:absolute;left:12px;top:0;bottom:0;display:flex;align-items:center;font-size:13px;font-weight:700;color:{{ skText }};pointer-events:none">Opacity {{ skPct }}</div></div>
+</section>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:6px">
+<button onClick="{{ undo }}" style="height:44px;border:none;border-radius:22px;background:#1C1C1E;color:{{ undoColor }};font-size:14px;font-weight:600;cursor:pointer">Undo</button>
+<button onClick="{{ redo }}" style="height:44px;border:none;border-radius:22px;background:#1C1C1E;color:{{ redoColor }};font-size:14px;font-weight:600;cursor:pointer">Redo</button>
+<button onClick="{{ openJson }}" style="height:44px;border:none;border-radius:22px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Export JSON</button>
+</div>
+</aside>
+
+<sc-if value="{{ showJson }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeJson }}" style="position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center">
+<div onClick="{{ stop }}" style="width:620px;max-height:640px;border-radius:26px;background:#1C1C1E;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px rgba(0,0,0,.5)">
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;flex-direction:column"><div style="font-size:20px;font-weight:700">Floor plan JSON</div><div style="font-size:13px;color:rgba(235,235,245,.6)">Units in cm · for the Flutter app</div></div><div style="display:flex;gap:8px"><button onClick="{{ copyJson }}" style="height:36px;border:none;border-radius:18px;padding:0 16px;font-size:14px;font-weight:600;background:#0A84FF;color:#fff;cursor:pointer">{{ copyLabel }}</button><button onClick="{{ closeJson }}" style="height:36px;border:none;border-radius:18px;padding:0 16px;font-size:14px;font-weight:600;background:#2C2C2E;color:#fff;cursor:pointer">Close</button></div></div>
+<pre style="margin:0;flex:1;min-height:0;overflow:auto;border-radius:14px;background:#000;padding:14px;font:12px/1.5 ui-monospace,'SF Mono',Menlo,monospace;color:rgba(235,235,245,.85);white-space:pre-wrap">{{ json }}</pre>
+</div>
+</div></sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1290,&quot;height&quot;:930}}">
+const KEY = 'hub.floorplan.v7';
+const DEF_ROOMS = [["office","Office",[[0,0],[450,0],[450,270],[280,270],[240,150],[0,150]]],["storage","Storage",[[280,270],[370,270],[370,365],[280,365]]],["storage2","Storage 2",[[370,270],[450,270],[450,365],[370,365]]],["hall","Hall",[[0,150],[240,150],[280,270],[280,365],[450,365],[450,450],[190,450],[190,270],[190,245],[0,245]]],["kitchen","Kitchen",[[450,0],[715,0],[715,365],[825,365],[825,450],[450,450]]],["wc","WC",[[715,0],[825,0],[825,365],[715,365]]],["sleep","Sleep",[[825,0],[1030,0],[1030,450],[825,450]]]].map(([id, name, pts, kind]) => ({ id, name, kind: kind || 'room', pts }));
+const DEF_DOORS = [[[0,160],[0,240],"door"],[[90,150],[170,150],"door"],[[285,365],[365,365],"open"],[[375,365],[445,365],"open"],[[450,370],[450,445],"open"],[[745,365],[795,365],"door"],[[825,370],[825,445],"open"]].map(([a, b, kind], i) => ({ id: 'd' + i, a, b, kind }));
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const areaOf = pts => Math.abs(pts.reduce((s, p, i) => { const q = pts[(i + 1) % pts.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+const centroid = pts => { let a = 0, cx = 0, cy = 0; pts.forEach((p, i) => { const q = pts[(i + 1) % pts.length], f = p[0] * q[1] - q[0] * p[1]; a += f; cx += (p[0] + q[0]) * f; cy += (p[1] + q[1]) * f; }); a /= 2; return Math.abs(a) < 1 ? pts[0] : [cx / (6 * a), cy / (6 * a)]; };
+const m2 = a => (a / 10000).toFixed(1).replace('.', ',') + ' m²';
+const mtr = l => (l / 100).toFixed(2).replace('.', ',') + ' m';
+
+class Component extends DCLogic {
+  boxRef = React.createRef(); svgRef = React.createRef();
+  state = (() => {
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    return { rooms: saved?.rooms || DEF_ROOMS, doors: saved?.doors || DEF_DOORS, tool: 'select', sel: null, draft: [], cursor: null, guides: [], rect: null,
+      vb: { x: -100, y: -200, w: 1400, h: 880 }, box: { w: 810, h: 766 }, skOp: saved?.skOp ?? .4, skRot: saved?.skRot ?? 90, past: [], future: [], showJson: false, copied: false, closeHot: false, skHas: false };
+  })();
+  componentDidMount() {
+    const measure = () => { const el = this.boxRef.current; if (!el) return; const r = el.getBoundingClientRect(); if (r.width && r.height) this.setState(s => ({ box: { w: r.width, h: r.height }, vb: this.fitVb(r.width, r.height) })); };
+    measure();
+    this.ro = new ResizeObserver(() => { cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(() => { const el = this.boxRef.current; if (!el) return; const r = el.getBoundingClientRect(); if (!r.width || !r.height) return;
+      const b = this.state.box; if (Math.abs(b.w - r.width) < 1 && Math.abs(b.h - r.height) < 1) return;
+      this.setState(s => ({ box: { w: r.width, h: r.height }, vb: { ...s.vb, h: s.vb.w * r.height / r.width } })); }); });
+    this.checkSketch();
+    const slot = document.getElementById('floorplan-sketch');
+    if (slot) { this.mo = new MutationObserver(() => this.checkSketch()); this.mo.observe(slot, { attributes: true, attributeFilter: ['data-filled'] }); }
+    if (this.boxRef.current) this.ro.observe(this.boxRef.current);
+    this.onKey = e => this.key(e); window.addEventListener('keydown', this.onKey);
+  }
+  checkSketch() { const slot = document.getElementById('floorplan-sketch'), has = !!(slot && slot.hasAttribute('data-filled')); if (has !== this.state.skHas) this.setState({ skHas: has }); }
+  componentWillUnmount() { this.mo && this.mo.disconnect(); cancelAnimationFrame(this.raf); this.ro && this.ro.disconnect(); window.removeEventListener('keydown', this.onKey); }
+  componentDidUpdate(_, ps) { const s = this.state; if (ps.rooms !== s.rooms || ps.doors !== s.doors || ps.skOp !== s.skOp || ps.skRot !== s.skRot) { try { localStorage.setItem(KEY, JSON.stringify({ rooms: s.rooms, doors: s.doors, skOp: s.skOp, skRot: s.skRot })); } catch (e) {} } }
+  fitVb(w, h) { const all = this.state.rooms.flatMap(r => r.pts); if (!all.length) return { x: -100, y: -200, w: 1400, h: 1400 * h / w };
+    const xs = all.map(p => p[0]), ys = all.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const pad = 120, bw = x1 - x0 + pad * 2, bh = y1 - y0 + pad * 2, vw = Math.max(bw, bh * w / h), vh = vw * h / w;
+    return { x: (x0 + x1) / 2 - vw / 2, y: (y0 + y1) / 2 - vh / 2, w: vw, h: vh }; }
+  ppc() { return this.state.box.w / this.state.vb.w; }
+  world(e) { const s = this.state, b = this.boxRef.current.getBoundingClientRect(); return [s.vb.x + (e.clientX - b.left) / b.width * s.vb.w, s.vb.y + (e.clientY - b.top) / b.height * s.vb.h]; }
+  snap(p, skip) {
+    const s = this.state, r = 14 / this.ppc();
+    const verts = []; s.rooms.forEach(rm => rm.pts.forEach((v, i) => { if (!(skip && skip.rid === rm.id && skip.i === i)) verts.push(v); })); s.draft.forEach(v => verts.push(v));
+    let best = null, bd = r; verts.forEach(v => { const d = dist(v, p); if (d < bd) { bd = d; best = v; } });
+    if (best) return { pt: [best[0], best[1]], guides: [] };
+    let x = Math.round(p[0] / 10) * 10, y = Math.round(p[1] / 10) * 10, bx = r, by = r, gx = null, gy = null;
+    verts.forEach(v => { const dx = Math.abs(v[0] - p[0]), dy = Math.abs(v[1] - p[1]); if (dx < bx) { bx = dx; x = v[0]; gx = v[0]; } if (dy < by) { by = dy; y = v[1]; gy = v[1]; } });
+    return { pt: [x, y], guides: [...(gx != null ? [{ v: true, at: gx }] : []), ...(gy != null ? [{ v: false, at: gy }] : [])] };
+  }
+  snapshot() { const s = this.state; return { rooms: s.rooms, doors: s.doors }; }
+  commit(patch) { this.setState(s => ({ past: [...s.past.slice(-49), { rooms: s.rooms, doors: s.doors }], future: [], ...patch })); }
+  undo() { this.setState(s => s.past.length ? { past: s.past.slice(0, -1), future: [{ rooms: s.rooms, doors: s.doors }, ...s.future], ...s.past[s.past.length - 1], sel: null } : null); }
+  redo() { this.setState(s => s.future.length ? { future: s.future.slice(1), past: [...s.past, { rooms: s.rooms, doors: s.doors }], ...s.future[0], sel: null } : null); }
+  setRoomPts(id, pts) { this.setState(s => ({ rooms: s.rooms.map(r => r.id === id ? { ...r, pts } : r) })); }
+  closeDraft() { const s = this.state; if (s.draft.length < 3) return; const id = 'r' + Date.now(); this.commit({ rooms: [...s.rooms, { id, name: 'Room ' + (s.rooms.length + 1), pts: s.draft }], draft: [], sel: { type: 'room', id }, tool: 'select', guides: [] }); }
+  delSel() { const s = this.state; if (!s.sel) return; if (s.sel.type === 'room') this.commit({ rooms: s.rooms.filter(r => r.id !== s.sel.id), sel: null }); else this.commit({ doors: s.doors.filter(d => d.id !== s.sel.id), sel: null }); }
+  key(e) {
+    const s = this.state; if (e.target && e.target.tagName === 'INPUT') return;
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? this.redo() : this.undo(); return; }
+    if (e.key === 'Escape') this.setState({ draft: [], sel: null, rect: null, guides: [] });
+    if (e.key === 'Enter') this.closeDraft();
+    if (e.key === 'Backspace' || e.key === 'Delete') { if (s.draft.length) this.setState({ draft: s.draft.slice(0, -1) }); else this.delSel(); }
+  }
+  nearestEdge(p) {
+    let best = null, bd = 24 / this.ppc();
+    this.state.rooms.forEach(r => r.pts.forEach((a, i) => { const b = r.pts[(i + 1) % r.pts.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy); if (!L) return;
+      const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (L * L))), q = [a[0] + dx * t, a[1] + dy * t], d = dist(p, q);
+      if (d < bd) { bd = d; best = { a, b, q, L, ux: dx / L, uy: dy / L }; } }));
+    return best;
+  }
+  down(e) {
+    const s = this.state, p = this.world(e), hEl = e.target.closest && e.target.closest('[data-h]'), h = hEl ? hEl.getAttribute('data-h') : '';
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (s.tool === 'select') {
+      if (h.startsWith('v:') || h.startsWith('m:')) {
+        const [, rid, si] = h.split(':'), i = +si, rm = s.rooms.find(r => r.id === rid);
+        this.op = { type: 'vertex', rid, i: h.startsWith('m:') ? i + 1 : i, snap: this.snapshot(), moved: false };
+        if (h.startsWith('m:')) { const pts = [...rm.pts]; pts.splice(i + 1, 0, this.snap(p).pt); this.commit({}); this.setRoomPts(rid, pts); this.op.moved = true; }
+      } else if (h.startsWith('r:')) { const rid = h.slice(2), rm = s.rooms.find(r => r.id === rid); this.setState({ sel: { type: 'room', id: rid } }); this.op = { type: 'move', rid, start: p, orig: rm.pts, snap: this.snapshot(), moved: false }; }
+      else if (h.startsWith('d:')) this.setState({ sel: { type: 'door', id: h.slice(2) } });
+      else { this.setState({ sel: null }); this.op = { type: 'pan', sx: e.clientX, sy: e.clientY, vb0: s.vb }; }
+    } else if (s.tool === 'room') {
+      const sp = this.snap(p).pt;
+      if (s.draft.length >= 3 && dist(sp, s.draft[0]) < 16 / this.ppc()) this.closeDraft();
+      else this.setState({ draft: [...s.draft, sp] });
+    } else if (s.tool === 'rect') { this.op = { type: 'rect', start: this.snap(p).pt }; }
+    else if (s.tool === 'door') {
+      const ed = this.nearestEdge(p); if (!ed) return;
+      const w = 80, rnd = v => Math.round(v / 5) * 5, a = [rnd(ed.q[0] - ed.ux * w / 2), rnd(ed.q[1] - ed.uy * w / 2)], b = [rnd(ed.q[0] + ed.ux * w / 2), rnd(ed.q[1] + ed.uy * w / 2)];
+      const id = 'd' + Date.now(); this.commit({ doors: [...s.doors, { id, a, b }], sel: { type: 'door', id }, tool: 'select' });
+    }
+  }
+  move(e) {
+    const s = this.state, p = this.world(e), op = this.op;
+    if (!op) { if (s.tool === 'room' || s.tool === 'rect') { const sn = this.snap(p); this.setState({ cursor: sn.pt, guides: sn.guides, closeHot: s.draft.length >= 3 && dist(sn.pt, s.draft[0]) < 16 / this.ppc() }); }
+      else if (s.tool === 'door') this.setState({ doorHover: this.nearestEdge(p) }); return; }
+    if (op.type === 'pan') { const k = s.vb.w / s.box.w; this.setState({ vb: { ...op.vb0, x: op.vb0.x - (e.clientX - op.sx) * k, y: op.vb0.y - (e.clientY - op.sy) * k } }); return; }
+    if (op.type === 'vertex') { if (!op.moved) { op.moved = true; this.setState(st => ({ past: [...st.past.slice(-49), op.snap], future: [] })); }
+      const sn = this.snap(p, { rid: op.rid, i: op.i }), rm = s.rooms.find(r => r.id === op.rid), pts = rm.pts.map((v, j) => j === op.i ? sn.pt : v); this.setRoomPts(op.rid, pts); this.setState({ guides: sn.guides }); }
+    if (op.type === 'move') { const dx = Math.round((p[0] - op.start[0]) / 10) * 10, dy = Math.round((p[1] - op.start[1]) / 10) * 10; if (!dx && !dy && !op.moved) return;
+      if (!op.moved) { op.moved = true; this.setState(st => ({ past: [...st.past.slice(-49), op.snap], future: [] })); }
+      this.setRoomPts(op.rid, op.orig.map(v => [v[0] + dx, v[1] + dy])); }
+    if (op.type === 'rect') { const sn = this.snap(p); this.setState({ rect: [op.start, sn.pt], guides: sn.guides }); }
+  }
+  up() {
+    const s = this.state, op = this.op; this.op = null;
+    if (op && op.type === 'rect' && s.rect) { const [[x0, y0], [x1, y1]] = s.rect, a = Math.min(x0, x1), b = Math.min(y0, y1), c = Math.max(x0, x1), d = Math.max(y0, y1);
+      if (c - a >= 50 && d - b >= 50) { const id = 'r' + Date.now(); this.commit({ rooms: [...s.rooms, { id, name: 'Room ' + (s.rooms.length + 1), pts: [[a, b], [c, b], [c, d], [a, d]] }], sel: { type: 'room', id }, tool: 'select' }); }
+      this.setState({ rect: null, guides: [] }); return; }
+    if (op && op.type === 'vertex') this.setState({ guides: [] });
+  }
+  dbl(e) { const hEl = e.target.closest && e.target.closest('[data-h]'), h = hEl ? hEl.getAttribute('data-h') : ''; if (!h.startsWith('v:')) return;
+    const [, rid, si] = h.split(':'), rm = this.state.rooms.find(r => r.id === rid); if (rm.pts.length <= 3) return; this.commit({ rooms: this.state.rooms.map(r => r.id === rid ? { ...r, pts: r.pts.filter((_, j) => j !== +si) } : r) }); }
+  zoom(f, at) { this.setState(s => { const c = at || [s.vb.x + s.vb.w / 2, s.vb.y + s.vb.h / 2], w = Math.min(4000, Math.max(300, s.vb.w * f)), k = w / s.vb.w;
+    return { vb: { x: c[0] - (c[0] - s.vb.x) * k, y: c[1] - (c[1] - s.vb.y) * k, w, h: s.vb.h * k } }; }); }
+  canvas() {
+    const h = React.createElement, s = this.state, ppc = this.ppc(), px = n => n / ppc, NS = 'non-scaling-stroke';
+    const skOn = s.skHas && s.skOp > 0.02, floor = skOn ? 'rgba(38,38,40,.55)' : '#262628', kids = [];
+    kids.push(h('defs', { key: 'defs' },
+      h('pattern', { id: 'g50', width: 50, height: 50, patternUnits: 'userSpaceOnUse' }, h('path', { d: 'M 50 0 L 0 0 0 50', fill: 'none', stroke: 'rgba(255,255,255,.045)', strokeWidth: 1, vectorEffect: NS })),
+      h('pattern', { id: 'g100', width: 100, height: 100, patternUnits: 'userSpaceOnUse' }, h('path', { d: 'M 100 0 L 0 0 0 100', fill: 'none', stroke: 'rgba(255,255,255,.09)', strokeWidth: 1, vectorEffect: NS }))));
+    kids.push(h('rect', { key: 'g1', x: s.vb.x - 200, y: s.vb.y - 200, width: s.vb.w + 400, height: s.vb.h + 400, fill: 'url(#g50)' }), h('rect', { key: 'g2', x: s.vb.x - 200, y: s.vb.y - 200, width: s.vb.w + 400, height: s.vb.h + 400, fill: 'url(#g100)' }));
+    const selRoom = s.sel && s.sel.type === 'room' ? s.sel.id : null;
+    s.rooms.forEach(r => { const sel = r.id === selRoom;
+      kids.push(h('polygon', { key: 'p' + r.id, 'data-h': 'r:' + r.id, points: r.pts.map(p => p.join(',')).join(' '), fill: r.kind === 'wall' ? (sel ? '#5A6A80' : '#48484A') : sel ? 'rgba(10,132,255,.16)' : floor, stroke: sel ? '#0A84FF' : '#636366', strokeWidth: sel ? 3 : 2.5, strokeLinejoin: 'round', vectorEffect: NS, style: { cursor: s.tool === 'select' ? 'move' : 'inherit', transition: 'fill .2s' } })); });
+    s.doors.forEach(d => { const sel = s.sel && s.sel.type === 'door' && s.sel.id === d.id, L = dist(d.a, d.b) || 1, nx = -(d.b[1] - d.a[1]) / L, ny = (d.b[0] - d.a[0]) / L, tip = [d.a[0] + nx * L, d.a[1] + ny * L], col = sel ? '#0A84FF' : 'rgba(235,235,245,.45)';
+      kids.push(h('g', { key: 'd' + d.id },
+        h('line', { x1: d.a[0], y1: d.a[1], x2: d.b[0], y2: d.b[1], stroke: floor === '#262628' ? '#262628' : '#1C1C1E', strokeWidth: 6, vectorEffect: NS }),
+        d.kind === 'open' ? null : h('line', { x1: d.a[0], y1: d.a[1], x2: tip[0], y2: tip[1], stroke: col, strokeWidth: 1.5, vectorEffect: NS }),
+        d.kind === 'open' ? (sel ? h('line', { x1: d.a[0], y1: d.a[1], x2: d.b[0], y2: d.b[1], stroke: '#0A84FF', strokeWidth: 2, strokeDasharray: '4 4', vectorEffect: NS }) : null) : h('path', { d: `M ${tip[0]} ${tip[1]} A ${L} ${L} 0 0 ${nx * (d.b[0] - d.a[0]) + ny * (d.b[1] - d.a[1]) > 0 ? 1 : 0} ${d.b[0]} ${d.b[1]}`, fill: 'none', stroke: col, strokeWidth: 1, strokeDasharray: '3 3', vectorEffect: NS }),
+        h('line', { 'data-h': 'd:' + d.id, x1: d.a[0], y1: d.a[1], x2: d.b[0], y2: d.b[1], stroke: 'transparent', strokeWidth: 18, vectorEffect: NS, style: { cursor: 'pointer' } }))); });
+    s.rooms.filter(r => r.kind !== 'wall').forEach(r => { const c = centroid(r.pts), sel = r.id === selRoom;
+      kids.push(h('text', { key: 't' + r.id, x: c[0], y: c[1] - px(4), textAnchor: 'middle', fontSize: px(15), fontWeight: 700, fill: sel ? '#409CFF' : 'rgba(235,235,245,.8)', style: { pointerEvents: 'none' } }, r.name),
+        h('text', { key: 'a' + r.id, x: c[0], y: c[1] + px(14), textAnchor: 'middle', fontSize: px(12), fontWeight: 600, fill: 'rgba(235,235,245,.45)', style: { pointerEvents: 'none' } }, m2(areaOf(r.pts)))); });
+    const rm = selRoom && s.rooms.find(r => r.id === selRoom);
+    if (rm && s.tool === 'select') {
+      const c = centroid(rm.pts);
+      rm.pts.forEach((a, i) => { const b = rm.pts[(i + 1) % rm.pts.length], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, L = dist(a, b); if (L < 1) return;
+        let nx = -(b[1] - a[1]) / L, ny = (b[0] - a[0]) / L; if ((mx + nx - c[0]) ** 2 + (my + ny - c[1]) ** 2 < (mx - c[0]) ** 2 + (my - c[1]) ** 2) { nx = -nx; ny = -ny; }
+        kids.push(h('text', { key: 'l' + i, x: mx + nx * px(16), y: my + ny * px(16) + px(4), textAnchor: 'middle', fontSize: px(11), fontWeight: 700, fill: '#409CFF', style: { pointerEvents: 'none' } }, mtr(L)),
+          h('circle', { key: 'm' + i, 'data-h': `m:${rm.id}:${i}`, cx: mx, cy: my, r: px(5), fill: '#1C1C1E', stroke: '#0A84FF', strokeWidth: 1.5, vectorEffect: NS, style: { cursor: 'copy' } })); });
+      rm.pts.forEach((v, i) => kids.push(h('circle', { key: 'v' + i, 'data-h': `v:${rm.id}:${i}`, cx: v[0], cy: v[1], r: px(7), fill: '#fff', stroke: '#0A84FF', strokeWidth: 2.5, vectorEffect: NS, style: { cursor: 'grab' } })));
+    }
+    if (s.tool === 'door' && s.doorHover) { const e = s.doorHover; kids.push(h('line', { key: 'dh', x1: e.q[0] - e.ux * 40, y1: e.q[1] - e.uy * 40, x2: e.q[0] + e.ux * 40, y2: e.q[1] + e.uy * 40, stroke: '#0A84FF', strokeWidth: 6, strokeLinecap: 'round', vectorEffect: NS, style: { pointerEvents: 'none' } })); }
+    s.guides.forEach((g, i) => kids.push(h('line', { key: 'gd' + i, x1: g.v ? g.at : s.vb.x - 200, x2: g.v ? g.at : s.vb.x + s.vb.w + 200, y1: g.v ? s.vb.y - 200 : g.at, y2: g.v ? s.vb.y + s.vb.h + 200 : g.at, stroke: '#0A84FF', strokeWidth: 1, strokeDasharray: '4 4', vectorEffect: NS, opacity: .7, style: { pointerEvents: 'none' } })));
+    if (s.tool === 'room' && (s.draft.length || s.cursor)) {
+      const pts = s.cursor ? [...s.draft, s.cursor] : s.draft;
+      if (s.draft.length >= 2) kids.push(h('polygon', { key: 'dfill', points: pts.map(p => p.join(',')).join(' '), fill: 'rgba(10,132,255,.1)', stroke: 'none', style: { pointerEvents: 'none' } }));
+      kids.push(h('polyline', { key: 'dl', points: pts.map(p => p.join(',')).join(' '), fill: 'none', stroke: '#0A84FF', strokeWidth: 2.5, strokeLinejoin: 'round', vectorEffect: NS, style: { pointerEvents: 'none' } }));
+      s.draft.forEach((v, i) => kids.push(h('circle', { key: 'dp' + i, cx: v[0], cy: v[1], r: px(i === 0 && s.closeHot ? 10 : 5), fill: i === 0 ? '#0A84FF' : '#fff', stroke: '#0A84FF', strokeWidth: 2, vectorEffect: NS, style: { pointerEvents: 'none', transition: 'r .15s' } })));
+      if (s.cursor && s.draft.length) { const a = s.draft[s.draft.length - 1]; kids.push(h('text', { key: 'dlen', x: (a[0] + s.cursor[0]) / 2, y: (a[1] + s.cursor[1]) / 2 - px(10), textAnchor: 'middle', fontSize: px(12), fontWeight: 700, fill: '#fff', style: { pointerEvents: 'none' } }, mtr(dist(a, s.cursor)))); }
+    }
+    if (s.rect) { const [[x0, y0], [x1, y1]] = s.rect, a = Math.min(x0, x1), b = Math.min(y0, y1), w = Math.abs(x1 - x0), hh = Math.abs(y1 - y0);
+      kids.push(h('rect', { key: 'rc', x: a, y: b, width: w, height: hh, fill: 'rgba(10,132,255,.12)', stroke: '#0A84FF', strokeWidth: 2.5, vectorEffect: NS, style: { pointerEvents: 'none' } }),
+        h('text', { key: 'rct', x: a + w / 2, y: b + hh / 2 + px(5), textAnchor: 'middle', fontSize: px(14), fontWeight: 700, fill: '#fff', style: { pointerEvents: 'none' } }, `${mtr(w)} × ${mtr(hh)} · ${m2(w * hh)}`)); }
+    if ((s.tool === 'room' || s.tool === 'rect') && s.cursor && !s.rect) kids.push(h('circle', { key: 'cur', cx: s.cursor[0], cy: s.cursor[1], r: px(4), fill: '#0A84FF', style: { pointerEvents: 'none' } }));
+    const cursor = { select: 'default', room: 'crosshair', rect: 'crosshair', door: 'cell', sketch: 'default' }[s.tool];
+    return h('svg', { ref: this.svgRef, viewBox: `${s.vb.x} ${s.vb.y} ${s.vb.w} ${s.vb.h}`, preserveAspectRatio: 'none',
+      style: { position: 'absolute', inset: 0, width: '100%', height: '100%', cursor, touchAction: 'none', pointerEvents: s.tool === 'sketch' ? 'none' : 'auto', zIndex: 2, fontFamily: 'inherit' },
+      onPointerDown: e => this.down(e), onPointerMove: e => this.move(e), onPointerUp: () => this.up(), onPointerLeave: () => { if (!this.op) this.setState({ cursor: null, guides: [], doorHover: null }); },
+      onDoubleClick: e => this.dbl(e), onWheel: e => this.zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, this.world(e)) }, kids);
+  }
+  renderVals() {
+    const s = this.state, ppc = this.ppc();
+    const toolDefs = [['select', 'Select', '↖'], ['room', 'Room', '⬠'], ['rect', 'Rectangle', '▭'], ['door', 'Door', '◜'], ['sketch', 'Sketch', '◫']];
+    const hints = { select: 'Drag rooms or corners · double-click a corner to remove it · drag empty space to pan',
+      room: s.draft.length ? (s.draft.length >= 3 ? 'Click the first point or press Enter to finish' : 'Click to add corners · Backspace removes the last') : 'Click to place the first corner',
+      rect: 'Drag to draw a rectangular room', door: 'Click on a wall to place a door', sketch: 'Drop a photo · double-click it to move and scale' };
+    const selR = s.sel && s.sel.type === 'room' ? s.rooms.find(r => r.id === s.sel.id) : null;
+    const selD = s.sel && s.sel.type === 'door' ? s.doors.find(d => d.id === s.sel.id) : null;
+    const total = s.rooms.filter(r => r.kind !== 'wall').reduce((a, r) => a + areaOf(r.pts), 0);
+    const skW = 1400, skX = 600 - skW / 2, skY = 240 - skW / 2;
+    const json = JSON.stringify({ unit: 'cm', rooms: s.rooms.filter(r => r.kind !== 'wall').map(r => ({ id: r.id, name: r.name, polygon: r.pts })), walls: s.rooms.filter(r => r.kind === 'wall').map(r => ({ id: r.id, polygon: r.pts })), doors: s.doors.map(d => ({ id: d.id, type: d.kind || 'door', a: d.a, b: d.b })) }, null, 2);
+    return {
+      boxRef: this.boxRef, canvas: this.canvas(), meterPx: (100 * ppc) + 'px', hint: hints[s.tool],
+      sk: { left: ((skX - s.vb.x) * ppc) + 'px', top: ((skY - s.vb.y) * ppc) + 'px', size: (skW * ppc) + 'px', rot: s.skRot + 'deg', op: s.tool === 'sketch' ? Math.max(.6, s.skOp) : s.skOp, pe: s.tool === 'sketch' ? 'auto' : 'none', z: s.tool === 'sketch' ? 3 : 1, vis: (s.skHas && s.skOp > 0.02) || s.tool === 'sketch' ? 'visible' : 'hidden' },
+      tools: toolDefs.map(([k, n, g]) => ({ name: n, glyph: g, bg: s.tool === k ? '#0A84FF' : '#2C2C2E', fg: '#fff', pick: () => this.setState({ tool: k, draft: [], rect: null, guides: [], cursor: null, doorHover: null, sel: k === 'select' ? s.sel : null }) })),
+      hasSelRoom: !!selR, hasSelDoor: !!selD, selName: selR ? selR.name : '',
+      onName: e => { const v = e.target.value; this.setState(st => ({ rooms: st.rooms.map(r => r.id === st.sel.id ? { ...r, name: v } : r) })); },
+      selInfo: selR ? `${m2(areaOf(selR.pts))} · ${selR.pts.length} corners` : '',
+      delSel: () => this.delSel(),
+      doorWidths: [70, 80, 90, 100, 180].map(w => ({ name: w + '', bg: selD && Math.round(dist(selD.a, selD.b)) === w ? '#636366' : 'transparent',
+        pick: () => { const L = dist(selD.a, selD.b) || 1, ux = (selD.b[0] - selD.a[0]) / L, uy = (selD.b[1] - selD.a[1]) / L, cx = (selD.a[0] + selD.b[0]) / 2, cy = (selD.a[1] + selD.b[1]) / 2;
+          this.commit({ doors: s.doors.map(d => d.id === selD.id ? { ...d, a: [cx - ux * w / 2, cy - uy * w / 2], b: [cx + ux * w / 2, cy + uy * w / 2] } : d) }); } })),
+      doorKinds: [['door', 'Door'], ['open', 'Opening']].map(([k, n]) => ({ name: n, bg: selD && (selD.kind || 'door') === k ? '#636366' : 'transparent', pick: () => this.commit({ doors: s.doors.map(d => d.id === selD.id ? { ...d, kind: k } : d) }) })),
+      roomList: s.rooms.map(r => ({ name: r.name, area: r.kind === 'wall' ? 'wall' : m2(areaOf(r.pts)), bg: selR && selR.id === r.id ? 'rgba(10,132,255,.22)' : 'transparent', color: selR && selR.id === r.id ? '#409CFF' : '#fff', pick: () => this.setState({ sel: { type: 'room', id: r.id }, tool: 'select' }) })),
+      totalArea: m2(total) + ' total',
+      rotateSketch: () => this.setState(st => ({ skRot: st.skRot + 90 })),
+      opSlider: (() => { const val = e => { const b = e.currentTarget.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)); };
+        return { down: e => { e.currentTarget.setPointerCapture(e.pointerId); this.sdrag = true; this.setState({ skOp: val(e) }); }, move: e => { if (this.sdrag) this.setState({ skOp: val(e) }); }, up: () => { this.sdrag = false; } }; })(),
+      skPct: Math.round(s.skOp * 100) + '%', skText: s.skOp > .3 ? '#1C1C1E' : '#fff',
+      undo: () => this.undo(), redo: () => this.redo(), undoColor: s.past.length ? '#fff' : 'rgba(235,235,245,.3)', redoColor: s.future.length ? '#fff' : 'rgba(235,235,245,.3)',
+      zoomIn: () => this.zoom(1 / 1.25), zoomOut: () => this.zoom(1.25), zoomFit: () => this.setState(st => ({ vb: this.fitVb(st.box.w, st.box.h) })),
+      showJson: s.showJson, json, openJson: () => this.setState({ showJson: true, copied: false }), closeJson: () => this.setState({ showJson: false }), stop: e => e.stopPropagation(),
+      copyJson: () => { try { navigator.clipboard.writeText(json); } catch (e) {} this.setState({ copied: true }); }, copyLabel: s.copied ? 'Copied' : 'Copy'
+    };
+  }
+}
+</script>
+</body>
+</html>

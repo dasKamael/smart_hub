@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>body{margin:0;background:#cfcbc4;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}a{color:#0A84FF;text-decoration:none}a:hover{color:#409CFF}::-webkit-scrollbar{width:0;height:0}button{font-family:inherit}input::placeholder{color:rgba(235,235,245,.4)}</style></helmet>
+<div style="min-height:100vh;display:flex;padding:32px;box-sizing:border-box">
+<div style="margin:auto;width:1194px;height:834px;flex:none;border-radius:44px;border:14px solid #111;box-shadow:0 30px 80px rgba(0,0,0,.3);overflow:hidden;position:relative;background:#000;color:#fff">
+<div style="position:absolute;inset:-80px;filter:blur(40px);opacity:.2;background:radial-gradient(38% 42% at 14% 18%,#e0794c 0%,transparent 70%),radial-gradient(36% 40% at 88% 12%,#3d72c2 0%,transparent 70%),radial-gradient(42% 44% at 52% 98%,#2a9384 0%,transparent 70%),radial-gradient(34% 40% at 96% 86%,#7b52b8 0%,transparent 70%)"></div>
+<div style="position:relative;height:100%;box-sizing:border-box;padding:20px 24px 24px;display:flex;flex-direction:column;gap:20px">
+
+<header style="display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:20px;padding:0 4px">
+<div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+<div style="font-size:15px;font-weight:600;color:rgba(235,235,245,.6)">Widget kit</div>
+<div style="font-size:28px;font-weight:700;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ featureName }}</div>
+</div>
+<nav style="position:relative;display:flex;gap:2px;padding:4px;border-radius:26px;background:rgba(255,255,255,.1);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:0.5px solid rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 24px rgba(0,0,0,.35)">
+<div style="position:absolute;top:4px;bottom:4px;width:74px;left:{{ tabX }};border-radius:22px;background:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);transition:left .45s cubic-bezier(.3,1.35,.5,1)"></div>
+<sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="9">
+<button onClick="{{ tb.go }}" style="position:relative;width:74px;height:44px;border:none;background:none;border-radius:22px;white-space:nowrap;padding:0;font-size:13px;font-weight:600;color:{{ tb.color }};cursor:pointer;transition:color .2s">{{ tb.name }}</button>
+</sc-for>
+</nav>
+<div style="display:flex;justify-content:flex-end"><div style="display:flex;gap:4px;padding:3px;border-radius:20px;background:#2C2C2E">
+<sc-for list="{{ views }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.pick }}" style="height:36px;border:none;border-radius:17px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;background:{{ v.bg }};color:#fff;white-space:nowrap">{{ v.name }}</button></sc-for>
+</div></div>
+</header>
+
+<sc-if value="{{ isTodos }}" hint-placeholder-val="{{ true }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px">
+<div style="min-width:0;display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:20px;font-weight:700">Today</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">{{ todoProgress }}</div></div><div style="display:flex;gap:4px"><sc-for list="{{ todoSegs }}" as="sg" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:3px;background:{{ sg.bg }}"></div></sc-for></div><div style="display:flex;flex-direction:column;gap:2px"><sc-for list="{{ todosX }}" as="t" hint-placeholder-count="6"><div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:16px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></div>
+<div style="min-width:0;display:flex;flex-direction:column;gap:10px;border-left:0.5px solid rgba(84,84,88,.6);padding-left:24px"><div style="font-size:20px;font-weight:700">Tomorrow</div><div style="height:6px"></div><div style="display:flex;flex-direction:column;gap:2px"><sc-for list="{{ tomorrowX }}" as="t" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;min-height:44px;cursor:default;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:16px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></div>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:20px;font-weight:700">Today</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">{{ todoProgress }}</div></div><div style="display:flex;gap:4px"><sc-for list="{{ todoSegs }}" as="sg" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:3px;background:{{ sg.bg }}"></div></sc-for></div><div style="display:flex;flex-direction:column;gap:2px"><sc-for list="{{ todosX }}" as="t" hint-placeholder-count="6"><div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:12px;min-height:42px;cursor:pointer;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:15px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 18px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">Today</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">{{ todoProgress }}</div></div><div style="display:flex;gap:4px"><sc-for list="{{ todoSegs }}" as="sg" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:3px;background:{{ sg.bg }}"></div></sc-for></div><div style="display:flex;flex-direction:column"><sc-for list="{{ todosOpenX }}" as="t" hint-placeholder-count="3"><div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:12px;min-height:36px;cursor:pointer;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:15px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Today</div><div style="font-size:36px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ todoDone }}<span style="font-size:20px;color:rgba(235,235,245,.45)">/{{ todoTotal }}</span></div><div style="display:flex;gap:4px"><sc-for list="{{ todoSegs }}" as="sg" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:3px;background:{{ sg.bg }}"></div></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0"><div style="align-self:flex-start;height:22px;padding:0 8px;border-radius:7px;background:rgba(10,132,255,.22);display:flex;align-items:center;font-size:12px;font-weight:600;color:#64B5FF;font-variant-numeric:tabular-nums">{{ nextTimeX }}</div><div style="font-size:14px;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ nextTitle }}</div></div>
+</div></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isNews }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px">
+<div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+<div style="height:170px;flex:none;border-radius:16px;background:repeating-linear-gradient(135deg,#2C2C2E 0 10px,#242426 10px 20px);display:flex;align-items:center;justify-content:center;font:500 11px ui-monospace,Menlo,monospace;color:rgba(235,235,245,.5)">lead image</div>
+<div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">{{ lead.source }} · {{ lead.time }}</div>
+<div style="font-size:21px;font-weight:700;letter-spacing:-.3px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ lead.title }}</div>
+<div style="font-size:14px;line-height:1.4;color:rgba(235,235,245,.7);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ lead.summary }}</div>
+</div>
+<div style="min-width:0;display:flex;flex-direction:column">
+<sc-for list="{{ news4 }}" as="n" hint-placeholder-count="4">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px;border-top:{{ n.sep }};min-height:0">
+<div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">{{ n.source }} · {{ n.time }}</div>
+<div style="font-size:15px;font-weight:600;line-height:1.28;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ n.title }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px;display:flex;flex-direction:column;gap:8px;overflow:hidden">
+<div style="height:120px;flex:none;border-radius:14px;background:repeating-linear-gradient(135deg,#2C2C2E 0 10px,#242426 10px 20px)"></div>
+<div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">{{ lead.source }} · {{ lead.time }}</div>
+<div style="font-size:17px;font-weight:700;line-height:1.22;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ lead.title }}</div>
+<sc-for list="{{ news2 }}" as="n" hint-placeholder-count="2">
+<div style="border-top:0.5px solid rgba(84,84,88,.6);padding-top:8px;font-size:14px;font-weight:600;line-height:1.28;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ n.title }}</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px;display:flex;gap:14px">
+<div style="width:120px;flex:none;border-radius:14px;background:repeating-linear-gradient(135deg,#2C2C2E 0 10px,#242426 10px 20px)"></div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px">
+<div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">{{ lead.source }} · {{ lead.time }}</div>
+<div style="font-size:16px;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">{{ lead.title }}</div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:repeating-linear-gradient(135deg,#2C2C2E 0 10px,#242426 10px 20px);position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.85) 75%)"></div>
+<div style="position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-direction:column;gap:3px">
+<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.75)">{{ lead.source }}</div>
+<div style="font-size:14px;font-weight:700;line-height:1.22;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ lead.title }}</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPlants }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:12px;display:grid;grid-template-columns:minmax(0,2.6fr) repeat(6,minmax(0,1fr))">
+<sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
+<div style="min-height:0;display:flex;flex-direction:column;gap:10px;padding:10px {{ c.padX }};border-radius:{{ c.radius }};background:{{ c.bg }};border-left:{{ c.sep }};overflow:hidden">
+<div style="display:flex;align-items:center;gap:6px">
+<div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:{{ c.dowColor }}">{{ c.dow }}</div>
+<div style="min-width:28px;height:28px;border-radius:14px;background:{{ c.numBg }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:{{ c.numColor }}">{{ c.num }}</div>
+</div>
+<sc-if value="{{ c.isToday }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 8px;align-content:start">
+<sc-for list="{{ c.items }}" as="p" hint-placeholder-count="4">
+<div onClick="{{ p.water }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;opacity:{{ p.op }};min-width:0">
+<div style="width:100%;aspect-ratio:1;border-radius:14px;background:{{ p.thumbBg }};box-shadow:{{ p.ring }};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:rgba(235,235,245,.55)">{{ p.letter }}</div>
+<div lang="en" style="width:100%;font-size:11px;font-weight:600;color:{{ p.nameColor }};text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;line-height:1.2">{{ p.name }}</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ c.isFuture }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ c.items }}" as="p" hint-placeholder-count="2">
+<div onClick="{{ p.water }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.55;cursor:pointer;min-width:0">
+<div style="width:30px;height:30px;border-radius:15px;background:{{ p.thumbBg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:rgba(235,235,245,.6)">{{ p.letter }}</div>
+<div lang="en" style="width:100%;font-size:11px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;line-height:1.2">{{ p.name }}</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px 18px;display:flex;flex-direction:column;gap:4px;overflow:hidden">
+<div style="font-size:20px;font-weight:700;padding-bottom:4px">Plants</div>
+<sc-if value="{{ hasOverdue }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;font-weight:600;color:#FF6961">Overdue</div></sc-if>
+<sc-for list="{{ overdue }}" as="p" hint-placeholder-count="2">
+<div onClick="{{ p.water }}" style="display:flex;align-items:center;gap:12px;min-height:42px;cursor:pointer">
+<div style="width:32px;height:32px;flex:none;border-radius:16px;background:{{ p.thumbBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(235,235,245,.7)">{{ p.letter }}</div>
+<div style="flex:1;min-width:0;font-size:16px;color:#FF6961;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+</div>
+</sc-for>
+<sc-if value="{{ hasToday }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);padding-top:4px">Today</div></sc-if>
+<sc-for list="{{ today }}" as="p" hint-placeholder-count="3">
+<div onClick="{{ p.water }}" style="display:flex;align-items:center;gap:12px;min-height:42px;cursor:pointer">
+<div style="width:32px;height:32px;flex:none;border-radius:16px;background:{{ p.thumbBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(235,235,245,.7)">{{ p.letter }}</div>
+<div style="flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+</div>
+</sc-for>
+<sc-if value="{{ noneDue }}" hint-placeholder-val="{{ false }}"><div style="font-size:16px;color:rgba(235,235,245,.6)">Every plant is watered.</div></sc-if>
+</div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">Water today</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ dueCountLabel }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<sc-for list="{{ due4 }}" as="p" hint-placeholder-count="4">
+<div onClick="{{ p.water }}" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-width:0">
+<div style="width:58px;height:58px;border-radius:29px;background:{{ p.thumbBg }};box-shadow:{{ p.ring }};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:rgba(235,235,245,.6)">{{ p.letter }}</div>
+<div lang="en" style="width:100%;font-size:12px;font-weight:600;color:{{ p.nameColor }};text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;line-height:1.2">{{ p.name }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between">
+<svg width="18" height="20" viewBox="0 0 16 18"><path d="M8 1C8 1 2 7.5 2 11.3A6 6 0 0 0 14 11.3C14 7.5 8 1 8 1Z" fill="#0A84FF"></path></svg>
+<div style="display:flex;flex-direction:column">
+<div style="font-size:46px;font-weight:700;letter-spacing:-1.5px;line-height:1.05">{{ dueCount }}</div>
+<div style="font-size:14px;color:rgba(235,235,245,.6)">plants to water</div>
+<div style="font-size:13px;font-weight:600;color:#FF6961;padding-top:4px">{{ overdueLabel }}</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isLights }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;gap:18px">
+<div style="flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:10px">
+<sc-for list="{{ rooms }}" as="r" hint-placeholder-count="6">
+<div onClick="{{ r.select }}" style="border-radius:20px;padding:12px 14px;background:{{ r.bg }};box-shadow:{{ r.ringSel }};display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;min-width:0;transition:background .25s">
+<div onClick="{{ r.toggle }}" style="width:42px;height:42px;border-radius:21px;background:{{ r.iconBg }};display:flex;align-items:center;justify-content:center"><svg width="14" height="18" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5V13h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 7 1Z" fill="{{ r.iconFg }}"></path><rect x="4.5" y="14.2" width="5" height="1.4" rx=".7" fill="{{ r.iconFg }}"></rect></svg></div>
+<div style="min-width:0">
+<div style="font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+<div style="font-size:13px;color:{{ r.subColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div>
+</div>
+</div>
+</sc-for>
+</div>
+<div onPointerDown="{{ briV.down }}" onPointerMove="{{ briV.move }}" onPointerUp="{{ briV.up }}" style="width:96px;flex:none;border-radius:28px;background:#2C2C2E;overflow:hidden;position:relative;cursor:pointer;touch-action:none">
+<div style="position:absolute;left:0;right:0;bottom:0;height:{{ selPct }};background:{{ selColor }}"></div>
+<div style="position:absolute;left:0;right:0;top:14px;text-align:center;font-size:12px;font-weight:600;color:{{ selTopText }};padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ selName }}</div>
+<div style="position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:16px;font-weight:700;color:{{ selText }}">{{ selLabel }}</div>
+</div>
+<div style="width:120px;flex:none;display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ scenes }}" as="s" hint-placeholder-count="4">
+<button onClick="{{ s.apply }}" style="flex:1;border:none;border-radius:16px;padding:0 12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;background:{{ s.bg }};color:#fff;text-align:left"><span style="width:10px;height:10px;flex:none;border-radius:5px;background:{{ s.color }}"></span>{{ s.name }}</button>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:20px;font-weight:700">Lights</div><button onClick="{{ allOff }}" style="height:32px;border:none;border-radius:16px;padding:0 12px;background:#2C2C2E;color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">{{ allLabel }}</button></div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:8px">
+<sc-for list="{{ rooms }}" as="r" hint-placeholder-count="6">
+<div onClick="{{ r.toggle }}" style="border-radius:16px;padding:0 10px;background:{{ r.bg }};display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;transition:background .25s">
+<div style="width:34px;height:34px;flex:none;border-radius:17px;background:{{ r.iconBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="16" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5V13h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 7 1Z" fill="{{ r.iconFg }}"></path><rect x="4.5" y="14.2" width="5" height="1.4" rx=".7" fill="{{ r.iconFg }}"></rect></svg></div>
+<div style="min-width:0">
+<div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+<div style="font-size:12px;color:{{ r.subColor }}">{{ r.short }}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:17px;font-weight:700">Lights</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ onLabel }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+<sc-for list="{{ rooms4 }}" as="r" hint-placeholder-count="4">
+<div onClick="{{ r.toggle }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:0">
+<div style="width:60px;height:60px;border-radius:30px;background:{{ r.iconBg }};box-shadow:{{ r.glow }};display:flex;align-items:center;justify-content:center;transition:background .25s"><svg width="16" height="21" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5V13h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 7 1Z" fill="{{ r.iconFg }}"></path><rect x="4.5" y="14.2" width="5" height="1.4" rx=".7" fill="{{ r.iconFg }}"></rect></svg></div>
+<div style="width:100%;font-size:12px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div onClick="{{ toggleSel }}" style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:{{ selTileBg }};padding:16px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:background .25s">
+<div style="width:48px;height:48px;border-radius:24px;background:{{ selIconBg }};box-shadow:{{ selGlow }};display:flex;align-items:center;justify-content:center"><svg width="16" height="21" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5V13h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 7 1Z" fill="{{ selIconFg }}"></path><rect x="4.5" y="14.2" width="5" height="1.4" rx=".7" fill="{{ selIconFg }}"></rect></svg></div>
+<div style="min-width:0">
+<div style="font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ selName }}</div>
+<div style="font-size:14px;color:{{ selSubColor }}">{{ selLabel }}</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMusic }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;gap:18px;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background:{{ track.art }};opacity:.22;pointer-events:none;transition:background .5s"></div>
+<div style="position:relative;width:300px;flex:none;display:flex;flex-direction:column;gap:12px">
+<div style="width:180px;height:180px;border-radius:16px;background:{{ track.art }};box-shadow:0 12px 30px rgba(0,0,0,.4)"></div>
+<div style="min-width:0">
+<div style="font-size:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.title }}</div>
+<div style="font-size:15px;color:rgba(235,235,245,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.artist }}</div>
+</div>
+<div style="height:5px;border-radius:3px;background:rgba(255,255,255,.22);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ progPct }};background:#fff;border-radius:3px"></div></div>
+<div style="display:flex;align-items:center;gap:18px">
+<button onClick="{{ prev }}" style="width:40px;height:40px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="24" height="16" viewBox="0 0 26 18"><path d="M12 1v16L1 9zM25 1v16L14 9z" fill="#fff"></path></svg></button>
+<button onClick="{{ togglePlay }}" style="width:50px;height:50px;border-radius:25px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:0.5px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)"><svg width="16" height="18" viewBox="0 0 16 18" style="opacity:{{ pauseOp }}"><rect x="1" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect><rect x="10" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect></svg><svg width="16" height="18" viewBox="0 0 18 20" style="position:absolute;opacity:{{ playOp }};margin-left:3px"><path d="M2 1.5v17L17 10z" fill="#fff"></path></svg></button>
+<button onClick="{{ next }}" style="width:40px;height:40px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="24" height="16" viewBox="0 0 26 18"><path d="M1 1v16l11-8zM14 1v16l11-8z" fill="#fff"></path></svg></button>
+</div>
+</div>
+<div style="position:relative;flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:15px;font-weight:700;color:rgba(235,235,245,.75)">Jump back in</div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:10px">
+<sc-for list="{{ playlists }}" as="pl" hint-placeholder-count="6">
+<div onClick="{{ pl.play }}" style="border-radius:14px;background:{{ pl.art }};padding:10px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;position:relative;overflow:hidden;min-width:0">
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.6))"></div>
+<div lang="en" style="position:relative;font-size:14px;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;line-height:1.2">{{ pl.name }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background:{{ track.art }};opacity:.22;pointer-events:none;transition:background .5s"></div>
+<div style="position:relative;display:flex;gap:14px;align-items:center">
+<div style="width:110px;height:110px;flex:none;border-radius:14px;background:{{ track.art }};box-shadow:0 8px 22px rgba(0,0,0,.4)"></div>
+<div style="min-width:0;display:flex;flex-direction:column;gap:3px">
+<div style="font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.title }}</div>
+<div style="font-size:14px;color:rgba(235,235,245,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.artist }}</div>
+<div style="font-size:12px;color:rgba(235,235,245,.55);display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#1DB954"></span>Kitchen speaker</div>
+</div>
+</div>
+<div style="position:relative;height:5px;border-radius:3px;background:rgba(255,255,255,.22)"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ progPct }};background:#fff;border-radius:3px"></div></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:center;gap:28px">
+<button onClick="{{ prev }}" style="width:40px;height:40px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="24" height="16" viewBox="0 0 26 18"><path d="M12 1v16L1 9zM25 1v16L14 9z" fill="#fff"></path></svg></button>
+<button onClick="{{ togglePlay }}" style="position:relative;width:52px;height:52px;border-radius:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:0.5px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)"><svg width="16" height="18" viewBox="0 0 16 18" style="opacity:{{ pauseOp }}"><rect x="1" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect><rect x="10" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect></svg><svg width="16" height="18" viewBox="0 0 18 20" style="position:absolute;opacity:{{ playOp }};margin-left:3px"><path d="M2 1.5v17L17 10z" fill="#fff"></path></svg></button>
+<button onClick="{{ next }}" style="width:40px;height:40px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="24" height="16" viewBox="0 0 26 18"><path d="M1 1v16l11-8zM14 1v16l11-8z" fill="#fff"></path></svg></button>
+</div>
+<div style="position:relative;display:flex;flex-direction:column;gap:6px;border-top:0.5px solid rgba(255,255,255,.14);padding-top:10px">
+<div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.55)">Up next</div>
+<sc-for list="{{ upNext2 }}" as="q" hint-placeholder-count="2">
+<div onClick="{{ q.play }}" style="display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0">
+<div style="width:28px;height:28px;flex:none;border-radius:6px;background:{{ q.art }}"></div>
+<div style="flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.title }} <span style="font-weight:400;color:rgba(235,235,245,.6)">· {{ q.artist }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background:{{ track.art }};opacity:.22;pointer-events:none;transition:background .5s"></div>
+<div style="position:relative;display:flex;gap:14px;align-items:center">
+<div style="width:76px;height:76px;flex:none;border-radius:12px;background:{{ track.art }};box-shadow:0 6px 16px rgba(0,0,0,.35)"></div>
+<div style="flex:1;min-width:0">
+<div style="font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.title }}</div>
+<div style="font-size:14px;color:rgba(235,235,245,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.artist }}</div>
+</div>
+<button onClick="{{ togglePlay }}" style="position:relative;width:48px;height:48px;flex:none;border-radius:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:0.5px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)"><svg width="14" height="16" viewBox="0 0 16 18" style="opacity:{{ pauseOp }}"><rect x="1" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect><rect x="10" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect></svg><svg width="14" height="16" viewBox="0 0 18 20" style="position:absolute;opacity:{{ playOp }};margin-left:3px"><path d="M2 1.5v17L17 10z" fill="#fff"></path></svg></button>
+</div>
+<div style="position:relative;display:flex;flex-direction:column;gap:4px">
+<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.22);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ progPct }};background:#fff;border-radius:2px"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums"><span>{{ elapsed }}</span><span>{{ remaining }}</span></div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:{{ track.art }};position:relative;overflow:hidden;transition:background .5s">
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.6))"></div>
+<button onClick="{{ togglePlay }}" style="position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(255,255,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)"><svg width="12" height="14" viewBox="0 0 16 18" style="opacity:{{ pauseOp }}"><rect x="1" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect><rect x="10" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect></svg><svg width="12" height="14" viewBox="0 0 18 20" style="position:absolute;opacity:{{ playOp }};margin-left:2px"><path d="M2 1.5v17L17 10z" fill="#fff"></path></svg></button>
+<div style="position:absolute;left:14px;right:14px;bottom:12px;min-width:0">
+<div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.title }}</div>
+<div style="font-size:12px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.artist }}</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStreaming }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:20px;font-weight:700">Continue watching</div>
+<div style="display:flex;gap:10px">
+<sc-for list="{{ services }}" as="sv" hint-placeholder-count="4">
+<a href="{{ sv.href }}" target="_blank" title="{{ sv.name }}" style="width:44px;height:44px;border-radius:22px;background:{{ sv.bg }};display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,.14);overflow:hidden"><span style="display:flex;transform:scale(.69)"><sc-if value="{{ sv.isN }}" hint-placeholder-val="{{ false }}"><span style="font:900 34px/1 Helvetica Neue,Arial,sans-serif;color:#E50914;transform:scaleX(.82)">N</span></sc-if><sc-if value="{{ sv.isP }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 Helvetica Neue,Arial,sans-serif;color:#fff">prime</span></sc-if><sc-if value="{{ sv.isD }}" hint-placeholder-val="{{ false }}"><span style="font:600 22px/1 Georgia,serif;font-style:italic;color:#fff">D<span style="font-style:normal;font-family:Helvetica Neue,Arial,sans-serif;font-weight:300;color:#7FD3F7">+</span></span></sc-if><sc-if value="{{ sv.isY }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:24px;border-radius:7px;background:#FF0000;display:flex;align-items:center;justify-content:center"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="#fff"></path></svg></span></sc-if></span></a>
+</sc-for>
+</div>
+</div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+<sc-for list="{{ continueItems }}" as="cw" hint-placeholder-count="3">
+<div style="min-width:0;display:flex;flex-direction:column;gap:8px">
+<div style="flex:1;min-height:0;border-radius:16px;background:repeating-linear-gradient(135deg,#2C2C2E 0 10px,#242426 10px 20px);position:relative;overflow:hidden">
+<div style="position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.2)"><div style="height:100%;width:{{ cw.prog }};background:{{ cw.color }}"></div></div>
+<div style="position:absolute;top:10px;left:10px;font:500 10px ui-monospace,Menlo,monospace;color:rgba(235,235,245,.5)">poster</div>
+</div>
+<div style="min-width:0">
+<div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cw.title }}</div>
+<div style="font-size:13px;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cw.service }} · {{ cw.meta }}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:20px;font-weight:700">Watch</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:12px">
+<sc-for list="{{ services }}" as="sv" hint-placeholder-count="4">
+<a href="{{ sv.href }}" target="_blank" style="border-radius:20px;background:#2C2C2E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;min-width:0">
+<span style="width:64px;height:64px;border-radius:32px;background:{{ sv.bg }};display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,.14)"><sc-if value="{{ sv.isN }}" hint-placeholder-val="{{ false }}"><span style="font:900 34px/1 Helvetica Neue,Arial,sans-serif;color:#E50914;transform:scaleX(.82)">N</span></sc-if><sc-if value="{{ sv.isP }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 Helvetica Neue,Arial,sans-serif;color:#fff">prime</span></sc-if><sc-if value="{{ sv.isD }}" hint-placeholder-val="{{ false }}"><span style="font:600 22px/1 Georgia,serif;font-style:italic;color:#fff">D<span style="font-style:normal;font-family:Helvetica Neue,Arial,sans-serif;font-weight:300;color:#7FD3F7">+</span></span></sc-if><sc-if value="{{ sv.isY }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:24px;border-radius:7px;background:#FF0000;display:flex;align-items:center;justify-content:center"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="#fff"></path></svg></span></sc-if></span>
+<span style="font-size:14px;font-weight:600">{{ sv.name }}</span>
+</a>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px;display:flex;align-items:center;justify-content:space-evenly">
+<sc-for list="{{ services }}" as="sv" hint-placeholder-count="4">
+<a href="{{ sv.href }}" target="_blank" title="{{ sv.name }}" style="width:66px;height:66px;border-radius:33px;background:{{ sv.bg }};display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,.14),0 6px 16px rgba(0,0,0,.35)"><sc-if value="{{ sv.isN }}" hint-placeholder-val="{{ false }}"><span style="font:900 34px/1 Helvetica Neue,Arial,sans-serif;color:#E50914;transform:scaleX(.82)">N</span></sc-if><sc-if value="{{ sv.isP }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 Helvetica Neue,Arial,sans-serif;color:#fff">prime</span></sc-if><sc-if value="{{ sv.isD }}" hint-placeholder-val="{{ false }}"><span style="font:600 22px/1 Georgia,serif;font-style:italic;color:#fff">D<span style="font-style:normal;font-family:Helvetica Neue,Arial,sans-serif;font-weight:300;color:#7FD3F7">+</span></span></sc-if><sc-if value="{{ sv.isY }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:24px;border-radius:7px;background:#FF0000;display:flex;align-items:center;justify-content:center"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="#fff"></path></svg></span></sc-if></a>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;place-items:center">
+<sc-for list="{{ services }}" as="sv" hint-placeholder-count="4">
+<a href="{{ sv.href }}" target="_blank" title="{{ sv.name }}" style="width:56px;height:56px;border-radius:28px;background:{{ sv.bg }};display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,.14);overflow:hidden"><span style="display:flex;transform:scale(.85)"><sc-if value="{{ sv.isN }}" hint-placeholder-val="{{ false }}"><span style="font:900 34px/1 Helvetica Neue,Arial,sans-serif;color:#E50914;transform:scaleX(.82)">N</span></sc-if><sc-if value="{{ sv.isP }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 Helvetica Neue,Arial,sans-serif;color:#fff">prime</span></sc-if><sc-if value="{{ sv.isD }}" hint-placeholder-val="{{ false }}"><span style="font:600 22px/1 Georgia,serif;font-style:italic;color:#fff">D<span style="font-style:normal;font-family:Helvetica Neue,Arial,sans-serif;font-weight:300;color:#7FD3F7">+</span></span></sc-if><sc-if value="{{ sv.isY }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:24px;border-radius:7px;background:#FF0000;display:flex;align-items:center;justify-content:center"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="#fff"></path></svg></span></sc-if></span></a>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullTodos }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:12px;min-height:0"><div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:24px;font-weight:700">Today</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">{{ todoProgress }}</div></div><div style="display:flex;gap:4px"><sc-for list="{{ todoSegs }}" as="sg" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:3px;background:{{ sg.bg }}"></div></sc-for></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px"><sc-for list="{{ todosX }}" as="t" hint-placeholder-count="6"><div onClick="{{ t.toggle }}" style="display:flex;align-items:center;gap:12px;min-height:52px;cursor:pointer;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:17px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div>
+<div style="display:flex;align-items:center;gap:12px;min-height:52px;border-radius:14px;background:#2C2C2E;padding:0 14px"><div style="font-size:22px;font-weight:400;color:#409CFF;line-height:1">+</div><input value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="Add a task" style="flex:1;border:none;outline:none;background:transparent;font:inherit;font-size:17px;color:#fff;padding:10px 0"></input></div>
+</section>
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:12px;min-height:0"><div style="font-size:24px;font-weight:700">Tomorrow</div><div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px"><sc-for list="{{ tomorrowX }}" as="t" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;min-height:52px;cursor:default;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:17px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></section>
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:12px;min-height:0"><div style="font-size:24px;font-weight:700">This week</div><div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px"><sc-for list="{{ laterX }}" as="t" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;min-height:52px;cursor:default;opacity:{{ t.op }};transition:opacity .2s"><div style="width:54px;flex:none;height:26px;border-radius:8px;background:{{ t.chipBg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:{{ t.chipFg }};font-variant-numeric:tabular-nums">{{ t.timeText }}</div><div style="flex:1;min-width:0;font-size:17px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.title }}</div><div style="width:24px;height:24px;flex:none;border-radius:7px;box-sizing:border-box;border:{{ t.cBorder }};background:{{ t.cBg }};display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12" style="opacity:{{ t.cOp }}"><path d="M2.5 6.2l2.3 2.3 4.7-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div></sc-for></div></section>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullNews }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden">
+<div style="flex:1;min-height:0;border-radius:18px;background:repeating-linear-gradient(135deg,#2C2C2E 0 12px,#242426 12px 24px);display:flex;align-items:center;justify-content:center;font:500 12px ui-monospace,Menlo,monospace;color:rgba(235,235,245,.5)">lead story image</div>
+<div style="font-size:14px;font-weight:600;color:rgba(235,235,245,.6)">{{ lead.source }} · {{ lead.time }}</div>
+<div style="font-size:30px;font-weight:700;letter-spacing:-.6px;line-height:1.15;text-wrap:pretty">{{ lead.title }}</div>
+<div style="font-size:17px;line-height:1.45;color:rgba(235,235,245,.75);text-wrap:pretty">{{ lead.summary }}</div>
+</section>
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:4px;min-height:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px;white-space:nowrap">Top stories</div></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column">
+<sc-for list="{{ newsAll }}" as="n" hint-placeholder-count="6">
+<div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-top:{{ n.sep }}">
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+<div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ n.source }} · {{ n.time }}</div>
+<div style="font-size:17px;font-weight:600;line-height:1.28;text-wrap:pretty">{{ n.title }}</div>
+</div>
+<div style="width:72px;height:72px;flex:none;border-radius:12px;background:repeating-linear-gradient(135deg,#2C2C2E 0 6px,#242426 6px 12px)"></div>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullPlants }}" hint-placeholder-val="{{ false }}">
+<section style="flex:1;min-height:0;border-radius:26px;background:#1C1C1E;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+<div style="display:flex;flex-direction:column"><div style="font-size:26px;font-weight:700;letter-spacing:-.5px;white-space:nowrap">Watering plan</div><div style="font-size:15px;color:rgba(235,235,245,.6)">{{ plantSub }}</div></div>
+<sc-if value="{{ anyDue }}" hint-placeholder-val="{{ true }}"><button onClick="{{ waterAll }}" style="flex:none;height:42px;border:none;border-radius:21px;padding:0 16px;font-size:15px;font-weight:600;cursor:pointer;background:#0A84FF;color:#fff;white-space:nowrap">Water all</button></sc-if>
+</div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,2.3fr) repeat(6,minmax(0,1fr))">
+<sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
+<div style="min-height:0;display:flex;flex-direction:column;gap:12px;padding:12px {{ c.padXL }};border-radius:{{ c.radius }};background:{{ c.bg }};border-left:{{ c.sep }}">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:{{ c.dowColor }}">{{ c.dow }}</div>
+<div style="min-width:34px;height:34px;border-radius:17px;background:{{ c.numBg }};display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600;color:{{ c.numColor }}">{{ c.num }}</div>
+</div>
+<sc-if value="{{ c.isToday }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:12px 10px">
+<sc-for list="{{ c.items }}" as="p" hint-placeholder-count="4">
+<div onClick="{{ p.water }}" style="display:flex;flex-direction:column;gap:6px;cursor:pointer;opacity:{{ p.op }};transition:opacity .25s;min-width:0">
+<div style="aspect-ratio:1;border-radius:16px;background:{{ p.thumbBg }};box-shadow:{{ p.ring }};display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:rgba(235,235,245,.55)">{{ p.letter }}</div>
+<div lang="en" style="font-size:14px;font-weight:600;line-height:1.2;color:{{ p.nameColor }};hyphens:auto;padding:0 2px">{{ p.name }}</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ c.isFuture }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ c.items }}" as="p" hint-placeholder-count="2">
+<div onClick="{{ p.water }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;opacity:.6;min-width:0">
+<div style="width:30px;height:30px;flex:none;border-radius:15px;background:{{ p.thumbBg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:rgba(235,235,245,.6)">{{ p.letter }}</div>
+<div lang="en" style="flex:1;min-width:0;font-size:13px;font-weight:500;line-height:1.2;hyphens:auto">{{ p.name }}</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ fullLights }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:16px;min-height:0">
+<div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><div style="font-size:26px;font-weight:700;letter-spacing:-.5px">Rooms</div><div style="font-size:15px;color:rgba(235,235,245,.6)">{{ onLabelLong }}</div></div><button onClick="{{ allOff }}" style="flex:none;height:42px;border:none;border-radius:21px;padding:0 16px;background:#2C2C2E;color:#fff;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">{{ allLabel }}</button></div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:12px">
+<sc-for list="{{ rooms }}" as="r" hint-placeholder-count="6">
+<div onClick="{{ r.select }}" style="border-radius:22px;padding:16px;background:{{ r.bg }};box-shadow:{{ r.ringSel }};display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;min-width:0;transition:background .25s">
+<div onClick="{{ r.toggle }}" style="width:52px;height:52px;border-radius:26px;background:{{ r.iconBg }};box-shadow:{{ r.glow }};display:flex;align-items:center;justify-content:center"><svg width="18" height="23" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5V13h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 7 1Z" fill="{{ r.iconFg }}"></path><rect x="4.5" y="14.2" width="5" height="1.4" rx=".7" fill="{{ r.iconFg }}"></rect></svg></div>
+<div style="min-width:0"><div style="font-size:19px;font-weight:700;line-height:1.2">{{ r.name }}</div><div style="font-size:15px;color:{{ r.subColor }}">{{ r.sub }}</div></div>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:16px;min-height:0">
+<div style="display:flex;flex-direction:column"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px">{{ selName }}</div><div style="font-size:15px;color:rgba(235,235,245,.6)">{{ selLabelLong }}</div></div>
+<div style="flex:1;min-height:0;display:flex;gap:18px">
+<div onPointerDown="{{ briV.down }}" onPointerMove="{{ briV.move }}" onPointerUp="{{ briV.up }}" style="width:110px;flex:none;border-radius:32px;background:#2C2C2E;overflow:hidden;position:relative;cursor:pointer;touch-action:none">
+<div style="position:absolute;left:0;right:0;bottom:0;height:{{ selPct }};background:{{ selColor }}"></div>
+<div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:18px;font-weight:700;color:{{ selText }}">{{ selLabel }}</div>
+</div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:15px;font-weight:600;color:rgba(235,235,245,.6)">Scenes</div>
+<sc-for list="{{ scenes }}" as="s" hint-placeholder-count="4">
+<button onClick="{{ s.apply }}" style="flex:1;max-height:64px;border:none;border-radius:18px;padding:0 16px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;background:{{ s.bg }};color:#fff;text-align:left"><span style="width:14px;height:14px;flex:none;border-radius:7px;background:{{ s.color }}"></span>{{ s.name }}</button>
+</sc-for>
+</div>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullMusic }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px">
+<section style="flex:none;border-radius:26px;background:#1C1C1E;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background:{{ track.art }};opacity:.3;pointer-events:none;transition:background .5s"></div>
+<div style="position:relative;display:flex;align-items:center;gap:20px;padding:18px 22px 18px 18px">
+<div style="width:96px;height:96px;flex:none;border-radius:14px;background:{{ track.art }};box-shadow:0 8px 24px rgba(0,0,0,.4)"></div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+<div style="min-width:0"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ track.title }}</div><div style="font-size:16px;color:rgba(235,235,245,.7)">{{ track.artist }}</div></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:rgba(235,235,245,.6);width:36px;font-variant-numeric:tabular-nums">{{ elapsed }}</span><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.22);position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ progPct }};background:#fff;border-radius:3px"></div></div><span style="font-size:13px;color:rgba(235,235,245,.6);width:40px;text-align:right;font-variant-numeric:tabular-nums">{{ remaining }}</span></div>
+</div>
+<div style="flex:none;display:flex;align-items:center;gap:8px">
+<button onClick="{{ prev }}" style="width:52px;height:52px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="28" height="19" viewBox="0 0 26 18"><path d="M12 1v16L1 9zM25 1v16L14 9z" fill="#fff"></path></svg></button>
+<button onClick="{{ togglePlay }}" style="position:relative;width:64px;height:64px;flex:none;border-radius:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:0.5px solid rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)"><svg width="18" height="20" viewBox="0 0 16 18" style="opacity:{{ pauseOp }}"><rect x="1" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect><rect x="10" y="1" width="5" height="16" rx="1.2" fill="#fff"></rect></svg><svg width="18" height="20" viewBox="0 0 18 20" style="position:absolute;opacity:{{ playOp }};margin-left:4px"><path d="M2 1.5v17L17 10z" fill="#fff"></path></svg></button>
+<button onClick="{{ next }}" style="width:52px;height:52px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="28" height="19" viewBox="0 0 26 18"><path d="M1 1v16l11-8zM14 1v16l11-8z" fill="#fff"></path></svg></button>
+</div>
+</div>
+</section>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px;white-space:nowrap">Jump back in</div></div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:12px">
+<sc-for list="{{ playlists }}" as="pl" hint-placeholder-count="6">
+<div onClick="{{ pl.play }}" style="border-radius:18px;background:{{ pl.art }};padding:14px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;position:relative;overflow:hidden;min-width:0">
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.55))"></div>
+<div lang="en" style="position:relative;font-size:17px;font-weight:700;line-height:1.2;hyphens:auto">{{ pl.name }}</div>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="border-radius:26px;background:#1C1C1E;padding:20px;display:flex;flex-direction:column;gap:8px;min-height:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px;white-space:nowrap">Up next</div></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ queue }}" as="q" hint-placeholder-count="5">
+<div onClick="{{ q.play }}" style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 8px;border-radius:14px;background:{{ q.bg }};cursor:pointer">
+<div style="width:40px;height:40px;flex:none;border-radius:8px;background:{{ q.art }}"></div>
+<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:{{ q.titleColor }}">{{ q.title }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ q.artist }}</div></div>
+<div style="font-size:14px;color:rgba(235,235,245,.6);font-variant-numeric:tabular-nums">{{ q.dur }}</div>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullStreaming }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px">
+<section style="flex:1;min-height:0;border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div style="font-size:24px;font-weight:700;letter-spacing:-.4px;white-space:nowrap">Continue watching</div></div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+<sc-for list="{{ continueItems }}" as="cw" hint-placeholder-count="3">
+<div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+<div style="flex:1;min-height:0;border-radius:18px;background:repeating-linear-gradient(135deg,#2C2C2E 0 12px,#242426 12px 24px);position:relative;overflow:hidden">
+<div style="position:absolute;top:12px;left:12px;font:500 11px ui-monospace,Menlo,monospace;color:rgba(235,235,245,.5)">poster</div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.2)"><div style="height:100%;width:{{ cw.prog }};background:{{ cw.color }}"></div></div>
+</div>
+<div style="min-width:0"><div style="font-size:18px;font-weight:600">{{ cw.title }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ cw.service }} · {{ cw.meta }}</div></div>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="flex:none;border-radius:26px;background:#1C1C1E;padding:20px 22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+<sc-for list="{{ services }}" as="sv" hint-placeholder-count="4">
+<a href="{{ sv.href }}" target="_blank" style="height:112px;border-radius:20px;background:#2C2C2E;display:flex;align-items:center;gap:16px;padding:0 20px;color:#fff;min-width:0">
+<span style="width:72px;height:72px;flex:none;border-radius:36px;background:{{ sv.bg }};display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,.14)"><sc-if value="{{ sv.isN }}" hint-placeholder-val="{{ false }}"><span style="font:900 34px/1 Helvetica Neue,Arial,sans-serif;color:#E50914;transform:scaleX(.82)">N</span></sc-if><sc-if value="{{ sv.isP }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 Helvetica Neue,Arial,sans-serif;color:#fff">prime</span></sc-if><sc-if value="{{ sv.isD }}" hint-placeholder-val="{{ false }}"><span style="font:600 22px/1 Georgia,serif;font-style:italic;color:#fff">D<span style="font-style:normal;font-family:Helvetica Neue,Arial,sans-serif;font-weight:300;color:#7FD3F7">+</span></span></sc-if><sc-if value="{{ sv.isY }}" hint-placeholder-val="{{ false }}"><span style="width:34px;height:24px;border-radius:7px;background:#FF0000;display:flex;align-items:center;justify-content:center"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z" fill="#fff"></path></svg></span></sc-if></span>
+<span style="font-size:17px;font-weight:600;line-height:1.2">{{ sv.name }}</span>
+</a>
+</sc-for>
+</section>
+</div>
+</sc-if>
+
+
+<sc-if value="{{ isWeather }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:20px 22px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:26px">
+<div style="min-width:0;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;flex:none;display:inline-flex"><sc-if value="{{ wx.isSun }}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ wx.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ wx.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ wx.isRain }}" hint-placeholder-val="{{ false }}"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:56px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ wx.temp }}</div></div><div style="font-size:15px;color:rgba(235,235,245,.7)">{{ wx.cond }} · Feels {{ wx.feels }}</div></div><div style="font-size:15px;font-weight:600;color:rgba(235,235,245,.7)">{{ wx.city }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;align-items:end"><sc-for list="{{ hoursX8 }}" as="hr" hint-placeholder-count="8"><div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0"><div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">{{ hr.temp }}</div><div style="width:100%;max-width:26px;height:70px;display:flex;align-items:flex-end"><div style="width:100%;height:{{ hr.barH }};border-radius:6px;background:{{ hr.barBg }}"></div></div><span style="width:20px;height:20px;flex:none;display:inline-flex"><sc-if value="{{ hr.isSun }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ hr.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ hr.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ hr.isRain }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:12px;font-weight:600;color:{{ hr.labelColor }}">{{ hr.label }}</div></div></sc-for></div>
+</div>
+<div style="min-width:0;border-left:0.5px solid rgba(84,84,88,.6);padding-left:24px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;flex-direction:column"><sc-for list="{{ daysX5 }}" as="dy" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(0,1fr) 24px 56px 76px;align-items:center;gap:10px;min-height:48px;border-top:{{ dy.sep }}"><div style="font-size:15px;font-weight:600">{{ dy.day }}</div><span style="width:22px;height:22px;flex:none;display:inline-flex"><sc-if value="{{ dy.isSun }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ dy.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ dy.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ dy.isRain }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="justify-self:start;height:22px;padding:0 7px;border-radius:7px;background:{{ dy.popBg }};display:flex;align-items:center;font-size:12px;font-weight:600;color:{{ dy.popFg }};font-variant-numeric:tabular-nums">{{ dy.pop }}</div><div style="text-align:right;font-size:15px;font-variant-numeric:tabular-nums"><span style="font-weight:700">{{ dy.hi }}</span><span style="color:rgba(235,235,245,.45)"> / {{ dy.lo }}</span></div></div></sc-for></div></div>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:18px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:center;gap:12px"><span style="width:36px;height:36px;flex:none;display:inline-flex"><sc-if value="{{ wx.isSun }}" hint-placeholder-val="{{ false }}"><svg width="36" height="36" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ wx.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="36" height="36" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ wx.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="36" height="36" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ wx.isRain }}" hint-placeholder-val="{{ false }}"><svg width="36" height="36" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:44px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ wx.temp }}</div></div><div style="font-size:14px;color:rgba(235,235,245,.7)">{{ wx.cond }} · {{ wx.hiLo }}</div></div><div style="font-size:14px;font-weight:600;color:rgba(235,235,245,.7)">{{ wx.city }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:end"><sc-for list="{{ hoursX6 }}" as="hr" hint-placeholder-count="6"><div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0"><div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">{{ hr.temp }}</div><div style="width:100%;max-width:26px;height:44px;display:flex;align-items:flex-end"><div style="width:100%;height:{{ hr.barH }};border-radius:6px;background:{{ hr.barBg }}"></div></div><div style="font-size:12px;font-weight:600;color:{{ hr.labelColor }}">{{ hr.label }}</div></div></sc-for></div>
+<div style="display:flex;flex-direction:column"><sc-for list="{{ daysX3 }}" as="dy" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1fr) 24px 56px 76px;align-items:center;gap:10px;min-height:36px;border-top:{{ dy.sep }}"><div style="font-size:14px;font-weight:600">{{ dy.day }}</div><span style="width:22px;height:22px;flex:none;display:inline-flex"><sc-if value="{{ dy.isSun }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ dy.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ dy.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ dy.isRain }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="justify-self:start;height:22px;padding:0 7px;border-radius:7px;background:{{ dy.popBg }};display:flex;align-items:center;font-size:12px;font-weight:600;color:{{ dy.popFg }};font-variant-numeric:tabular-nums">{{ dy.pop }}</div><div style="text-align:right;font-size:14px;font-variant-numeric:tabular-nums"><span style="font-weight:700">{{ dy.hi }}</span><span style="color:rgba(235,235,245,.45)"> / {{ dy.lo }}</span></div></div></sc-for></div>
+</div></div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 18px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:6px"><span style="width:34px;height:34px;flex:none;display:inline-flex"><sc-if value="{{ wx.isSun }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ wx.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ wx.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ wx.isRain }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ wx.temp }}</div><div style="font-size:13px;color:rgba(235,235,245,.7)">{{ wx.hiLo }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:end"><sc-for list="{{ hoursX5 }}" as="hr" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0"><div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">{{ hr.temp }}</div><div style="width:100%;max-width:26px;height:54px;display:flex;align-items:flex-end"><div style="width:100%;height:{{ hr.barH }};border-radius:6px;background:{{ hr.barBg }}"></div></div><div style="font-size:12px;font-weight:600;color:{{ hr.labelColor }}">{{ hr.label }}</div></div></sc-for></div>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="width:34px;height:34px;flex:none;display:inline-flex"><sc-if value="{{ wx.isSun }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ wx.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ wx.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ wx.isRain }}" hint-placeholder-val="{{ false }}"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6)">{{ wx.city }}</div></div>
+<div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ wx.temp }}</div><div style="font-size:13px;font-weight:600">{{ wx.cond }}</div><div style="font-size:12px;color:rgba(235,235,245,.6)">{{ wx.hiLo }} · Rain {{ wx.popToday }}</div></div>
+</div></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">
+<sc-for list="{{ calWeek }}" as="cd" hint-placeholder-count="7">
+<div style="min-height:0;display:flex;flex-direction:column;gap:8px;overflow:hidden">
+<div style="height:30px;border-radius:9px;background:{{ cd.headBg }};display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;color:{{ cd.headFg }}"><span style="text-transform:uppercase;letter-spacing:.4px">{{ cd.dow }}</span><span style="font-variant-numeric:tabular-nums">{{ cd.num }}</span></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{ cd.events }}" as="ev" hint-placeholder-count="2"><div style="border-radius:9px;padding:6px 7px;background:{{ ev.tint }};opacity:{{ ev.op }}"><div style="font-size:11px;font-weight:700;color:{{ ev.color }};font-variant-numeric:tabular-nums">{{ ev.start }}</div><div lang="en" style="font-size:12px;font-weight:600;line-height:1.2;hyphens:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ ev.title }}</div></div></sc-for>
+</div>
+</div>
+</sc-for>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Large · 2×2</div>
+<div style="width:356px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:48px;flex:none;border-radius:12px;background:#2C2C2E;overflow:hidden;display:flex;flex-direction:column"><div style="height:14px;background:#0A84FF;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;letter-spacing:.5px">{{ calMonthShort }}</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">{{ calTodayNum }}</div></div><div style="display:flex;flex-direction:column"><div style="font-size:18px;font-weight:700">{{ calTodayDow }}</div><div style="font-size:13px;color:rgba(235,235,245,.6)">{{ calLeftLabel }}</div></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ todayEvents }}" as="ev" hint-placeholder-count="4"><div style="display:flex;align-items:stretch;gap:10px;opacity:{{ ev.op }}"><div style="width:44px;flex:none;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums"><div style="font-size:13px;font-weight:700">{{ ev.start }}</div><div style="font-size:11px;color:rgba(235,235,245,.5)">{{ ev.end }}</div></div><div style="flex:1;min-width:0;border-radius:10px;padding:6px 10px;background:{{ ev.tint }};display:flex;flex-direction:column;justify-content:center"><div style="font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ev.title }}</div><div style="font-size:11px;font-weight:600;color:{{ ev.color }}">{{ ev.cal }}</div></div></div></sc-for></div>
+</div></div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 16px;display:flex;gap:14px">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="width:64px;height:64px;flex:none;border-radius:15px;background:#2C2C2E;overflow:hidden;display:flex;flex-direction:column"><div style="height:19px;background:#0A84FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;letter-spacing:.5px">{{ calMonthShort }}</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:700;font-variant-numeric:tabular-nums">{{ calTodayNum }}</div></div><div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.6);width:64px;text-align:center">{{ calTodayDowShort }}</div></div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:7px"><sc-for list="{{ upcoming3 }}" as="ev" hint-placeholder-count="3"><div style="display:flex;align-items:stretch;gap:10px;opacity:{{ ev.op }}"><div style="width:44px;flex:none;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums"><div style="font-size:12px;font-weight:700">{{ ev.start }}</div><div style="font-size:10px;color:rgba(235,235,245,.5)">{{ ev.end }}</div></div><div style="flex:1;min-width:0;border-radius:10px;padding:6px 10px;background:{{ ev.tint }};display:flex;flex-direction:column;justify-content:center"><div style="font-size:13px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ev.title }}</div><div style="font-size:10px;font-weight:600;color:{{ ev.color }}">{{ ev.cal }}</div></div></div></sc-for></div>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Small · 1×1</div>
+<div style="width:170px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:46px;height:46px;flex:none;border-radius:11px;background:#2C2C2E;overflow:hidden;display:flex;flex-direction:column"><div style="height:14px;background:#0A84FF;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;letter-spacing:.5px">{{ calMonthShort }}</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums">{{ calTodayNum }}</div></div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.7)">{{ calTodayDowShort }}</div></div>
+<div style="border-radius:12px;padding:8px 10px;background:{{ nextEv.tint }};min-width:0"><div style="font-size:12px;font-weight:700;color:{{ nextEv.color }};font-variant-numeric:tabular-nums">{{ nextEv.timeLabel }}</div><div style="font-size:14px;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ nextEv.title }}</div></div>
+</div></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullWeather }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px">
+<div style="min-height:0;display:flex;flex-direction:column;gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:22px 24px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:12px"><span style="width:56px;height:56px;flex:none;display:inline-flex"><sc-if value="{{ wx.isSun }}" hint-placeholder-val="{{ false }}"><svg width="56" height="56" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ wx.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="56" height="56" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ wx.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="56" height="56" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ wx.isRain }}" hint-placeholder-val="{{ false }}"><svg width="56" height="56" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:72px;font-weight:700;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums">{{ wx.temp }}</div></div><div style="font-size:17px;color:rgba(235,235,245,.75);white-space:nowrap">{{ wx.cond }} · {{ wx.hiLo }} · Feels {{ wx.feels }}</div></div><div style="font-size:17px;font-weight:600;color:rgba(235,235,245,.7)">{{ wx.city }}</div></div>
+<div style="font-size:15px;color:rgba(235,235,245,.75);border-radius:12px;background:#2C2C2E;padding:10px 14px">{{ wx.summary }}</div>
+<div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end"><sc-for list="{{ hoursX12 }}" as="hr" hint-placeholder-count="12"><div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0"><div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">{{ hr.temp }}</div><div style="width:100%;max-width:26px;height:90px;display:flex;align-items:flex-end"><div style="width:100%;height:{{ hr.barH }};border-radius:6px;background:{{ hr.barBg }}"></div></div><span style="width:20px;height:20px;flex:none;display:inline-flex"><sc-if value="{{ hr.isSun }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ hr.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ hr.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ hr.isRain }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="font-size:12px;font-weight:600;color:{{ hr.labelColor }}">{{ hr.label }}</div></div></sc-for></div>
+</section>
+<section style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:12px">
+<sc-for list="{{ wxDetails }}" as="wd" hint-placeholder-count="6"><div style="border-radius:20px;background:#1C1C1E;padding:12px 16px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:0"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ wd.label }}</div><div style="font-size:24px;font-weight:700;font-variant-numeric:tabular-nums">{{ wd.value }}</div><div style="font-size:12px;color:rgba(235,235,245,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ wd.note }}</div></div></sc-for>
+</section>
+</div>
+<section style="border-radius:26px;background:#1C1C1E;padding:20px 22px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto">
+<div style="font-size:20px;font-weight:700;padding-bottom:4px">Next 10 days</div>
+<div style="display:flex;flex-direction:column"><sc-for list="{{ daysX10 }}" as="dy" hint-placeholder-count="10"><div style="display:grid;grid-template-columns:minmax(0,1fr) 24px 56px 76px;align-items:center;gap:10px;min-height:52px;border-top:{{ dy.sep }}"><div style="font-size:16px;font-weight:600">{{ dy.day }}</div><span style="width:22px;height:22px;flex:none;display:inline-flex"><sc-if value="{{ dy.isSun }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#FFD60A"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="#FFD60A" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if><sc-if value="{{ dy.isPartly }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="4" fill="#FFD60A"></circle><path d="M8 20h9.5a3.8 3.8 0 0 0 .4-7.6A5.6 5.6 0 0 0 7.4 13 3.5 3.5 0 0 0 8 20Z" fill="#E5E5EA"></path></svg></sc-if><sc-if value="{{ dy.isCloud }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 19h10.5a4.2 4.2 0 0 0 .5-8.4A6.2 6.2 0 0 0 6.3 11.4 3.8 3.8 0 0 0 7 19Z" fill="#C7C7CC"></path></svg></sc-if><sc-if value="{{ dy.isRain }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8A6 6 0 0 0 6.3 7.6 3.7 3.7 0 0 0 7 15Z" fill="#C7C7CC"></path><path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" stroke="#64D2FF" stroke-width="1.8" stroke-linecap="round"></path></svg></sc-if></span><div style="justify-self:start;height:22px;padding:0 7px;border-radius:7px;background:{{ dy.popBg }};display:flex;align-items:center;font-size:12px;font-weight:600;color:{{ dy.popFg }};font-variant-numeric:tabular-nums">{{ dy.pop }}</div><div style="text-align:right;font-size:16px;font-variant-numeric:tabular-nums"><span style="font-weight:700">{{ dy.hi }}</span><span style="color:rgba(235,235,245,.45)"> / {{ dy.lo }}</span></div></div></sc-for></div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullCalendar }}" hint-placeholder-val="{{ false }}">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px">
+<div style="display:flex;align-items:baseline;gap:12px;white-space:nowrap;min-width:0"><div style="font-size:24px;font-weight:700">{{ calHeadTitle }}</div><div style="font-size:15px;color:rgba(235,235,245,.6)">{{ calHeadSub }}</div></div>
+<div style="display:flex;align-items:center;gap:10px;flex:none"><div style="display:flex;gap:3px;padding:3px;border-radius:13px;background:#2C2C2E"><sc-for list="{{ calModes }}" as="cm" hint-placeholder-count="2"><button onClick="{{ cm.pick }}" style="height:30px;border:none;border-radius:10px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;background:{{ cm.bg }};color:#fff;transition:background .2s">{{ cm.name }}</button></sc-for></div><button onClick="{{ goToday }}" style="height:36px;border:none;border-radius:10px;padding:0 14px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Today</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullCalendar }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px">
+<div style="min-height:0;min-width:0;display:flex">
+<sc-if value="{{ fullCalMonth }}" hint-placeholder-val="{{ false }}"><section style="flex:1;min-width:0;border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:0">
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center"><sc-for list="{{ dowHeads }}" as="dh" hint-placeholder-count="7"><div style="font-size:12px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase">{{ dh }}</div></sc-for></div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;gap:6px">
+<sc-for list="{{ mCells }}" as="mc" hint-placeholder-count="35">
+<div onClick="{{ mc.pick }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:12px;cursor:pointer;background:{{ mc.bg }};box-shadow:{{ mc.ring }};opacity:{{ mc.op }}">
+<div style="font-size:17px;font-weight:{{ mc.weight }};color:{{ mc.numColor }};font-variant-numeric:tabular-nums">{{ mc.num }}</div>
+<div style="display:flex;gap:3px;height:5px"><sc-for list="{{ mc.dots }}" as="dt" hint-placeholder-count="0"><span style="width:10px;height:4px;border-radius:2px;background:{{ dt }}"></span></sc-for></div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ calLegend }}" as="lg" hint-placeholder-count="4"><div style="height:28px;padding:0 10px;border-radius:8px;background:{{ lg.tint }};display:flex;align-items:center;font-size:13px;font-weight:600;color:{{ lg.color }}">{{ lg.name }}</div></sc-for></div>
+</section></sc-if>
+<sc-if value="{{ fullCalWeek }}" hint-placeholder-val="{{ false }}"><section style="flex:1;min-height:0;min-width:0;border-radius:26px;background:#1C1C1E;padding:16px 18px 18px 10px;display:flex;flex-direction:column;gap:10px">
+<div style="flex:none;display:grid;grid-template-columns:40px repeat(7,minmax(0,1fr));column-gap:4px">
+<div></div>
+<sc-for list="{{ calWeek }}" as="cd" hint-placeholder-count="7"><div onClick="{{ cd.pick }}" style="height:46px;border-radius:12px;background:{{ cd.headBg }};box-shadow:{{ cd.selRing }};display:flex;flex-direction:column;align-items:center;justify-content:center;color:{{ cd.headFg }};cursor:pointer;transition:background .2s,box-shadow .2s"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">{{ cd.dow }}</div><div style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1">{{ cd.num }}</div></div></sc-for>
+</div>
+<div style="flex:1;min-height:0;position:relative;display:grid;grid-template-columns:40px repeat(7,minmax(0,1fr));column-gap:4px">
+<div style="position:absolute;inset:0;pointer-events:none"><sc-for list="{{ weekHours }}" as="hr" hint-placeholder-count="16"><div style="position:absolute;left:40px;right:0;top:{{ hr.top }};height:0;border-top:0.5px solid rgba(84,84,88,.55)"><div style="position:absolute;left:-40px;top:-7px;width:32px;text-align:right;font-size:11px;font-weight:600;color:rgba(235,235,245,.45);font-variant-numeric:tabular-nums">{{ hr.label }}</div></div></sc-for></div>
+<div></div>
+<sc-for list="{{ calWeek }}" as="cd" hint-placeholder-count="7">
+<div onClick="{{ cd.pick }}" style="position:relative;min-width:0;border-radius:8px;background:{{ cd.colBg }};cursor:pointer;transition:background .2s">
+<sc-for list="{{ cd.blocks }}" as="ev" hint-placeholder-count="2"><div style="position:absolute;left:2px;right:2px;top:{{ ev.top }};height:{{ ev.height }};min-height:18px;box-sizing:border-box;border-radius:6px;padding:{{ ev.pad }};background:{{ ev.solid }};opacity:{{ ev.op }};overflow:hidden;display:flex;flex-direction:{{ ev.dir }};align-items:{{ ev.align }};gap:{{ ev.gap }}"><div style="flex-shrink:0;max-width:100%;font-size:12px;font-weight:600;line-height:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ev.title }}</div><div style="flex-shrink:1;min-width:0;font-size:11px;font-weight:600;line-height:15px;color:{{ ev.color }};font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden">{{ ev.start }}</div></div></sc-for>
+<sc-if value="{{ cd.showNow }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:-3px;right:0;top:{{ cd.nowTop }};height:2px;background:#FF453A;pointer-events:none"><div style="position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:4px;background:#FF453A"></div></div></sc-if>
+</div>
+</sc-for>
+</div>
+</section></sc-if>
+</div>
+<section style="border-radius:26px;background:#1C1C1E;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:0">
+<div style="display:flex;align-items:center;gap:14px"><div style="width:60px;height:60px;flex:none;border-radius:15px;background:#2C2C2E;overflow:hidden;display:flex;flex-direction:column"><div style="height:18px;background:#0A84FF;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;letter-spacing:.5px">{{ selMonthShort }}</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:700">{{ selNum }}</div></div><div style="display:flex;flex-direction:column"><div style="font-size:24px;font-weight:700">{{ selDow }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ selCount }}</div></div></div>
+<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px"><sc-for list="{{ selEvents }}" as="ev" hint-placeholder-count="4"><div style="display:flex;align-items:stretch;gap:10px;opacity:{{ ev.op }}"><div style="width:44px;flex:none;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums"><div style="font-size:16px;font-weight:700">{{ ev.start }}</div><div style="font-size:14px;color:rgba(235,235,245,.5)">{{ ev.end }}</div></div><div style="flex:1;min-width:0;border-radius:10px;padding:6px 10px;background:{{ ev.tint }};display:flex;flex-direction:column;justify-content:center"><div style="font-size:17px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ev.title }}</div><div style="font-size:14px;font-weight:600;color:{{ ev.color }}">{{ ev.cal }}</div></div></div></sc-for>
+<sc-if value="{{ selEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:17px;color:rgba(235,235,245,.6);padding:16px 0">Nothing planned.</div></sc-if>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 auto;display:grid;grid-template-columns:728px 356px;gap:16px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Extra large · 4×2</div>
+<div style="width:728px;height:356px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><div style="font-size:20px;font-weight:700">Home</div><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ planSummary }}</div></div>
+<div style="position:relative;width:100%;aspect-ratio:1140/460">
+<svg viewBox="0 0 1140 460" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+<polygon points="0,0 1140,0 1140,460 250,460 250,250 215,220 0,220" fill="none" stroke="#636366" stroke-width="12" stroke-linejoin="round"></polygon>
+<g fill="#262628" stroke="#636366" stroke-width="4" stroke-linejoin="round">
+<polygon points="0,0 425,0 425,280 330,280 255,150 0,150"></polygon>
+<polygon points="425,0 530,0 530,280 425,280"></polygon>
+<polygon points="0,150 255,150 330,280 330,370 530,370 530,460 250,460 250,250 215,220 0,220"></polygon>
+<polygon points="330,280 530,280 530,370 330,370"></polygon>
+<polygon points="530,0 760,0 760,280 860,280 860,460 530,460"></polygon>
+<polygon points="760,0 860,0 860,280 760,280"></polygon>
+<polygon points="860,0 1140,0 1140,460 860,460"></polygon>
+</g>
+<g stroke="#262628" stroke-width="7"><line x1="90" y1="150" x2="160" y2="150"></line><line x1="360" y1="370" x2="420" y2="370"></line><line x1="530" y1="110" x2="530" y2="170"></line><line x1="530" y1="380" x2="530" y2="450"></line><line x1="785" y1="280" x2="835" y2="280"></line><line x1="860" y1="340" x2="860" y2="410"></line></g>
+<line x1="0" y1="160" x2="0" y2="210" stroke="#1C1C1E" stroke-width="14"></line>
+</svg>
+<sc-for list="{{ glowsAll }}" as="gl" hint-placeholder-count="0"><div style="position:absolute;inset:0;clip-path:{{ gl.clip }};pointer-events:none"><div style="position:absolute;left:{{ gl.left }};top:{{ gl.top }};width:{{ gl.size }};aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:{{ gl.bg }};opacity:{{ gl.op }};mix-blend-mode:screen;transition:{{ gl.trans }}"></div></div></sc-for>
+<sc-for list="{{ fpLabels }}" as="lb" hint-placeholder-count="6"><div style="position:absolute;left:{{ lb.left }};top:{{ lb.top }};font-size:11px;font-weight:600;color:{{ lb.color }};pointer-events:none;white-space:nowrap">{{ lb.name }}</div></sc-for>
+<sc-for list="{{ planClusters }}" as="cl" hint-placeholder-count="0"><div onClick="{{ cl.openXL }}" style="position:absolute;left:{{ cl.left }};top:{{ cl.top }};width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:13px;background:#48484A;box-shadow:{{ cl.shadowS }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;cursor:pointer;z-index:3">{{ cl.count }}</div></sc-for>
+<sc-for list="{{ xlMarks }}" as="m" hint-placeholder-count="0">
+<div onClick="{{ m.open }}" style="position:absolute;left:{{ m.left }};top:{{ m.top }};width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:12px;background:{{ m.bg }};box-shadow:{{ m.shadowS }};color:{{ m.fg }};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700">
+<sc-if value="{{ m.isLight }}" hint-placeholder-val="{{ false }}"><svg width="9" height="12" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ m.isPlant }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></sc-if><sc-if value="{{ m.isSpeaker }}" hint-placeholder-val="{{ false }}"><svg width="9" height="12" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle></svg></sc-if>
+{{ m.letter }}
+<sc-if value="{{ m.isPlaying }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:-2px;right:-2px;width:9px;height:9px;border-radius:5px;background:#30D158;border:1.5px solid #1C1C1E"></div></sc-if>
+</div>
+</sc-for>
+</div>
+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.5)">Medium · 2×1</div>
+<div style="width:356px;height:170px;box-sizing:border-box;border-radius:24px;background:#1C1C1E;padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:17px;font-weight:700">Home</div>
+<sc-for list="{{ homeStats }}" as="h" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;min-width:0">
+<div style="width:28px;height:28px;flex:none;border-radius:14px;background:{{ h.bg }};color:{{ h.fg }};display:flex;align-items:center;justify-content:center">
+<sc-if value="{{ h.isL }}" hint-placeholder-val="{{ false }}"><svg width="10" height="13" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ h.isP }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></sc-if>
+<sc-if value="{{ h.isS }}" hint-placeholder-val="{{ false }}"><svg width="10" height="13" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle></svg></sc-if>
+</div>
+<div style="flex:1;font-size:15px;font-weight:600">{{ h.label }}</div>
+<div style="font-size:15px;font-weight:600;color:{{ h.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ h.val }}</div>
+</div></sc-for>
+</div></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ fullPlan }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:16px">
+<section style="flex:none;border-radius:26px;background:#1C1C1E;padding:14px 18px 18px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:16px;height:36px">
+<div style="display:flex;gap:6px;flex:none"><sc-for list="{{ layerChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.toggle }}" style="height:34px;border:none;border-radius:17px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.color }}">{{ c.name }}</button></sc-for></div>
+</div>
+<div ref="{{ planRef }}" style="position:relative;width:100%;aspect-ratio:1140/460;user-select:none;-webkit-user-select:none">
+<svg viewBox="0 0 1140 460" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+<polygon points="0,0 1140,0 1140,460 250,460 250,250 215,220 0,220" fill="none" stroke="#636366" stroke-width="12" stroke-linejoin="round"></polygon>
+<g fill="#262628" stroke="#636366" stroke-width="4" stroke-linejoin="round" style="cursor:pointer">
+<polygon points="0,0 425,0 425,280 330,280 255,150 0,150" onClick="{{ rs.office }}"></polygon>
+<polygon points="425,0 530,0 530,280 425,280" onClick="{{ rs.storage }}"></polygon>
+<polygon points="0,150 255,150 330,280 330,370 530,370 530,460 250,460 250,250 215,220 0,220" onClick="{{ rs.hall }}"></polygon>
+<polygon points="330,280 530,280 530,370 330,370" onClick="{{ rs.storage2 }}"></polygon>
+<polygon points="530,0 760,0 760,280 860,280 860,460 530,460" onClick="{{ rs.kitchen }}"></polygon>
+<polygon points="760,0 860,0 860,280 760,280" onClick="{{ rs.wc }}"></polygon>
+<polygon points="860,0 1140,0 1140,460 860,460" onClick="{{ rs.sleep }}"></polygon>
+</g>
+<g stroke="#262628" stroke-width="7" style="pointer-events:none"><line x1="90" y1="150" x2="160" y2="150"></line><line x1="360" y1="370" x2="420" y2="370"></line><line x1="530" y1="110" x2="530" y2="170"></line><line x1="530" y1="380" x2="530" y2="450"></line><line x1="785" y1="280" x2="835" y2="280"></line><line x1="860" y1="340" x2="860" y2="410"></line></g>
+<line x1="0" y1="160" x2="0" y2="210" stroke="#1C1C1E" stroke-width="14"></line>
+<sc-if value="{{ hasSelRoom }}" hint-placeholder-val="{{ false }}"><polygon points="{{ selRoomPts }}" fill="rgba(10,132,255,.12)" stroke="#0A84FF" stroke-width="4" stroke-linejoin="round" style="pointer-events:none"></polygon></sc-if>
+</svg>
+<sc-for list="{{ glowsAll }}" as="gl" hint-placeholder-count="0"><div style="position:absolute;inset:0;clip-path:{{ gl.clip }};pointer-events:none"><div style="position:absolute;left:{{ gl.left }};top:{{ gl.top }};width:{{ gl.size }};aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:{{ gl.bg }};opacity:{{ gl.op }};mix-blend-mode:screen;transition:{{ gl.trans }}"></div></div></sc-for>
+<sc-for list="{{ fpLabels }}" as="lb" hint-placeholder-count="6"><div style="position:absolute;left:{{ lb.left }};top:{{ lb.top }};display:flex;flex-direction:column;pointer-events:none;white-space:nowrap"><div style="font-size:15px;font-weight:700;color:{{ lb.color }}">{{ lb.name }}</div><div style="font-size:12px;font-weight:600;color:rgba(235,235,245,.4)">{{ lb.area }}</div></div></sc-for>
+<sc-for list="{{ planBubbles }}" as="b" hint-placeholder-count="0">
+<div style="position:absolute;left:{{ b.discLeft }};top:{{ b.discTop }};width:{{ b.discW }};height:58px;transform:{{ b.discT }};transform-origin:{{ b.discOrigin }};opacity:{{ b.discOp }};border-radius:29px;background:rgba(58,58,60,.72);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 0 0.5px 0 rgba(255,255,255,.3),0 10px 30px rgba(0,0,0,.45);pointer-events:none;z-index:8;transition:transform .4s cubic-bezier(.3,1.35,.5,1),opacity .2s"></div>
+<div onClick="{{ b.toggle }}" style="position:absolute;left:{{ b.left }};top:{{ b.top }};width:{{ b.w }};height:{{ b.w }};border-radius:50%;background:{{ b.bg }};box-shadow:{{ b.shadow }};transform:{{ b.t }};pointer-events:{{ b.pe }};display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:{{ b.z }};color:#fff;transition:left .45s cubic-bezier(.3,1.25,.5,1),top .45s cubic-bezier(.3,1.25,.5,1),transform .4s cubic-bezier(.3,1.5,.5,1),width .25s,height .25s,background .25s,box-shadow .2s">
+<div style="font-size:{{ b.fs }};font-weight:800;line-height:1">{{ b.label }}</div>
+<sc-if value="{{ b.showPill }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:-2px;right:-6px;min-width:22px;height:22px;box-sizing:border-box;padding:0 6px;border-radius:11px;background:{{ b.pillBg }};color:{{ b.pillFg }};border:2px solid #1C1C1E;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ b.count }}</div></sc-if>
+<sc-if value="{{ b.badge }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:9px;background:#FF453A;border:2px solid #1C1C1E;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center">!</div></sc-if>
+<sc-if value="{{ b.hot }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:9px;background:#0A84FF;font-size:12px;font-weight:700;color:#fff;pointer-events:none">Add to group</div></sc-if>
+</div>
+</sc-for>
+<sc-for list="{{ planDevs }}" as="m" hint-placeholder-count="0">
+<div onPointerDown="{{ m.down }}" style="position:absolute;left:{{ m.left }};top:{{ m.top }};width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:22px;background:{{ m.bg }};box-shadow:{{ m.shadow }};color:{{ m.fg }};display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;font-size:17px;font-weight:700;z-index:{{ m.z }};transform:{{ m.tf }};opacity:{{ m.op }};pointer-events:{{ m.pe }};transition:{{ m.trans }}">
+<sc-if value="{{ m.isLight }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ m.isPlant }}" hint-placeholder-val="{{ false }}"><svg width="17" height="17" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></sc-if><sc-if value="{{ m.isSpeaker }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle><circle cx="7" cy="5" r="1.2" fill="currentColor"></circle></svg></sc-if>
+{{ m.letter }}
+<sc-if value="{{ m.isOverdue }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:9px;background:#FF453A;border:2px solid #1C1C1E;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center">!</div></sc-if>
+<sc-if value="{{ m.isPlaying }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;border-radius:7px;background:#30D158;border:2px solid #1C1C1E"></div></sc-if>
+<sc-if value="{{ m.showName }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:52px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:9px;background:rgba(0,0,0,.8);font-size:12px;font-weight:600;color:#fff;pointer-events:none">{{ m.name }}</div></sc-if>
+<sc-if value="{{ m.isTarget }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:54px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:9px;background:#0A84FF;font-size:12px;font-weight:700;color:#fff;pointer-events:none">Group</div></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px">
+<section style="border-radius:26px;background:#1C1C1E;padding:16px 20px;display:flex;flex-direction:column;justify-content:center;min-height:0;min-width:0;overflow:hidden">
+
+<sc-if value="{{ insNone }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:20px;font-weight:700">Tap a room or device</div><div style="font-size:15px;color:rgba(235,235,245,.6)">Drag anything on the plan to move it. Lights glow in the room they're in.</div></div></sc-if>
+
+<sc-if value="{{ insRoom }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:700">{{ ins.name }}</div><div style="font-size:14px;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.sub }}</div></div>
+<sc-if value="{{ ins.hasLights }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ins.lightsToggle }}" style="height:38px;border:none;border-radius:19px;padding:0 16px;font-size:15px;font-weight:600;background:#2C2C2E;color:#fff;cursor:pointer">{{ ins.lightsLabel }}</button></sc-if>
+<sc-if value="{{ ins.hasDue }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ins.water }}" style="height:38px;border:none;border-radius:19px;padding:0 16px;font-size:15px;font-weight:600;background:#0A84FF;color:#fff;cursor:pointer">{{ ins.waterLabel }}</button></sc-if>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px"><sc-for list="{{ ins.stats }}" as="st" hint-placeholder-count="3"><div style="border-radius:14px;background:#2C2C2E;padding:9px 14px;min-width:0"><div style="font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">{{ st.label }}</div><div style="font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ st.val }}</div></div></sc-for></div>
+</div></sc-if>
+
+<sc-if value="{{ insLight }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:14px">
+<div onClick="{{ ins.toggle }}" style="width:48px;height:48px;flex:none;border-radius:24px;background:{{ ins.iconBg }};color:{{ ins.iconFg }};box-shadow:{{ ins.glow }};display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="20" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></div>
+<div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.name }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ ins.room }} · {{ ins.status }}</div></div>
+<sc-if value="{{ insCanRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ins.remove }}" style="height:36px;border:none;border-radius:18px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer">Remove</button></sc-if>
+</div>
+<div style="display:flex;align-items:center;gap:14px">
+<div onPointerDown="{{ ins.bri.down }}" onPointerMove="{{ ins.bri.move }}" onPointerUp="{{ ins.bri.up }}" style="flex:1;height:40px;border-radius:12px;background:#3A3A3C;position:relative;overflow:hidden;cursor:pointer;touch-action:none"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ ins.pct }};background:{{ ins.color }}"></div><div style="position:absolute;left:14px;top:0;bottom:0;display:flex;align-items:center;font-size:14px;font-weight:700;color:{{ ins.pctText }};pointer-events:none">{{ ins.pctLabel }}</div></div>
+<div style="display:flex;gap:8px"><sc-for list="{{ ins.swatches }}" as="w" hint-placeholder-count="5"><div onClick="{{ w.pick }}" style="width:30px;height:30px;border-radius:15px;background:{{ w.c }};box-shadow:{{ w.ring }};cursor:pointer"></div></sc-for></div>
+</div>
+</div></sc-if>
+
+<sc-if value="{{ insPlant }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:16px;align-items:center">
+<div style="width:100px;height:100px;flex:none;border-radius:18px;background:{{ ins.photo }};display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:rgba(235,235,245,.6)">{{ ins.letter }}</div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div style="font-size:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.name }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ ins.room }} · {{ ins.schedule }}</div><div style="font-size:15px;font-weight:600;color:{{ ins.stColor }};padding-top:4px">{{ ins.status }}</div></div>
+<div style="display:flex;flex-direction:column;gap:8px;flex:none;align-items:stretch">
+<button onClick="{{ ins.water }}" style="height:40px;border:none;border-radius:20px;padding:0 18px;font-size:15px;font-weight:600;background:{{ ins.waterBg }};color:#fff;cursor:pointer">{{ ins.waterLabel }}</button>
+<sc-if value="{{ insCanRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ins.remove }}" style="height:36px;border:none;border-radius:18px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer">Remove</button></sc-if>
+</div>
+</div></sc-if>
+
+<sc-if value="{{ insSpeaker }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:14px">
+<div style="width:48px;height:48px;flex:none;border-radius:24px;background:#2C2C2E;color:{{ ins.iconFg }};display:flex;align-items:center;justify-content:center"><svg width="16" height="20" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle><circle cx="7" cy="5" r="1.2" fill="currentColor"></circle></svg></div>
+<div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.name }}</div><div style="font-size:14px;color:rgba(235,235,245,.6)">{{ ins.room }} · {{ ins.status }}</div></div>
+<button onClick="{{ ins.toggle }}" style="height:36px;border:none;border-radius:18px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#fff;cursor:pointer">{{ ins.toggleLabel }}</button>
+<sc-if value="{{ insCanRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ins.remove }}" style="height:36px;border:none;border-radius:18px;padding:0 14px;font-size:14px;font-weight:600;background:#2C2C2E;color:#FF6961;cursor:pointer">Remove</button></sc-if>
+</div>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:40px;height:40px;flex:none;border-radius:8px;background:{{ ins.track.art }}"></div>
+<div style="width:150px;flex:none;min-width:0"><div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.track.title }}</div><div style="font-size:13px;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ins.track.artist }}</div></div>
+<button onClick="{{ ins.togglePlay }}" style="width:40px;height:40px;flex:none;border:none;border-radius:20px;background:#fff;color:#1C1C1E;display:flex;align-items:center;justify-content:center;cursor:pointer">
+<sc-if value="{{ ins.playing }}" hint-placeholder-val="{{ true }}"><svg width="14" height="16" viewBox="0 0 14 16"><rect x="2" y="1" width="3.5" height="14" rx="1" fill="currentColor"></rect><rect x="8.5" y="1" width="3.5" height="14" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ ins.paused }}" hint-placeholder-val="{{ false }}"><svg width="14" height="16" viewBox="0 0 14 16"><path d="M3 1.5v13l10-6.5z" fill="currentColor"></path></svg></sc-if>
+</button>
+<div onPointerDown="{{ ins.vol.down }}" onPointerMove="{{ ins.vol.move }}" onPointerUp="{{ ins.vol.up }}" style="flex:1;height:40px;border-radius:12px;background:#3A3A3C;position:relative;overflow:hidden;cursor:pointer;touch-action:none"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ ins.volPct }};background:#fff"></div><div style="position:absolute;left:14px;top:0;bottom:0;display:flex;align-items:center;font-size:14px;font-weight:700;color:{{ ins.volText }};pointer-events:none">Volume {{ ins.volPct }}</div></div>
+</div>
+</div></sc-if>
+
+</section>
+<section style="border-radius:26px;background:#1C1C1E;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><div style="font-size:17px;font-weight:700;white-space:nowrap">Not placed</div><div style="font-size:13px;color:rgba(235,235,245,.6);white-space:nowrap">Drag onto the plan</div></div>
+<div style="flex:1;min-height:0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:6px 4px;align-items:flex-start">
+<sc-for list="{{ trayItems }}" as="m" hint-placeholder-count="5">
+<div onPointerDown="{{ m.down }}" style="width:62px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:grab;touch-action:none">
+<div style="width:44px;height:44px;border-radius:22px;background:{{ m.bg }};box-shadow:{{ m.shadow }};color:{{ m.fg }};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700">
+<sc-if value="{{ m.isLight }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ m.isPlant }}" hint-placeholder-val="{{ false }}"><svg width="17" height="17" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></sc-if><sc-if value="{{ m.isSpeaker }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle><circle cx="7" cy="5" r="1.2" fill="currentColor"></circle></svg></sc-if>
+{{ m.letter }}
+</div>
+<div style="font-size:11px;font-weight:600;color:rgba(235,235,245,.7);width:62px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div>
+</div>
+</sc-for>
+<sc-if value="{{ trayEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;color:rgba(235,235,245,.6)">Everything is on the plan.</div></sc-if>
+</div>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasGhost }}" hint-placeholder-val="{{ false }}"><div style="position:fixed;left:{{ ghost.left }};top:{{ ghost.top }};width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:22px;background:{{ ghost.bg }};color:{{ ghost.fg }};box-shadow:0 10px 28px rgba(0,0,0,.55),0 0 0 3px #fff;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:50;font-size:17px;font-weight:700">
+<sc-if value="{{ ghost.isLight }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><path d="M7 1a5.5 5.5 0 0 0-3.3 9.9c.5.4.8 1 .8 1.6V13h5v-.5c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 7 1z" fill="currentColor"></path><rect x="4.5" y="14.5" width="5" height="2" rx="1" fill="currentColor"></rect></svg></sc-if>
+<sc-if value="{{ ghost.isPlant }}" hint-placeholder-val="{{ false }}"><svg width="17" height="17" viewBox="0 0 16 16"><path d="M14 2C7 2 2 5 2 11c0 1 .2 2 .6 3C4 9 7 7 11 6 8 8 5.5 10.5 4 14.5c1 .3 1.8.5 3 .5 5 0 7-5 7-13z" fill="currentColor"></path></svg></sc-if><sc-if value="{{ ghost.isSpeaker }}" hint-placeholder-val="{{ false }}"><svg width="15" height="19" viewBox="0 0 14 18"><rect x="1.5" y="1" width="11" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"></rect><circle cx="7" cy="11.2" r="2.6" fill="currentColor"></circle></svg></sc-if>
+{{ ghost.letter }}
+</div></sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1290,&quot;height&quot;:930},&quot;groupStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Stack&quot;,&quot;Ring&quot;],&quot;default&quot;:&quot;Stack&quot;,&quot;tsType&quot;:&quot;'Stack' | 'Ring'&quot;,&quot;section&quot;:&quot;Floor plan&quot;}}">
+class Component extends DCLogic {
+  state = {
+    tab: 8, full: true, fpSel: null, fpOpen: null, fpDrag: null, ghost: null, fpLayers: { plants: true, lights: true, speakers: true, glow: true },
+    fp: [
+      ...[['l1', 'Desk lamp', 400, 60, true, 80, '#FFB340'], ['l2', 'Ceiling light', 320, 190, false, 90, '#FFE08A'], ['l3', 'Hall light', 290, 400, true, 40, '#FFB340'], ['l4', 'Pendant', 645, 200, true, 100, '#FFE08A'], ['l5', 'Mirror light', 810, 140, false, 80, '#BFE3FF'], ['l6', 'Bedside lamp', 1090, 140, true, 30, '#FF9F6B'], ['l7', 'Ceiling light', 1000, 260, false, 60, '#FFE08A'], ['l8', 'Floor lamp', 570, 230, false, 60, '#FFB340', false]]
+        .map(([id, name, x, y, on, bri, color, placed = true]) => ({ id, type: 'light', name, x, y, on, bri, color, placed })),
+      ...[['s1', 'Office speaker', 60, 110, true, 35], ['s2', 'Kitchen speaker', 590, 410, true, 50], ['s3', 'Sleep speaker', 905, 420, false, 25], ['s4', 'Portable speaker', 570, 230, false, 40, false]]
+        .map(([id, name, x, y, on, vol, placed = true]) => ({ id, type: 'speaker', name, x, y, on, vol, placed })),
+      ...[[0, 230, 40], [1, 40, 45], [8, 385, 240], [5, 712, 60], [7, 732, 74], [6, 714, 88], [9, 575, 45], [16, 470, 410], [10, 1095, 410], [11, 1095, 45], [14, 810, 235], [2], [3], [4], [12], [13], [15]]
+        .map(([pi, x, y]) => ({ id: 'p' + pi, type: 'plant', pi, x: x ?? 570, y: y ?? 230, placed: x != null }))
+    ],
+    calSel: 0, calMode: 'month', draft: '', now: new Date(), photos: {},
+    todos: [
+      { title: 'Call plumber about the kitchen sink', time: '09:30', done: true },
+      { title: 'Team sync', time: '11:00', done: false },
+      { title: 'Pick up dry cleaning', time: '13:00', done: false },
+      { title: 'Gym — leg day', time: '18:30', done: false },
+      { title: 'Book dentist appointment', time: '', done: false },
+      { title: 'Order cat food', time: '', done: false }
+    ],
+    plants: [
+      ['Fiddle Leaf Fig', 7, 8], ['Monstera', 7, 6], ['Bird of Paradise', 7, 7], ['ZZ Plant', 14, 5], ['Rubber Plant', 10, 4],
+      ['Basil', 2, 2], ['Rosemary', 4, 1], ['Mint', 2, 1], ['Pothos', 6, 3], ['Peace Lily', 5, 5], ['Calathea', 4, 2],
+      ['Snake Plant', 14, 2], ['String of Pearls', 10, 8], ['Aloe Vera', 14, 12], ['Boston Fern', 3, 4], ['Orchid', 7, 3], ['Olive Tree', 5, 1]
+    ].map(([name, every, since]) => ({ name, every, since })),
+    rooms: [
+      { name: 'Living Room', on: true, bri: 72, color: '#FFB340' },
+      { name: 'Kitchen', on: true, bri: 100, color: '#FFE08A' },
+      { name: 'Bedroom', on: false, bri: 35, color: '#FF9F6B' },
+      { name: 'Office', on: false, bri: 90, color: '#BFE3FF' },
+      { name: 'Bathroom', on: false, bri: 80, color: '#FFE08A' },
+      { name: 'Hallway', on: true, bri: 40, color: '#FFB340' }
+    ],
+    sel: 0, trackIdx: 0, pos: 74, playing: true
+  };
+  tabNames = ['To-dos', 'News', 'Plants', 'Lights', 'Music', 'Streaming', 'Weather', 'Calendar', 'Plan'];
+  cals = { Home: '#FF9F0A', Work: '#0A84FF', Personal: '#30D158', Health: '#BF5AF2' };
+  events = [
+    [-3, '18:00', '19:00', 'Yoga', 'Health', 'Studio Mitte'], [-1, '12:00', '13:00', 'Lunch with Tom', 'Personal', ''],
+    [0, '09:30', '10:00', 'Plumber visit', 'Home', 'Kitchen'], [0, '11:00', '11:30', 'Team sync', 'Work', 'Video call'], [0, '13:00', '14:00', 'Lunch with Sara', 'Personal', 'Café Lindner'], [0, '18:30', '19:30', 'Gym', 'Health', ''],
+    [1, '08:00', '08:45', 'Dentist', 'Health', 'Dr. Weber'], [1, '15:00', '15:30', '1:1 with Max', 'Work', ''], [1, '19:30', '22:00', "Dinner at Lena's", 'Personal', ''],
+    [2, '10:00', '11:30', 'Design review', 'Work', 'Room 4'], [3, '17:00', '18:00', 'Parents evening', 'Personal', 'School'],
+    [4, '09:00', '12:00', 'Quarterly planning', 'Work', ''], [4, '20:00', '22:30', 'Cinema', 'Personal', ''], [5, '11:00', '12:30', 'Farmers market', 'Personal', ''],
+    [6, '10:30', '12:00', 'Brunch with Jonas', 'Personal', ''], [8, '14:00', '15:00', 'Car service', 'Home', 'Garage'], [10, '09:00', '17:00', 'Team offsite', 'Work', 'Potsdam'], [13, '19:00', '21:00', 'Concert', 'Personal', 'Philharmonie']
+  ];
+  later = [{ title: 'Renew passport', time: 'Wed' }, { title: 'Plan weekend trip', time: 'Thu' }, { title: 'Return library books', time: 'Fri' }, { title: 'Car service', time: 'Sat' }];
+  tomorrow = [{ title: 'Recycling collection', time: '07:00' }, { title: 'Call mum', time: '18:00' }, { title: 'Groceries for the weekend', time: '' }];
+  lead = { source: 'Local', time: '32m ago', title: 'City approves 40 km of protected bike lanes along the river', summary: 'Construction starts in spring, with the first stretch between the old harbour and the central station due by summer.' };
+  news = [
+    { source: 'Tech', time: '1h ago', title: 'Battery recycling plant opens with capacity for 50,000 tonnes a year' },
+    { source: 'Science', time: '2h ago', title: 'Researchers map the deepest cave system in the Alps' },
+    { source: 'Business', time: '3h ago', title: 'Rail operators agree on a single ticket for cross-border travel' },
+    { source: 'Culture', time: '5h ago', title: 'Museum Island extends opening hours through the winter' },
+    { source: 'Sport', time: '6h ago', title: 'Hometown club secures promotion after late equaliser' },
+    { source: 'Weather', time: '7h ago', title: 'Mild week ahead before first frost on Sunday' }
+  ];
+  scenes = [{ name: 'Relax', bri: 55, color: '#FFB340' }, { name: 'Read', bri: 85, color: '#FFE08A' }, { name: 'Focus', bri: 100, color: '#BFE3FF' }, { name: 'Night', bri: 12, color: '#FF9F6B' }];
+  tracks = [
+    { title: 'Morning Light', artist: 'Lumen Quartet', dur: 214, art: '#c76b4a' },
+    { title: 'Slow Rivers', artist: 'Nadia Hale', dur: 241, art: '#4a6fc7' },
+    { title: 'Copper Sky', artist: 'The Field Notes', dur: 198, art: '#5c9a6a' },
+    { title: 'Weekend Drift', artist: 'Ohno Club', dur: 263, art: '#8a5cc7' },
+    { title: 'Paper Boats', artist: 'Mira Sol', dur: 187, art: '#b8894a' },
+    { title: 'Late Tram', artist: 'Kessler', dur: 226, art: '#4a8fa8' }
+  ];
+  playlists = [
+    { name: 'Morning Coffee', art: '#b8894a', start: 4 }, { name: 'Focus Flow', art: '#4a6fc7', start: 1 }, { name: 'Daily Mix 1', art: '#5c9a6a', start: 2 },
+    { name: 'Weekend Drift', art: '#8a5cc7', start: 3 }, { name: 'Dinner Jazz', art: '#c76b4a', start: 0 }, { name: 'Nightline', art: '#4a8fa8', start: 5 }
+  ];
+  services = [
+    { name: 'Netflix', href: 'https://www.netflix.com', bg: '#000', isN: true },
+    { name: 'Prime Video', href: 'https://www.primevideo.com', bg: '#00A8E1', isP: true },
+    { name: 'Disney+', href: 'https://www.disneyplus.com', bg: '#0E1A4A', isD: true },
+    { name: 'YouTube', href: 'https://www.youtube.com', bg: '#fff', isY: true }
+  ];
+  continueItems = [
+    { title: 'The Last Harbour', meta: 'S2 · E4', service: 'Netflix', prog: '62%', color: '#E50914' },
+    { title: 'Northern Lines', meta: 'Film', service: 'Prime Video', prog: '30%', color: '#00A8E1' },
+    { title: 'Ocean Kids', meta: 'S1 · E7', service: 'Disney+', prog: '80%', color: '#7FD3F7' }
+  ];
+
+  loadPhotos() { fetch('.image-slots.state.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(j => { if (j) { const n = JSON.stringify(j).length; if (n !== this._pl) { this._pl = n; this.setState({ photos: j }); } } }).catch(() => {}); }
+  componentDidMount() {
+    this.loadPhotos();
+    this.timer = setInterval(() => this.setState(s => {
+      const t = this.tracks[s.trackIdx]; let pos = s.playing ? s.pos + 1 : s.pos, trackIdx = s.trackIdx;
+      if (pos >= t.dur) { pos = 0; trackIdx = (trackIdx + 1) % this.tracks.length; }
+      return { now: new Date(), pos, trackIdx };
+    }), 1000);
+    this.photoTimer = setInterval(() => this.loadPhotos(), 5000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.photoTimer); }
+  fmt(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+  setRoom(i, patch) { this.setState(s => ({ rooms: s.rooms.map((r, j) => j === i ? { ...r, ...patch } : r) })); }
+  slider(set) {
+    const val = e => { const b = e.currentTarget.getBoundingClientRect(); return Math.round(Math.min(100, Math.max(1, (b.bottom - e.clientY) / b.height * 100))); };
+    return { down: e => { e.currentTarget.setPointerCapture(e.pointerId); this.drag = true; set(val(e)); }, move: e => { if (this.drag) set(val(e)); }, up: () => { this.drag = false; } };
+  }
+
+  planRef = React.createRef();
+  fpColors = ['#FFB340', '#FFE08A', '#FF9F6B', '#BFE3FF', '#BF5AF2'];
+  fpRooms = [
+    { id: 'office', name: 'Office', area: '9 m²', pts: [[0, 0], [425, 0], [425, 280], [330, 280], [255, 150], [0, 150]], lx: 275, ly: 12 },
+    { id: 'storage', name: 'Storage', area: '', pts: [[425, 0], [530, 0], [530, 280], [425, 280]], lx: 437, ly: 12 },
+    { id: 'storage2', name: 'Storage', area: '', pts: [[330, 280], [530, 280], [530, 370], [330, 370]], lx: 345, ly: 292 },
+    { id: 'hall', name: 'Hall', area: '', pts: [[0, 150], [255, 150], [330, 280], [330, 370], [530, 370], [530, 460], [250, 460], [250, 250], [215, 220], [0, 220]], lx: 20, ly: 168 },
+    { id: 'kitchen', name: 'Kitchen', area: '9 m²', pts: [[530, 0], [760, 0], [760, 280], [860, 280], [860, 460], [530, 460]], lx: 548, ly: 250 },
+    { id: 'wc', name: 'WC', area: '', pts: [[760, 0], [860, 0], [860, 280], [760, 280]], lx: 774, ly: 12 },
+    { id: 'sleep', name: 'Sleep', area: '9 m²', pts: [[860, 0], [1140, 0], [1140, 460], [860, 460]], lx: 874, ly: 12 }
+  ];
+  pip(x, y, pts) { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; }
+  roomOf(d) { return this.fpRooms.find(r => this.pip(d.x, d.y, r.pts)) || this.fpRooms[3]; }
+  setDev(id, patch) { this.setState(s => ({ fp: s.fp.map(d => d.id === id ? { ...d, ...patch } : d) })); }
+  hslider(set) {
+    const val = e => { const b = e.currentTarget.getBoundingClientRect(); return Math.round(Math.min(100, Math.max(1, (e.clientX - b.left) / b.width * 100))); };
+    return { down: e => { e.currentTarget.setPointerCapture(e.pointerId); this.drag = true; set(val(e)); }, move: e => { if (this.drag) set(val(e)); }, up: () => { this.drag = false; } };
+  }
+  startDrag(e, id) {
+    e.preventDefault(); e.stopPropagation();
+    const info = { sx: e.clientX, sy: e.clientY, moved: false };
+    const move = ev => {
+      if (!info.moved && Math.hypot(ev.clientX - info.sx, ev.clientY - info.sy) < 5) return;
+      info.moved = true;
+      const el = this.planRef.current; if (!el) return;
+      const b = el.getBoundingClientRect(), d = this.state.fp.find(x => x.id === id);
+      const inside = ev.clientX >= b.left && ev.clientX <= b.right && ev.clientY >= b.top && ev.clientY <= b.bottom;
+      if (inside || d.placed) {
+        const x = Math.min(1120, Math.max(20, (ev.clientX - b.left) / b.width * 1140)), y = Math.min(440, Math.max(20, (ev.clientY - b.top) / b.height * 460));
+        this.setState(s => ({ ghost: null, fpSel: id, fpDrag: id, fp: s.fp.map(q => q.id === id ? { ...q, x, y, placed: true } : q) }));
+      } else this.setState({ ghost: { id, cx: ev.clientX, cy: ev.clientY } });
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      this.setState(st => {
+        const q = info.moved ? this.findTarget(st, id) : null;
+        return { ghost: null, fpDrag: null, fpSel: id, fpOpen: q ? null : st.fpOpen, fp: q ? st.fp.map(x => x.id === id ? { ...x, x: q.x + 7, y: q.y + 5 } : x) : st.fp };
+      });
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+  }
+  findTarget(st, id) {
+    const d = st.fp.find(q => q.id === id); if (!d || !d.placed) return null;
+    const lo = { light: 'lights', plant: 'plants', speaker: 'speakers' }; let best = null, bd = 40;
+    st.fp.forEach(q => { if (q.id === id || !q.placed || !st.fpLayers[lo[q.type]]) return; const dist = Math.hypot(q.x - d.x, q.y - d.y); if (dist < bd) { bd = dist; best = q; } });
+    return best;
+  }
+  planVals(s, plants) {
+    const W = 1140, H = 460, pc = (v, m) => (v / m * 100) + '%', L = s.fpLayers;
+    const layerOf = { light: 'lights', plant: 'plants', speaker: 'speakers' };
+    const nameOf = d => d.type === 'plant' ? s.plants[d.pi].name : d.name;
+    const mk = d => {
+      const sel = s.fpSel === d.id;
+      const o = { id: d.id, name: nameOf(d), left: pc(d.x, W), top: pc(d.y, H), isLight: d.type === 'light', isPlant: d.type === 'plant', isSpeaker: d.type === 'speaker',
+        isOverdue: false, isPlaying: false, letter: '', bg: '#2C2C2E', fg: '#fff', shadow: '0 0 0 2px rgba(255,255,255,.18)', shadowS: 'none', sel, z: sel ? 5 : 2 };
+      if (o.isLight) { o.bg = d.on ? d.color : '#3A3A3C'; o.fg = d.on ? '#1C1C1E' : 'rgba(235,235,245,.6)'; if (d.on) o.shadow = o.shadowS = `0 0 16px ${d.color}aa`; }
+      if (o.isPlant) { const p = plants[d.pi]; o.bg = '#1E3524'; o.fg = '#30D158'; o.letter = ''; o.isOverdue = p.left < 0;
+        o.shadow = p.left < 0 ? '0 0 0 3px #FF453A, 0 0 0 7px rgba(255,69,58,.25)' : p.left === 0 ? '0 0 0 3px #0A84FF' : '0 0 0 2px rgba(255,255,255,.25)';
+        o.shadowS = p.left < 0 ? '0 0 0 2px #FF453A' : p.left === 0 ? '0 0 0 2px #0A84FF' : 'none'; }
+      if (o.isSpeaker) { o.isPlaying = s.playing && d.on; o.fg = d.on ? '#fff' : 'rgba(235,235,245,.5)'; }
+      if (sel) o.shadow = '0 0 0 3px #fff, 0 6px 18px rgba(0,0,0,.5)';
+      o.down = e => this.startDrag(e, d.id);
+      o.open = () => this.setState({ full: true, fpSel: d.id });
+      return o;
+    };
+    const placed = s.fp.filter(d => d.placed);
+    const isVis = d => d.placed && L[layerOf[d.type]], idx = id => s.fp.findIndex(d => d.id === id), groups = [];
+    s.fp.filter(d => isVis(d) && d.id !== s.fpDrag).forEach(d => {
+      const hit = groups.filter(g => g.some(q => Math.hypot(q.x - d.x, q.y - d.y) < 34));
+      if (!hit.length) return groups.push([d]);
+      hit[0].push(d); hit.slice(1).forEach(g => { hit[0].push(...g); groups.splice(groups.indexOf(g), 1); });
+    });
+    groups.forEach(g => g.sort((a, b) => idx(a.id) - idx(b.id)));
+    const singles = groups.filter(g => g.length === 1).map(g => g[0]).concat(s.fp.filter(d => isVis(d) && d.id === s.fpDrag));
+    const xlMarks = singles.map(mk);
+    const dotOf = d => d.type === 'light' ? (d.on ? d.color : '#8E8E93') : d.type === 'plant' ? (plants[d.pi].left < 0 ? '#FF453A' : '#30D158') : '#fff';
+    const tgt = s.fpDrag ? this.findTarget(s, s.fpDrag) : null, clOf = {};
+    const planClusters = groups.filter(g => g.length > 1).map(g => {
+      const key = g.map(d => d.id).sort().join('|'), cx = g.reduce((a, d) => a + d.x, 0) / g.length, cy = g.reduce((a, d) => a + d.y, 0) / g.length;
+      const isOpen = s.fpOpen === key, od = g.some(d => d.type === 'plant' && plants[d.pi].left < 0), R = 44 + g.length * 4;
+      const hot = !!tgt && !isOpen && g.some(d => d.id === tgt.id);
+      const c = { key, cx, cy, R, members: g, left: pc(cx, W), top: pc(cy, H), count: g.length, isOpen, hot, label: isOpen ? '×' : g.length, fs: isOpen ? '22px' : '16px',
+        badge: od && !isOpen, disc: (R * 2 + 56) + 'px', z: isOpen ? 7 : 3, dots: g.slice(0, 3).map(dotOf),
+        shadow: hot ? '0 0 0 3px #0A84FF, 0 0 0 9px rgba(10,132,255,.28)' : od && !isOpen ? '0 0 0 3px #FF453A, 0 0 0 7px rgba(255,69,58,.25)' : '0 0 0 2px rgba(255,255,255,.35), 0 4px 12px rgba(0,0,0,.4)',
+        shadowS: od ? '0 0 0 2px #FF453A' : '0 0 0 1.5px rgba(255,255,255,.35)',
+        toggle: () => this.setState(st => ({ fpOpen: st.fpOpen === key ? null : key })),
+        openXL: () => this.setState({ full: true, fpOpen: key, fpSel: null }) };
+      g.forEach((d, i) => { clOf[d.id] = { c, i }; });
+      return c;
+    });
+    const gs = this.props.groupStyle ?? 'Stack', stack = gs !== 'Ring';
+    const BLUE = '0 0 0 3px #0A84FF, 0 0 0 9px rgba(10,132,255,.28)';
+    const MV = dl => ['left .45s cubic-bezier(.3,1.25,.5,1)', 'top .45s cubic-bezier(.3,1.25,.5,1)', 'transform .35s cubic-bezier(.3,1.5,.5,1)', 'opacity .25s', 'box-shadow .2s', 'background .25s'].map(t => t + ' ' + dl + 'ms').join(', ');
+    const planDevs = s.fp.map(d => {
+      const o = mk(d), show = isVis(d), cm = clOf[d.id], dragging = s.fpDrag === d.id;
+      let sc = 1, op = 1, pe = 'auto', dl = 0;
+      if (!show) { sc = .3; op = 0; pe = 'none'; }
+      if (cm) {
+        const c = cm.c, i = cm.i, n = c.count, dir = c.cy < 140 ? 1 : -1;
+        const off = (dx, dy) => { o.left = `calc(${c.left} + ${Math.round(dx)}px)`; o.top = `calc(${c.top} + ${Math.round(dy)}px)`; };
+        if (!c.isOpen) {
+          o.isOverdue = false; o.isPlaying = false; pe = 'none';
+          if (stack && i < 3) { off(-i * 7, -i * 6); sc = (1 - i * .1) * (c.hot ? 1.12 : 1); o.z = 4 - i;
+            o.shadow = c.hot && i === 0 ? BLUE : i === 0 ? '0 0 0 2px #1C1C1E, 0 4px 10px rgba(0,0,0,.45)' : '0 0 0 2px #1C1C1E'; }
+          else { off(0, 0); sc = .3; op = 0; }
+        } else {
+          dl = i * 35; o.z = 9;
+          const R = 44 + n * 4, a = -Math.PI / 2 + i * 2 * Math.PI / n; off(Math.cos(a) * R, Math.sin(a) * R);
+        }
+      }
+      const isTarget = !!tgt && tgt.id === d.id && !(cm && !cm.c.isOpen);
+      if (isTarget) { sc = 1.18; o.shadow = BLUE; }
+      if (dragging) { sc = 1.12; o.shadow = '0 0 0 3px #fff, 0 14px 30px rgba(0,0,0,.55)'; o.z = 10; }
+      return { ...o, tf: `scale(${sc})`, op, pe, isTarget, showName: o.sel && !dragging && !tgt,
+        trans: dragging ? 'transform .2s, box-shadow .2s, opacity .2s' : MV(dl) };
+    });
+    const ringOf = c => { const n = c.count, seg = 360 / n;
+      return `radial-gradient(circle, #2C2C2E 0 15px, transparent 15.5px), conic-gradient(from -90deg, ${c.members.map((d, i) => `${dotOf(d)} ${i * seg + 3}deg ${(i + 1) * seg - 3}deg, transparent ${(i + 1) * seg - 3}deg ${(i + 1) * seg + 3}deg`).join(', ')})`; };
+    const planBubbles = s.fp.map(d => {
+      const cm = clOf[d.id], lead = !!cm && cm.i === 0, c = cm && cm.c, open = lead && c.isOpen, dir = c && c.cy < 140 ? 1 : -1;
+      const od = lead && c.members.some(m => m.type === 'plant' && plants[m.pi].left < 0);
+      const b = { left: c ? c.left : pc(d.x, W), top: c ? c.top : pc(d.y, H), pe: lead ? 'auto' : 'none', toggle: lead ? c.toggle : undefined, z: open ? 10 : lead ? 6 : 1,
+        hot: lead && c.hot, count: lead ? c.count : '', badge: false, showPill: false, pillBg: od ? '#FF453A' : '#fff', pillFg: od ? '#fff' : '#1C1C1E',
+        label: '', fs: '16px', w: '44px', bg: 'transparent', shadow: 'none', t: `translate(-50%,-50%) scale(${lead ? 1 : 0})`,
+        discLeft: '0px', discTop: '0px', discW: '0px', discT: 'scale(.6)', discOrigin: 'center', discOp: 0 };
+      if (!lead) return b;
+      if (stack) {
+        if (open) Object.assign(b, { w: '30px', bg: '#48484A', label: '×', fs: '18px', shadow: '0 2px 8px rgba(0,0,0,.45)' });
+        else Object.assign(b, { w: '56px', showPill: true, t: `translate(-50%,-50%) scale(${c.hot ? 1.12 : 1})` });
+      } else {
+        Object.assign(b, { bg: ringOf(c), label: open ? '×' : c.count, fs: open ? '18px' : '15px', badge: od && !open,
+          shadow: c.hot ? BLUE : '0 4px 12px rgba(0,0,0,.4)', t: `translate(-50%,-50%) scale(${c.hot ? 1.18 : 1})` });
+      }
+      return b;
+    });
+    const trayItems = s.fp.filter(d => !d.placed).map(mk);
+    const clipOf = r => 'polygon(' + r.pts.map(([x, y]) => pc(x, W) + ' ' + pc(y, H)).join(',') + ')';
+    const glowsAll = s.fp.filter(d => d.type === 'light').map(d => { const on = d.placed && d.on && L.lights && L.glow; return { clip: clipOf(this.roomOf(d)), left: pc(d.x, W), top: pc(d.y, H), size: (16 + d.bri * .26) + '%',
+      bg: `radial-gradient(circle, ${d.color}b3 0%, ${d.color}4d 35%, ${d.color}00 70%)`, op: on ? .45 + d.bri / 180 : 0, trans: s.fpDrag === d.id ? 'opacity .4s, width .3s' : 'opacity .5s, width .3s, left .45s cubic-bezier(.3,1.25,.5,1), top .45s cubic-bezier(.3,1.25,.5,1)' }; });
+    const glows = L.lights && L.glow ? placed.filter(d => d.type === 'light' && d.on).map(d => ({ clip: clipOf(this.roomOf(d)), left: pc(d.x, W), top: pc(d.y, H), size: (16 + d.bri * .26) + '%',
+      bg: `radial-gradient(circle, ${d.color}b3 0%, ${d.color}4d 35%, ${d.color}00 70%)`, op: .45 + d.bri / 180 })) : [];
+    const sel = s.fpSel, sRoom = sel && sel.startsWith('room:') ? this.fpRooms.find(r => r.id === sel.slice(5)) : null;
+    const sd = sel && !sRoom ? s.fp.find(d => d.id === sel) : null;
+    const lightsOn = placed.filter(d => d.type === 'light' && d.on).length;
+    const odCount = placed.filter(d => d.type === 'plant' && plants[d.pi].left < 0).length;
+    const dueCount = placed.filter(d => d.type === 'plant' && plants[d.pi].left === 0).length;
+    const musicRooms = s.playing ? [...new Set(placed.filter(d => d.type === 'speaker' && d.on).map(d => this.roomOf(d).name))] : [];
+    const planSummary = [`${lightsOn} light${lightsOn === 1 ? '' : 's'} on`, odCount ? `${odCount} plant${odCount === 1 ? '' : 's'} overdue` : 'No plants overdue', musicRooms.length ? 'Music in ' + musicRooms.join(' & ') : 'Music paused'].join(' · ');
+    const remove = id => this.setState(st => ({ fpSel: null, fp: st.fp.map(d => d.id === id ? { ...d, placed: false } : d) }));
+    let ins = {};
+    if (sd) {
+      ins = { name: nameOf(sd), room: sd.placed ? this.roomOf(sd).name : 'Not placed', remove: () => remove(sd.id) };
+      if (sd.type === 'light') Object.assign(ins, { status: sd.on ? sd.bri + '%' : 'Off', iconBg: sd.on ? sd.color : '#3A3A3C', iconFg: sd.on ? '#1C1C1E' : 'rgba(235,235,245,.6)', glow: sd.on ? `0 0 18px ${sd.color}88` : 'none',
+        toggle: () => this.setDev(sd.id, { on: !sd.on }), bri: this.hslider(v => this.setDev(sd.id, { bri: v, on: true })),
+        pct: (sd.on ? sd.bri : 0) + '%', color: sd.color, pctLabel: sd.on ? sd.bri + '%' : 'Off', pctText: sd.on && sd.bri > 20 ? '#1C1C1E' : '#fff',
+        swatches: this.fpColors.map(c => ({ c, ring: c === sd.color ? '0 0 0 2px #1C1C1E, 0 0 0 4px #fff' : 'none', pick: () => this.setDev(sd.id, { color: c, on: true }) })) });
+      if (sd.type === 'plant') { const p = plants[sd.pi]; Object.assign(ins, { photo: p.thumbBg, letter: p.letter, schedule: `Every ${p.every} days`,
+        status: p.done ? `Watered today · next in ${p.every} days` : p.left < 0 ? `${-p.left} day${p.left === -1 ? '' : 's'} overdue` : p.left === 0 ? 'Due today' : `Next watering in ${p.left} day${p.left === 1 ? '' : 's'}`,
+        stColor: p.done ? '#30D158' : p.left < 0 ? '#FF6961' : p.left === 0 ? '#409CFF' : 'rgba(235,235,245,.6)',
+        water: p.water, waterLabel: p.done ? 'Undo' : 'Water now', waterBg: p.done ? '#2C2C2E' : '#0A84FF' }); }
+      if (sd.type === 'speaker') Object.assign(ins, { status: !sd.on ? 'Not in group' : s.playing ? 'Playing' : 'Paused', iconFg: sd.on ? '#fff' : 'rgba(235,235,245,.5)',
+        toggle: () => this.setDev(sd.id, { on: !sd.on }), toggleLabel: sd.on ? 'Leave group' : 'Join group', track: this.tracks[s.trackIdx],
+        playing: s.playing, paused: !s.playing, togglePlay: () => this.setState(st => ({ playing: !st.playing })),
+        vol: this.hslider(v => this.setDev(sd.id, { vol: v })), volPct: sd.vol + '%', volText: sd.vol > 40 ? '#1C1C1E' : '#fff' });
+    }
+    if (sRoom) {
+      const ds = placed.filter(d => this.roomOf(d) === sRoom), ls = ds.filter(d => d.type === 'light'), ps = ds.filter(d => d.type === 'plant'), sp = ds.filter(d => d.type === 'speaker');
+      const anyOn = ls.some(d => d.on), due = ps.filter(d => plants[d.pi].left <= 0 && !plants[d.pi].done), ids = due.map(d => d.pi);
+      const lOnN = ls.filter(d => d.on).length;
+      ins = { name: sRoom.name, sub: sRoom.area || 'No size set',
+        stats: [{ label: 'Lights', val: ls.length ? `${ls.filter(d => d.on).length} of ${ls.length} on` : 'None' },
+          { label: 'Plants', val: ps.length ? ps.length + (due.length ? ` · ${due.length} to water` : ' · all watered') : 'None' },
+          { label: 'Speakers', val: sp.length ? (s.playing && sp.some(d => d.on) ? 'Playing' : 'Idle') : 'None' }],
+        hasLights: ls.length > 0, lightsLabel: anyOn ? 'Lights off' : 'Lights on',
+        lightsToggle: () => this.setState(st => ({ fp: st.fp.map(d => ls.some(l => l.id === d.id) ? { ...d, on: !anyOn } : d) })),
+        hasDue: due.length > 0, waterLabel: `Water ${due.length}`,
+        water: () => this.setState(st => ({ plants: st.plants.map((x, j) => ids.includes(j) ? { ...x, since: 0, prev: x.since } : x) })) };
+    }
+    const g = s.ghost, gd = g && s.fp.find(d => d.id === g.id);
+    return {
+      isPlan: !s.full && s.tab === 8, fullPlan: s.full && s.tab === 8, planRef: this.planRef, trayItems, trayEmpty: !trayItems.length, glows, planSummary,
+      fpLabels: this.fpRooms.map(r => ({ name: r.name, area: r.area, left: pc(r.lx, W), top: pc(r.ly, H), color: sRoom === r ? '#409CFF' : 'rgba(235,235,245,.55)' })),
+      rs: Object.fromEntries(this.fpRooms.map(r => [r.id, () => this.setState(st => ({ fpOpen: null, fpSel: st.fpSel === 'room:' + r.id ? null : 'room:' + r.id }))])),
+      planClusters, xlMarks, planDevs, planBubbles, glowsAll,
+      hasSelRoom: !!sRoom, selRoomPts: sRoom ? sRoom.pts.map(p => p.join(',')).join(' ') : '',
+      layerChips: [['plants', 'Plants'], ['lights', 'Lights'], ['speakers', 'Speakers'], ['glow', 'Glow']].map(([k, n]) => ({ name: n, bg: L[k] ? 'rgba(10,132,255,.22)' : '#2C2C2E', color: L[k] ? '#409CFF' : 'rgba(235,235,245,.6)', toggle: () => this.setState(st => ({ fpLayers: { ...st.fpLayers, [k]: !st.fpLayers[k] } })) })),
+      ins, insNone: !sd && !sRoom, insRoom: !!sRoom, insLight: !!sd && sd.type === 'light', insPlant: !!sd && sd.type === 'plant', insSpeaker: !!sd && sd.type === 'speaker', insCanRemove: !!(sd && sd.placed),
+      hasGhost: !!gd, ghost: gd ? { ...mk(gd), left: g.cx + 'px', top: g.cy + 'px' } : {},
+      homeStats: [
+        { label: 'Lights', val: lightsOn + ' on', color: 'rgba(235,235,245,.6)', bg: lightsOn ? '#FFB340' : '#3A3A3C', fg: lightsOn ? '#1C1C1E' : '#fff', isL: true, isP: false, isS: false },
+        { label: 'Plants', val: odCount ? odCount + ' overdue' : dueCount ? dueCount + ' due today' : 'All watered', color: odCount ? '#FF6961' : dueCount ? '#409CFF' : '#30D158', bg: '#30D158', fg: '#1C1C1E', isL: false, isP: true, isS: false },
+        { label: 'Music', val: musicRooms.length ? musicRooms.join(', ') : 'Paused', color: 'rgba(235,235,245,.6)', bg: '#2C2C2E', fg: '#fff', isL: false, isP: false, isS: true }
+      ]
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const nowMin = s.now.getHours() * 60 + s.now.getMinutes();
+    const toMin = t => t ? +t.slice(0, 2) * 60 + +t.slice(3) : null;
+
+    const todos = s.todos.map((t, i) => {
+      const m = toMin(t.time), late = !t.done && m !== null && m < nowMin;
+      return { ...t, ring: t.done ? 'none' : '2px solid rgba(235,235,245,.3)', fill: t.done ? '#0A84FF' : 'transparent', checkOp: t.done ? 1 : 0,
+        color: t.done ? 'rgba(235,235,245,.4)' : '#fff', deco: t.done ? 'line-through' : 'none', timeColor: late ? '#FF453A' : 'rgba(235,235,245,.6)',
+        toggle: () => this.setState(st => ({ todos: st.todos.map((x, j) => j === i ? { ...x, done: !x.done } : x) })) };
+    });
+    const open = todos.filter(t => !t.done);
+    const nextT = open.find(t => toMin(t.time) !== null && toMin(t.time) >= nowMin) || open[0];
+
+    const photo = n => { const v = s.photos['plant-' + n.toLowerCase().replace(/[^a-z0-9]+/g, '-')]; const u = typeof v === 'string' ? v : v && v.u; return u ? `center / cover no-repeat url("${u}")` : '#3A3A3C'; };
+    const plants = s.plants.map((pl, i) => {
+      const left = pl.every - pl.since, bg = photo(pl.name);
+      return { name: pl.name, left, every: pl.every, done: pl.since === 0, isDue: left <= 0, thumbBg: bg, letter: bg === '#3A3A3C' ? pl.name[0] : '',
+        ring: left < 0 ? 'inset 0 0 0 2px #FF453A' : 'none', nameColor: left < 0 ? '#FF6961' : '#fff',
+        water: () => this.setState(st => ({ plants: st.plants.map((x, j) => j === i ? (x.since === 0 && x.prev != null ? { ...x, since: x.prev, prev: null } : { ...x, since: 0, prev: x.since }) : x) })) };
+    });
+    const due = plants.filter(p => p.isDue).sort((a, b) => a.left - b.left);
+    const overdue = due.filter(p => p.left < 0), today = due.filter(p => p.left === 0);
+    const weekCols = [...Array(7)].map((_, d) => {
+      const dt = new Date(s.now); dt.setDate(dt.getDate() + d);
+      const items = plants.filter(x => d === 0 ? (x.left <= 0 || x.done) : (() => { const f = Math.max(0, x.left); return d >= f && (d - f) % x.every === 0; })())
+        .sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || a.left - b.left)
+        .map(x => ({ ...x, op: x.done ? .35 : 1 }));
+      return { isToday: d === 0, isFuture: d > 0, items, dow: d === 0 ? 'Today' : dt.toLocaleDateString('en-GB', { weekday: 'short' }), num: dt.getDate(),
+        bg: d === 0 ? '#2C2C2E' : 'transparent', radius: d === 0 ? '16px' : '0', padX: d === 0 ? '12px' : '6px', padXL: d === 0 ? '14px' : '10px', sep: d > 1 ? '0.5px solid rgba(84,84,88,.55)' : 'none',
+        numBg: d === 0 ? '#0A84FF' : 'transparent', numColor: d === 0 ? '#fff' : 'rgba(235,235,245,.6)', dowColor: d === 0 ? '#409CFF' : 'rgba(235,235,245,.45)' };
+    });
+
+    const anyOn = s.rooms.some(r => r.on), onCount = s.rooms.filter(r => r.on).length;
+    const rooms = s.rooms.map((r, i) => ({
+      name: r.name, sub: r.on ? `On · ${r.bri}%` : 'Off', short: r.on ? r.bri + '%' : 'Off',
+      bg: r.on ? r.color + '2E' : '#2C2C2E', subColor: r.on ? r.color : 'rgba(235,235,245,.6)',
+      iconBg: r.on ? r.color : '#3A3A3C', iconFg: r.on ? '#1C1C1E' : 'rgba(235,235,245,.6)', glow: r.on ? `0 0 16px ${r.color}55` : 'none',
+      ringSel: i === s.sel ? 'inset 0 0 0 2px #0A84FF' : 'none',
+      select: () => this.setState({ sel: i }),
+      toggle: e => { if (e && e.stopPropagation) e.stopPropagation(); this.setRoom(i, { on: !r.on }); }
+    }));
+    const sr = s.rooms[s.sel];
+
+    const t = this.tracks[s.trackIdx], len = this.tracks.length;
+    const go = d => this.setState(st => ({ trackIdx: (st.trackIdx + d + len) % len, pos: 0 }));
+
+    const wxT = n => ({ isSun: n === 's', isPartly: n === 'p', isCloud: n === 'c', isRain: n === 'r' });
+    const hrNow = s.now.getHours();
+    const hrTemps = [10, 9, 9, 8, 8, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 15, 14, 13, 12, 11, 11, 10, 10, 10];
+    const hrCond = h0 => h0 >= 17 && h0 <= 20 ? 'r' : h0 >= 7 && h0 <= 11 ? 'p' : h0 >= 12 && h0 <= 16 ? 's' : 'c';
+    const hours = [...Array(12)].map((_, k) => { const hh = (hrNow + k) % 24; return { label: k === 0 ? 'Now' : String(hh).padStart(2, '0'), temp: hrTemps[hh] + '°', ...wxT(hrCond(hh)) }; });
+    const dayData = [['s', 8, 16], ['r', 9, 15], ['r', 7, 13], ['c', 5, 12], ['s', 6, 14], ['s', 7, 15], ['p', 6, 13], ['s', 2, 11], ['p', 3, 10], ['c', 4, 12]];
+    const days = dayData.map(([c, lo, hi], k) => { const dt = new Date(s.now); dt.setDate(dt.getDate() + k); return { day: k === 0 ? 'Today' : dt.toLocaleDateString('en-GB', { weekday: 'short' }), lo: lo + '°', hi: hi + '°', l: ((lo - 2) / 14 * 100) + '%', w: ((hi - lo) / 14 * 100) + '%', sep: k ? '0.5px solid rgba(84,84,88,.6)' : 'none', ...wxT(c) }; });
+    const nowMinC = s.now.getHours() * 60 + s.now.getMinutes();
+    const mkEv = (e, isToday) => { const [d, st, en, title, cal, where] = e; const past = isToday && toMin(en) < nowMinC; const c = this.cals[cal];
+      return { start: st, end: en, title, cal, where, whereSep: where ? ' · ' : '', color: c, tint: c + '26', op: past ? .45 : 1, timeLabel: st + '–' + en }; };
+    const evOn = d => this.events.filter(e => e[0] === d);
+    const todayEv = evOn(0).map(e => mkEv(e, true));
+    const upcoming = todayEv.filter(e => e.op === 1);
+    const dayName = (d, o) => { const dt = new Date(s.now); dt.setDate(dt.getDate() + d); return dt.toLocaleDateString('en-GB', o); };
+    const selD = s.calSel;
+    const first = new Date(s.now.getFullYear(), s.now.getMonth(), 1); const lead = (first.getDay() + 6) % 7;
+    const dim = new Date(s.now.getFullYear(), s.now.getMonth() + 1, 0).getDate();
+    const cellsN = Math.ceil((lead + dim) / 7) * 7;
+    const todayDate = s.now.getDate();
+    const monthCells = [...Array(cellsN)].map((_, k) => { const dnum = k - lead + 1; const inM = dnum >= 1 && dnum <= dim; const off = dnum - todayDate;
+      const dots = inM ? [...new Set(evOn(off).map(e => this.cals[e[4]]))].slice(0, 3) : [];
+      const isT = inM && off === 0, isS = inM && off === selD;
+      return { num: inM ? dnum : '', op: inM ? 1 : 0, dots, numBg: isT ? '#FF453A' : 'transparent', numColor: isT ? '#fff' : off < 0 ? 'rgba(235,235,245,.45)' : '#fff', weight: isT ? 700 : 500,
+        bg: isS && !isT ? '#2C2C2E' : isS ? '#2C2C2E' : 'transparent', pick: () => inM && this.setState({ calSel: off }) }; });
+    const selEvents = evOn(selD).map(e => mkEv(e, selD === 0));
+    const tRowX = (t, interactive) => ({ ...t, timeText: t.time || '—', op: t.done ? .45 : 1,
+      chipBg: t.done ? '#2C2C2E' : t.timeColor === '#FF453A' ? 'rgba(255,69,58,.2)' : t.time ? 'rgba(10,132,255,.2)' : '#2C2C2E',
+      chipFg: t.done ? 'rgba(235,235,245,.5)' : t.timeColor === '#FF453A' ? '#FF6961' : t.time ? '#64B5FF' : 'rgba(235,235,245,.5)',
+      cBorder: t.done ? 'none' : '2px solid rgba(235,235,245,.3)', cBg: t.done ? '#0A84FF' : 'transparent', cOp: t.done ? 1 : 0 });
+    const doneN = todos.filter(t => t.done).length;
+    const hrs = hours.map((x, k) => { const tv = parseInt(x.temp); return { ...x, barH: Math.round(18 + (tv - 8) / 8 * 82) + '%', barBg: k === 0 ? '#0A84FF' : 'rgba(10,132,255,.38)', labelColor: k === 0 ? '#fff' : 'rgba(235,235,245,.55)' }; });
+    const pops = [20, 70, 60, 30, 0, 10, 20, 0, 10, 30];
+    const dys = days.map((x, k) => ({ ...x, pop: pops[k] + '%', popBg: pops[k] >= 50 ? 'rgba(100,210,255,.22)' : '#2C2C2E', popFg: pops[k] >= 50 ? '#64D2FF' : 'rgba(235,235,245,.6)' }));
+    const selDt = new Date(s.now); selDt.setDate(selDt.getDate() + s.calSel);
+    const extra = {
+      todosX: todos.map(t => tRowX(t)), todosOpenX: open.slice(0, 3).map(t => tRowX(t)),
+      tomorrowX: this.tomorrow.map(t => tRowX({ ...t, done: false, timeColor: '' })), laterX: this.later.map(t => tRowX({ ...t, done: false, timeColor: '' })),
+      todoSegs: todos.map(t => ({ bg: t.done ? '#0A84FF' : '#3A3A3C' })), todoDone: doneN, todoTotal: todos.length, todoProgress: doneN + ' of ' + todos.length + ' done',
+      nextTimeX: nextT && nextT.time ? 'Next · ' + nextT.time : 'Next',
+      hoursX5: hrs.slice(0, 5), hoursX6: hrs.slice(0, 6), hoursX8: hrs.slice(0, 8), hoursX12: hrs, daysX3: dys.slice(0, 3), daysX5: dys.slice(0, 5), daysX10: dys,
+      calMonthShort: s.now.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(), calTodayDowShort: dayName(0, { weekday: 'long' }),
+      selMonthShort: selDt.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(), selNum: selDt.getDate(),
+      mCells: monthCells.map(m => { const isT = m.numBg === '#FF453A'; const isS = m.bg === '#2C2C2E'; return { ...m, bg: isS ? '#0A84FF' : 'transparent', ring: isT && !isS ? 'inset 0 0 0 2px #0A84FF' : 'none', numColor: isS ? '#fff' : m.numColor, weight: isT || isS ? 700 : 500 }; })
+    };
+    return {
+      ...extra,
+      ...this.planVals(s, plants),
+      wx: { city: 'Berlin', temp: hrTemps[hrNow] + '°', cond: { s: 'Sunny', p: 'Partly cloudy', c: 'Cloudy', r: 'Rain' }[hrCond(hrNow)], hi: '16°', lo: '8°', feels: (hrTemps[hrNow] - 2) + '°', hiLo: '16° / 8°', popToday: '20%', summary: 'Rain expected around 17:00. Gusts up to 30 km/h in the evening.', ...wxT(hrCond(hrNow)) },
+      hours6: hours.slice(0, 6), hours8: hours.slice(0, 8), hours12: hours, days4: days.slice(0, 4), days5: days.slice(0, 5), days10: days,
+      wxDetails: [{ label: 'Feels like', value: (hrTemps[hrNow] - 2) + '°', note: 'Wind makes it feel cooler.' }, { label: 'Precipitation', value: '4 mm', note: 'Expected in the next 24 h.' }, { label: 'Wind', value: '14 km/h', note: 'West · gusts 30 km/h' }, { label: 'Humidity', value: '68%', note: 'Dew point 8°' }, { label: 'UV index', value: '2', note: 'Low for the rest of the day.' }, { label: 'Sunset', value: '16:47', note: 'Sunrise 07:58' }],
+      calTodayDow: dayName(0, { weekday: 'long' }), calTodayNum: todayDate, calTodayLong: dayName(0, { day: 'numeric', month: 'long' }),
+      todayEvents: todayEv, tomorrowEvents2: evOn(1).slice(0, 1).map(e => mkEv(e, false)), upcoming3: (upcoming.length ? upcoming : evOn(1).map(e => mkEv(e, false))).slice(0, 3),
+      calLeftLabel: upcoming.length ? upcoming.length + (upcoming.length === 1 ? ' event left' : ' events left') : 'Free evening',
+      nextEv: upcoming[0] || mkEv(evOn(1)[0], false),
+      calWeek: [...Array(7)].map((_, d) => ({ headBg: d === 0 ? '#0A84FF' : '#2C2C2E', headFg: d === 0 ? '#fff' : 'rgba(235,235,245,.7)', dow: d === 0 ? 'Today' : dayName(d, { weekday: 'short' }), num: dayName(d, { day: 'numeric' }), events: evOn(d).map(e => mkEv(e, d === 0)), empty: !evOn(d).length, pick: () => this.setState({ calSel: d }), colBg: d === s.calSel ? 'rgba(10,132,255,.08)' : 'transparent',
+        showNow: d === 0 && nowMinC >= 480 && nowMinC <= 1380, nowTop: ((nowMinC - 480) / 900 * 100) + '%',
+        blocks: evOn(d).map(e => { const ev = mkEv(e, d === 0), m0 = toMin(ev.start), m1 = toMin(ev.end) > m0 ? toMin(ev.end) : m0 + 60;
+          const t0 = Math.max(0, m0 - 480), t1 = Math.min(900, m1 - 480);
+          const short = m1 - m0 < 50;
+          return { ...ev, dir: short ? 'row' : 'column', align: short ? 'center' : 'stretch', gap: short ? '4px' : '0', pad: short ? '1px 6px' : '3px 6px', top: (t0 / 900 * 100) + '%', height: `calc(${Math.max(0, t1 - t0) / 900 * 100}% - 2px)`, solid: ev.color + '40' }; }),
+        selRing: d === s.calSel && d !== 0 ? 'inset 0 0 0 2px #0A84FF' : 'none',
+        sep: d > 1 ? '0.5px solid rgba(84,84,88,.55)' : 'none', bg: d === 0 ? '#2C2C2E' : 'transparent', radius: d === 0 ? '14px' : '0', numBg: d === 0 ? '#FF453A' : 'transparent', dowColor: d === 0 ? '#FF6961' : 'rgba(235,235,245,.5)' })),
+      monthTitle: s.now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }), dowHeads: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], monthCells,
+      calLegend: Object.entries(this.cals).map(([name, color]) => ({ name, color, tint: color + '26' })), selCount: (n => n ? n + (n === 1 ? ' event' : ' events') : 'Free day')(evOn(selD).length), goToday: () => this.setState({ calSel: 0 }),
+      selDow: dayName(selD, { weekday: 'long' }), selLong: dayName(selD, { day: 'numeric', month: 'long' }), selEvents, selEmpty: selEvents.length === 0,
+      isWeather: !s.full && s.tab === 6, isCalendar: !s.full && s.tab === 7, fullWeather: s.full && s.tab === 6, fullCalendar: s.full && s.tab === 7, fullCalMonth: s.full && s.tab === 7 && s.calMode !== 'week', fullCalWeek: s.full && s.tab === 7 && s.calMode === 'week',
+      calModes: [['month', 'Month'], ['week', 'Week']].map(([k, n]) => ({ name: n, bg: (s.calMode === 'week') === (k === 'week') ? '#636366' : 'transparent', pick: () => this.setState({ calMode: k }) })),
+      weekHours: [...Array(16)].map((_, i) => ({ label: i < 15 ? String(8 + i).padStart(2, '0') : '', top: (i / 15 * 100) + '%' })),
+      calHeadTitle: s.calMode === 'week' ? 'This week' : s.now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }), calHeadSub: s.calMode === 'week' ? dayName(0, { day: 'numeric', month: 'short' }) + ' – ' + dayName(6, { day: 'numeric', month: 'short' }) : '',
+      weekRange: dayName(0, { day: 'numeric', month: 'short' }) + ' – ' + dayName(6, { day: 'numeric', month: 'short' }),
+      tabs: this.tabNames.map((n, i) => ({ name: n, color: i === s.tab ? '#fff' : 'rgba(235,235,245,.7)', go: () => this.setState({ tab: i }) })),
+      tabX: (4 + s.tab * 76) + 'px', featureName: this.tabNames[s.tab],
+      isTodos: !s.full && s.tab === 0, isNews: !s.full && s.tab === 1, isPlants: !s.full && s.tab === 2, isLights: !s.full && s.tab === 3, isMusic: !s.full && s.tab === 4, isStreaming: !s.full && s.tab === 5,
+      fullTodos: s.full && s.tab === 0, fullNews: s.full && s.tab === 1, fullPlants: s.full && s.tab === 2, fullLights: s.full && s.tab === 3, fullMusic: s.full && s.tab === 4, fullStreaming: s.full && s.tab === 5,
+      views: ['Widgets', 'Full page'].map((n, i) => ({ name: n, bg: (i === 1) === s.full ? '#636366' : 'transparent', pick: () => this.setState({ full: i === 1 }) })),
+      draft: s.draft, onDraft: e => this.setState({ draft: e.target.value }),
+      onDraftKey: e => { if (e.key === 'Enter' && s.draft.trim()) this.setState(st => ({ draft: '', todos: [...st.todos, { title: st.draft.trim(), time: '', done: false }] })); },
+      tomorrowRows: this.tomorrow.map(x => ({ ...x, ring: '2px solid rgba(235,235,245,.25)', fill: 'transparent', checkOp: 0, color: 'rgba(235,235,245,.8)', deco: 'none', timeColor: 'rgba(235,235,245,.5)' })),
+      laterRows: this.later.map(x => ({ ...x, ring: '2px solid rgba(235,235,245,.25)', fill: 'transparent', checkOp: 0, color: 'rgba(235,235,245,.8)', deco: 'none', timeColor: 'rgba(235,235,245,.5)' })),
+      newsAll: this.news.map((n, i) => ({ ...n, sep: i ? '0.5px solid rgba(84,84,88,.6)' : 'none' })),
+      anyDue: due.length > 0, plantSub: `${due.length} due today · ${plants.length} plants`,
+      waterAll: () => this.setState(st => ({ plants: st.plants.map(x => x.every - x.since <= 0 ? { ...x, since: 0, prev: x.since } : x) })),
+      onLabelLong: onCount ? `${onCount} of ${s.rooms.length} rooms on` : 'Everything is off', selLabelLong: sr.on ? `On · ${sr.bri}% brightness` : 'Off',
+      queue: this.tracks.map((q, i) => ({ ...q, dur: this.fmt(q.dur), bg: i === s.trackIdx ? '#2C2C2E' : 'transparent', titleColor: i === s.trackIdx ? '#1DB954' : '#fff', play: () => this.setState({ trackIdx: i, pos: 0, playing: true }) })),
+      todos, todosOpen3: open.slice(0, 3), tomorrow: this.tomorrow, todoCount: open.length, todoLeft: open.length ? open.length + ' left' : 'All done',
+      nextTime: nextT ? (nextT.time ? 'Next · ' + nextT.time : 'Next') : 'All done', nextTitle: nextT ? nextT.title : '',
+      lead: this.lead, news4: this.news.map((n, i) => ({ ...n, sep: i ? '0.5px solid rgba(84,84,88,.6)' : 'none' })), news2: this.news.slice(0, 2),
+      weekCols, overdue, today, hasOverdue: overdue.length > 0, hasToday: today.length > 0, noneDue: due.length === 0,
+      due4: due.slice(0, 3), dueCount: due.length, dueCountLabel: due.length > 3 ? `+${due.length - 3} more` : '',
+      overdueLabel: overdue.length ? overdue.length + ' overdue' : '',
+      rooms, rooms4: rooms.slice(0, 4), allLabel: anyOn ? 'All off' : 'All on', onLabel: onCount + ' on',
+      allOff: () => this.setState(st => ({ rooms: st.rooms.map(r => ({ ...r, on: !anyOn })) })),
+      scenes: this.scenes.map(sc => ({ ...sc, bg: sr.on && sr.color === sc.color && sr.bri === sc.bri ? '#0A84FF' : '#2C2C2E', apply: () => this.setRoom(s.sel, { on: true, bri: sc.bri, color: sc.color }) })),
+      briV: this.slider(v => this.setRoom(this.state.sel, { bri: v, on: true })),
+      selName: sr.name, selLabel: sr.on ? sr.bri + '%' : 'Off', selPct: (sr.on ? sr.bri : 0) + '%', selColor: sr.color,
+      selText: sr.on && sr.bri > 15 ? '#1C1C1E' : '#fff', selTopText: sr.on && sr.bri > 88 ? '#1C1C1E' : 'rgba(235,235,245,.7)',
+      selTileBg: sr.on ? sr.color + '2E' : '#1C1C1E', selIconBg: sr.on ? sr.color : '#3A3A3C', selIconFg: sr.on ? '#1C1C1E' : 'rgba(235,235,245,.6)',
+      selGlow: sr.on ? `0 0 18px ${sr.color}66` : 'none', selSubColor: sr.on ? sr.color : 'rgba(235,235,245,.6)',
+      toggleSel: () => this.setRoom(s.sel, { on: !sr.on }),
+      track: t, progPct: (s.pos / t.dur * 100) + '%', elapsed: this.fmt(s.pos), remaining: '-' + this.fmt(t.dur - s.pos),
+      pauseOp: s.playing ? 1 : 0, playOp: s.playing ? 0 : 1,
+      togglePlay: () => this.setState(st => ({ playing: !st.playing })), next: () => go(1), prev: () => s.pos > 3 ? this.setState({ pos: 0 }) : go(-1),
+      upNext2: [1, 2].map(k => { const idx = (s.trackIdx + k) % len; return { ...this.tracks[idx], play: () => this.setState({ trackIdx: idx, pos: 0, playing: true }) }; }),
+      playlists: this.playlists.map(pl => ({ ...pl, play: () => this.setState({ trackIdx: pl.start, pos: 0, playing: true }) })),
+      services: this.services.map(x => ({ isN: false, isP: false, isD: false, isY: false, ...x })), continueItems: this.continueItems
+    };
+  }
+}
+</script>
+</body>
+</html>
