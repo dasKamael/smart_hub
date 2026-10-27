@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/domain/music/network_speakers.service.dart';
 import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
@@ -112,7 +112,7 @@ class _NothingToPlayOn extends ConsumerWidget {
 
 /// Spotify devices are steered over the internet, so they work while Home Assistant is offline.
 bool _transportEnabled(WidgetRef ref, PlaybackTarget? target) {
-  return target is ConnectTarget || (ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false);
+  return target is ConnectTarget || ref.watch(speakersOnlineProvider);
 }
 
 class _NowPlaying extends ConsumerWidget {
@@ -152,7 +152,7 @@ class _Tiles extends ConsumerWidget {
     final groups = ref.watch(speakerGroupsProvider);
     PlaybackTarget? current() => ref.read(currentTargetProvider(visible: visible));
     final devices = ref.watch(connectTargetsProvider(visible: visible));
-    final enabled = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    final enabled = ref.watch(speakersOnlineProvider);
     return ListView(
       scrollDirection: Axis.horizontal,
       children: [

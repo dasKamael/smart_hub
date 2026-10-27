@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/screens/settings/widgets/network_speakers_dialog.dart';
+import 'package:smart_hub/domain/music/model/speaker_state.dart';
+import 'package:smart_hub/domain/music/speaker.service.dart';
+import 'package:smart_hub/domain/music/network_speakers.service.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/presentation/screens/settings/widgets/light_bridge_dialog.dart';
@@ -105,6 +109,7 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const _HomeAppCard(),
                               const _LightsCard(),
+                              const _NetworkSpeakersCard(),
                               const _SpotifyCard(),
                               const _SpeakersCard(),
                               const _ZenCard(),
@@ -233,6 +238,52 @@ class _LightsCard extends ConsumerWidget {
                   onPressed: () => unawaited(ref.read(lightBridgeServiceProvider.notifier).disconnect(bridge.host)),
                 ),
               ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Speakers in the home network directly, instead of Home Assistant.
+class _NetworkSpeakersCard extends ConsumerWidget {
+  const _NetworkSpeakersCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hosts = ref.watch(networkSpeakersServiceProvider).value ?? const <String>[];
+    final names = [
+      for (final speaker in ref.watch(speakersServiceProvider).value ?? const <SpeakerState>[]) speaker.name,
+    ];
+    return PageCard(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: Row(
+        spacing: HubSpacing.s16,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: HubSpacing.s4,
+              children: [
+                const Text('Speakers in the network', style: HubTextStyles.widgetTitle),
+                Text(
+                  hosts.isEmpty
+                      ? 'Control your speakers directly, without Home Assistant.'
+                      : names.isEmpty
+                      ? '${hosts.length} speakers'
+                      : names.join(' · '),
+                  style: HubTextStyles.secondary,
+                ),
+              ],
+            ),
+          ),
+          if (hosts.isEmpty)
+            HubButton(label: 'Add speakers', onPressed: () => unawaited(showNetworkSpeakersDialog(context)))
+          else
+            HubButton(
+              label: 'Remove',
+              variant: HubButtonVariant.destructive,
+              onPressed: () => unawaited(ref.read(networkSpeakersServiceProvider.notifier).removeAll()),
             ),
         ],
       ),

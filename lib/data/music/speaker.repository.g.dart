@@ -9,16 +9,19 @@ part of 'speaker.repository.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Providers
+/// Speakers added from the home network provide the speakers; otherwise Home Assistant does.
 
 @ProviderFor(speakerRepository)
 final speakerRepositoryProvider = SpeakerRepositoryProvider._();
 
 /// Providers
+/// Speakers added from the home network provide the speakers; otherwise Home Assistant does.
 
 final class SpeakerRepositoryProvider
     extends $FunctionalProvider<SpeakerRepository, SpeakerRepository, SpeakerRepository>
     with $Provider<SpeakerRepository> {
   /// Providers
+  /// Speakers added from the home network provide the speakers; otherwise Home Assistant does.
   SpeakerRepositoryProvider._()
     : super(
         from: null,
@@ -48,4 +51,4 @@ final class SpeakerRepositoryProvider
   }
 }
 
-String _$speakerRepositoryHash() => r'e01e3efbf8622fb462190f648ccf45f82942f483';
+String _$speakerRepositoryHash() => r'11d9eefe01f170f5e81682842132e7545a623598';

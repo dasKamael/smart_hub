@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/domain/music/network_speakers.service.dart';
 import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/play_queue.util.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
@@ -34,7 +34,7 @@ class MusicWidget extends ConsumerWidget {
     // Spotify is only polled while the dashboard is on screen.
     final visible = TickerMode.valuesOf(context).enabled;
     final target = ref.watch(currentTargetProvider(visible: visible));
-    final online = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    final online = ref.watch(speakersOnlineProvider);
     final controller = ref.read(musicControllerProvider.notifier);
 
     return WidgetTile(

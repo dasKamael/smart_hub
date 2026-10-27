@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ha_client/ha_client.dart';
 import 'package:ha_client/testing.dart';
 import 'package:smart_hub/data/connection/ha_session.repository.dart';
-import 'package:smart_hub/data/music/speaker.repository.dart';
+import 'package:smart_hub/data/music/ha_speaker.repository.dart';
 import 'package:smart_hub/domain/connection/model/connection_config.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
@@ -24,7 +24,7 @@ HaEntityState _player(Map<String, Object?> attributes, {String state = 'playing'
 void main() {
   group('SpeakerRepository media', () {
     late FakeHomeAssistant server;
-    late SpeakerRepository repository;
+    late HaSpeakerRepository repository;
 
     Future<void> connect(List<HaEntityState> states) async {
       server = FakeHomeAssistant(states: states);
@@ -35,7 +35,7 @@ void main() {
         ConnectionConfig.homeAssistant(baseUrl: Uri.parse('http://ha.local:8123'), token: 'test-token'),
       );
       await online;
-      repository = SpeakerRepository(session: session);
+      repository = HaSpeakerRepository(session: session);
     }
 
     test('Given a playing Sonos, '

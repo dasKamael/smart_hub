@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ha_client/ha_client.dart';
 import 'package:ha_client/testing.dart';
 import 'package:smart_hub/data/connection/ha_session.repository.dart';
-import 'package:smart_hub/data/music/speaker.repository.dart';
+import 'package:smart_hub/data/music/ha_speaker.repository.dart';
 import 'package:smart_hub/domain/connection/model/connection_config.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
 import 'package:smart_hub/domain/music/model/playback.enum.dart';
@@ -13,12 +13,12 @@ HaEntityState _player(String id, String state, Map<String, Object?> attributes) 
 }
 
 void main() {
-  group('SpeakerRepository mapping', () {
+  group('HaSpeakerRepository mapping', () {
     test('Given a playing grouped speaker, '
         'when mapping, '
         'then playback, volume, group and track are read', () {
       // When
-      final speaker = SpeakerRepository.toSpeaker(
+      final speaker = HaSpeakerRepository.toSpeaker(
         _player('media_player.office', 'playing', {
           'friendly_name': 'Office',
           'volume_level': 0.35,
@@ -47,22 +47,22 @@ void main() {
     };
     for (final MapEntry(key: state, value: playback) in playbacks.entries) {
       test('Given state "$state", when mapping, then playback is ${playback.name}', () {
-        expect(SpeakerRepository.toSpeaker(_player('media_player.x', state, {})).playback, playback);
+        expect(HaSpeakerRepository.toSpeaker(_player('media_player.x', state, {})).playback, playback);
       });
     }
 
     test('Given a media player without group_members, when filtering, then it is not a speaker', () {
-      expect(SpeakerRepository.isSpeaker(_player('media_player.spotify', 'playing', {})), isFalse);
+      expect(HaSpeakerRepository.isSpeaker(_player('media_player.spotify', 'playing', {})), isFalse);
       expect(
-        SpeakerRepository.isSpeaker(_player('media_player.office', 'idle', {'group_members': <String>[]})),
+        HaSpeakerRepository.isSpeaker(_player('media_player.office', 'idle', {'group_members': <String>[]})),
         isTrue,
       );
     });
   });
 
-  group('SpeakerRepository commands', () {
+  group('HaSpeakerRepository commands', () {
     late FakeHomeAssistant server;
-    late SpeakerRepository repository;
+    late HaSpeakerRepository repository;
 
     setUp(() async {
       server = FakeHomeAssistant(
@@ -77,7 +77,7 @@ void main() {
       final online = session.watchStatus().firstWhere((s) => s == ConnectionStatus.online);
       await session.connect(ConnectionConfig.homeAssistant(baseUrl: Uri.parse('http://ha:8123'), token: 'test-token'));
       await online;
-      repository = SpeakerRepository(session: session);
+      repository = HaSpeakerRepository(session: session);
     });
 
     test('Given a speaker, when sending commands, then the matching services are called', () async {

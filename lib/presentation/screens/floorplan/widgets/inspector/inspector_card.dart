@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/music/network_speakers.service.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
@@ -26,7 +26,7 @@ class InspectorCard extends ConsumerWidget {
     final selection = ref.watch(floorplanControllerProvider.select((s) => s.selection));
     final devices = ref.watch(planDevicesProvider);
     // Controls are disabled while offline; the last known state stays visible.
-    final enabled = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    final enabled = ref.watch(speakersOnlineProvider);
     // Lights may come from a light bridge instead of Home Assistant.
     final lightsEnabled = ref.watch(lightsOnlineProvider);
 

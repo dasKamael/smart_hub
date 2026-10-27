@@ -330,7 +330,7 @@ final class CurrentTargetProvider extends $NotifierProvider<CurrentTarget, Playb
   }
 }
 
-String _$currentTargetHash() => r'5e7400ce1ce84f7942d2c7521ac1e25fe25347ed';
+String _$currentTargetHash() => r'02f44db40ba2c0a3717132a8d9aec449d4d2c9ea';
 
 /// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
 /// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected

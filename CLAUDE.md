@@ -122,6 +122,14 @@ stream for live changes; `data/lights/hue/`). Found via Signify's discovery serv
 bridge's button. The key lives in `flutter_secure_storage`. Paired bridges provide all lights instead of Home
 Assistant (`lightRepositoryProvider`). Domain and presentation call it a "light bridge" (no brand names there).
 
+## Speakers without Home Assistant
+
+Settings → "Speakers in the network": the hub talks to Sonos speakers directly over their local UPnP interface (port
+1400, `data/music/sonos/`) – no Home Assistant, cloud or Sonos app. One address is enough, the others of the system
+are read from it (SSDP search does not get through the emulator). State is polled every 1.5 s. Music sent from a phone
+plays on Sonos via Spotify Connect and is shown and controlled from the speaker; Spotify's Web API does not list Sonos
+speakers, so starting a Spotify playlist on Sonos from the hub is open (would need Spotify linked in the Sonos app).
+
 ## Demo mode
 
 The app runs without Home Assistant: the setup screen offers a demo mode backed by `FakeHomeAssistant`
