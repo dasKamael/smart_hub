@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/data/dashboard/dashboard_state.table.dart';
+import 'package:smart_hub/data/dashboard/dashboard_widgets.table.dart';
 import 'package:smart_hub/data/database/app_database.steps.dart';
 import 'package:smart_hub/data/floorplan/floor_plans.table.dart';
 import 'package:smart_hub/data/floorplan/placements.table.dart';
@@ -24,13 +26,15 @@ part 'app_database.g.dart';
     ZenSettingsTable,
     PlantProfilesTable,
     WeatherSettingsTable,
+    DashboardWidgetsTable,
+    DashboardStateTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'smart_hub'));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -62,6 +66,11 @@ class AppDatabase extends _$AppDatabase {
         ),
         // v7: weather location and offline cache.
         from6To7: (migrator, schema) => migrator.createTable(schema.weatherSettings),
+        // v8: arranged dashboard widgets.
+        from7To8: (migrator, schema) async {
+          await migrator.createTable(schema.dashboardWidgets);
+          await migrator.createTable(schema.dashboardState);
+        },
       ),
     );
   }

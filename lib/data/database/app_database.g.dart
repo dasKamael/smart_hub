@@ -2824,6 +2824,429 @@ class WeatherSettingsTableCompanion extends UpdateCompanion<WeatherSettingsRow> 
   }
 }
 
+class $DashboardWidgetsTableTable extends DashboardWidgetsTable
+    with TableInfo<$DashboardWidgetsTableTable, DashboardWidgetRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardWidgetsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sizeMeta = const VerificationMeta('size');
+  @override
+  late final GeneratedColumn<String> size = GeneratedColumn<String>(
+    'size',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta('position');
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, kind, size, position];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_widgets';
+  @override
+  VerificationContext validateIntegrity(Insertable<DashboardWidgetRow> instance, {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(_kindMeta, kind.isAcceptableOrUnknown(data['kind']!, _kindMeta));
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('size')) {
+      context.handle(_sizeMeta, size.isAcceptableOrUnknown(data['size']!, _sizeMeta));
+    } else if (isInserting) {
+      context.missing(_sizeMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta, position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DashboardWidgetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardWidgetRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      kind: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
+      size: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}size'])!,
+      position: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+    );
+  }
+
+  @override
+  $DashboardWidgetsTableTable createAlias(String alias) {
+    return $DashboardWidgetsTableTable(attachedDatabase, alias);
+  }
+}
+
+class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidgetRow> {
+  final String id;
+
+  /// `DashboardWidgetKind` name.
+  final String kind;
+
+  /// `DashboardWidgetSize` name.
+  final String size;
+  final int position;
+  const DashboardWidgetRow({required this.id, required this.kind, required this.size, required this.position});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['kind'] = Variable<String>(kind);
+    map['size'] = Variable<String>(size);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  DashboardWidgetsTableCompanion toCompanion(bool nullToAbsent) {
+    return DashboardWidgetsTableCompanion(
+      id: Value(id),
+      kind: Value(kind),
+      size: Value(size),
+      position: Value(position),
+    );
+  }
+
+  factory DashboardWidgetRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardWidgetRow(
+      id: serializer.fromJson<String>(json['id']),
+      kind: serializer.fromJson<String>(json['kind']),
+      size: serializer.fromJson<String>(json['size']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'kind': serializer.toJson<String>(kind),
+      'size': serializer.toJson<String>(size),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  DashboardWidgetRow copyWith({String? id, String? kind, String? size, int? position}) => DashboardWidgetRow(
+    id: id ?? this.id,
+    kind: kind ?? this.kind,
+    size: size ?? this.size,
+    position: position ?? this.position,
+  );
+  DashboardWidgetRow copyWithCompanion(DashboardWidgetsTableCompanion data) {
+    return DashboardWidgetRow(
+      id: data.id.present ? data.id.value : this.id,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      size: data.size.present ? data.size.value : this.size,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardWidgetRow(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('size: $size, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, kind, size, position);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DashboardWidgetRow &&
+          other.id == this.id &&
+          other.kind == this.kind &&
+          other.size == this.size &&
+          other.position == this.position);
+}
+
+class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow> {
+  final Value<String> id;
+  final Value<String> kind;
+  final Value<String> size;
+  final Value<int> position;
+  final Value<int> rowid;
+  const DashboardWidgetsTableCompanion({
+    this.id = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.size = const Value.absent(),
+    this.position = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DashboardWidgetsTableCompanion.insert({
+    required String id,
+    required String kind,
+    required String size,
+    required int position,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       kind = Value(kind),
+       size = Value(size),
+       position = Value(position);
+  static Insertable<DashboardWidgetRow> custom({
+    Expression<String>? id,
+    Expression<String>? kind,
+    Expression<String>? size,
+    Expression<int>? position,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (kind != null) 'kind': kind,
+      if (size != null) 'size': size,
+      if (position != null) 'position': position,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DashboardWidgetsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? kind,
+    Value<String>? size,
+    Value<int>? position,
+    Value<int>? rowid,
+  }) {
+    return DashboardWidgetsTableCompanion(
+      id: id ?? this.id,
+      kind: kind ?? this.kind,
+      size: size ?? this.size,
+      position: position ?? this.position,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (size.present) {
+      map['size'] = Variable<String>(size.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardWidgetsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('size: $size, ')
+          ..write('position: $position, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DashboardStateTableTable extends DashboardStateTable
+    with TableInfo<$DashboardStateTableTable, DashboardStateRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DashboardStateTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _arrangedMeta = const VerificationMeta('arranged');
+  @override
+  late final GeneratedColumn<bool> arranged = GeneratedColumn<bool>(
+    'arranged',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("arranged" IN (0, 1))'),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, arranged];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dashboard_state';
+  @override
+  VerificationContext validateIntegrity(Insertable<DashboardStateRow> instance, {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('arranged')) {
+      context.handle(_arrangedMeta, arranged.isAcceptableOrUnknown(data['arranged']!, _arrangedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DashboardStateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DashboardStateRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      arranged: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}arranged'])!,
+    );
+  }
+
+  @override
+  $DashboardStateTableTable createAlias(String alias) {
+    return $DashboardStateTableTable(attachedDatabase, alias);
+  }
+}
+
+class DashboardStateRow extends DataClass implements Insertable<DashboardStateRow> {
+  final int id;
+  final bool arranged;
+  const DashboardStateRow({required this.id, required this.arranged});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['arranged'] = Variable<bool>(arranged);
+    return map;
+  }
+
+  DashboardStateTableCompanion toCompanion(bool nullToAbsent) {
+    return DashboardStateTableCompanion(id: Value(id), arranged: Value(arranged));
+  }
+
+  factory DashboardStateRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DashboardStateRow(
+      id: serializer.fromJson<int>(json['id']),
+      arranged: serializer.fromJson<bool>(json['arranged']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{'id': serializer.toJson<int>(id), 'arranged': serializer.toJson<bool>(arranged)};
+  }
+
+  DashboardStateRow copyWith({int? id, bool? arranged}) =>
+      DashboardStateRow(id: id ?? this.id, arranged: arranged ?? this.arranged);
+  DashboardStateRow copyWithCompanion(DashboardStateTableCompanion data) {
+    return DashboardStateRow(
+      id: data.id.present ? data.id.value : this.id,
+      arranged: data.arranged.present ? data.arranged.value : this.arranged,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardStateRow(')
+          ..write('id: $id, ')
+          ..write('arranged: $arranged')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, arranged);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is DashboardStateRow && other.id == this.id && other.arranged == this.arranged);
+}
+
+class DashboardStateTableCompanion extends UpdateCompanion<DashboardStateRow> {
+  final Value<int> id;
+  final Value<bool> arranged;
+  const DashboardStateTableCompanion({this.id = const Value.absent(), this.arranged = const Value.absent()});
+  DashboardStateTableCompanion.insert({this.id = const Value.absent(), this.arranged = const Value.absent()});
+  static Insertable<DashboardStateRow> custom({Expression<int>? id, Expression<bool>? arranged}) {
+    return RawValuesInsertable({if (id != null) 'id': id, if (arranged != null) 'arranged': arranged});
+  }
+
+  DashboardStateTableCompanion copyWith({Value<int>? id, Value<bool>? arranged}) {
+    return DashboardStateTableCompanion(id: id ?? this.id, arranged: arranged ?? this.arranged);
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (arranged.present) {
+      map['arranged'] = Variable<bool>(arranged.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DashboardStateTableCompanion(')
+          ..write('id: $id, ')
+          ..write('arranged: $arranged')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2834,6 +3257,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ZenSettingsTableTable zenSettingsTable = $ZenSettingsTableTable(this);
   late final $PlantProfilesTableTable plantProfilesTable = $PlantProfilesTableTable(this);
   late final $WeatherSettingsTableTable weatherSettingsTable = $WeatherSettingsTableTable(this);
+  late final $DashboardWidgetsTableTable dashboardWidgetsTable = $DashboardWidgetsTableTable(this);
+  late final $DashboardStateTableTable dashboardStateTable = $DashboardStateTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
@@ -2845,6 +3270,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     zenSettingsTable,
     plantProfilesTable,
     weatherSettingsTable,
+    dashboardWidgetsTable,
+    dashboardStateTable,
   ];
   @override
   DriftDatabaseOptions get options => const DriftDatabaseOptions(storeDateTimeAsText: true);
@@ -4193,6 +4620,248 @@ typedef $$WeatherSettingsTableTableProcessedTableManager =
       WeatherSettingsRow,
       PrefetchHooks Function()
     >;
+typedef $$DashboardWidgetsTableTableCreateCompanionBuilder = DashboardWidgetsTableCompanion Function({
+  required String id,
+  required String kind,
+  required String size,
+  required int position,
+  Value<int> rowid,
+});
+typedef $$DashboardWidgetsTableTableUpdateCompanionBuilder = DashboardWidgetsTableCompanion Function({
+  Value<String> id,
+  Value<String> kind,
+  Value<String> size,
+  Value<int> position,
+  Value<int> rowid,
+});
+
+class $$DashboardWidgetsTableTableFilterComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+  $$DashboardWidgetsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get kind => $composableBuilder(column: $table.kind, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get size => $composableBuilder(column: $table.size, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => ColumnFilters(column));
+}
+
+class $$DashboardWidgetsTableTableOrderingComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+  $$DashboardWidgetsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get size =>
+      $composableBuilder(column: $table.size, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DashboardWidgetsTableTableAnnotationComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+  $$DashboardWidgetsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind => $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get size => $composableBuilder(column: $table.size, builder: (column) => column);
+
+  GeneratedColumn<int> get position => $composableBuilder(column: $table.position, builder: (column) => column);
+}
+
+class $$DashboardWidgetsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DashboardWidgetsTableTable,
+          DashboardWidgetRow,
+          $$DashboardWidgetsTableTableFilterComposer,
+          $$DashboardWidgetsTableTableOrderingComposer,
+          $$DashboardWidgetsTableTableAnnotationComposer,
+          $$DashboardWidgetsTableTableCreateCompanionBuilder,
+          $$DashboardWidgetsTableTableUpdateCompanionBuilder,
+          (DashboardWidgetRow, BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>),
+          DashboardWidgetRow,
+          PrefetchHooks Function()
+        > {
+  $$DashboardWidgetsTableTableTableManager(_$AppDatabase db, $DashboardWidgetsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () => $$DashboardWidgetsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$DashboardWidgetsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$DashboardWidgetsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> kind = const Value.absent(),
+            Value<String> size = const Value.absent(),
+            Value<int> position = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => DashboardWidgetsTableCompanion(id: id, kind: kind, size: size, position: position, rowid: rowid),
+          createCompanionCallback: ({
+            required String id,
+            required String kind,
+            required String size,
+            required int position,
+            Value<int> rowid = const Value.absent(),
+          }) => DashboardWidgetsTableCompanion.insert(id: id, kind: kind, size: size, position: position, rowid: rowid),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardWidgetsTableTable, DashboardWidgetRow>(table),
+                  BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardWidgetsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DashboardWidgetsTableTable,
+      DashboardWidgetRow,
+      $$DashboardWidgetsTableTableFilterComposer,
+      $$DashboardWidgetsTableTableOrderingComposer,
+      $$DashboardWidgetsTableTableAnnotationComposer,
+      $$DashboardWidgetsTableTableCreateCompanionBuilder,
+      $$DashboardWidgetsTableTableUpdateCompanionBuilder,
+      (DashboardWidgetRow, BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>),
+      DashboardWidgetRow,
+      PrefetchHooks Function()
+    >;
+typedef $$DashboardStateTableTableCreateCompanionBuilder = DashboardStateTableCompanion Function({
+  Value<int> id,
+  Value<bool> arranged,
+});
+typedef $$DashboardStateTableTableUpdateCompanionBuilder = DashboardStateTableCompanion Function({
+  Value<int> id,
+  Value<bool> arranged,
+});
+
+class $$DashboardStateTableTableFilterComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+  $$DashboardStateTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get arranged =>
+      $composableBuilder(column: $table.arranged, builder: (column) => ColumnFilters(column));
+}
+
+class $$DashboardStateTableTableOrderingComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+  $$DashboardStateTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get arranged =>
+      $composableBuilder(column: $table.arranged, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DashboardStateTableTableAnnotationComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+  $$DashboardStateTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get arranged => $composableBuilder(column: $table.arranged, builder: (column) => column);
+}
+
+class $$DashboardStateTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DashboardStateTableTable,
+          DashboardStateRow,
+          $$DashboardStateTableTableFilterComposer,
+          $$DashboardStateTableTableOrderingComposer,
+          $$DashboardStateTableTableAnnotationComposer,
+          $$DashboardStateTableTableCreateCompanionBuilder,
+          $$DashboardStateTableTableUpdateCompanionBuilder,
+          (DashboardStateRow, BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>),
+          DashboardStateRow,
+          PrefetchHooks Function()
+        > {
+  $$DashboardStateTableTableTableManager(_$AppDatabase db, $DashboardStateTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () => $$DashboardStateTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$DashboardStateTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$DashboardStateTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<bool> arranged = const Value.absent(),
+          }) => DashboardStateTableCompanion(id: id, arranged: arranged),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<bool> arranged = const Value.absent(),
+          }) => DashboardStateTableCompanion.insert(id: id, arranged: arranged),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DashboardStateTableTable, DashboardStateRow>(table),
+                  BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DashboardStateTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DashboardStateTableTable,
+      DashboardStateRow,
+      $$DashboardStateTableTableFilterComposer,
+      $$DashboardStateTableTableOrderingComposer,
+      $$DashboardStateTableTableAnnotationComposer,
+      $$DashboardStateTableTableCreateCompanionBuilder,
+      $$DashboardStateTableTableUpdateCompanionBuilder,
+      (DashboardStateRow, BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>),
+      DashboardStateRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4210,6 +4879,10 @@ class $AppDatabaseManager {
       $$PlantProfilesTableTableTableManager(_db, _db.plantProfilesTable);
   $$WeatherSettingsTableTableTableManager get weatherSettingsTable =>
       $$WeatherSettingsTableTableTableManager(_db, _db.weatherSettingsTable);
+  $$DashboardWidgetsTableTableTableManager get dashboardWidgetsTable =>
+      $$DashboardWidgetsTableTableTableManager(_db, _db.dashboardWidgetsTable);
+  $$DashboardStateTableTableTableManager get dashboardStateTable =>
+      $$DashboardStateTableTableTableManager(_db, _db.dashboardStateTable);
 }
 
 // **************************************************************************
