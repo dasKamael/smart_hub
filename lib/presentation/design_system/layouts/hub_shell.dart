@@ -3,13 +3,11 @@ import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart
 import 'package:smart_hub/presentation/design_system/molecules/glass_tab_bar.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
-import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 
-/// Page frame of the hub: header (title · tab bar · trailing slot) above the page content.
+/// Page frame of the hub: header (centered tab bar · trailing slot) above the page content.
 class HubShell extends StatelessWidget {
   const HubShell({
     super.key,
-    required this.title,
     required this.tabLabels,
     required this.selectedTab,
     required this.onTabSelected,
@@ -18,7 +16,6 @@ class HubShell extends StatelessWidget {
     this.tint,
   });
 
-  final String title;
   final List<String> tabLabels;
   final int selectedTab;
   final ValueChanged<int> onTabSelected;
@@ -43,9 +40,8 @@ class HubShell extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(title, style: HubTextStyles.pageTitle, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ),
+                    // Empty counterpart of the trailing slot keeps the tab bar centered.
+                    const Spacer(),
                     GlassTabBar(labels: tabLabels, selectedIndex: selectedTab, onSelected: onTabSelected),
                     Expanded(
                       child: Align(alignment: Alignment.centerRight, child: trailing ?? const SizedBox.shrink()),

@@ -80,7 +80,6 @@ GoRouter createHubRouter({
                 HubRoute.music => ref.watch(musicTintProvider(visible: true)),
                 HubRoute.home || HubRoute.plan => null,
               },
-              title: route.title,
               tabLabels: [for (final r in HubRoute.values) r.tabLabel],
               selectedTab: shell.currentIndex,
               onTabSelected: (index) => shell.goBranch(index, initialLocation: index == shell.currentIndex),
