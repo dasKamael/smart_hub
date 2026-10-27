@@ -13,8 +13,9 @@ class PageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: HubColorPalette.surface,
+        color: HubColorPalette.card,
         borderRadius: BorderRadius.circular(HubRadius.pageCard),
+        border: Border.all(color: HubColorPalette.cardBorder),
       ),
       child: Padding(padding: padding, child: child),
     );

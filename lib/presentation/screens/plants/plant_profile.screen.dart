@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
@@ -42,63 +43,65 @@ class PlantProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: HubSpacing.s16,
-            children: [
-              Row(
-                spacing: HubSpacing.s16,
-                children: [
-                  HubIconButton(
-                    glyph: HubGlyph.back,
-                    semanticLabel: 'Back',
-                    onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.plants.path),
-                  ),
+      body: HubBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: HubSpacing.s16,
+              children: [
+                Row(
+                  spacing: HubSpacing.s16,
+                  children: [
+                    HubIconButton(
+                      glyph: HubGlyph.back,
+                      semanticLabel: 'Back',
+                      onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.plants.path),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(plant?.name ?? '', style: HubTextStyles.pageTitle),
+                          if (profile != null)
+                            Text(
+                              [profile.commonName, ?profile.scientificName].join(' · '),
+                              style: HubTextStyles.secondary.copyWith(fontStyle: FontStyle.italic),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (profile?.source == PlantProfileSource.perenual)
+                      HubButton(
+                        label: 'Reload',
+                        glyph: HubGlyph.sync,
+                        variant: HubButtonVariant.secondary,
+                        isLoading: busy,
+                        onPressed: () => unawaited(ref.read(plantProfileControllerProvider(plantId).notifier).reload()),
+                      ),
+                  ],
+                ),
+                if (plant != null)
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: HubSpacing.s16,
                       children: [
-                        Text(plant?.name ?? '', style: HubTextStyles.pageTitle),
-                        if (profile != null)
-                          Text(
-                            [profile.commonName, ?profile.scientificName].join(' · '),
-                            style: HubTextStyles.secondary.copyWith(fontStyle: FontStyle.italic),
-                          ),
+                        SizedBox(
+                          width: 380,
+                          child: _Overview(plant: plant, profile: profile),
+                        ),
+                        Expanded(
+                          child: profile == null
+                              ? _LinkSpecies(plant: plant, busy: busy)
+                              : _Care(plant: plant, profile: profile),
+                        ),
                       ],
                     ),
                   ),
-                  if (profile?.source == PlantProfileSource.perenual)
-                    HubButton(
-                      label: 'Reload',
-                      glyph: HubGlyph.sync,
-                      variant: HubButtonVariant.secondary,
-                      isLoading: busy,
-                      onPressed: () => unawaited(ref.read(plantProfileControllerProvider(plantId).notifier).reload()),
-                    ),
-                ],
-              ),
-              if (plant != null)
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: HubSpacing.s16,
-                    children: [
-                      SizedBox(
-                        width: 380,
-                        child: _Overview(plant: plant, profile: profile),
-                      ),
-                      Expanded(
-                        child: profile == null
-                            ? _LinkSpecies(plant: plant, busy: busy)
-                            : _Care(plant: plant, profile: profile),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

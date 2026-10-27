@@ -21,7 +21,11 @@ class HubIconButton extends StatelessWidget {
         child: Container(
           width: HubSizes.minTouchTarget,
           height: HubSizes.minTouchTarget,
-          decoration: const BoxDecoration(color: HubColorPalette.elevated, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: HubColorPalette.glassFill,
+            shape: BoxShape.circle,
+            border: Border.all(color: HubColorPalette.glassBorder, width: 0.5),
+          ),
           alignment: Alignment.center,
           child: HubGlyphIcon(glyph, color: HubColorPalette.text2),
         ),

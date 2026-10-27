@@ -217,7 +217,7 @@ class _Frame extends StatelessWidget {
       height: frame.height,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: HubColorPalette.surface,
+        color: HubColorPalette.card,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: resizing ? const Color(0x59FFFFFF) : const Color(0x00FFFFFF), width: 1.5),
       ),

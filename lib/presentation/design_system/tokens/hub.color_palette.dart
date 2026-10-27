@@ -3,15 +3,25 @@ import 'package:flutter/painting.dart';
 /// Colors from the design handoff (`design/UI Library.dc.html` → "Farben").
 abstract final class HubColorPalette {
   // Surfaces
-  static const bg = Color(0xFF000000);
-  static const surface = Color(0xFF1C1C1E);
-  static const elevated = Color(0xFF2C2C2E);
-  static const control = Color(0xFF3A3A3C);
-  static const controlStrong = Color(0xFF48484A);
+  /// Behind everything before the sky shows (`HubBackground`); a deep night blue instead of the handoff's black.
+  static const bg = Color(0xFF0B0F17);
+
+  /// Opaque, for dialogs and overlays; a night blue that matches the sky.
+  static const surface = Color(0xFF1B2230);
+
+  /// Tiles, buttons and controls on cards: white veils, so the sky tints them (the handoff's greys were opaque).
+  static const elevated = Color(0x1FFFFFFF);
+  static const control = Color(0x2EFFFFFF);
+  static const controlStrong = Color(0x47FFFFFF);
   static const selected = Color(0xFF636366);
 
+  /// Cards on the sky background: light enough that the sky shines through, with a fine edge.
+  static const card = Color(0x1AFFFFFF);
+  static const cardBorder = Color(0x14FFFFFF);
+
   // Floor plan
-  static const floor = Color(0xFF262628);
+  /// Rooms of the plan, darker than the card around them.
+  static const floor = Color(0x47000000);
   static const wall = Color(0xFF636366);
   static const plantMarkerBg = Color(0xFF1E3524);
 

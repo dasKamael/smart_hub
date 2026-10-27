@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
@@ -35,89 +36,91 @@ class SetupScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(HubSpacing.s24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: PageCard(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: HubSpacing.s20,
-                  children: [
-                    Row(
-                      spacing: HubSpacing.s16,
-                      children: [
-                        if (GoRouter.maybeOf(context)?.canPop() ?? false)
-                          HubIconButton(glyph: HubGlyph.back, semanticLabel: 'Back', onPressed: context.pop),
-                        const HubLogo(size: 56),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: HubSpacing.s4,
-                            children: [
-                              Text('Connect your home', style: HubTextStyles.pageTitle),
-                              Text(
-                                'The hub controls your lights and speakers through Home Assistant.',
-                                style: HubTextStyles.secondary,
-                              ),
-                            ],
+      body: HubBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(HubSpacing.s24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: PageCard(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: HubSpacing.s20,
+                    children: [
+                      Row(
+                        spacing: HubSpacing.s16,
+                        children: [
+                          if (GoRouter.maybeOf(context)?.canPop() ?? false)
+                            HubIconButton(glyph: HubGlyph.back, semanticLabel: 'Back', onPressed: context.pop),
+                          const HubLogo(size: 56),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: HubSpacing.s4,
+                              children: [
+                                Text('Connect your home', style: HubTextStyles.pageTitle),
+                                Text(
+                                  'The hub controls your lights and speakers through Home Assistant.',
+                                  style: HubTextStyles.secondary,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    HubTextField(
-                      label: 'Home Assistant address',
-                      hint: 'homeassistant.local:8123',
-                      keyboardType: TextInputType.url,
-                      onChanged: controller.updateAddress,
-                    ),
-                    HubTextField(
-                      label: 'Access token',
-                      hint: 'Long-lived access token',
-                      helper: 'Home Assistant → Profile → Security → Long-lived access tokens',
-                      obscure: true,
-                      onChanged: controller.updateToken,
-                      onSubmitted: (_) => controller.connect(),
-                    ),
-                    if (state.error case final error?)
-                      Text(_errorText(error), style: HubTextStyles.label.copyWith(color: HubColorPalette.dangerText)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      spacing: HubSpacing.s12,
-                      children: [
-                        HubButton(
-                          label: 'Try demo',
-                          variant: HubButtonVariant.secondary,
-                          isLoading: state.isStartingDemo,
-                          onPressed: state.isConnecting && !state.isStartingDemo ? null : controller.startDemo,
-                        ),
-                        HubButton(
-                          label: 'Connect',
-                          isLoading: state.isConnecting && !state.isStartingDemo,
-                          onPressed: state.isStartingDemo ? null : controller.connect,
-                        ),
-                      ],
-                    ),
-                    if (!standalone)
-                      Semantics(
-                        button: true,
-                        child: GestureDetector(
-                          onTap: state.isConnecting ? null : controller.startWithoutHomeAssistant,
-                          child: Text(
-                            'No Home Assistant? Start with plants and Spotify',
-                            textAlign: TextAlign.center,
-                            style: HubTextStyles.label.copyWith(
-                              color: HubColorPalette.text2,
-                              decoration: TextDecoration.underline,
-                              decorationColor: HubColorPalette.text3,
+                        ],
+                      ),
+                      HubTextField(
+                        label: 'Home Assistant address',
+                        hint: 'homeassistant.local:8123',
+                        keyboardType: TextInputType.url,
+                        onChanged: controller.updateAddress,
+                      ),
+                      HubTextField(
+                        label: 'Access token',
+                        hint: 'Long-lived access token',
+                        helper: 'Home Assistant → Profile → Security → Long-lived access tokens',
+                        obscure: true,
+                        onChanged: controller.updateToken,
+                        onSubmitted: (_) => controller.connect(),
+                      ),
+                      if (state.error case final error?)
+                        Text(_errorText(error), style: HubTextStyles.label.copyWith(color: HubColorPalette.dangerText)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: HubSpacing.s12,
+                        children: [
+                          HubButton(
+                            label: 'Try demo',
+                            variant: HubButtonVariant.secondary,
+                            isLoading: state.isStartingDemo,
+                            onPressed: state.isConnecting && !state.isStartingDemo ? null : controller.startDemo,
+                          ),
+                          HubButton(
+                            label: 'Connect',
+                            isLoading: state.isConnecting && !state.isStartingDemo,
+                            onPressed: state.isStartingDemo ? null : controller.connect,
+                          ),
+                        ],
+                      ),
+                      if (!standalone)
+                        Semantics(
+                          button: true,
+                          child: GestureDetector(
+                            onTap: state.isConnecting ? null : controller.startWithoutHomeAssistant,
+                            child: Text(
+                              'No Home Assistant? Start with plants and Spotify',
+                              textAlign: TextAlign.center,
+                              style: HubTextStyles.label.copyWith(
+                                color: HubColorPalette.text2,
+                                decoration: TextDecoration.underline,
+                                decorationColor: HubColorPalette.text3,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

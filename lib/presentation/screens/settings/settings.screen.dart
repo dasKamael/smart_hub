@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
@@ -39,91 +40,93 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: HubSpacing.s16,
-            children: [
-              Row(
-                spacing: HubSpacing.s16,
-                children: [
-                  HubIconButton(
-                    glyph: HubGlyph.back,
-                    semanticLabel: 'Back',
-                    onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
-                  ),
-                  const Expanded(child: Text('Settings', style: HubTextStyles.pageTitle)),
-                  const ConnectionIndicator(),
-                ],
-              ),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: HubBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: HubSpacing.s16,
+              children: [
+                Row(
                   spacing: HubSpacing.s16,
                   children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          spacing: HubSpacing.s16,
-                          children: [
-                            PageCard(
-                              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      spacing: HubSpacing.s4,
-                                      children: [
-                                        const Text('Home Assistant', style: HubTextStyles.widgetTitle),
-                                        Text(switch (config) {
-                                          HomeAssistantConnectionConfig(:final baseUrl) => baseUrl.toString(),
-                                          DemoConnectionConfig() => 'Demo home – no Home Assistant needed',
-                                          StandaloneConnectionConfig() || null => 'Not connected',
-                                        }, style: HubTextStyles.secondary),
-                                      ],
-                                    ),
-                                  ),
-                                  if (hasHomeAssistant)
-                                    HubButton(
-                                      label: 'Disconnect',
-                                      variant: HubButtonVariant.destructive,
-                                      onPressed: () => ref.read(connectionConfigServiceProvider.notifier).clear(),
-                                    )
-                                  else
-                                    HubButton(label: 'Connect', onPressed: () => context.push(HubPage.setup.path)),
-                                ],
-                              ),
-                            ),
-                            const _HomeAppCard(),
-                            const _SpotifyCard(),
-                            const _SpeakersCard(),
-                            const _ZenCard(),
-                            const _WeatherCard(),
-                          ],
-                        ),
-                      ),
+                    HubIconButton(
+                      glyph: HubGlyph.back,
+                      semanticLabel: 'Back',
+                      onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
                     ),
-                    Expanded(
-                      child: PageCard(
-                        padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
-                        child: hasHomeAssistant
-                            ? _EntityList(entities: entities)
-                            : const HomeAssistantHint(
-                                glyph: HubGlyph.bulb,
-                                title: 'No Home Assistant',
-                                text: 'Lights and speakers show up here once the hub is connected to Home Assistant.',
-                                showConnect: false,
-                              ),
-                      ),
-                    ),
+                    const Expanded(child: Text('Settings', style: HubTextStyles.pageTitle)),
+                    const ConnectionIndicator(),
                   ],
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: HubSpacing.s16,
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            spacing: HubSpacing.s16,
+                            children: [
+                              PageCard(
+                                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        spacing: HubSpacing.s4,
+                                        children: [
+                                          const Text('Home Assistant', style: HubTextStyles.widgetTitle),
+                                          Text(switch (config) {
+                                            HomeAssistantConnectionConfig(:final baseUrl) => baseUrl.toString(),
+                                            DemoConnectionConfig() => 'Demo home – no Home Assistant needed',
+                                            StandaloneConnectionConfig() || null => 'Not connected',
+                                          }, style: HubTextStyles.secondary),
+                                        ],
+                                      ),
+                                    ),
+                                    if (hasHomeAssistant)
+                                      HubButton(
+                                        label: 'Disconnect',
+                                        variant: HubButtonVariant.destructive,
+                                        onPressed: () => ref.read(connectionConfigServiceProvider.notifier).clear(),
+                                      )
+                                    else
+                                      HubButton(label: 'Connect', onPressed: () => context.push(HubPage.setup.path)),
+                                  ],
+                                ),
+                              ),
+                              const _HomeAppCard(),
+                              const _SpotifyCard(),
+                              const _SpeakersCard(),
+                              const _ZenCard(),
+                              const _WeatherCard(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: PageCard(
+                          padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
+                          child: hasHomeAssistant
+                              ? _EntityList(entities: entities)
+                              : const HomeAssistantHint(
+                                  glyph: HubGlyph.bulb,
+                                  title: 'No Home Assistant',
+                                  text: 'Lights and speakers show up here once the hub is connected to Home Assistant.',
+                                  showConnect: false,
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

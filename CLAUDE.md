@@ -10,6 +10,8 @@ their live state there and are controlled directly from it.
   design tokens, acceptance criteria. Read the relevant section before building anything.
 - `design_handoff_hub_core/design/*.dc.html` – high-fidelity HTML prototypes. Reference only, not code.
   Colors, sizes, radii, spacing and curves are final – match them exactly.
+  Deliberate change (Richard, 2026-10-27): no black background – a calm sky that follows the time of day
+  (`HubBackground`, `HubSky`) and translucent cards and controls (`HubColorPalette.card`, `elevated`, `control`).
 - `design_handoff_hub_core/data/floorplan.json` – the apartment (units: cm), initial plan.
 - `design_handoff_hub_core/design/Roadmap.dc.html` – phases and milestones (German).
 

@@ -102,7 +102,7 @@ class _Player extends StatelessWidget {
     return AnimatedContainer(
       duration: HubMotion.glowDuration,
       // The cover's color shines through, as on the music page.
-      color: card ? Color.alphaBlend(Artwork.colorOf(seed).withValues(alpha: 0.22), HubColorPalette.surface) : null,
+      color: card ? Artwork.colorOf(seed).withValues(alpha: 0.28) : null,
       padding: EdgeInsets.all(size == WidgetSize.medium ? 16 : 18),
       child: switch (size) {
         WidgetSize.medium => _Medium(track: track, seed: seed, controls: controls),

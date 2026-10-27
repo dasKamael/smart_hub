@@ -1,5 +1,6 @@
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
@@ -25,44 +26,46 @@ class WeatherScreen extends ConsumerWidget {
     final forecast = ref.watch(weatherServiceProvider).value;
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: HubSpacing.s16,
-            children: [
-              Row(
-                spacing: HubSpacing.s16,
-                children: [
-                  HubIconButton(
-                    glyph: HubGlyph.back,
-                    semanticLabel: 'Back',
-                    onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
-                  ),
-                  const Expanded(child: Text('Weather', style: HubTextStyles.pageTitle)),
-                  if (forecast != null)
-                    Text(
-                      'Updated ${WeatherFormat.time(forecast.fetchedAt)}',
-                      style: HubTextStyles.label.copyWith(color: HubColorPalette.text3),
+      body: HubBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: HubSpacing.s16,
+              children: [
+                Row(
+                  spacing: HubSpacing.s16,
+                  children: [
+                    HubIconButton(
+                      glyph: HubGlyph.back,
+                      semanticLabel: 'Back',
+                      onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
                     ),
-                ],
-              ),
-              Expanded(
-                child: forecast == null
-                    ? const PageCard(
-                        child: Center(child: Text('Weather not available', style: HubTextStyles.secondary)),
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: HubSpacing.s16,
-                        children: [
-                          Expanded(flex: 13, child: _Today(forecast)),
-                          Expanded(flex: 10, child: _Days(forecast)),
-                        ],
+                    const Expanded(child: Text('Weather', style: HubTextStyles.pageTitle)),
+                    if (forecast != null)
+                      Text(
+                        'Updated ${WeatherFormat.time(forecast.fetchedAt)}',
+                        style: HubTextStyles.label.copyWith(color: HubColorPalette.text3),
                       ),
-              ),
-            ],
+                  ],
+                ),
+                Expanded(
+                  child: forecast == null
+                      ? const PageCard(
+                          child: Center(child: Text('Weather not available', style: HubTextStyles.secondary)),
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          spacing: HubSpacing.s16,
+                          children: [
+                            Expanded(flex: 13, child: _Today(forecast)),
+                            Expanded(flex: 10, child: _Days(forecast)),
+                          ],
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

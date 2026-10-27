@@ -47,8 +47,9 @@ class WidgetTile extends StatelessWidget {
         onTap: onTap,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: card ? HubColorPalette.surface : null,
+            color: card ? HubColorPalette.card : null,
             borderRadius: BorderRadius.circular(24),
+            border: card ? Border.all(color: HubColorPalette.cardBorder) : null,
           ),
           child: Padding(padding: EdgeInsets.all(padding), child: child),
         ),
