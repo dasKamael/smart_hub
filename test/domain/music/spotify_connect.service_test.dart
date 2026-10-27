@@ -182,6 +182,32 @@ void main() {
       });
     });
 
+    test('Given Spotify reports nothing, '
+        'when moving music from a speaker to the laptop, '
+        'then the laptop plays its track at once until Spotify answers', () {
+      fakeAsync((async) {
+        // Given
+        playback = null;
+        final container = createContainer();
+        async.flushMicrotasks();
+
+        // When
+        serviceOf(container).transfer(
+          'd-laptop',
+          from: SpotifyPlayback(deviceId: 'office', isPlaying: true, title: 'Solo', positionAt: DateTime(2026)),
+        );
+        async.flushMicrotasks();
+
+        // Then
+        expect(stateOf(container)?.playback, isA<SpotifyPlayback>());
+        expect(stateOf(container)?.playback?.deviceId, 'd-laptop');
+        expect(stateOf(container)?.playback?.title, 'Solo');
+        expect(stateOf(container)?.playback?.isPlaying, isTrue);
+        async.elapse(const Duration(seconds: 9));
+        expect(stateOf(container)?.playback, isNull);
+      });
+    });
+
     test('Given a track at 1:40, when skipping, then it starts over at once', () {
       fakeAsync((async) {
         // Given

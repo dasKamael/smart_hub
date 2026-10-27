@@ -9,6 +9,9 @@ abstract class SpotifyPlayback with _$SpotifyPlayback {
     required String deviceId,
     required bool isPlaying,
     String? title,
+
+    /// The playing track, e.g. `spotify:track:…`.
+    String? trackUri,
     String? artist,
     String? artworkUrl,
 

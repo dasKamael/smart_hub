@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:smart_hub/data/music/sonos/sonos_speaker.repository.dart';
+import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/speaker_state.dart';
 
 /// A small Sonos system: Küche (playing a stream) and Büro (paused) on their own, Wohnzimmer with a hidden sub.
@@ -24,9 +25,15 @@ class _FakeSonos {
   Future<http.Response> handle(http.Request request) async {
     final action = request.headers['SOAPACTION']!.split('#').last.replaceAll('"', '');
     final host = request.url.host;
-    calls.add(
-      '$host $action${action == 'SetVolume' ? ' ${RegExp('<DesiredVolume>(.*?)<').firstMatch(request.body)!.group(1)}' : ''}',
-    );
+    String? argument(String name) =>
+        RegExp('<$name>(.*?)<').firstMatch(request.body)?.group(1)?.replaceAll('&amp;', '&');
+    calls.add(switch (action) {
+      'SetVolume' => '$host $action ${argument('DesiredVolume')}',
+      'Seek' => '$host $action ${argument('Unit')} ${argument('Target')}',
+      'AddURIToQueue' => '$host $action ${argument('EnqueuedURI')}',
+      'SetAVTransportURI' => '$host $action ${argument('CurrentURI') ?? ''}'.trim(),
+      _ => '$host $action',
+    });
     final body = switch (action) {
       'GetZoneGroupState' => '<ZoneGroupState>${_escape(_topology)}</ZoneGroupState>',
       'GetTransportInfo' => switch (host) {
@@ -38,6 +45,10 @@ class _FakeSonos {
       'GetPositionInfo' when host == '10.0.0.24' =>
         '<TrackDuration>0:03:01</TrackDuration><RelTime>0:01:04</RelTime><TrackMetaData>${_escape('<DIDL-Lite><item><dc:title>Take U There</dc:title><dc:creator>Cramoki</dc:creator><upnp:albumArtURI>/getaa?s=1&amp;u=x</upnp:albumArtURI></item></DIDL-Lite>')}</TrackMetaData>',
       'GetPositionInfo' => '<TrackDuration>NOT_IMPLEMENTED</TrackDuration><RelTime>NOT_IMPLEMENTED</RelTime><TrackMetaData></TrackMetaData>',
+      'Browse' =>
+        '<Result>${_escape('<DIDL-Lite><item id="Q:0/1"><res>x-sonos-spotify:spotify%3atrack%3aFirst?sid=9&amp;sn=3</res></item>'
+            '<item id="Q:0/2"><res>x-sonos-spotify:spotify%3atrack%3aSecond?sid=9&amp;sn=3</res></item></DIDL-Lite>')}</Result>'
+            '<NumberReturned>2</NumberReturned><TotalMatches>2</TotalMatches>',
       'GetVolume' => '<CurrentVolume>${host == '10.0.0.24' ? 30 : 20}</CurrentVolume>',
       _ => '',
     };
@@ -115,10 +126,57 @@ void main() {
         // Then
         expect(
           sonos.calls,
-          containsAllInOrder(['10.0.0.25 SetAVTransportURI', '10.0.0.25 BecomeCoordinatorOfStandaloneGroup']),
+          containsAllInOrder([
+            '10.0.0.25 SetAVTransportURI x-rincon:RINCON_K',
+            '10.0.0.25 BecomeCoordinatorOfStandaloneGroup',
+          ]),
         );
       },
     );
+
+    test('Given a playlist moves to the office, when playing it from its second track, '
+        'then the office queues it and starts there', () async {
+      // Given
+      await firstRead();
+      sonos.calls.clear();
+
+      // When
+      await repository.play(
+        'RINCON_B',
+        const MediaItem(
+          title: 'Second',
+          contentId: 'spotify:playlist:Mix',
+          contentType: 'playlist',
+          startTrack: 'spotify:track:Second',
+          startSeconds: 75,
+        ),
+      );
+
+      // Then
+      expect(sonos.calls.where((call) => call.startsWith('10.0.0.25') && !call.contains(' Get')), [
+        '10.0.0.25 RemoveAllTracksFromQueue',
+        '10.0.0.25 AddURIToQueue x-rincon-cpcontainer:1006206cspotify%3aplaylist%3aMix?sid=9&flags=8300&sn=0',
+        '10.0.0.25 SetAVTransportURI x-rincon-queue:RINCON_B#0',
+        '10.0.0.25 Browse',
+        '10.0.0.25 Seek TRACK_NR 2',
+        '10.0.0.25 Seek REL_TIME 0:01:15',
+        '10.0.0.25 Play',
+      ]);
+    });
+
+    test('Given a podcast show, when playing it, then the speakers cannot', () async {
+      // Given
+      await firstRead();
+
+      // When
+      final play = repository.play(
+        'RINCON_B',
+        const MediaItem(title: 'Show', contentId: 'spotify:show:x', contentType: 'show'),
+      );
+
+      // Then
+      await expectLater(play, throwsUnsupportedError);
+    });
 
     test('Given a group state with a group of two, when parsing, then the coordinator leads it', () {
       // When

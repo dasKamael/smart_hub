@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/domain/music/model/spotify_playback.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/utils/throttler.dart';
@@ -147,27 +148,58 @@ class MusicController extends _$MusicController {
     final fromDevice = deviceOf(from);
     if (playback != null && playback.isPlaying && fromDevice == playback.deviceId) {
       final toDevice = deviceOf(to);
-      if (toDevice != null) return _spotify.transfer(toDevice);
-      if ((to, playback.contextUri) case (SpeakerGroupTarget(:final group), final uri?)) {
-        // The speaker has no Spotify device of its own: start the same album / playlist there.
+      if (toDevice != null) return _spotify.transfer(toDevice, from: _playbackOf(from));
+      // Albums and playlists go on at the same track; anything else (e.g. liked songs) as the track alone.
+      final context = playback.contextUri;
+      final uri = context != null && (context.contains(':playlist:') || context.contains(':album:'))
+          ? context
+          : playback.trackUri;
+      if ((to, uri) case (SpeakerGroupTarget(:final group), final uri?)) {
+        // The speaker has no Spotify device of its own: start the same music there.
+        final now = clock.now();
         final item = MediaItem(
           title: playback.title ?? 'Spotify',
           contentId: uri,
-          contentType: uri.contains(':playlist:') ? 'playlist' : 'album',
+          contentType: uri.split(':')[1],
+          artworkUrl: playback.artworkUrl,
+          startTrack: uri == playback.trackUri ? null : playback.trackUri,
+          startSeconds: playback.positionSeconds + now.difference(playback.positionAt).inMilliseconds / 1000,
         );
-        await _speakers.play(group.leaderId, item);
-        return _spotify.pause(playback.deviceId);
+        // Paused first, so only one place plays while the speaker starts; it plays on when the speaker cannot.
+        await _spotify.pause(playback.deviceId);
+        try {
+          return await _speakers.play(group.leaderId, item);
+        } on Object {
+          await _spotify.resume(playback.deviceId);
+          rethrow;
+        }
       }
       return;
     }
     if ((from, to) case (SpeakerGroupTarget(:final group), ConnectTarget(:final device))) {
       // Music sent to the speaker over Spotify is not reported by Spotify: pause it there, then resume it on the device.
       await _speakers.playPause(group.leaderId);
-      return _spotify.transfer(device.id);
+      return _spotify.transfer(device.id, from: _playbackOf(from));
     }
     if ((from, to) case (SpeakerGroupTarget(group: final source), SpeakerGroupTarget(group: final target))) {
       return _speakers.move(source.leaderId, [for (final speaker in target.members) speaker.id]);
     }
+  }
+
+  /// What [target] plays, to show it at once where it moves to.
+  static SpotifyPlayback _playbackOf(PlaybackTarget target) {
+    final track = target.nowPlaying;
+    final now = clock.now();
+    return SpotifyPlayback(
+      deviceId: target.id,
+      isPlaying: true,
+      title: track.title,
+      artist: track.artist,
+      artworkUrl: track.artworkUrl,
+      durationSeconds: track.durationSeconds,
+      positionSeconds: track.positionAtTime(now) ?? 0,
+      positionAt: now,
+    );
   }
 
   /// The Spotify device of a speaker group: speakers with Spotify built in show up there under their own name.
@@ -299,11 +331,9 @@ class CurrentTarget extends _$CurrentTarget {
       _ => playing ?? targets.where(isDefault).firstOrNull ?? targets.firstOrNull,
     };
     if (target != null && (target.id == selected || target.nowPlaying.isPlaying)) _keptId = target.id;
-    // Once the music moved there, the hold is done; otherwise ask again when it ends, so a target that plays
-    // meanwhile takes over.
-    if (justSelected && target != null && target.nowPlaying.isPlaying && target.id == byId(selected)?.id) {
-      _selectedAt = DateTime(0);
-    } else if (justSelected) {
+    // The hold lasts even when the target already shows as playing: that may only be the optimistic state while the
+    // music starts there. Asked again when it ends, so a target that plays meanwhile takes over.
+    if (justSelected) {
       final timer = Timer(selectionHold - now.difference(_selectedAt), ref.invalidateSelf);
       ref.onDispose(timer.cancel);
     }

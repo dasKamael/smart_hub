@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MediaItem {
 
- String get title; String get contentId; String get contentType; String? get artworkUrl;
+ String get title; String get contentId; String get contentType; String? get artworkUrl;/// Where to start: a track of it (e.g. `spotify:track:…`) and the seconds into that track.
+ String? get startTrack; double? get startSeconds;
 /// Create a copy of MediaItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +28,20 @@ $MediaItemCopyWith<MediaItem> get copyWith => _$MediaItemCopyWithImpl<MediaItem>
 @override
 bool operator ==(Object other) {
   final _this = this as MediaItem;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MediaItem&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.contentId, _this.contentId) || other.contentId == _this.contentId)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.artworkUrl, _this.artworkUrl) || other.artworkUrl == _this.artworkUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MediaItem&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.contentId, _this.contentId) || other.contentId == _this.contentId)&&(identical(other.contentType, _this.contentType) || other.contentType == _this.contentType)&&(identical(other.artworkUrl, _this.artworkUrl) || other.artworkUrl == _this.artworkUrl)&&(identical(other.startTrack, _this.startTrack) || other.startTrack == _this.startTrack)&&(identical(other.startSeconds, _this.startSeconds) || other.startSeconds == _this.startSeconds));
 }
 
 
 @override
 int get hashCode {
   final _this = this as MediaItem;
-  return Object.hash(runtimeType,_this.title,_this.contentId,_this.contentType,_this.artworkUrl);
+  return Object.hash(runtimeType,_this.title,_this.contentId,_this.contentType,_this.artworkUrl,_this.startTrack,_this.startSeconds);
 }
 
 @override
 String toString() {
   final _this = this as MediaItem;
-  return 'MediaItem(title: ${_this.title}, contentId: ${_this.contentId}, contentType: ${_this.contentType}, artworkUrl: ${_this.artworkUrl})';
+  return 'MediaItem(title: ${_this.title}, contentId: ${_this.contentId}, contentType: ${_this.contentType}, artworkUrl: ${_this.artworkUrl}, startTrack: ${_this.startTrack}, startSeconds: ${_this.startSeconds})';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $MediaItemCopyWith<$Res>  {
   factory $MediaItemCopyWith(MediaItem value, $Res Function(MediaItem) _then) = _$MediaItemCopyWithImpl;
 @useResult
 $Res call({
- String title, String contentId, String contentType, String? artworkUrl
+ String title, String contentId, String contentType, String? artworkUrl, String? startTrack, double? startSeconds
 });
 
 
@@ -68,13 +69,15 @@ class _$MediaItemCopyWithImpl<$Res>
 
 /// Create a copy of MediaItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? contentId = null,Object? contentType = null,Object? artworkUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? contentId = null,Object? contentType = null,Object? artworkUrl = freezed,Object? startTrack = freezed,Object? startSeconds = freezed,}) {
   return _then(MediaItem(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,contentId: null == contentId ? _self.contentId : contentId // ignore: cast_nullable_to_non_nullable
 as String,contentType: null == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
 as String,artworkUrl: freezed == artworkUrl ? _self.artworkUrl : artworkUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,startTrack: freezed == startTrack ? _self.startTrack : startTrack // ignore: cast_nullable_to_non_nullable
+as String?,startSeconds: freezed == startSeconds ? _self.startSeconds : startSeconds // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 
@@ -159,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String contentId,  String contentType,  String? artworkUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String contentId,  String contentType,  String? artworkUrl,  String? startTrack,  double? startSeconds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MediaItem() when $default != null:
-return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);case _:
+return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl,_that.startTrack,_that.startSeconds);case _:
   return orElse();
 
 }
@@ -180,10 +183,10 @@ return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String contentId,  String contentType,  String? artworkUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String contentId,  String contentType,  String? artworkUrl,  String? startTrack,  double? startSeconds)  $default,) {final _that = this;
 switch (_that) {
 case _MediaItem():
-return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);case _:
+return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl,_that.startTrack,_that.startSeconds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +203,10 @@ return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String contentId,  String contentType,  String? artworkUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String contentId,  String contentType,  String? artworkUrl,  String? startTrack,  double? startSeconds)?  $default,) {final _that = this;
 switch (_that) {
 case _MediaItem() when $default != null:
-return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);case _:
+return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl,_that.startTrack,_that.startSeconds);case _:
   return null;
 
 }
@@ -215,13 +218,16 @@ return $default(_that.title,_that.contentId,_that.contentType,_that.artworkUrl);
 
 
 class _MediaItem extends MediaItem {
-  const _MediaItem({required this.title, required this.contentId, required this.contentType, this.artworkUrl}): super._();
+  const _MediaItem({required this.title, required this.contentId, required this.contentType, this.artworkUrl, this.startTrack, this.startSeconds}): super._();
   
 
 @override final  String title;
 @override final  String contentId;
 @override final  String contentType;
 @override final  String? artworkUrl;
+/// Where to start: a track of it (e.g. `spotify:track:…`) and the seconds into that track.
+@override final  String? startTrack;
+@override final  double? startSeconds;
 
 /// Create a copy of MediaItem
 /// with the given fields replaced by the non-null parameter values.
@@ -233,18 +239,18 @@ _$MediaItemCopyWith<_MediaItem> get copyWith => __$MediaItemCopyWithImpl<_MediaI
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MediaItem&&(identical(other.title, title) || other.title == title)&&(identical(other.contentId, contentId) || other.contentId == contentId)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.artworkUrl, artworkUrl) || other.artworkUrl == artworkUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MediaItem&&(identical(other.title, title) || other.title == title)&&(identical(other.contentId, contentId) || other.contentId == contentId)&&(identical(other.contentType, contentType) || other.contentType == contentType)&&(identical(other.artworkUrl, artworkUrl) || other.artworkUrl == artworkUrl)&&(identical(other.startTrack, startTrack) || other.startTrack == startTrack)&&(identical(other.startSeconds, startSeconds) || other.startSeconds == startSeconds));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,title,contentId,contentType,artworkUrl);
+    return Object.hash(runtimeType,title,contentId,contentType,artworkUrl,startTrack,startSeconds);
 }
 
 @override
 String toString() {
-    return 'MediaItem(title: $title, contentId: $contentId, contentType: $contentType, artworkUrl: $artworkUrl)';
+    return 'MediaItem(title: $title, contentId: $contentId, contentType: $contentType, artworkUrl: $artworkUrl, startTrack: $startTrack, startSeconds: $startSeconds)';
 }
 
 
@@ -255,7 +261,7 @@ abstract mixin class _$MediaItemCopyWith<$Res> implements $MediaItemCopyWith<$Re
   factory _$MediaItemCopyWith(_MediaItem value, $Res Function(_MediaItem) _then) = __$MediaItemCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String contentId, String contentType, String? artworkUrl
+ String title, String contentId, String contentType, String? artworkUrl, String? startTrack, double? startSeconds
 });
 
 
@@ -272,13 +278,15 @@ class __$MediaItemCopyWithImpl<$Res>
 
 /// Create a copy of MediaItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? contentId = null,Object? contentType = null,Object? artworkUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? contentId = null,Object? contentType = null,Object? artworkUrl = freezed,Object? startTrack = freezed,Object? startSeconds = freezed,}) {
   return _then(_MediaItem(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,contentId: null == contentId ? _self.contentId : contentId // ignore: cast_nullable_to_non_nullable
 as String,contentType: null == contentType ? _self.contentType : contentType // ignore: cast_nullable_to_non_nullable
 as String,artworkUrl: freezed == artworkUrl ? _self.artworkUrl : artworkUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,startTrack: freezed == startTrack ? _self.startTrack : startTrack // ignore: cast_nullable_to_non_nullable
+as String?,startSeconds: freezed == startSeconds ? _self.startSeconds : startSeconds // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 

@@ -127,8 +127,10 @@ Assistant (`lightRepositoryProvider`). Domain and presentation call it a "light 
 Settings → "Speakers in the network": the hub talks to Sonos speakers directly over their local UPnP interface (port
 1400, `data/music/sonos/`) – no Home Assistant, cloud or Sonos app. One address is enough, the others of the system
 are read from it (SSDP search does not get through the emulator). State is polled every 1.5 s. Music sent from a phone
-plays on Sonos via Spotify Connect and is shown and controlled from the speaker; Spotify's Web API does not list Sonos
-speakers, so starting a Spotify playlist on Sonos from the hub is open (would need Spotify linked in the Sonos app).
+plays on Sonos via Spotify Connect and is shown and controlled from the speaker. Spotify's Web API does not list Sonos
+speakers: the hub starts Spotify tracks, albums and playlists on them through the speaker's queue instead (needs Spotify
+linked in the Sonos system once; service 9 / `SA_RINCON2311`, the speaker finds the account). Moving music from a
+Spotify device to a speaker goes on at the same track and position.
 
 ## Demo mode
 

@@ -105,6 +105,7 @@ class SpotifyRepository {
       deviceId: deviceId,
       isPlaying: json['is_playing'] == true,
       title: item?['name'] as String?,
+      trackUri: item?['uri'] as String?,
       artist: _list(item?['artists']).map((artist) => artist['name']).whereType<String>().join(', '),
       artworkUrl: images.isEmpty ? null : images.first['url'] as String?,
       contextUri: (json['context'] as Map<String, Object?>?)?['uri'] as String?,

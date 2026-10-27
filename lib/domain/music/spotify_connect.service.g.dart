@@ -47,7 +47,7 @@ final class SpotifyConnectServiceProvider extends $AsyncNotifierProvider<Spotify
   SpotifyConnectService create() => SpotifyConnectService();
 }
 
-String _$spotifyConnectServiceHash() => r'23dc922811854a2e756e4c458dd50440f8912ba5';
+String _$spotifyConnectServiceHash() => r'9e18596d8bb4b09cb633d3d1a40e3eea1577b6e8';
 
 /// Spotify Connect, polled every [spotifyConnectInterval] while someone listens (Spotify has no push for this),
 /// and the playback commands. Empty while signed out.

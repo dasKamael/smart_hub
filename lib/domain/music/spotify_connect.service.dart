@@ -37,6 +37,9 @@ class SpotifyConnectService extends _$SpotifyConnectService {
   late OptimisticOverlay<ConnectDevice> _devices;
   late OptimisticOverlay<SpotifyPlayback> _playback;
   SpotifyConnectState _reported = _empty;
+
+  /// What a transfer moves while Spotify reports nothing, e.g. music it sent to a speaker it does not list.
+  SpotifyPlayback? _moving;
   final _refreshes = <Timer>[];
 
   @override
@@ -126,12 +129,15 @@ class SpotifyConnectService extends _$SpotifyConnectService {
     return _run(_repository.setVolume(deviceId, value), devices: [deviceId]);
   }
 
-  /// Moves what is playing to [deviceId].
-  Future<void> transfer(String deviceId) {
+  /// Moves what is playing to [deviceId]; [from] (what played before) shows there at once.
+  Future<void> transfer(String deviceId, {SpotifyPlayback? from}) {
+    _moving = from;
     _playback.add(
       _playbackId,
-      apply: (playback) => playback.copyWith(deviceId: deviceId, isPlaying: true),
-      isConfirmed: (playback) => playback.deviceId == deviceId,
+      apply: (playback) => (from ?? playback).copyWith(deviceId: deviceId, isPlaying: true),
+      isConfirmed: (playback) => playback.deviceId == deviceId && playback.isPlaying,
+      // Spotify takes a while to start on another device.
+      timeout: const Duration(seconds: 8),
     );
     return _run(_repository.transfer(deviceId));
   }
@@ -198,7 +204,7 @@ class SpotifyConnectService extends _$SpotifyConnectService {
   }
 
   SpotifyConnectState _applied() {
-    final playback = _reported.playback;
+    final playback = _reported.playback ?? (_playback.isPending(_playbackId) ? _moving : null);
     return (
       devices: _devices.applyTo(_reported.devices),
       playback: playback == null ? null : _playback.applyTo([playback]).single,

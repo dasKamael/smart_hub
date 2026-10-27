@@ -130,9 +130,89 @@ class SonosSpeakerRepository implements SpeakerRepository {
   @override
   Future<List<MediaItem>> favorites(String id) async => const [];
 
+  /// Plays a Spotify track, album or playlist from the group's queue, from [MediaItem.startTrack] on when given.
+  /// Needs Spotify linked in the speakers' system once.
   @override
-  Future<void> play(String id, MediaItem item) =>
-      Future.error(UnsupportedError('Starting ${item.title} on the speaker directly is not possible yet'));
+  Future<void> play(String id, MediaItem item) {
+    final entry = _spotifyEntry(item.contentId);
+    if (entry == null) return Future.error(UnsupportedError('The speakers cannot play ${item.contentId}'));
+    final coordinator = _coordinator(id);
+    final soap = _soap(coordinator);
+    return _command(() async {
+      await soap.avTransport('RemoveAllTracksFromQueue');
+      await soap.avTransport('AddURIToQueue', {
+        'EnqueuedURI': entry.uri,
+        'EnqueuedURIMetaData': entry.metadata,
+        'DesiredFirstTrackNumberEnqueued': '0',
+        'EnqueueAsNext': '0',
+      });
+      await soap.avTransport('SetAVTransportURI', {
+        'CurrentURI': 'x-rincon-queue:$coordinator#0',
+        'CurrentURIMetaData': '',
+      });
+      if (item.startTrack case final track?) {
+        final position = await _queuePositionOf(soap, track);
+        if (position != null) {
+          await soap.avTransport('Seek', {'Unit': 'TRACK_NR', 'Target': '${position + 1}'});
+          if (item.startSeconds case final seconds? when seconds >= 1) {
+            await soap.avTransport('Seek', {'Unit': 'REL_TIME', 'Target': _time(seconds.floor())});
+          }
+        }
+      }
+      await soap.avTransport('Play', {'Speed': '1'});
+    });
+  }
+
+  /// The queue entry of a Spotify URI; Sonos knows Spotify as service 9 (`SA_RINCON2311`) and finds the linked
+  /// account itself.
+  static ({String uri, String metadata})? _spotifyEntry(String spotifyUri) {
+    final kind = spotifyUri.split(':').elementAtOrNull(1);
+    final (prefix, itemClass) = switch (kind) {
+      'track' => ('00032020', 'object.item.audioItem.musicTrack'),
+      'album' => ('1004206c', 'object.container.album.musicAlbum'),
+      'playlist' => ('1006206c', 'object.container.playlistContainer'),
+      _ => (null, null),
+    };
+    if (prefix == null || itemClass == null) return null;
+    final encoded = spotifyUri.replaceAll(':', '%3a');
+    return (
+      uri: kind == 'track'
+          ? 'x-sonos-spotify:$encoded?sid=9&flags=8224&sn=0'
+          : 'x-rincon-cpcontainer:$prefix$encoded?sid=9&flags=8300&sn=0',
+      metadata:
+          '<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" '
+          'xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/">'
+          '<item id="$prefix$encoded" parentID="" restricted="true"><dc:title></dc:title>'
+          '<upnp:class>$itemClass</upnp:class>'
+          '<desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON2311_X_#Svc2311-0-Token</desc>'
+          '</item></DIDL-Lite>',
+    );
+  }
+
+  /// Where [spotifyTrack] is in the queue, looked up a page at a time.
+  static Future<int?> _queuePositionOf(SonosSoap soap, String spotifyTrack) async {
+    final needle = spotifyTrack.replaceAll(':', '%3a').toLowerCase();
+    const page = 100;
+    for (var start = 0; start < 2000; start += page) {
+      final reply = await soap.contentDirectory('Browse', {
+        'ObjectID': 'Q:0',
+        'BrowseFlag': 'BrowseDirectChildren',
+        'Filter': 'res',
+        'StartingIndex': '$start',
+        'RequestedCount': '$page',
+        'SortCriteria': '',
+      });
+      final items = RegExp(r'<res[^>]*>(.*?)</res>').allMatches(SonosSoap.value(reply, 'Result') ?? '').toList();
+      for (final (index, item) in items.indexed) {
+        if (item.group(1)!.toLowerCase().contains('$needle?')) return start + index;
+      }
+      if (items.length < page) return null;
+    }
+    return null;
+  }
+
+  static String _time(int seconds) =>
+      '${seconds ~/ 3600}:${(seconds ~/ 60 % 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
 
   void dispose() {
     _disposed = true;

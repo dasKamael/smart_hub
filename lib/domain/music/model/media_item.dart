@@ -10,6 +10,10 @@ abstract class MediaItem with _$MediaItem {
     required String contentId,
     required String contentType,
     String? artworkUrl,
+
+    /// Where to start: a track of it (e.g. `spotify:track:…`) and the seconds into that track.
+    String? startTrack,
+    double? startSeconds,
   }) = _MediaItem;
 
   const MediaItem._();

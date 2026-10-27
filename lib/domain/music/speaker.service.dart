@@ -125,6 +125,8 @@ class SpeakersService extends _$SpeakersService {
           positionUpdatedAt: now,
         ),
         isConfirmed: (speaker) => speaker.playback.isPlaying && speaker.title != title,
+        // A stream takes a few seconds to start on the speakers.
+        timeout: const Duration(seconds: 10),
       );
     }
     return _run(group, _repository.play(id, item));

@@ -8,6 +8,7 @@ import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/model/speaker_state.dart';
+import 'package:smart_hub/domain/music/model/spotify_playback.dart';
 import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
@@ -76,6 +77,10 @@ class FakeSpeakersService extends SpeakersService {
 
   final List<SpeakerState> speakers;
   final commands = <String>[];
+  final played = <MediaItem>[];
+
+  /// Thrown by [play] when set, like a speaker that cannot start the music.
+  Object? playError;
 
   @override
   Future<List<SpeakerState>> build() async => speakers;
@@ -103,7 +108,11 @@ class FakeSpeakersService extends SpeakersService {
   Future<void> previous(String id) async => commands.add('previous $id');
 
   @override
-  Future<void> play(String id, MediaItem item) async => commands.add('play ${item.title} on $id');
+  Future<void> play(String id, MediaItem item) async {
+    if (playError case final error?) throw error;
+    played.add(item);
+    commands.add('play ${item.title} on $id');
+  }
 
   @override
   Future<void> playFromQueue(String id, QueueItem item) async => commands.add('queue ${item.title} on $id');
@@ -162,7 +171,7 @@ class FakeSpotifyConnectService extends SpotifyConnectService {
   Future<void> setVolume(String deviceId, int percent) async => commands.add('volume $deviceId $percent');
 
   @override
-  Future<void> transfer(String deviceId) async => commands.add('transfer $deviceId');
+  Future<void> transfer(String deviceId, {SpotifyPlayback? from}) async => commands.add('transfer $deviceId');
 
   @override
   Future<void> skipTo(String deviceId, QueueItem item, {required int steps}) async =>

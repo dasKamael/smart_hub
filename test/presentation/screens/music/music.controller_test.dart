@@ -158,6 +158,7 @@ void main() {
         deviceId: 'd-phone',
         isPlaying: true,
         title: 'Slow Rivers',
+        trackUri: 'spotify:track:slow',
         contextUri: 'spotify:playlist:mc',
         positionAt: DateTime(2026),
       );
@@ -189,7 +190,7 @@ void main() {
 
       test('Given Spotify plays on the phone, '
           'when choosing a speaker without a Spotify device of its own, '
-          'then the playlist starts on the speaker and the phone pauses', () async {
+          'then the playlist goes on at the same track on the speaker and the phone pauses', () async {
         // Given
         final container = await createContainer();
         expect(container.read(currentTargetProvider(visible: true))?.name, 'Pixel 9');
@@ -200,8 +201,72 @@ void main() {
 
         // Then
         expect(speakers.commands, ['play Slow Rivers on media_player.office']);
+        expect(speakers.played.single.contentId, 'spotify:playlist:mc');
+        expect(speakers.played.single.startTrack, 'spotify:track:slow');
         expect(spotify.commands, ['pause d-phone']);
         expect(container.read(currentTargetProvider(visible: true))?.name, 'Office');
+      });
+
+      test('Given Spotify plays on the phone, '
+          'when the speaker cannot start the music, '
+          'then the phone paused first and plays on', () async {
+        // Given
+        final container = await createContainer();
+        speakers.playError = UnsupportedError('no Spotify on the speaker');
+
+        // When
+        tap(container, 'Office');
+        await Future<void>.delayed(Duration.zero);
+
+        // Then
+        expect(spotify.commands, ['pause d-phone', 'resume d-phone']);
+      });
+
+      test('Given music moved to the speaker, '
+          'when the speaker looks paused for a moment while the phone still plays, '
+          'then the speaker stays the current place', () async {
+        // Given
+        final container = await createContainer();
+        tap(container, 'Office');
+        await Future<void>.delayed(Duration.zero);
+        speakers.state = AsyncData([office.copyWith(playback: Playback.playing)]);
+        expect(container.read(currentTargetProvider(visible: true))?.name, 'Office');
+
+        // When
+        speakers.state = const AsyncData([office]);
+
+        // Then
+        expect(container.read(currentTargetProvider(visible: true))?.name, 'Office');
+      });
+
+      test('Given the phone plays liked songs, '
+          'when choosing a speaker, '
+          'then the playing track starts on the speaker', () async {
+        // Given
+        speakers = FakeSpeakersService(const [office]);
+        spotify = FakeSpotifyConnectService((
+          devices: const [phone],
+          playback: phonePlays.copyWith(contextUri: 'spotify:user:richard:collection'),
+        ));
+        final container = createTestContainer(
+          overrides: [
+            speakersServiceProvider.overrideWith(() => speakers),
+            speakerSettingsServiceProvider.overrideWith(FakeSpeakerSettingsService.new),
+            spotifyConnectServiceProvider.overrideWith(() => spotify),
+          ],
+        );
+        container.listen(currentTargetProvider(visible: true), (_, _) {});
+        await container.read(speakersServiceProvider.future);
+        await container.read(speakerSettingsServiceProvider.future);
+        await container.read(spotifyConnectServiceProvider.future);
+
+        // When
+        tap(container, 'Office');
+        await Future<void>.delayed(Duration.zero);
+
+        // Then
+        expect(speakers.played.single.contentId, 'spotify:track:slow');
+        expect(spotify.commands, ['pause d-phone']);
       });
 
       test('Given Spotify plays on the phone and the speaker is a Spotify device too, '
