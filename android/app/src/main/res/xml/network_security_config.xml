@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home Assistant usually runs on plain http in the home network, often by IP (e.g. http://192.168.1.20:8123).
+     Android cannot allow IP ranges, so cleartext is allowed in general. The only other services the app talks to
+     (Spotify) are addressed with https URLs. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
