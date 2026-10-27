@@ -24,4 +24,18 @@ final class LightRoom {
 
   /// Color of the first light that is on; warm white for lights without color.
   RgbColor? get color => lightsOn.map((light) => light.displayColor).nonNulls.firstOrNull;
+
+  /// The different colors of the lights that are on, in light order – e.g. red and blue when the room is mixed.
+  /// Nearly equal colors count once.
+  List<RgbColor> get colors {
+    final distinct = <RgbColor>[];
+    for (final color in lightsOn.map((light) => light.displayColor).nonNulls) {
+      final known = distinct.any(
+        (other) =>
+            (other.red - color.red).abs() + (other.green - color.green).abs() + (other.blue - color.blue).abs() < 40,
+      );
+      if (!known) distinct.add(color);
+    }
+    return distinct;
+  }
 }

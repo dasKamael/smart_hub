@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/data/database/app_database.dart';
 import 'package:smart_hub/common/utils/current_day.provider.dart';
 import 'package:smart_hub/data/floorplan/placement.repository.dart';
+import 'package:smart_hub/data/lights/hue/hue_bridge.repository.dart';
 import 'package:smart_hub/data/plants/plant.repository.dart';
+import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
@@ -74,6 +76,7 @@ List<Override> floorplanWidgetTestOverrides(
     // Lights and speakers on the plan come from Home Assistant.
     hasHomeAssistantProvider.overrideWithValue(hasHomeAssistant),
     roomScenesServiceProvider.overrideWith(FakeRoomScenesService.new),
+    hueBridgeConfigProvider.overrideWith(_NoBridges.new),
   ];
 }
 
@@ -121,4 +124,10 @@ class FakePlantsService extends PlantsService {
 
   @override
   Future<void> delete(Plant plant) async => commands.add('delete ${plant.id}');
+}
+
+/// No light bridge paired; keeps tests away from the platform's secure storage.
+class _NoBridges extends HueBridgeConfig {
+  @override
+  Future<List<LightBridge>> build() async => const [];
 }

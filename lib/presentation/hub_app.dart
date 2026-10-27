@@ -14,6 +14,8 @@ class HubApp extends ConsumerWidget {
       title: 'Smart Hub',
       debugShowCheckedModeBanner: false,
       theme: HubTheme.dark,
+      // Lists bounce at their ends everywhere, as on iOS.
+      scrollBehavior: const _BouncingScrollBehavior(),
       routerConfig: ref.watch(hubRouterProvider),
       builder: (context, child) => _FadeIn(child: ZenHost(child: child ?? const SizedBox.shrink())),
     );
@@ -49,4 +51,12 @@ class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
       ),
     );
   }
+}
+
+class _BouncingScrollBehavior extends MaterialScrollBehavior {
+  const _BouncingScrollBehavior();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      const BouncingScrollPhysics(parent: RangeMaintainingScrollPhysics());
 }

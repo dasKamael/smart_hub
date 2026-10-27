@@ -45,6 +45,7 @@ class RoomDetailCard extends StatelessWidget {
     required this.openSceneId,
     required this.onScene,
     required this.actions,
+    this.onColor,
     this.tint,
   });
 
@@ -56,6 +57,9 @@ class RoomDetailCard extends StatelessWidget {
   final String? openSceneId;
   final ValueChanged<RoomScene> onScene;
   final SceneActions actions;
+
+  /// Opens the color wheel; `null` when the lights here have no colors or white tones.
+  final VoidCallback? onColor;
   final Color? tint;
 
   @override
@@ -66,11 +70,21 @@ class RoomDetailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: HubSpacing.s16,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(room.name, style: HubTextStyles.sectionTitle),
-              Text(room.isOn ? 'On · ${room.brightnessPercent}% brightness' : 'Off', style: HubTextStyles.secondary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(room.name, style: HubTextStyles.sectionTitle),
+                    Text(
+                      room.isOn ? 'On · ${room.brightnessPercent}% brightness' : 'Off',
+                      style: HubTextStyles.secondary,
+                    ),
+                  ],
+                ),
+              ),
+              if (onColor case final onColor?) _ColorButton(onTap: enabled ? onColor : null),
             ],
           ),
           Expanded(
@@ -81,6 +95,7 @@ class RoomDetailCard extends StatelessWidget {
                 VerticalSlider(
                   value: room.brightnessPercent,
                   fillColor: room.color?.toColor() ?? HubColorPalette.lightWarm,
+                  fillColors: [for (final color in room.colors) color.toColor()],
                   label: room.isOn ? '${room.brightnessPercent}%' : 'Off',
                   onChanged: enabled ? onBrightnessChanged : null,
                   onChangeEnd: onBrightnessEnd,
@@ -264,6 +279,55 @@ class _AddSceneButton extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A round button in all colors that opens the color wheel.
+class _ColorButton extends StatelessWidget {
+  const _ColorButton({required this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Colors',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Opacity(
+          opacity: onTap == null ? 0.4 : 1,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: SweepGradient(
+                colors: [
+                  Color(0xFFFF5F5F),
+                  Color(0xFFFFC85F),
+                  Color(0xFF8CF06E),
+                  Color(0xFF5FD2FF),
+                  Color(0xFF8C6EFF),
+                  Color(0xFFFF6EC8),
+                  Color(0xFFFF5F5F),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Container(
+              decoration: const BoxDecoration(color: HubColorPalette.surface, shape: BoxShape.circle),
+              alignment: Alignment.center,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: const BoxDecoration(color: HubColorPalette.text, shape: BoxShape.circle),
+              ),
+            ),
           ),
         ),
       ),

@@ -12,6 +12,7 @@ class VerticalSlider extends StatefulWidget {
     this.onChanged,
     this.onChangeEnd,
     this.width = 110,
+    this.fillColors,
   });
 
   /// 0–100.
@@ -23,6 +24,9 @@ class VerticalSlider extends StatefulWidget {
   final ValueChanged<int>? onChanged;
   final ValueChanged<int>? onChangeEnd;
   final double width;
+
+  /// Several colors (e.g. of a mixed room) fill as a gradient from bottom to top instead of [fillColor].
+  final List<Color>? fillColors;
 
   @override
   State<VerticalSlider> createState() => _VerticalSliderState();
@@ -78,7 +82,18 @@ class _VerticalSliderState extends State<VerticalSlider> {
                         right: 0,
                         bottom: 0,
                         height: height * value / 100,
-                        child: ColoredBox(color: widget.fillColor),
+                        child: switch (widget.fillColors) {
+                          final colors? when colors.length > 1 => DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: colors,
+                              ),
+                            ),
+                          ),
+                          _ => ColoredBox(color: widget.fillColor),
+                        },
                       ),
                       Positioned(
                         left: 0,

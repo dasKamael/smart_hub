@@ -16,6 +16,8 @@ import 'package:smart_hub/presentation/screens/floorplan/floorplan.controller.da
 import 'package:smart_hub/presentation/screens/floorplan/plan_device.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/inspector/inspector_header.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/plan_marker.dart';
+import 'package:smart_hub/presentation/screens/lights/lights.controller.dart';
+import 'package:smart_hub/presentation/screens/lights/widgets/light_color_dialog.dart';
 import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart';
 
 /// Power, brightness and color of one light. Only controls the light supports are shown.
@@ -118,6 +120,17 @@ class LightInspector extends ConsumerWidget {
                         selected: _isClose(light.color, preset),
                         onTap: enabled ? () => controller.setLightColor(light.id, _rgbOf(preset)) : null,
                       ),
+                    _MoreColors(
+                      onTap: enabled
+                          ? () {
+                              final room = ref
+                                  .read(lightRoomsProvider)
+                                  .where((room) => room.lights.any((l) => l.id == light.id))
+                                  .firstOrNull;
+                              if (room != null) showLightColorDialog(context, roomId: room.id, lightId: light.id);
+                            }
+                          : null,
+                    ),
                   ],
                 ),
             ],
@@ -175,6 +188,45 @@ class ColorTemperatureSlider extends StatelessWidget {
       labelBuilder: (percent) => kelvin == null && percent == 50 ? 'Warm – cool' : '${_kelvinAt(percent)} K',
       onChanged: enabled ? (percent) => onChanged(_kelvinAt(percent)) : null,
       onChangeEnd: (percent) => onChangeEnd(_kelvinAt(percent)),
+    );
+  }
+}
+
+/// A swatch in all colors that opens the color wheel for this light.
+class _MoreColors extends StatelessWidget {
+  const _MoreColors({required this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'More colors',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Opacity(
+          opacity: onTap == null ? 0.4 : 1,
+          child: Container(
+            width: 30,
+            height: 30,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: SweepGradient(
+                colors: [
+                  Color(0xFFFF5F5F),
+                  Color(0xFFFFC85F),
+                  Color(0xFF8CF06E),
+                  Color(0xFF5FD2FF),
+                  Color(0xFF8C6EFF),
+                  Color(0xFFFF6EC8),
+                  Color(0xFFFF5F5F),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

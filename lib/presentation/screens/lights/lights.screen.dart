@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
+import 'package:smart_hub/presentation/screens/lights/widgets/light_color_dialog.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/lights/scene.util.dart';
 import 'package:smart_hub/presentation/shared_widgets/name_dialog.dart';
@@ -122,6 +124,14 @@ class LightsScreen extends ConsumerWidget {
                   scenes: ref.watch(roomScenesProvider(selected.id)),
                   openSceneId: ref.watch(lightsControllerProvider.select((s) => s.openSceneId)),
                   onScene: (scene) => controller.applyScene(selected, scene),
+                  onColor:
+                      selected.lights.any(
+                        (light) =>
+                            light.capabilities.contains(LightCapability.color) ||
+                            light.capabilities.contains(LightCapability.colorTemperature),
+                      )
+                      ? () => showLightColorDialog(context, roomId: selected.id)
+                      : null,
                   actions: SceneActions(
                     onOptions: controller.toggleSceneOptions,
                     onOverwrite: (scene) => controller.overwriteScene(selected, scene),

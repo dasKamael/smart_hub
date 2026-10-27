@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/painting.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/domain/lights/model/rgb_color.dart';
+import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
 import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
@@ -54,6 +56,60 @@ class LightsController extends _$LightsController {
 
   void endBrightness(LightRoom room, int percent) {
     _throttlers.putIfAbsent(room.id, () => Throttler(sliderInterval)).flush(() => _setBrightness(room, percent));
+  }
+
+  /// Dims [lights] together, throttled while dragging.
+  void changeBrightnessOf(List<LightState> lights, int percent) =>
+      _wheel(lights, 'brightness')(() => _setBrightnessOf(lights, percent));
+
+  void endBrightnessOf(List<LightState> lights, int percent) =>
+      _wheel(lights, 'brightness').flush(() => _setBrightnessOf(lights, percent));
+
+  void _setBrightnessOf(List<LightState> lights, int percent) {
+    _run(
+      'set brightness',
+      ref.read(lightsServiceProvider.notifier).setBrightnessOf([for (final l in lights) l.id], percent),
+    );
+  }
+
+  /// Colors [lights] while the wheel is dragged (throttled), and once more when it is let go.
+  void changeColor(List<LightState> lights, RgbColor color) => _wheel(lights)(() => _setColor(lights, color));
+
+  void endColor(List<LightState> lights, RgbColor color) => _wheel(lights).flush(() => _setColor(lights, color));
+
+  void changeKelvin(List<LightState> lights, int kelvin) => _wheel(lights)(() => _setKelvin(lights, kelvin));
+
+  void endKelvin(List<LightState> lights, int kelvin) => _wheel(lights).flush(() => _setKelvin(lights, kelvin));
+
+  Throttler _wheel(List<LightState> lights, [String what = 'color']) {
+    return _throttlers.putIfAbsent(
+      '$what:${lights.map((light) => light.id).join(',')}',
+      () => Throttler(sliderInterval),
+    );
+  }
+
+  void _setColor(List<LightState> lights, RgbColor color) {
+    final service = ref.read(lightsServiceProvider.notifier);
+    _run(
+      'set color',
+      Future.wait([
+        for (final light in lights)
+          if (light.capabilities.contains(LightCapability.color)) service.setColor(light.id, color),
+      ]),
+    );
+  }
+
+  /// Each light gets the temperature as far as its range goes.
+  void _setKelvin(List<LightState> lights, int kelvin) {
+    final service = ref.read(lightsServiceProvider.notifier);
+    _run(
+      'set color temperature',
+      Future.wait([
+        for (final light in lights)
+          if (light.capabilities.contains(LightCapability.colorTemperature))
+            service.setKelvin(light.id, kelvin.clamp(light.minKelvin, light.maxKelvin)),
+      ]),
+    );
   }
 
   void applyScene(LightRoom room, RoomScene scene) {

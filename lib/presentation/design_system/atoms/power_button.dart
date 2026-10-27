@@ -10,6 +10,7 @@ class PowerButton extends StatelessWidget {
     required this.background,
     required this.foreground,
     this.glowColor,
+    this.colors,
     this.onTap,
     this.semanticLabel,
   });
@@ -18,6 +19,9 @@ class PowerButton extends StatelessWidget {
   final Color background;
   final Color foreground;
   final Color? glowColor;
+
+  /// Several colors (e.g. of a mixed room) shown as a diagonal gradient instead of [background].
+  final List<Color>? colors;
   final VoidCallback? onTap;
   final String? semanticLabel;
 
@@ -34,6 +38,14 @@ class PowerButton extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             color: background,
+            gradient: switch (colors) {
+              final colors? when colors.length > 1 => LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: colors,
+              ),
+              _ => null,
+            },
             shape: BoxShape.circle,
             boxShadow: [if (glowColor case final glow?) BoxShadow(color: glow.withValues(alpha: 0.66), blurRadius: 16)],
           ),

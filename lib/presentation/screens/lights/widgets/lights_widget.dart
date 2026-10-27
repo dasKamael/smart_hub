@@ -86,6 +86,20 @@ class LightsWidget extends ConsumerWidget {
 
 Color _colorOf(LightRoom room) => room.color?.toColor() ?? HubColorPalette.lightWarm;
 
+/// All colors of a mixed room; a single color for the others.
+List<Color> _colorsOf(LightRoom room) => [for (final color in room.colors) color.toColor()];
+
+/// A mixed room's colors as a soft diagonal gradient, e.g. behind its tile; `null` for a single color.
+Gradient? _mixOf(LightRoom room, {required double alpha}) {
+  final colors = _colorsOf(room);
+  if (!room.isOn || colors.length < 2) return null;
+  return LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [for (final color in colors) color.withValues(alpha: alpha)],
+  );
+}
+
 /// One bulb that switches all rooms shown, and how many of them are lit.
 class _Small extends StatelessWidget {
   const _Small(this.rooms, {required this.onToggle});
@@ -171,6 +185,7 @@ class _Medium extends StatelessWidget {
                           _Bulb(
                             on: rooms[i].isOn,
                             color: _colorOf(rooms[i]),
+                            colors: _colorsOf(rooms[i]),
                             size: 60,
                             label: rooms[i].name,
                             onTap: onToggle == null ? null : () => onToggle!(rooms[i]),
@@ -277,6 +292,7 @@ class _RoomRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: room.isOn ? color.withValues(alpha: 0.18) : HubColorPalette.elevated,
+            gradient: _mixOf(room, alpha: 0.22),
             borderRadius: BorderRadius.circular(16),
           ),
           // Few rooms make tall tiles: bulb and text grow with them.
@@ -286,7 +302,7 @@ class _RoomRow extends StatelessWidget {
               return Row(
                 spacing: big ? 14 : 10,
                 children: [
-                  _Bulb(on: room.isOn, color: color, size: big ? 52 : 34),
+                  _Bulb(on: room.isOn, color: color, colors: _colorsOf(room), size: big ? 52 : 34),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -389,6 +405,7 @@ class _ExtraLarge extends StatelessWidget {
           width: 96,
           value: selected.brightnessPercent,
           fillColor: _colorOf(selected),
+          fillColors: _colorsOf(selected),
           label: selected.isOn ? '${selected.brightnessPercent}%' : 'Off',
           onChanged: onBrightnessChanged,
           onChangeEnd: onBrightnessEnd,
@@ -447,6 +464,7 @@ class _RoomTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: room.isOn ? color.withValues(alpha: 0.18) : HubColorPalette.elevated,
+            gradient: _mixOf(room, alpha: 0.22),
             borderRadius: BorderRadius.circular(20),
             // Outside stroke: a shadow would shine through the translucent tile color.
             border: Border.all(
@@ -462,6 +480,7 @@ class _RoomTile extends StatelessWidget {
               _Bulb(
                 on: room.isOn,
                 color: color,
+                colors: _colorsOf(room),
                 size: compact ? 32 : 42,
                 label: room.isOn ? 'Turn ${room.name} off' : 'Turn ${room.name} on',
                 onTap: onToggle,
@@ -541,10 +560,13 @@ class _SceneButton extends StatelessWidget {
 
 /// Round bulb in the light's color with a glow while on; grey while off.
 class _Bulb extends StatelessWidget {
-  const _Bulb({required this.on, required this.color, required this.size, this.label, this.onTap});
+  const _Bulb({required this.on, required this.color, required this.size, this.label, this.onTap, this.colors});
 
   final bool on;
   final Color color;
+
+  /// Several colors of a mixed room, as a diagonal gradient.
+  final List<Color>? colors;
   final double size;
   final String? label;
   final VoidCallback? onTap;
@@ -567,6 +589,14 @@ class _Bulb extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: on ? color : HubColorPalette.control,
+            gradient: switch (colors) {
+              final colors? when on && colors.length > 1 => LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: colors,
+              ),
+              _ => null,
+            },
             shape: BoxShape.circle,
             boxShadow: [if (on) BoxShadow(color: color.withValues(alpha: 0.66), blurRadius: size / 3)],
           ),

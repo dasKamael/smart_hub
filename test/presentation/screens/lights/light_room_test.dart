@@ -41,5 +41,23 @@ void main() {
 
       expect(room.color, const RgbColor(9, 9, 9));
     });
+
+    test(
+      'Given a red, a blue and a nearly red light, when asking for the colors, then red and blue show once each',
+      () {
+        final room = LightRoom(
+          id: 'office',
+          name: 'Office',
+          lights: [
+            light('a', brightness: 100, color: const RgbColor(230, 50, 40)),
+            light('b', brightness: 100, color: const RgbColor(60, 70, 240)),
+            light('c', brightness: 100, color: const RgbColor(235, 55, 45)),
+            light('d', on: false),
+          ],
+        );
+
+        expect(room.colors, const [RgbColor(230, 50, 40), RgbColor(60, 70, 240)]);
+      },
+    );
   });
 }

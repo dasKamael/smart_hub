@@ -21,6 +21,7 @@ class RoomTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = room.color?.toColor() ?? HubColorPalette.lightWarm;
+    final colors = [for (final color in room.colors) color.toColor()];
     final on = room.isOn;
     return Semantics(
       button: true,
@@ -34,6 +35,14 @@ class RoomTile extends StatelessWidget {
           padding: const EdgeInsets.all(HubSpacing.s16),
           decoration: BoxDecoration(
             color: on ? color.withValues(alpha: 0.18) : HubColorPalette.elevated,
+            // A mixed room shows all its colors.
+            gradient: on && colors.length > 1
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [for (final color in colors) color.withValues(alpha: 0.22)],
+                  )
+                : null,
             borderRadius: BorderRadius.circular(HubRadius.roomTile),
             // Outside stroke: a shadow would shine through the translucent tile color.
             border: Border.all(
@@ -46,7 +55,7 @@ class RoomTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _RoomPowerButton(on: on, color: color, onTap: onToggle),
+              _RoomPowerButton(on: on, color: color, colors: colors, onTap: onToggle),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -78,10 +87,11 @@ class RoomTile extends StatelessWidget {
 }
 
 class _RoomPowerButton extends StatelessWidget {
-  const _RoomPowerButton({required this.on, required this.color, this.onTap});
+  const _RoomPowerButton({required this.on, required this.color, required this.colors, this.onTap});
 
   final bool on;
   final Color color;
+  final List<Color> colors;
   final VoidCallback? onTap;
 
   @override
@@ -94,6 +104,7 @@ class _RoomPowerButton extends StatelessWidget {
         background: on ? color : HubColorPalette.control,
         foreground: on ? HubColorPalette.surface : HubColorPalette.text2,
         glowColor: on ? color : null,
+        colors: on ? colors : null,
         semanticLabel: on ? 'Turn room off' : 'Turn room on',
         onTap: onTap,
       ),
