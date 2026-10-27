@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ha_client/ha_client.dart';
 import 'package:ha_client/testing.dart';
 import 'package:smart_hub/data/connection/ha_session.repository.dart';
-import 'package:smart_hub/data/lights/light.repository.dart';
+import 'package:smart_hub/data/lights/ha_light.repository.dart';
 import 'package:smart_hub/domain/connection/model/connection_config.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
 import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
@@ -14,12 +14,12 @@ HaEntityState _light(String state, Map<String, Object?> attributes, {String id =
 }
 
 void main() {
-  group('LightRepository.toLight', () {
+  group('HaLightRepository.toLight', () {
     test('Given a color light that is on, '
         'when mapping, '
         'then brightness is in percent and the color is taken from rgb_color', () {
       // When
-      final light = LightRepository.toLight(
+      final light = HaLightRepository.toLight(
         _light('on', {
           'friendly_name': 'Desk lamp',
           'supported_color_modes': ['xy', 'color_temp'],
@@ -42,7 +42,7 @@ void main() {
         'when mapping, '
         'then kelvin is set, there is no color and the display color is warm white', () {
       // When
-      final light = LightRepository.toLight(
+      final light = HaLightRepository.toLight(
         _light('on', {
           'supported_color_modes': ['color_temp', 'xy'],
           'color_mode': 'color_temp',
@@ -63,7 +63,7 @@ void main() {
         'when mapping, '
         'then brightness, color and kelvin are empty', () {
       // When
-      final light = LightRepository.toLight(
+      final light = HaLightRepository.toLight(
         _light('off', {
           'supported_color_modes': ['brightness'],
           'brightness': null,
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('Given an unavailable light, when mapping, then it is not available and off', () {
-      final light = LightRepository.toLight(_light('unavailable', {}));
+      final light = HaLightRepository.toLight(_light('unavailable', {}));
 
       expect(light.isAvailable, isFalse);
       expect(light.isOn, isFalse);
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('Given a very dim light, when mapping, then brightness is at least 1 %', () {
-      final light = LightRepository.toLight(
+      final light = HaLightRepository.toLight(
         _light('on', {
           'supported_color_modes': ['brightness'],
           'brightness': 1,
@@ -96,7 +96,7 @@ void main() {
     });
   });
 
-  group('LightRepository.capabilitiesOf', () {
+  group('HaLightRepository.capabilitiesOf', () {
     final cases = <List<String>, Set<LightCapability>>{
       ['onoff']: {},
       ['brightness']: {LightCapability.brightness},
@@ -108,14 +108,14 @@ void main() {
     };
     for (final MapEntry(key: modes, value: expected) in cases.entries) {
       test('Given color modes $modes, when mapping, then the capabilities are $expected', () {
-        expect(LightRepository.capabilitiesOf(modes), expected);
+        expect(HaLightRepository.capabilitiesOf(modes), expected);
       });
     }
   });
 
-  group('LightRepository commands', () {
+  group('HaLightRepository commands', () {
     late FakeHomeAssistant server;
-    late LightRepository repository;
+    late HaLightRepository repository;
 
     setUp(() async {
       server = FakeHomeAssistant(states: [_light('off', {})]);
@@ -124,7 +124,7 @@ void main() {
       final online = session.watchStatus().firstWhere((s) => s == ConnectionStatus.online);
       await session.connect(ConnectionConfig.homeAssistant(baseUrl: Uri.parse('http://ha:8123'), token: 'test-token'));
       await online;
-      repository = LightRepository(session: session);
+      repository = HaLightRepository(session: session);
     });
 
     test('Given lights, when turning them on with values, then only the given values are sent', () async {

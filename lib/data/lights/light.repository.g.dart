@@ -9,15 +9,18 @@ part of 'light.repository.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Providers
+/// A paired bridge provides the lights; otherwise Home Assistant does.
 
 @ProviderFor(lightRepository)
 final lightRepositoryProvider = LightRepositoryProvider._();
 
 /// Providers
+/// A paired bridge provides the lights; otherwise Home Assistant does.
 
 final class LightRepositoryProvider extends $FunctionalProvider<LightRepository, LightRepository, LightRepository>
     with $Provider<LightRepository> {
   /// Providers
+  /// A paired bridge provides the lights; otherwise Home Assistant does.
   LightRepositoryProvider._()
     : super(
         from: null,
@@ -47,4 +50,4 @@ final class LightRepositoryProvider extends $FunctionalProvider<LightRepository,
   }
 }
 
-String _$lightRepositoryHash() => r'391018332b50ff09b3cf3edee1b5d29ef1aa32de';
+String _$lightRepositoryHash() => r'566106da84f1a699c52e607401b26f6185232e84';

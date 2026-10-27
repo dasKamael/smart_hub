@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/plants/model/watering_state.enum.dart';
@@ -24,7 +24,7 @@ class HomeSummaryWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasHomeAssistant = ref.watch(hasHomeAssistantProvider);
+    final hasLights = ref.watch(hasLightsProvider);
     final lightsOn = (ref.watch(lightsServiceProvider).value ?? const <LightState>[]).where((light) => light.isOn);
     final plants = ref.watch(wateringPlanProvider).all;
     final overdue = plants.where((entry) => entry.state == WateringState.overdue).length;
@@ -48,7 +48,7 @@ class HomeSummaryWidget extends ConsumerWidget {
             glyph: HubGlyph.bulb,
             color: HubColorPalette.lightWarm,
             label: 'Lights',
-            value: hasHomeAssistant ? (lightsOn.isEmpty ? 'All off' : '${lightsOn.length} on') : 'Not connected',
+            value: hasLights ? (lightsOn.isEmpty ? 'All off' : '${lightsOn.length} on') : 'Not connected',
             onTap: () => context.go(HubRoute.lights.path),
           ),
           _Row(

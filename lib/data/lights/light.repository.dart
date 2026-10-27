@@ -1,75 +1,33 @@
-import 'package:ha_client/ha_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/data/connection/ha_session.repository.dart';
-import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
+import 'package:smart_hub/data/lights/ha_light.repository.dart';
+import 'package:smart_hub/data/lights/hue/hue_bridge.repository.dart';
+import 'package:smart_hub/data/lights/hue/hue_light.repository.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 
 part 'light.repository.g.dart';
 
-/// Lights are `light.*` entities in Home Assistant – any brand HA supports.
-class LightRepository {
-  LightRepository({required this.session});
+/// Where the lights come from: Home Assistant, or a light bridge in the home network directly.
+abstract interface class LightRepository {
+  Stream<List<LightState>> watchLights();
 
-  final HaSessionRepository session;
-
-  Stream<List<LightState>> watchLights() => session.watchDomain('light').map((states) => states.map(toLight).toList());
+  /// Whether the lights can be controlled right now.
+  Stream<bool> watchOnline();
 
   /// Turns [ids] on. Only the given values change; the light keeps the others.
-  Future<void> turnOn(List<String> ids, {int? brightnessPercent, RgbColor? color, int? kelvin}) {
-    return session.callService(
-      'light',
-      'turn_on',
-      entityIds: ids,
-      data: {
-        'brightness_pct': ?brightnessPercent,
-        if (color != null) 'rgb_color': [color.red, color.green, color.blue],
-        'color_temp_kelvin': ?kelvin,
-      },
-    );
-  }
+  Future<void> turnOn(List<String> ids, {int? brightnessPercent, RgbColor? color, int? kelvin});
 
-  Future<void> turnOff(List<String> ids) => session.callService('light', 'turn_off', entityIds: ids);
-
-  static LightState toLight(HaEntityState state) {
-    final attributes = state.attributes;
-    final isOn = state.state == 'on';
-    final modes = (attributes['supported_color_modes'] as List<Object?>? ?? const []).whereType<String>();
-    final brightness = attributes['brightness'] as num?;
-    final kelvin = (attributes['color_temp_kelvin'] as num?)?.round();
-    final rgb = (attributes['rgb_color'] as List<Object?>?)?.whereType<num>().toList();
-    final colorMode = attributes['color_mode'] as String?;
-    final isWhiteMode = colorMode == 'color_temp' && kelvin != null;
-    return LightState(
-      id: state.entityId,
-      name: (attributes['friendly_name'] as String?) ?? state.entityId,
-      isOn: isOn,
-      isAvailable: state.state != 'unavailable',
-      brightnessPercent: isOn && brightness != null ? (brightness * 100 / 255).round().clamp(1, 100) : null,
-      color: isOn && !isWhiteMode && rgb != null && rgb.length == 3
-          ? RgbColor(rgb[0].round(), rgb[1].round(), rgb[2].round())
-          : null,
-      kelvin: isOn && isWhiteMode ? kelvin : null,
-      minKelvin: (attributes['min_color_temp_kelvin'] as num?)?.round() ?? 2000,
-      maxKelvin: (attributes['max_color_temp_kelvin'] as num?)?.round() ?? 6500,
-      capabilities: capabilitiesOf(modes),
-    );
-  }
-
-  static const _colorModes = {'hs', 'rgb', 'rgbw', 'rgbww', 'xy'};
-
-  /// Maps HA's `supported_color_modes` to the controls the hub shows (`README` → "Capability model").
-  static Set<LightCapability> capabilitiesOf(Iterable<String> modes) {
-    final set = modes.toSet();
-    return {
-      // Every mode except plain on/off can be dimmed.
-      if (set.any((mode) => mode != 'onoff' && mode != 'unknown')) LightCapability.brightness,
-      if (set.contains('color_temp')) LightCapability.colorTemperature,
-      if (set.any(_colorModes.contains)) LightCapability.color,
-    };
-  }
+  Future<void> turnOff(List<String> ids);
 }
 
 /// Providers
+/// A paired bridge provides the lights; otherwise Home Assistant does.
 @Riverpod(keepAlive: true)
-LightRepository lightRepository(Ref ref) => LightRepository(session: ref.watch(haSessionRepositoryProvider));
+LightRepository lightRepository(Ref ref) {
+  final bridge = ref.watch(hueBridgeConfigProvider).value;
+  if (bridge == null) return HaLightRepository(session: ref.watch(haSessionRepositoryProvider));
+  final repository = HueLightRepository(host: bridge.host, appKey: bridge.appKey, client: hueClientFor(bridge.host));
+  ref.onDispose(repository.dispose);
+  return repository;
+}

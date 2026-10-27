@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
@@ -26,14 +27,16 @@ class InspectorCard extends ConsumerWidget {
     final devices = ref.watch(planDevicesProvider);
     // Controls are disabled while offline; the last known state stays visible.
     final enabled = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    // Lights may come from a light bridge instead of Home Assistant.
+    final lightsEnabled = ref.watch(lightsOnlineProvider);
 
     final content = switch (selection) {
       RoomSelection(:final roomId) => switch (plan.rooms.where((r) => r.id == roomId).firstOrNull) {
-        final room? => RoomInspector(room: room, devices: devices, enabled: enabled),
+        final room? => RoomInspector(room: room, devices: devices, enabled: lightsEnabled),
         null => const _Hint(),
       },
       DeviceSelection(:final deviceId) => switch (devices.where((d) => d.id == deviceId).firstOrNull) {
-        final PlanLight light => LightInspector(device: light, plan: plan, enabled: enabled),
+        final PlanLight light => LightInspector(device: light, plan: plan, enabled: lightsEnabled),
         final PlanSpeaker speaker => SpeakerInspector(device: speaker, plan: plan, enabled: enabled),
         final PlanPlant plant => PlantInspector(device: plant, plan: plan),
         null => const _Hint(),
@@ -64,7 +67,7 @@ class _Hint extends ConsumerWidget {
       children: [
         const Text('Tap a room or device', style: HubTextStyles.widgetTitle),
         Text(
-          ref.watch(hasHomeAssistantProvider)
+          ref.watch(hasLightsProvider)
               ? "Drag anything on the plan to move it. Lights glow in the room they're in."
               : 'Drag anything on the plan to move it.',
           style: HubTextStyles.secondary,

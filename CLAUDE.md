@@ -115,6 +115,13 @@ Logo master: `branding/logo.svg` (floor plan with a glowing light and a plant). 
 `values-v31` (Android 12+) and `launch_background.xml` (older). In Flutter: `HubLogo`. The app is dark in light and dark
 system mode alike.
 
+## Lights without Home Assistant
+
+Settings → Lights → "Pair bridge": the hub talks to a Philips Hue Bridge directly in the home network (CLIP v2, event
+stream for live changes; `data/lights/hue/`). Found via Signify's discovery service or typed address; pairing needs the
+bridge's button. The key lives in `flutter_secure_storage`. A paired bridge provides all lights instead of Home
+Assistant (`lightRepositoryProvider`). Domain and presentation call it a "light bridge" (no brand names there).
+
 ## Demo mode
 
 The app runs without Home Assistant: the setup screen offers a demo mode backed by `FakeHomeAssistant`

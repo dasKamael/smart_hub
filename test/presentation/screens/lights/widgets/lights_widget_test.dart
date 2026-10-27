@@ -134,7 +134,7 @@ void main() {
       await load(tester, WidgetSize.medium, hasHomeAssistant: false);
 
       // Then
-      expect(find.text('Needs Home Assistant'), findsOneWidget);
+      expect(find.text('No lights yet'), findsOneWidget);
     });
 
     testWidgets('Given the kitchen and the office chosen, when shown medium, then only they show, kitchen first', (

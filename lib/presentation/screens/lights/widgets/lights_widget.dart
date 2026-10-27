@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/lights/model/room_scene.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
@@ -35,7 +35,7 @@ class LightsWidget extends ConsumerWidget {
     final all = ref.watch(lightRoomsProvider);
     final chosen = [for (final id in roomIds) ?all.where((room) => room.id == id).firstOrNull];
     final rooms = chosen.isEmpty ? all : chosen;
-    final enabled = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    final enabled = ref.watch(lightsOnlineProvider);
     final controller = ref.read(lightsControllerProvider.notifier);
     final selectedId = ref.watch(lightsControllerProvider.select((state) => state.selectedRoomId));
     final selected = rooms.where((room) => room.id == selectedId).firstOrNull ?? rooms.firstOrNull;
@@ -53,11 +53,11 @@ class LightsWidget extends ConsumerWidget {
         _ => 16,
       },
       onTap: () => context.go(HubRoute.lights.path),
-      child: switch ((ref.watch(hasHomeAssistantProvider), rooms)) {
+      child: switch ((ref.watch(hasLightsProvider), rooms)) {
         (false, _) => _Message(
           glyph: HubGlyph.bulb,
-          text: 'Needs Home Assistant',
-          detail: size == WidgetSize.small ? null : 'Connect it to switch your lights here.',
+          text: 'No lights yet',
+          detail: size == WidgetSize.small ? null : 'Connect Home Assistant or a light bridge in the settings.',
         ),
         (_, []) => const _Message(glyph: HubGlyph.bulb, text: 'No lights yet'),
         _ => switch (size) {

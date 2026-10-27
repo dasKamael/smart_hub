@@ -136,7 +136,7 @@ void main() {
 
         // Then
         expect(plan, 1);
-        expect(find.text('Lights need Home Assistant'), findsOneWidget);
+        expect(find.text('No lights connected yet'), findsOneWidget);
       });
 
       testWidgets('Given the hub runs without Home Assistant, '
@@ -158,7 +158,7 @@ void main() {
         // Then
         expect(setup, 1);
         expect(find.byType(SetupScreen), findsNothing);
-        expect(find.text('Lights need Home Assistant'), findsOneWidget);
+        expect(find.text('No lights connected yet'), findsOneWidget);
       });
     });
   });

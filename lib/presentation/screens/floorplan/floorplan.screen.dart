@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
@@ -180,8 +180,8 @@ class _LayerChips extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final layers = ref.watch(floorplanControllerProvider.select((s) => s.layers));
     final controller = ref.read(floorplanControllerProvider.notifier);
-    // Without Home Assistant there are only plants – nothing to switch between.
-    if (!ref.watch(hasHomeAssistantProvider)) return const SizedBox(height: 36);
+    // Without lights and speakers there are only plants – nothing to switch between.
+    if (!ref.watch(hasLightsProvider)) return const SizedBox(height: 36);
     return SizedBox(
       height: 36,
       child: Row(

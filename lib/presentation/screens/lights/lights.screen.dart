@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/lights/scene.util.dart';
 import 'package:smart_hub/presentation/shared_widgets/name_dialog.dart';
-import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
@@ -25,16 +25,18 @@ class LightsScreen extends ConsumerWidget {
     final rooms = ref.watch(lightRoomsProvider);
     final selectedId = ref.watch(lightsControllerProvider.select((s) => s.selectedRoomId));
     final controller = ref.read(lightsControllerProvider.notifier);
-    final enabled = ref.watch(connectionStatusServiceProvider).value?.isOnline ?? false;
+    final enabled = ref.watch(lightsOnlineProvider);
     final selected = rooms.where((room) => room.id == selectedId).firstOrNull ?? rooms.firstOrNull;
     final onCount = rooms.where((room) => room.isOn).length;
 
-    if (!ref.watch(hasHomeAssistantProvider)) {
+    if (!ref.watch(hasLightsProvider)) {
       return const PageCard(
         child: HomeAssistantHint(
           glyph: HubGlyph.bulb,
-          title: 'Lights need Home Assistant',
-          text: 'Connect Home Assistant to switch and dim your lights here and on the plan.',
+          title: 'No lights connected yet',
+          text:
+              'Connect Home Assistant, or pair your light bridge in the settings (Lights), to switch and dim your '
+              'lights here and on the plan.',
         ),
       );
     }

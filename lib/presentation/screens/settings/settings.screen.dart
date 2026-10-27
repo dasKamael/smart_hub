@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
+import 'package:smart_hub/presentation/screens/settings/widgets/light_bridge_dialog.dart';
 import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -101,6 +103,7 @@ class SettingsScreen extends ConsumerWidget {
                                 ),
                               ),
                               const _HomeAppCard(),
+                              const _LightsCard(),
                               const _SpotifyCard(),
                               const _SpeakersCard(),
                               const _ZenCard(),
@@ -172,6 +175,47 @@ class _HomeAppCard extends ConsumerWidget {
 }
 
 /// Spotify as content source for "Jump back in". Hidden when the build has no Spotify client id.
+/// Lights from a light bridge directly, instead of Home Assistant.
+class _LightsCard extends ConsumerWidget {
+  const _LightsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bridge = ref.watch(lightBridgeServiceProvider).value;
+    final hasHomeAssistant = ref.watch(hasHomeAssistantProvider);
+    return PageCard(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: Row(
+        spacing: HubSpacing.s16,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: HubSpacing.s4,
+              children: [
+                const Text('Lights', style: HubTextStyles.widgetTitle),
+                Text(switch ((bridge, hasHomeAssistant)) {
+                  (final bridge?, _) => 'From ${bridge.name ?? 'the light bridge'} at ${bridge.host}',
+                  (null, true) => 'From Home Assistant. A paired light bridge would take over.',
+                  (null, false) => 'Pair your light bridge to switch lights without Home Assistant.',
+                }, style: HubTextStyles.secondary),
+              ],
+            ),
+          ),
+          if (bridge != null)
+            HubButton(
+              label: 'Disconnect',
+              variant: HubButtonVariant.destructive,
+              onPressed: () => unawaited(ref.read(lightBridgeServiceProvider.notifier).disconnect()),
+            )
+          else
+            HubButton(label: 'Pair bridge', onPressed: () => unawaited(showLightBridgeDialog(context))),
+        ],
+      ),
+    );
+  }
+}
+
 class _SpotifyCard extends ConsumerWidget {
   const _SpotifyCard();
 
