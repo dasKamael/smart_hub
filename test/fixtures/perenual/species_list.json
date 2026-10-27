@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "id": 5257,
+      "common_name": "Swiss cheese plant",
+      "scientific_name": [
+        "Monstera deliciosa"
+      ],
+      "default_image": {
+        "thumbnail": "https://s3.us-central-1.wasabisys.com/perenual/image/upgrade_access.jpg?X-Amz-Expires=86400"
+      }
+    },
+    {
+      "id": 2774,
+      "common_name": "pothos",
+      "scientific_name": [
+        "Epipremnum aureum 'Neon'"
+      ],
+      "default_image": {
+        "thumbnail": "https://perenual.com/storage/species_image/2193/thumbnail.jpg"
+      }
+    },
+    {
+      "id": 2194,
+      "common_name": "Monstera adansonii",
+      "scientific_name": [],
+      "default_image": null
+    }
+  ],
+  "to": 2,
+  "per_page": 30,
+  "current_page": 1,
+  "from": 1,
+  "last_page": 1,
+  "total": 2
+}

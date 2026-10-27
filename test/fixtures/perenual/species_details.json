@@ -1,0 +1,37 @@
+{
+  "id": 2193,
+  "common_name": "Swiss cheese plant",
+  "scientific_name": [
+    "Monstera deliciosa"
+  ],
+  "watering": "Average",
+  "watering_general_benchmark": {
+    "value": "\"7-10\"",
+    "unit": "days"
+  },
+  "sunlight": [
+    "part shade",
+    "part sun/part shade"
+  ],
+  "pruning_month": [
+    "June",
+    "July",
+    "August",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "December",
+    "January",
+    "February",
+    "May"
+  ],
+  "care_level": "Medium",
+  "indoor": true,
+  "poisonous_to_pets": 1,
+  "default_image": {
+    "medium_url": "https://perenual.com/storage/species_image/2193/medium.jpg",
+    "thumbnail": "https://perenual.com/storage/species_image/2193/thumbnail.jpg"
+  }
+}
