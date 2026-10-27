@@ -11,6 +11,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
+import 'package:smart_hub/presentation/screens/music/widgets/now_playing_card.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 import 'package:smart_hub/presentation/utils/extension/connect_device_type.extension.dart';
 
@@ -36,10 +37,14 @@ class PlaybackPlaceButton extends ConsumerWidget {
       child: GestureDetector(
         onTap: () => unawaited(_showPlaces(context, visible: visible)),
         child: AnimatedContainer(
-          duration: HubMotion.glowDuration,
+          duration: HubMotion.tintDuration,
+          curve: HubMotion.tint,
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: PageCard.decoration(tint: Artwork.colorOf(target.nowPlaying.title ?? target.name), radius: 20),
+          decoration: PageCard.decoration(
+            color: NowPlayingCard.fillOf(Artwork.colorOf(target.nowPlaying.title ?? target.name)),
+            radius: 20,
+          ),
           child: Row(
             spacing: 10,
             children: [

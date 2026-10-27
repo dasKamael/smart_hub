@@ -4,8 +4,9 @@ Open wishes and known gaps, newest first. Each one gets a short concept before i
 
 ## Design: area colors on the pages
 
-The pages carry their area color in the glow and the page cards (`HubAreaColors`). Open: stronger page tint (~30 %),
-"Jump back in" / "Up next" in the cover color, a hint of the area color in tiles inside the pages.
+The pages carry their area color in the glow and the page cards (`HubAreaColors`); weather and music tint the whole
+sky and their cards (weather scene, cover). Open: stronger page tint (~30 %) on plants and lights, a hint of the area
+color in tiles inside the pages.
 
 ## Dashboard widgets
 

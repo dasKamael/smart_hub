@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -138,6 +140,15 @@ class _NowPlaying extends ConsumerWidget {
     final target = ref.watch(currentTargetProvider(visible: visible));
     if (target == null) return const SizedBox.shrink();
     final controller = ref.read(musicControllerProvider.notifier);
+    // The next cover loads ahead, so it shows at once when the track changes; a cached one costs nothing.
+    if (ref.watch(upNextProvider(visible: visible))?.coverUrl case final next?) {
+      final image = Artwork.imageOf(
+        next,
+        side: NowPlayingCard.coverSize,
+        devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
+      );
+      unawaited(precacheImage(image, context, onError: (_, _) {}));
+    }
     return NowPlayingCard(
       target: target,
       enabled: _transportEnabled(ref, target),
@@ -146,6 +157,14 @@ class _NowPlaying extends ConsumerWidget {
       onNext: () => controller.next(target),
     );
   }
+}
+
+/// The cards below the playing track share its cover's color as a plain tone.
+Color _cardColor(WidgetRef ref, bool visible) {
+  final seed = ref.watch(
+    currentTargetProvider(visible: visible).select((target) => target?.nowPlaying.title ?? target?.name ?? ''),
+  );
+  return NowPlayingCard.fillOf(Artwork.colorOf(seed));
 }
 
 /// The volume where the music plays; for a group all of its speakers together.
@@ -185,7 +204,8 @@ class _Volume extends ConsumerWidget {
     return Semantics(
       label: 'Volume',
       child: AnimatedContainer(
-        duration: HubMotion.glowDuration,
+        duration: HubMotion.tintDuration,
+        curve: HubMotion.tint,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(32),
           gradient: LinearGradient(
@@ -194,14 +214,20 @@ class _Volume extends ConsumerWidget {
             colors: NowPlayingCard.colorsOf(tint),
           ),
         ),
-        child: VerticalSlider(
-          width: 150,
-          trackColor: Colors.transparent,
-          value: value,
-          fillColor: Color.lerp(tint, HubColorPalette.text, 0.35)!,
-          label: '$value%',
-          onChanged: onChanged,
-          onChangeEnd: onEnd,
+        // The fill blends to the new cover's color with the card behind it.
+        child: TweenAnimationBuilder<Color?>(
+          tween: ColorTween(end: Color.lerp(tint, HubColorPalette.text, 0.35)),
+          duration: HubMotion.tintDuration,
+          curve: HubMotion.tint,
+          builder: (context, fill, _) => VerticalSlider(
+            width: 150,
+            trackColor: Colors.transparent,
+            value: value,
+            fillColor: fill ?? tint,
+            label: '$value%',
+            onChanged: onChanged,
+            onChangeEnd: onEnd,
+          ),
         ),
       ),
     );
@@ -229,6 +255,7 @@ class _JumpBackIn extends ConsumerWidget {
       (null, LibraryView.playlists) => ref.watch(spotifyPlaylistsProvider),
     };
     return PageCard(
+      color: _cardColor(ref, visible),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -339,6 +366,7 @@ class _UpNext extends ConsumerWidget {
         ref.watch(currentTargetProvider(visible: visible).select((target) => target is ConnectTarget)) ||
         _transportEnabled(ref, null);
     return PageCard(
+      color: _cardColor(ref, visible),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

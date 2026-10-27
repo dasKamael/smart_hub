@@ -25,9 +25,15 @@ class WeatherScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final forecast = ref.watch(weatherServiceProvider).value;
+    final tint = switch (forecast?.now) {
+      final now? => WeatherScene.moodOf(now.condition, isDay: now.isDay),
+      null => null,
+    };
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
       body: HubBackground(
+        tint: tint,
+        tintsSky: true,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),
@@ -60,8 +66,8 @@ class WeatherScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           spacing: HubSpacing.s16,
                           children: [
-                            Expanded(flex: 13, child: _Today(forecast)),
-                            Expanded(flex: 10, child: _Days(forecast)),
+                            Expanded(flex: 13, child: _Today(forecast, tint: tint)),
+                            Expanded(flex: 10, child: _Days(forecast, tint: tint)),
                           ],
                         ),
                 ),
@@ -75,9 +81,10 @@ class WeatherScreen extends ConsumerWidget {
 }
 
 class _Today extends StatelessWidget {
-  const _Today(this.forecast);
+  const _Today(this.forecast, {required this.tint});
 
   final Forecast forecast;
+  final Color? tint;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +156,7 @@ class _Today extends StatelessWidget {
             builder: (context) {
               final details = <Widget>[
                 _Detail(
+                  tint: tint,
                   label: 'Feels like',
                   value: WeatherFormat.degrees(now.apparentTemperature),
                   detail: switch (feels) {
@@ -158,21 +166,25 @@ class _Today extends StatelessWidget {
                   },
                 ),
                 _Detail(
+                  tint: tint,
                   label: 'Precipitation',
                   value: '${rainNextDay.toStringAsFixed(rainNextDay < 10 && rainNextDay > 0 ? 1 : 0)} mm',
                   detail: 'Expected in the next 24 h.',
                 ),
                 _Detail(
+                  tint: tint,
                   label: 'Wind',
                   value: '${now.windSpeed.round()} km/h',
                   detail: '${WeatherSummaryUtil.windFrom(now.windDirection)} · gusts ${now.windGusts.round()} km/h',
                 ),
                 _Detail(
+                  tint: tint,
                   label: 'Humidity',
                   value: '${now.humidity}%',
                   detail: 'Dew point ${WeatherFormat.degrees(now.dewPoint)}',
                 ),
                 _Detail(
+                  tint: tint,
                   label: 'UV index',
                   value: '${now.uvIndex.round()}',
                   detail: switch (today?.uvIndexMax ?? now.uvIndex) {
@@ -183,6 +195,7 @@ class _Today extends StatelessWidget {
                   },
                 ),
                 _Detail(
+                  tint: tint,
                   label: 'Sunset',
                   value: today == null ? '–' : WeatherFormat.time(today.sunset),
                   detail: today == null ? '' : 'Sunrise ${WeatherFormat.time(today.sunrise)}',
@@ -205,8 +218,9 @@ class _Today extends StatelessWidget {
 }
 
 class _Detail extends StatelessWidget {
-  const _Detail({required this.label, required this.value, required this.detail});
+  const _Detail({required this.label, required this.value, required this.detail, required this.tint});
 
+  final Color? tint;
   final String label;
   final String value;
   final String detail;
@@ -214,6 +228,7 @@ class _Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageCard(
+      tint: tint,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,14 +253,16 @@ class _Detail extends StatelessWidget {
 }
 
 class _Days extends StatelessWidget {
-  const _Days(this.forecast);
+  const _Days(this.forecast, {required this.tint});
 
   final Forecast forecast;
+  final Color? tint;
 
   @override
   Widget build(BuildContext context) {
     final today = clock.now();
     return PageCard(
+      tint: tint,
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

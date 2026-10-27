@@ -17,6 +17,13 @@ class WeatherScene extends StatefulWidget {
   /// Millimetres in the current hour; more means denser, faster rain.
   final double precipitation;
 
+  /// The scene's sky as a page color for the background and the cards around it; lifted, so a night sky still
+  /// shows its hue.
+  static Color moodOf(WeatherCondition condition, {required bool isDay}) {
+    final hsl = HSLColor.fromColor(_ScenePainter._skyOf(condition, isDay).$1);
+    return hsl.withLightness(math.max(hsl.lightness, 0.45)).toColor();
+  }
+
   @override
   State<WeatherScene> createState() => _WeatherSceneState();
 }

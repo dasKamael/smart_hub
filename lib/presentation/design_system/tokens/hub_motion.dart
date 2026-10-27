@@ -18,6 +18,10 @@ abstract final class HubMotion {
   static const glow = Curves.ease;
   static const glowDuration = Duration(milliseconds: 500);
 
+  /// A page's colors blending to a new tint (e.g. the next cover): sky, cards and controls in one rhythm.
+  static const tint = Curves.easeInOut;
+  static const tintDuration = Duration(milliseconds: 900);
+
   /// Tab indicator slide.
   static const tab = Cubic(0.3, 1.35, 0.5, 1);
   static const tabDuration = Duration(milliseconds: 450);

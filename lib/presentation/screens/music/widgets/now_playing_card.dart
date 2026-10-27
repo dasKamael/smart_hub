@@ -32,13 +32,20 @@ class NowPlayingCard extends StatelessWidget {
     HubColorPalette.surface,
   ];
 
+  /// Side of the cover; the next track's cover is loaded ahead at this size.
+  static const coverSize = 124.0;
+
+  /// One plain tone of that gradient for the cards around it.
+  static Color fillOf(Color tint) => Color.alphaBlend(tint.withValues(alpha: 0.15), HubColorPalette.surface);
+
   @override
   Widget build(BuildContext context) {
     final track = target.nowPlaying;
     final seed = track.title ?? target.name;
     final tint = Artwork.colorOf(seed);
     return AnimatedContainer(
-      duration: HubMotion.glowDuration,
+      duration: HubMotion.tintDuration,
+      curve: HubMotion.tint,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(HubRadius.pageCard),
         gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: colorsOf(tint)),
@@ -52,7 +59,19 @@ class NowPlayingCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 8))],
             ),
-            child: Artwork(seed: seed, url: track.artworkUrl, size: 124, radius: 16),
+            // A new track crossfades in as the card's color blends over.
+            child: AnimatedSwitcher(
+              duration: HubMotion.tintDuration,
+              switchInCurve: HubMotion.tint,
+              switchOutCurve: HubMotion.tint,
+              child: Artwork(
+                key: ValueKey(track.artworkUrl ?? seed),
+                seed: seed,
+                url: track.artworkUrl,
+                size: coverSize,
+                radius: 16,
+              ),
+            ),
           ),
           Expanded(
             child: Column(
@@ -82,17 +101,31 @@ class NowPlayingCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  track.title ?? 'Nothing playing',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: HubTextStyles.sectionTitle,
-                ),
-                Text(
-                  [?track.artist, ?track.source].where((part) => part.isNotEmpty).join(' · '),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: HubTextStyles.secondary.copyWith(fontSize: 16, color: const Color(0xB3EBEBF5)),
+                AnimatedSwitcher(
+                  duration: HubMotion.tintDuration,
+                  switchInCurve: HubMotion.tint,
+                  switchOutCurve: HubMotion.tint,
+                  layoutBuilder: (current, previous) =>
+                      Stack(alignment: Alignment.centerLeft, children: [...previous, ?current]),
+                  child: Column(
+                    key: ValueKey((track.title, track.artist)),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 6,
+                    children: [
+                      Text(
+                        track.title ?? 'Nothing playing',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: HubTextStyles.sectionTitle,
+                      ),
+                      Text(
+                        [?track.artist, ?track.source].where((part) => part.isNotEmpty).join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: HubTextStyles.secondary.copyWith(fontSize: 16, color: const Color(0xB3EBEBF5)),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 4),
                 TrackProgress(track: track),

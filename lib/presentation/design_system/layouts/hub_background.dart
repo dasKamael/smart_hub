@@ -3,18 +3,21 @@ import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_sky.dart';
 
 /// The calm sky behind every page: a gradient in the colors of the time of day with two soft glows drifting
-/// slowly over it. With a [tint] (the page's area color) the glows take on that color; a new tint blends in.
+/// slowly over it. With a [tint] (the page's area color) the glows take on that color; a new tint blends in. With
+/// [tintsSky] the whole sky does, e.g. on the weather page, where the sky is the weather's.
 ///
 /// Ticks 15 times a second instead of every frame and stands still while the page is not shown – ambience on a
 /// screen that is on all day.
 class HubBackground extends StatefulWidget {
-  const HubBackground({super.key, this.child, this.tint});
+  const HubBackground({super.key, this.child, this.tint, this.tintsSky = false});
 
   final Widget? child;
   final Color? tint;
+  final bool tintsSky;
 
   @override
   State<HubBackground> createState() => _HubBackgroundState();
@@ -22,7 +25,7 @@ class HubBackground extends StatefulWidget {
 
 class _HubBackgroundState extends State<HubBackground> {
   static const _tick = Duration(milliseconds: 66);
-  static const _blend = Duration(milliseconds: 1200);
+  static const _blend = HubMotion.tintDuration;
 
   /// Seconds of drift so far.
   final _phase = ValueNotifier(0.0);
@@ -74,7 +77,9 @@ class _HubBackgroundState extends State<HubBackground> {
       fit: StackFit.expand,
       children: [
         RepaintBoundary(
-          child: CustomPaint(painter: _SkyPainter(_phase, tint: () => _tintAt(clock.now(), widget.tint))),
+          child: CustomPaint(
+            painter: _SkyPainter(_phase, tint: () => _tintAt(clock.now(), widget.tint), tintsSky: widget.tintsSky),
+          ),
         ),
         ?widget.child,
       ],
@@ -83,10 +88,11 @@ class _HubBackgroundState extends State<HubBackground> {
 }
 
 class _SkyPainter extends CustomPainter {
-  _SkyPainter(this.phase, {required this.tint}) : super(repaint: phase);
+  _SkyPainter(this.phase, {required this.tint, required this.tintsSky}) : super(repaint: phase);
 
   final ValueNotifier<double> phase;
   final Color? Function() tint;
+  final bool tintsSky;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -94,12 +100,16 @@ class _SkyPainter extends CustomPainter {
     // The area color in a deep, saturated tone, so it colors the sky instead of washing it grey; its alpha says how
     // far a change has blended in.
     final tint = this.tint();
-    Color tinted(Color glow) {
+    Color tinted(Color glow, {double lightness = 0.32, double strength = 0.55}) {
       if (tint == null) return glow;
       final hsl = HSLColor.fromColor(tint.withValues(alpha: 1));
-      final deep = hsl.withLightness(0.32).withSaturation(math.min(1, hsl.saturation * 1.25)).toColor();
-      return Color.lerp(glow, deep, 0.55 * tint.a)!;
+      final deep = hsl.withLightness(lightness).withSaturation(math.min(1, hsl.saturation * 1.25)).toColor();
+      return Color.lerp(glow, deep, strength * tint.a)!;
     }
+
+    // Kept as dark as the time of day's sky, so cards and text stand out the same.
+    Color skyTinted(Color color) =>
+        tintsSky ? tinted(color, lightness: HSLColor.fromColor(color).lightness, strength: 0.85) : color;
 
     final rect = Offset.zero & size;
     canvas.drawRect(
@@ -108,7 +118,7 @@ class _SkyPainter extends CustomPainter {
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [sky.top, sky.bottom],
+          colors: [skyTinted(sky.top), skyTinted(sky.bottom)],
         ).createShader(rect),
     );
     final t = phase.value;
