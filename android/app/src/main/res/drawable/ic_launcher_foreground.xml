@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Smart Hub logo: a floor plan with a glowing light and a plant. Master: branding/logo.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M24,44 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="44"
+                android:centerY="44"
+                android:gradientRadius="20">
+                <item android:offset="0" android:color="#D9FFB340" />
+                <item android:offset="0.45" android:color="#40FFB340" />
+                <item android:offset="1" android:color="#00FFB340" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M30,30 H78 V78 H30 Z M58,30 V50 M58,60 V78 M30,56 H48"
+        android:strokeColor="#FFD6D6DC"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path android:pathData="M39.8,44 a4.2,4.2 0 1,0 8.4,0 a4.2,4.2 0 1,0 -8.4,0" android:fillColor="#FFE08A" />
+    <path android:pathData="M64.4,68 a3.6,3.6 0 1,0 7.2,0 a3.6,3.6 0 1,0 -7.2,0" android:fillColor="#30D158" />
+</vector>
