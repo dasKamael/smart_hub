@@ -5,6 +5,7 @@ import 'package:smart_hub/domain/lights/light.service.dart';
 import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
 import 'package:smart_hub/domain/lights/model/light_scene.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
+import 'package:smart_hub/domain/lights/scene.util.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 
 import '../../utils/riverpod.test_util.dart';
@@ -95,6 +96,7 @@ void main() {
           id: 'light.white',
           name: 'White',
           isOn: false,
+          maxKelvin: 3000,
           capabilities: {LightCapability.brightness, LightCapability.colorTemperature},
         ),
         LightState(id: 'light.dim', name: 'Dim', isOn: false, capabilities: {LightCapability.brightness}),
@@ -102,11 +104,11 @@ void main() {
       ];
 
       // When
-      await service.applyScene(lights, LightScene.read);
+      await service.applyScene(lights, SceneUtil.templates('office')[1]);
 
-      // Then
+      // Then: the white light only goes up to 3000 K.
       verify(() => repository.turnOn(['light.color'], brightnessPercent: 85, color: LightScene.read.color)).called(1);
-      verify(() => repository.turnOn(['light.white'], brightnessPercent: 85, kelvin: 3500)).called(1);
+      verify(() => repository.turnOn(['light.white'], brightnessPercent: 85, kelvin: 3000)).called(1);
       verify(() => repository.turnOn(['light.dim'], brightnessPercent: 85)).called(1);
       verify(() => repository.turnOn(['light.plain'])).called(1);
     });

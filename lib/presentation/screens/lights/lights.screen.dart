@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/lights/scene.util.dart';
+import 'package:smart_hub/presentation/shared_widgets/name_dialog.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
@@ -115,7 +117,24 @@ class LightsScreen extends ConsumerWidget {
                   enabled: enabled,
                   onBrightnessChanged: (percent) => controller.changeBrightness(selected, percent),
                   onBrightnessEnd: (percent) => controller.endBrightness(selected, percent),
+                  scenes: ref.watch(roomScenesProvider(selected.id)),
+                  openSceneId: ref.watch(lightsControllerProvider.select((s) => s.openSceneId)),
                   onScene: (scene) => controller.applyScene(selected, scene),
+                  actions: SceneActions(
+                    onOptions: controller.toggleSceneOptions,
+                    onOverwrite: (scene) => controller.overwriteScene(selected, scene),
+                    onRename: (scene) async {
+                      final name = await showNameDialog(context, title: 'Rename scene', initial: scene.name);
+                      if (name != null) controller.renameScene(scene, name);
+                    },
+                    onDelete: controller.deleteScene,
+                    onAdd: ref.watch(roomScenesProvider(selected.id)).length >= SceneUtil.maxScenes
+                        ? null
+                        : () async {
+                            final name = await showNameDialog(context, title: 'New scene');
+                            if (name != null) controller.addScene(selected, name);
+                          },
+                  ),
                 ),
         ),
       ],

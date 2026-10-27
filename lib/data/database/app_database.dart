@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/data/lights/room_scenes.table.dart';
 import 'package:smart_hub/data/dashboard/dashboard_state.table.dart';
 import 'package:smart_hub/data/dashboard/dashboard_widgets.table.dart';
 import 'package:smart_hub/data/database/app_database.steps.dart';
@@ -28,13 +29,14 @@ part 'app_database.g.dart';
     WeatherSettingsTable,
     DashboardWidgetsTable,
     DashboardStateTable,
+    RoomScenesTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'smart_hub'));
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -75,6 +77,8 @@ class AppDatabase extends _$AppDatabase {
         from8To9: (migrator, schema) => migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.selection),
         // v10: dashboard widgets with or without a card.
         from9To10: (migrator, schema) => migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.card),
+        // v11: light scenes per room.
+        from10To11: (migrator, schema) => migrator.createTable(schema.roomScenes),
       ),
     );
   }

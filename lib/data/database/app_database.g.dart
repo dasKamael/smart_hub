@@ -3336,6 +3336,444 @@ class DashboardStateTableCompanion extends UpdateCompanion<DashboardStateRow> {
   }
 }
 
+class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTableTable, RoomSceneRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RoomScenesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _roomIdMeta = const VerificationMeta('roomId');
+  @override
+  late final GeneratedColumn<String> roomId = GeneratedColumn<String>(
+    'room_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta('position');
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _brightnessPercentMeta = const VerificationMeta('brightnessPercent');
+  @override
+  late final GeneratedColumn<int> brightnessPercent = GeneratedColumn<int>(
+    'brightness_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<int> color = GeneratedColumn<int>(
+    'color',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kelvinMeta = const VerificationMeta('kelvin');
+  @override
+  late final GeneratedColumn<int> kelvin = GeneratedColumn<int>(
+    'kelvin',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lightsMeta = const VerificationMeta('lights');
+  @override
+  late final GeneratedColumn<String> lights = GeneratedColumn<String>(
+    'lights',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, roomId, name, position, brightnessPercent, color, kelvin, lights];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'room_scenes';
+  @override
+  VerificationContext validateIntegrity(Insertable<RoomSceneRow> instance, {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('room_id')) {
+      context.handle(_roomIdMeta, roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta));
+    } else if (isInserting) {
+      context.missing(_roomIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(_nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta, position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('brightness_percent')) {
+      context.handle(
+        _brightnessPercentMeta,
+        brightnessPercent.isAcceptableOrUnknown(data['brightness_percent']!, _brightnessPercentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_brightnessPercentMeta);
+    }
+    if (data.containsKey('color')) {
+      context.handle(_colorMeta, color.isAcceptableOrUnknown(data['color']!, _colorMeta));
+    } else if (isInserting) {
+      context.missing(_colorMeta);
+    }
+    if (data.containsKey('kelvin')) {
+      context.handle(_kelvinMeta, kelvin.isAcceptableOrUnknown(data['kelvin']!, _kelvinMeta));
+    } else if (isInserting) {
+      context.missing(_kelvinMeta);
+    }
+    if (data.containsKey('lights')) {
+      context.handle(_lightsMeta, lights.isAcceptableOrUnknown(data['lights']!, _lightsMeta));
+    } else if (isInserting) {
+      context.missing(_lightsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RoomSceneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoomSceneRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      roomId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}room_id'])!,
+      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      position: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+      brightnessPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}brightness_percent'],
+      )!,
+      color: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}color'])!,
+      kelvin: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}kelvin'])!,
+      lights: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}lights'])!,
+    );
+  }
+
+  @override
+  $RoomScenesTableTable createAlias(String alias) {
+    return $RoomScenesTableTable(attachedDatabase, alias);
+  }
+}
+
+class RoomSceneRow extends DataClass implements Insertable<RoomSceneRow> {
+  final String id;
+  final String roomId;
+  final String name;
+  final int position;
+  final int brightnessPercent;
+
+  /// `0xFFRRGGBB`.
+  final int color;
+  final int kelvin;
+
+  /// `RoomScene.lights` as JSON: light id → {on, brightness, color, kelvin}.
+  final String lights;
+  const RoomSceneRow({
+    required this.id,
+    required this.roomId,
+    required this.name,
+    required this.position,
+    required this.brightnessPercent,
+    required this.color,
+    required this.kelvin,
+    required this.lights,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['room_id'] = Variable<String>(roomId);
+    map['name'] = Variable<String>(name);
+    map['position'] = Variable<int>(position);
+    map['brightness_percent'] = Variable<int>(brightnessPercent);
+    map['color'] = Variable<int>(color);
+    map['kelvin'] = Variable<int>(kelvin);
+    map['lights'] = Variable<String>(lights);
+    return map;
+  }
+
+  RoomScenesTableCompanion toCompanion(bool nullToAbsent) {
+    return RoomScenesTableCompanion(
+      id: Value(id),
+      roomId: Value(roomId),
+      name: Value(name),
+      position: Value(position),
+      brightnessPercent: Value(brightnessPercent),
+      color: Value(color),
+      kelvin: Value(kelvin),
+      lights: Value(lights),
+    );
+  }
+
+  factory RoomSceneRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoomSceneRow(
+      id: serializer.fromJson<String>(json['id']),
+      roomId: serializer.fromJson<String>(json['roomId']),
+      name: serializer.fromJson<String>(json['name']),
+      position: serializer.fromJson<int>(json['position']),
+      brightnessPercent: serializer.fromJson<int>(json['brightnessPercent']),
+      color: serializer.fromJson<int>(json['color']),
+      kelvin: serializer.fromJson<int>(json['kelvin']),
+      lights: serializer.fromJson<String>(json['lights']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'roomId': serializer.toJson<String>(roomId),
+      'name': serializer.toJson<String>(name),
+      'position': serializer.toJson<int>(position),
+      'brightnessPercent': serializer.toJson<int>(brightnessPercent),
+      'color': serializer.toJson<int>(color),
+      'kelvin': serializer.toJson<int>(kelvin),
+      'lights': serializer.toJson<String>(lights),
+    };
+  }
+
+  RoomSceneRow copyWith({
+    String? id,
+    String? roomId,
+    String? name,
+    int? position,
+    int? brightnessPercent,
+    int? color,
+    int? kelvin,
+    String? lights,
+  }) => RoomSceneRow(
+    id: id ?? this.id,
+    roomId: roomId ?? this.roomId,
+    name: name ?? this.name,
+    position: position ?? this.position,
+    brightnessPercent: brightnessPercent ?? this.brightnessPercent,
+    color: color ?? this.color,
+    kelvin: kelvin ?? this.kelvin,
+    lights: lights ?? this.lights,
+  );
+  RoomSceneRow copyWithCompanion(RoomScenesTableCompanion data) {
+    return RoomSceneRow(
+      id: data.id.present ? data.id.value : this.id,
+      roomId: data.roomId.present ? data.roomId.value : this.roomId,
+      name: data.name.present ? data.name.value : this.name,
+      position: data.position.present ? data.position.value : this.position,
+      brightnessPercent: data.brightnessPercent.present ? data.brightnessPercent.value : this.brightnessPercent,
+      color: data.color.present ? data.color.value : this.color,
+      kelvin: data.kelvin.present ? data.kelvin.value : this.kelvin,
+      lights: data.lights.present ? data.lights.value : this.lights,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomSceneRow(')
+          ..write('id: $id, ')
+          ..write('roomId: $roomId, ')
+          ..write('name: $name, ')
+          ..write('position: $position, ')
+          ..write('brightnessPercent: $brightnessPercent, ')
+          ..write('color: $color, ')
+          ..write('kelvin: $kelvin, ')
+          ..write('lights: $lights')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, roomId, name, position, brightnessPercent, color, kelvin, lights);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoomSceneRow &&
+          other.id == this.id &&
+          other.roomId == this.roomId &&
+          other.name == this.name &&
+          other.position == this.position &&
+          other.brightnessPercent == this.brightnessPercent &&
+          other.color == this.color &&
+          other.kelvin == this.kelvin &&
+          other.lights == this.lights);
+}
+
+class RoomScenesTableCompanion extends UpdateCompanion<RoomSceneRow> {
+  final Value<String> id;
+  final Value<String> roomId;
+  final Value<String> name;
+  final Value<int> position;
+  final Value<int> brightnessPercent;
+  final Value<int> color;
+  final Value<int> kelvin;
+  final Value<String> lights;
+  final Value<int> rowid;
+  const RoomScenesTableCompanion({
+    this.id = const Value.absent(),
+    this.roomId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.position = const Value.absent(),
+    this.brightnessPercent = const Value.absent(),
+    this.color = const Value.absent(),
+    this.kelvin = const Value.absent(),
+    this.lights = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoomScenesTableCompanion.insert({
+    required String id,
+    required String roomId,
+    required String name,
+    required int position,
+    required int brightnessPercent,
+    required int color,
+    required int kelvin,
+    required String lights,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       roomId = Value(roomId),
+       name = Value(name),
+       position = Value(position),
+       brightnessPercent = Value(brightnessPercent),
+       color = Value(color),
+       kelvin = Value(kelvin),
+       lights = Value(lights);
+  static Insertable<RoomSceneRow> custom({
+    Expression<String>? id,
+    Expression<String>? roomId,
+    Expression<String>? name,
+    Expression<int>? position,
+    Expression<int>? brightnessPercent,
+    Expression<int>? color,
+    Expression<int>? kelvin,
+    Expression<String>? lights,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (roomId != null) 'room_id': roomId,
+      if (name != null) 'name': name,
+      if (position != null) 'position': position,
+      if (brightnessPercent != null) 'brightness_percent': brightnessPercent,
+      if (color != null) 'color': color,
+      if (kelvin != null) 'kelvin': kelvin,
+      if (lights != null) 'lights': lights,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoomScenesTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? roomId,
+    Value<String>? name,
+    Value<int>? position,
+    Value<int>? brightnessPercent,
+    Value<int>? color,
+    Value<int>? kelvin,
+    Value<String>? lights,
+    Value<int>? rowid,
+  }) {
+    return RoomScenesTableCompanion(
+      id: id ?? this.id,
+      roomId: roomId ?? this.roomId,
+      name: name ?? this.name,
+      position: position ?? this.position,
+      brightnessPercent: brightnessPercent ?? this.brightnessPercent,
+      color: color ?? this.color,
+      kelvin: kelvin ?? this.kelvin,
+      lights: lights ?? this.lights,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (roomId.present) {
+      map['room_id'] = Variable<String>(roomId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (brightnessPercent.present) {
+      map['brightness_percent'] = Variable<int>(brightnessPercent.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<int>(color.value);
+    }
+    if (kelvin.present) {
+      map['kelvin'] = Variable<int>(kelvin.value);
+    }
+    if (lights.present) {
+      map['lights'] = Variable<String>(lights.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomScenesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('roomId: $roomId, ')
+          ..write('name: $name, ')
+          ..write('position: $position, ')
+          ..write('brightnessPercent: $brightnessPercent, ')
+          ..write('color: $color, ')
+          ..write('kelvin: $kelvin, ')
+          ..write('lights: $lights, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3348,6 +3786,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $WeatherSettingsTableTable weatherSettingsTable = $WeatherSettingsTableTable(this);
   late final $DashboardWidgetsTableTable dashboardWidgetsTable = $DashboardWidgetsTableTable(this);
   late final $DashboardStateTableTable dashboardStateTable = $DashboardStateTableTable(this);
+  late final $RoomScenesTableTable roomScenesTable = $RoomScenesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
@@ -3361,6 +3800,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     weatherSettingsTable,
     dashboardWidgetsTable,
     dashboardStateTable,
+    roomScenesTable,
   ];
   @override
   DriftDatabaseOptions get options => const DriftDatabaseOptions(storeDateTimeAsText: true);
@@ -4992,6 +5432,211 @@ typedef $$DashboardStateTableTableProcessedTableManager =
       DashboardStateRow,
       PrefetchHooks Function()
     >;
+typedef $$RoomScenesTableTableCreateCompanionBuilder = RoomScenesTableCompanion Function({
+  required String id,
+  required String roomId,
+  required String name,
+  required int position,
+  required int brightnessPercent,
+  required int color,
+  required int kelvin,
+  required String lights,
+  Value<int> rowid,
+});
+typedef $$RoomScenesTableTableUpdateCompanionBuilder = RoomScenesTableCompanion Function({
+  Value<String> id,
+  Value<String> roomId,
+  Value<String> name,
+  Value<int> position,
+  Value<int> brightnessPercent,
+  Value<int> color,
+  Value<int> kelvin,
+  Value<String> lights,
+  Value<int> rowid,
+});
+
+class $$RoomScenesTableTableFilterComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+  $$RoomScenesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get roomId =>
+      $composableBuilder(column: $table.roomId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get brightnessPercent =>
+      $composableBuilder(column: $table.brightnessPercent, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get color => $composableBuilder(column: $table.color, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get kelvin =>
+      $composableBuilder(column: $table.kelvin, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lights =>
+      $composableBuilder(column: $table.lights, builder: (column) => ColumnFilters(column));
+}
+
+class $$RoomScenesTableTableOrderingComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+  $$RoomScenesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get roomId =>
+      $composableBuilder(column: $table.roomId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get brightnessPercent =>
+      $composableBuilder(column: $table.brightnessPercent, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get kelvin =>
+      $composableBuilder(column: $table.kelvin, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lights =>
+      $composableBuilder(column: $table.lights, builder: (column) => ColumnOrderings(column));
+}
+
+class $$RoomScenesTableTableAnnotationComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+  $$RoomScenesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get roomId => $composableBuilder(column: $table.roomId, builder: (column) => column);
+
+  GeneratedColumn<String> get name => $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get position => $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get brightnessPercent =>
+      $composableBuilder(column: $table.brightnessPercent, builder: (column) => column);
+
+  GeneratedColumn<int> get color => $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<int> get kelvin => $composableBuilder(column: $table.kelvin, builder: (column) => column);
+
+  GeneratedColumn<String> get lights => $composableBuilder(column: $table.lights, builder: (column) => column);
+}
+
+class $$RoomScenesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RoomScenesTableTable,
+          RoomSceneRow,
+          $$RoomScenesTableTableFilterComposer,
+          $$RoomScenesTableTableOrderingComposer,
+          $$RoomScenesTableTableAnnotationComposer,
+          $$RoomScenesTableTableCreateCompanionBuilder,
+          $$RoomScenesTableTableUpdateCompanionBuilder,
+          (RoomSceneRow, BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>),
+          RoomSceneRow,
+          PrefetchHooks Function()
+        > {
+  $$RoomScenesTableTableTableManager(_$AppDatabase db, $RoomScenesTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () => $$RoomScenesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$RoomScenesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$RoomScenesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> roomId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> brightnessPercent = const Value.absent(),
+                Value<int> color = const Value.absent(),
+                Value<int> kelvin = const Value.absent(),
+                Value<String> lights = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RoomScenesTableCompanion(
+                id: id,
+                roomId: roomId,
+                name: name,
+                position: position,
+                brightnessPercent: brightnessPercent,
+                color: color,
+                kelvin: kelvin,
+                lights: lights,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String roomId,
+                required String name,
+                required int position,
+                required int brightnessPercent,
+                required int color,
+                required int kelvin,
+                required String lights,
+                Value<int> rowid = const Value.absent(),
+              }) => RoomScenesTableCompanion.insert(
+                id: id,
+                roomId: roomId,
+                name: name,
+                position: position,
+                brightnessPercent: brightnessPercent,
+                color: color,
+                kelvin: kelvin,
+                lights: lights,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RoomScenesTableTable, RoomSceneRow>(table),
+                  BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RoomScenesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RoomScenesTableTable,
+      RoomSceneRow,
+      $$RoomScenesTableTableFilterComposer,
+      $$RoomScenesTableTableOrderingComposer,
+      $$RoomScenesTableTableAnnotationComposer,
+      $$RoomScenesTableTableCreateCompanionBuilder,
+      $$RoomScenesTableTableUpdateCompanionBuilder,
+      (RoomSceneRow, BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>),
+      RoomSceneRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5013,6 +5658,8 @@ class $AppDatabaseManager {
       $$DashboardWidgetsTableTableTableManager(_db, _db.dashboardWidgetsTable);
   $$DashboardStateTableTableTableManager get dashboardStateTable =>
       $$DashboardStateTableTableTableManager(_db, _db.dashboardStateTable);
+  $$RoomScenesTableTableTableManager get roomScenesTable =>
+      $$RoomScenesTableTableTableManager(_db, _db.roomScenesTable);
 }
 
 // **************************************************************************

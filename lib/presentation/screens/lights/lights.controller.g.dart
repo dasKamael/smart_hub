@@ -40,7 +40,7 @@ final class LightsControllerProvider extends $NotifierProvider<LightsController,
   }
 }
 
-String _$lightsControllerHash() => r'48bee49bfa93eba43b4362a32ade02641ed67d41';
+String _$lightsControllerHash() => r'3cb6a97fe2617bec3a9a38f7f6759013222c3c96';
 
 /// Lights page: selected room and room wide commands.
 
@@ -137,3 +137,91 @@ final class LightsTintProvider extends $FunctionalProvider<Color, Color, Color> 
 }
 
 String _$lightsTintHash() => r'b51ca6ebf260d144824db71b39f507562661a5fb';
+
+/// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+
+@ProviderFor(roomScenes)
+final roomScenesProvider = RoomScenesFamily._();
+
+/// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+
+final class RoomScenesProvider
+    extends
+        $FunctionalProvider<
+          List<({bool active, Color color, RoomScene scene})>,
+          List<({bool active, Color color, RoomScene scene})>,
+          List<({bool active, Color color, RoomScene scene})>
+        >
+    with $Provider<List<({bool active, Color color, RoomScene scene})>> {
+  /// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+  RoomScenesProvider._({required RoomScenesFamily super.from, required String super.argument})
+    : super(
+        retry: null,
+        name: r'roomScenesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$roomScenesHash();
+
+  @override
+  String toString() {
+    return r'roomScenesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<List<({bool active, Color color, RoomScene scene})>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<({bool active, Color color, RoomScene scene})> create(Ref ref) {
+    final argument = this.argument as String;
+    return roomScenes(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<({bool active, Color color, RoomScene scene})> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<({bool active, Color color, RoomScene scene})>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RoomScenesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$roomScenesHash() => r'7518c58a7a624a0c13ff962175dff27e2bf90970';
+
+/// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+
+final class RoomScenesFamily extends $Family
+    with $FunctionalFamilyOverride<List<({bool active, Color color, RoomScene scene})>, String> {
+  RoomScenesFamily._()
+    : super(
+        retry: null,
+        name: r'roomScenesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+
+  RoomScenesProvider call(String roomId) => RoomScenesProvider._(argument: roomId, from: this);
+
+  @override
+  String toString() => r'roomScenesProvider';
+}

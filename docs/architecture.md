@@ -52,7 +52,7 @@ smart_hub/
 |---|---|---|
 | `connection` | HA session: auth, reconnect with backoff, online/offline, entity registry (for the placement picker) | HA |
 | `floorplan` | Rooms, walls, doors, device placements, room derivation, grouping, tray | drift |
-| `lights` | Light state, capabilities, light commands, room scenes | HA |
+| `lights` | Light state, capabilities, light commands, scenes per room (templates until changed, adapted to what each lamp can do) | HA + drift |
 | `plants` | Plants, watering and fertilizing plan, photos, plant profiles (species care data from Perenual, loaded once per species and kept locally) | drift + local files + Perenual API |
 | `music` | Speaker state, playback, volume, speaker groups, Spotify content and Connect devices, local speaker settings | HA + Spotify Web API + drift |
 | `zen` | Idle time until the zen mode (calm full screen with time and cover) | drift |

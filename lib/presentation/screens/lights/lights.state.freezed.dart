@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LightsPageState {
 
- String? get selectedRoomId;
+ String? get selectedRoomId;/// The scene whose options (overwrite, rename, delete) are shown.
+ String? get openSceneId;
 /// Create a copy of LightsPageState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +28,20 @@ $LightsPageStateCopyWith<LightsPageState> get copyWith => _$LightsPageStateCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as LightsPageState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightsPageState&&(identical(other.selectedRoomId, _this.selectedRoomId) || other.selectedRoomId == _this.selectedRoomId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightsPageState&&(identical(other.selectedRoomId, _this.selectedRoomId) || other.selectedRoomId == _this.selectedRoomId)&&(identical(other.openSceneId, _this.openSceneId) || other.openSceneId == _this.openSceneId));
 }
 
 
 @override
 int get hashCode {
   final _this = this as LightsPageState;
-  return Object.hash(runtimeType,_this.selectedRoomId);
+  return Object.hash(runtimeType,_this.selectedRoomId,_this.openSceneId);
 }
 
 @override
 String toString() {
   final _this = this as LightsPageState;
-  return 'LightsPageState(selectedRoomId: ${_this.selectedRoomId})';
+  return 'LightsPageState(selectedRoomId: ${_this.selectedRoomId}, openSceneId: ${_this.openSceneId})';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $LightsPageStateCopyWith<$Res>  {
   factory $LightsPageStateCopyWith(LightsPageState value, $Res Function(LightsPageState) _then) = _$LightsPageStateCopyWithImpl;
 @useResult
 $Res call({
- String? selectedRoomId
+ String? selectedRoomId, String? openSceneId
 });
 
 
@@ -68,9 +69,10 @@ class _$LightsPageStateCopyWithImpl<$Res>
 
 /// Create a copy of LightsPageState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedRoomId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selectedRoomId = freezed,Object? openSceneId = freezed,}) {
   return _then(LightsPageState(
 selectedRoomId: freezed == selectedRoomId ? _self.selectedRoomId : selectedRoomId // ignore: cast_nullable_to_non_nullable
+as String?,openSceneId: freezed == openSceneId ? _self.openSceneId : openSceneId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -156,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? selectedRoomId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? selectedRoomId,  String? openSceneId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LightsPageState() when $default != null:
-return $default(_that.selectedRoomId);case _:
+return $default(_that.selectedRoomId,_that.openSceneId);case _:
   return orElse();
 
 }
@@ -177,10 +179,10 @@ return $default(_that.selectedRoomId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? selectedRoomId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? selectedRoomId,  String? openSceneId)  $default,) {final _that = this;
 switch (_that) {
 case _LightsPageState():
-return $default(_that.selectedRoomId);case _:
+return $default(_that.selectedRoomId,_that.openSceneId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +199,10 @@ return $default(_that.selectedRoomId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? selectedRoomId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? selectedRoomId,  String? openSceneId)?  $default,) {final _that = this;
 switch (_that) {
 case _LightsPageState() when $default != null:
-return $default(_that.selectedRoomId);case _:
+return $default(_that.selectedRoomId,_that.openSceneId);case _:
   return null;
 
 }
@@ -212,10 +214,12 @@ return $default(_that.selectedRoomId);case _:
 
 
 class _LightsPageState implements LightsPageState {
-  const _LightsPageState({this.selectedRoomId});
+  const _LightsPageState({this.selectedRoomId, this.openSceneId});
   
 
 @override final  String? selectedRoomId;
+/// The scene whose options (overwrite, rename, delete) are shown.
+@override final  String? openSceneId;
 
 /// Create a copy of LightsPageState
 /// with the given fields replaced by the non-null parameter values.
@@ -227,18 +231,18 @@ _$LightsPageStateCopyWith<_LightsPageState> get copyWith => __$LightsPageStateCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightsPageState&&(identical(other.selectedRoomId, selectedRoomId) || other.selectedRoomId == selectedRoomId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightsPageState&&(identical(other.selectedRoomId, selectedRoomId) || other.selectedRoomId == selectedRoomId)&&(identical(other.openSceneId, openSceneId) || other.openSceneId == openSceneId));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,selectedRoomId);
+    return Object.hash(runtimeType,selectedRoomId,openSceneId);
 }
 
 @override
 String toString() {
-    return 'LightsPageState(selectedRoomId: $selectedRoomId)';
+    return 'LightsPageState(selectedRoomId: $selectedRoomId, openSceneId: $openSceneId)';
 }
 
 
@@ -249,7 +253,7 @@ abstract mixin class _$LightsPageStateCopyWith<$Res> implements $LightsPageState
   factory _$LightsPageStateCopyWith(_LightsPageState value, $Res Function(_LightsPageState) _then) = __$LightsPageStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? selectedRoomId
+ String? selectedRoomId, String? openSceneId
 });
 
 
@@ -266,9 +270,10 @@ class __$LightsPageStateCopyWithImpl<$Res>
 
 /// Create a copy of LightsPageState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedRoomId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selectedRoomId = freezed,Object? openSceneId = freezed,}) {
   return _then(_LightsPageState(
 selectedRoomId: freezed == selectedRoomId ? _self.selectedRoomId : selectedRoomId // ignore: cast_nullable_to_non_nullable
+as String?,openSceneId: freezed == openSceneId ? _self.openSceneId : openSceneId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

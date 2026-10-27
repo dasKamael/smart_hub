@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/common/utils/optimistic_overlay.dart';
 import 'package:smart_hub/data/lights/light.repository.dart';
-import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
+import 'package:smart_hub/domain/lights/model/room_scene.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
+import 'package:smart_hub/domain/lights/scene.util.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 
 part 'light.service.g.dart';
@@ -101,17 +101,18 @@ class LightsService extends _$LightsService {
       Future.wait([for (final id in ids) setBrightness(id, percent)]);
 
   /// Applies [scene] to [lights], each with what it supports: color, color temperature or just brightness.
-  Future<void> applyScene(List<LightState> lights, LightScene scene) {
+  /// Each light as [scene] says, as far as it can (`SceneUtil.settingFor`).
+  Future<void> applyScene(List<LightState> lights, RoomScene scene) {
     return Future.wait([
       for (final light in lights)
-        if (light.capabilities.contains(LightCapability.color))
-          _turnOn(light.id, brightnessPercent: scene.brightnessPercent, color: scene.color)
-        else if (light.capabilities.contains(LightCapability.colorTemperature))
-          _turnOn(light.id, brightnessPercent: scene.brightnessPercent, kelvin: scene.kelvin)
-        else if (light.capabilities.contains(LightCapability.brightness))
-          setBrightness(light.id, scene.brightnessPercent)
-        else
-          setOn([light.id], on: true),
+        switch (SceneUtil.settingFor(light, scene)) {
+          SceneLight(on: false) => setOn([light.id], on: false),
+          SceneLight(brightnessPercent: final brightness?, :final color, :final kelvin)
+              when color != null || kelvin != null =>
+            _turnOn(light.id, brightnessPercent: brightness, color: color, kelvin: kelvin),
+          SceneLight(brightnessPercent: final brightness?) => setBrightness(light.id, brightness),
+          _ => setOn([light.id], on: true),
+        },
     ]);
   }
 

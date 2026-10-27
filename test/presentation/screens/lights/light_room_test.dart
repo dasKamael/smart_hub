@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 import 'package:smart_hub/presentation/screens/lights/light_room.dart';
@@ -27,24 +26,7 @@ void main() {
 
       expect(room.isOn, isFalse);
       expect(room.brightnessPercent, 0);
-      expect(room.activeScene, isNull);
       expect(room.color, isNull);
-    });
-
-    test('Given all lights at a scene brightness, when asking, then that scene is active', () {
-      final room = LightRoom(
-        id: 'sleep',
-        name: 'Sleep',
-        lights: [light('a', brightness: 12), light('b', brightness: 13), light('c', on: false)],
-      );
-
-      expect(room.activeScene, LightScene.night);
-    });
-
-    test('Given lights at different brightness, when asking, then no scene is active', () {
-      final room = LightRoom(id: 'x', name: 'X', lights: [light('a', brightness: 12), light('b', brightness: 85)]);
-
-      expect(room.activeScene, isNull);
     });
 
     test('Given a colored light that is on, when asking for the room color, then it is that color', () {

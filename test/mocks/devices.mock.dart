@@ -1,5 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
+import 'package:smart_hub/domain/lights/model/room_scene.dart';
+import 'package:smart_hub/domain/lights/room_scenes.service.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
@@ -39,8 +41,33 @@ class FakeLightsService extends LightsService {
       commands.add('brightness ${ids.join(',')} $percent');
 
   @override
-  Future<void> applyScene(List<LightState> lights, LightScene scene) async =>
+  Future<void> applyScene(List<LightState> lights, RoomScene scene) async =>
       commands.add('scene ${scene.name} ${lights.map((light) => light.id).join(',')}');
+}
+
+/// [RoomScenesService] in memory, without a database: every room starts with the templates.
+class FakeRoomScenesService extends RoomScenesService {
+  @override
+  Future<Map<String, List<RoomScene>>> build() async => const {};
+
+  @override
+  Future<bool> addFromCurrent(String roomId, String name, List<LightState> lights) async {
+    state = AsyncData({
+      ...?state.value,
+      roomId: [
+        ...scenesOf(roomId),
+        RoomScene(
+          id: '$roomId/$name',
+          roomId: roomId,
+          name: name,
+          brightnessPercent: 50,
+          color: const RgbColor(255, 255, 255),
+          kelvin: 3000,
+        ),
+      ],
+    });
+    return true;
+  }
 }
 
 /// [SpeakersService] with fixed [speakers] that records every command as text.

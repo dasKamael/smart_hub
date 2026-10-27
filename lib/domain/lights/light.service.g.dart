@@ -44,7 +44,7 @@ final class LightsServiceProvider extends $AsyncNotifierProvider<LightsService, 
   LightsService create() => LightsService();
 }
 
-String _$lightsServiceHash() => r'48867c2c9171c6023171ca6239c3c8386d0f3951';
+String _$lightsServiceHash() => r'0e97afa2cf4b5b8709029942e9bbec62fcdc736d';
 
 /// All lights, sorted by name, and the commands to control them.
 ///

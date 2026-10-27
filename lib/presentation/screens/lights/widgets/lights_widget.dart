@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
+import 'package:smart_hub/domain/lights/model/room_scene.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/vertical_slider.dart';
@@ -14,6 +14,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/lights/light_room.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.controller.dart';
+import 'package:smart_hub/presentation/screens/lights/widgets/room_detail_card.dart';
 import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart';
 
 /// The lights as a dashboard widget in any [WidgetSize] (`Widget Kit` → Lights). Tapping a bulb switches its room
@@ -74,6 +75,7 @@ class LightsWidget extends ConsumerWidget {
             onToggle: enabled ? controller.toggleRoom : null,
             onBrightnessChanged: enabled ? (percent) => controller.changeBrightness(selected, percent) : null,
             onBrightnessEnd: (percent) => controller.endBrightness(selected, percent),
+            scenes: ref.watch(roomScenesProvider(selected.id)),
             onScene: enabled ? (scene) => controller.applyScene(selected, scene) : null,
           ),
         },
@@ -328,6 +330,7 @@ class _ExtraLarge extends StatelessWidget {
     required this.onToggle,
     required this.onBrightnessChanged,
     required this.onBrightnessEnd,
+    required this.scenes,
     required this.onScene,
   });
 
@@ -337,11 +340,11 @@ class _ExtraLarge extends StatelessWidget {
   final ValueChanged<LightRoom>? onToggle;
   final ValueChanged<int>? onBrightnessChanged;
   final ValueChanged<int> onBrightnessEnd;
-  final ValueChanged<LightScene>? onScene;
+  final List<SceneEntry> scenes;
+  final ValueChanged<RoomScene>? onScene;
 
   @override
   Widget build(BuildContext context) {
-    final active = selected.activeScene;
     // The tiles fill the space: 1–2 rooms side by side, up to 4 in a square, then three columns.
     final columns = switch (rooms.length) {
       <= 2 => rooms.length.clamp(1, 2),
@@ -396,14 +399,12 @@ class _ExtraLarge extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8,
             children: [
-              for (final scene in LightScene.all)
+              // The first four of the room's scenes.
+              for (final entry in scenes.take(4))
                 Expanded(
-                  child: _SceneButton(
-                    scene: scene,
-                    active: scene == active,
-                    onTap: onScene == null ? null : () => onScene!(scene),
-                  ),
+                  child: _SceneButton(entry: entry, onTap: onScene == null ? null : () => onScene!(entry.scene)),
                 ),
+              for (var i = scenes.length; i < 4; i++) const Spacer(),
             ],
           ),
         ),
@@ -494,14 +495,14 @@ class _RoomTile extends StatelessWidget {
 }
 
 class _SceneButton extends StatelessWidget {
-  const _SceneButton({required this.scene, required this.active, required this.onTap});
+  const _SceneButton({required this.entry, required this.onTap});
 
-  final LightScene scene;
-  final bool active;
+  final SceneEntry entry;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final active = entry.active;
     return Semantics(
       button: true,
       selected: active,
@@ -520,9 +521,16 @@ class _SceneButton extends StatelessWidget {
               Container(
                 width: 10,
                 height: 10,
-                decoration: BoxDecoration(color: scene.color.toColor(), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: entry.color, shape: BoxShape.circle),
               ),
-              Text(scene.name, style: HubTextStyles.label.copyWith(fontSize: 14)),
+              Expanded(
+                child: Text(
+                  entry.scene.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: HubTextStyles.label.copyWith(fontSize: 14),
+                ),
+              ),
             ],
           ),
         ),

@@ -11,7 +11,9 @@ import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
+import 'package:smart_hub/domain/lights/model/room_scene.dart';
+import 'package:smart_hub/domain/lights/room_scenes.service.dart';
+import 'package:smart_hub/domain/lights/scene.util.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/presentation/screens/lights/light_room.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.state.dart';
@@ -36,7 +38,7 @@ class LightsController extends _$LightsController {
     return const LightsPageState();
   }
 
-  void selectRoom(String roomId) => state = state.copyWith(selectedRoomId: roomId);
+  void selectRoom(String roomId) => state = state.copyWith(selectedRoomId: roomId, openSceneId: null);
 
   void toggleRoom(LightRoom room) => _setOn(room.lights, on: !room.isOn);
 
@@ -54,8 +56,36 @@ class LightsController extends _$LightsController {
     _throttlers.putIfAbsent(room.id, () => Throttler(sliderInterval)).flush(() => _setBrightness(room, percent));
   }
 
-  void applyScene(LightRoom room, LightScene scene) {
+  void applyScene(LightRoom room, RoomScene scene) {
+    closeSceneOptions();
     _run('apply ${scene.name}', ref.read(lightsServiceProvider.notifier).applyScene(room.lights, scene));
+  }
+
+  /// Shows the options of a scene, or hides them when they are already shown.
+  void toggleSceneOptions(RoomScene scene) {
+    state = state.copyWith(openSceneId: state.openSceneId == scene.id ? null : scene.id);
+  }
+
+  void closeSceneOptions() => state = state.copyWith(openSceneId: null);
+
+  /// Saves how the room shines now as a new scene.
+  void addScene(LightRoom room, String name) {
+    _run('add a scene', ref.read(roomScenesServiceProvider.notifier).addFromCurrent(room.id, name, room.lights));
+  }
+
+  void overwriteScene(LightRoom room, RoomScene scene) {
+    closeSceneOptions();
+    _run('save ${scene.name}', ref.read(roomScenesServiceProvider.notifier).overwrite(scene, room.lights));
+  }
+
+  void renameScene(RoomScene scene, String name) {
+    closeSceneOptions();
+    _run('rename ${scene.name}', ref.read(roomScenesServiceProvider.notifier).rename(scene, name));
+  }
+
+  void deleteScene(RoomScene scene) {
+    closeSceneOptions();
+    _run('delete ${scene.name}', ref.read(roomScenesServiceProvider.notifier).delete(scene));
   }
 
   void _setOn(List<LightState> lights, {required bool on}) {
@@ -107,4 +137,16 @@ Color lightsTint(Ref ref) {
     for (final room in ref.watch(lightRoomsProvider))
       if (room.isOn) room.color?.toColor() ?? HubColorPalette.lightWarm,
   ]);
+}
+
+/// The scenes of [roomId] with what each does there: its color for the dot and whether the room shows it now.
+@riverpod
+List<({RoomScene scene, Color color, bool active})> roomScenes(Ref ref, String roomId) {
+  ref.watch(roomScenesServiceProvider);
+  final room = ref.watch(lightRoomsProvider).where((room) => room.id == roomId).firstOrNull;
+  final lights = room?.lights ?? const <LightState>[];
+  return [
+    for (final scene in ref.read(roomScenesServiceProvider.notifier).scenesOf(roomId))
+      (scene: scene, color: SceneUtil.colorOf(lights, scene).toColor(), active: SceneUtil.isActive(lights, scene)),
+  ];
 }

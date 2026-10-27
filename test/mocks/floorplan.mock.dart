@@ -12,9 +12,11 @@ import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
+import 'package:smart_hub/domain/lights/room_scenes.service.dart';
 import 'package:smart_hub/domain/plants/plants.service.dart';
 
 import '../fixtures/floorplan.fixture.dart';
+import 'devices.mock.dart';
 
 /// The day the tests run on.
 final testToday = DateTime(2026, 10, 26);
@@ -71,6 +73,7 @@ List<Override> floorplanWidgetTestOverrides(
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),
     // Lights and speakers on the plan come from Home Assistant.
     hasHomeAssistantProvider.overrideWithValue(hasHomeAssistant),
+    roomScenesServiceProvider.overrideWith(FakeRoomScenesService.new),
   ];
 }
 

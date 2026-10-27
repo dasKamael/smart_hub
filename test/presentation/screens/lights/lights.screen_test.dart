@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
@@ -109,6 +110,40 @@ void main() {
       // Then
       expect(lights.commands, isEmpty);
       expect(tester.widget<VerticalSlider>(find.byType(VerticalSlider)).onChanged, isNull);
+    });
+
+    testWidgets('Given the office, when long pressing Focus and deleting it, then the office has three scenes', (
+      tester,
+    ) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.longPress(find.text('Focus'));
+      await tester.pump();
+      await tester.tap(find.bySemanticsLabel('Delete'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.text('Focus'), findsNothing);
+      expect(find.text('Relax'), findsOneWidget);
+    });
+
+    testWidgets('Given the office, when adding a scene from the current light, then it shows in the list', (
+      tester,
+    ) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.tap(find.text('New scene'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Evening');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.text('Evening'), findsOneWidget);
     });
   });
 }

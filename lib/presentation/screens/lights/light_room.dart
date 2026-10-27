@@ -1,4 +1,3 @@
-import 'package:smart_hub/domain/lights/model/light_scene.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 
@@ -25,13 +24,4 @@ final class LightRoom {
 
   /// Color of the first light that is on; warm white for lights without color.
   RgbColor? get color => lightsOn.map((light) => light.displayColor).nonNulls.firstOrNull;
-
-  /// The scene whose brightness all lights that are on show.
-  LightScene? get activeScene {
-    final on = lightsOn;
-    if (on.isEmpty) return null;
-    return LightScene.all
-        .where((scene) => on.every((light) => ((light.brightnessPercent ?? 100) - scene.brightnessPercent).abs() <= 2))
-        .firstOrNull;
-  }
 }
