@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/apps/installed_apps.service.dart';
+import 'package:smart_hub/domain/apps/model/installed_app.dart';
 import 'package:smart_hub/domain/dashboard/model/dashboard_widget.dart';
 import 'package:smart_hub/domain/dashboard/model/dashboard_widget_kind.enum.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
+import 'package:smart_hub/presentation/design_system/atoms/hub_switch.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
@@ -33,13 +36,14 @@ class EditWidgetDialog extends ConsumerStatefulWidget {
 
 class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
   late final _selection = [...widget.widget.selection];
+  late var _card = widget.widget.showsCard;
 
   void _toggle(String id) {
     setState(() => _selection.contains(id) ? _selection.remove(id) : _selection.add(id));
   }
 
   void _done() {
-    ref.read(dashboardControllerProvider.notifier).select(widget.widget.id, _selection);
+    ref.read(dashboardControllerProvider.notifier).edit(widget.widget.id, selection: _selection, card: _card);
     Navigator.of(context).pop();
   }
 
@@ -49,9 +53,26 @@ class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
     final choices = switch (kind) {
       DashboardWidgetKind.lights => [
         for (final room in ref.watch(lightRoomsProvider))
-          (id: room.id, name: room.name, detail: room.lights.length == 1 ? '1 light' : '${room.lights.length} lights'),
+          (
+            id: room.id,
+            name: room.name,
+            detail: room.lights.length == 1 ? '1 light' : '${room.lights.length} lights',
+            icon: null,
+          ),
       ],
-      _ => const <({String id, String name, String detail})>[],
+      DashboardWidgetKind.apps => [
+        for (final app in ref.watch(installedAppsServiceProvider).value ?? const <InstalledApp>[])
+          (
+            id: app.packageName,
+            name: app.label,
+            detail: null,
+            icon: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.memory(app.icon, width: 36, height: 36, cacheWidth: 108),
+            ),
+          ),
+      ],
+      _ => const <({String id, String name, String? detail, Widget? icon})>[],
     };
 
     return Dialog(
@@ -74,7 +95,7 @@ class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: IgnorePointer(
-                        child: DashboardCatalog.build(kind, widget.widget.size, selection: _selection),
+                        child: DashboardCatalog.build(kind, widget.widget.size, selection: _selection, card: _card),
                       ),
                     ),
                   ),
@@ -88,35 +109,42 @@ class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(DashboardCatalog.name(kind), style: HubTextStyles.sectionTitle),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Pick ${DashboardCatalog.selectionName(kind)?.toLowerCase()} – the widget shows them in this order.',
-                    style: HubTextStyles.secondary,
-                  ),
                   const SizedBox(height: HubSpacing.s16),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        _ChoiceRow(
-                          name: 'Automatic',
-                          detail: 'All ${DashboardCatalog.selectionName(kind)?.toLowerCase()}, as on the plan',
-                          position: _selection.isEmpty ? 0 : null,
-                          onTap: () => setState(_selection.clear),
-                        ),
-                        const SizedBox(height: HubSpacing.s8),
-                        for (final choice in choices)
-                          _ChoiceRow(
-                            name: choice.name,
-                            detail: choice.detail,
-                            position: switch (_selection.indexOf(choice.id)) {
-                              -1 => null,
-                              final index => index + 1,
-                            },
-                            onTap: () => _toggle(choice.id),
-                          ),
-                      ],
+                  _BackgroundRow(card: _card, onChanged: (card) => setState(() => _card = card)),
+                  if (DashboardCatalog.selectionName(kind) case final selectionName?) ...[
+                    const SizedBox(height: HubSpacing.s20),
+                    Text(selectionName, style: HubTextStyles.body),
+                    Text(
+                      'Pick ${selectionName.toLowerCase()} – the widget shows them in this order.',
+                      style: HubTextStyles.secondary.copyWith(fontSize: 14),
                     ),
-                  ),
+                    const SizedBox(height: HubSpacing.s12),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          _ChoiceRow(
+                            name: 'Automatic',
+                            detail: DashboardCatalog.automaticDetail(kind),
+                            position: _selection.isEmpty ? 0 : null,
+                            onTap: () => setState(_selection.clear),
+                          ),
+                          const SizedBox(height: HubSpacing.s8),
+                          for (final choice in choices)
+                            _ChoiceRow(
+                              name: choice.name,
+                              detail: choice.detail,
+                              icon: choice.icon,
+                              position: switch (_selection.indexOf(choice.id)) {
+                                -1 => null,
+                                final index => index + 1,
+                              },
+                              onTap: () => _toggle(choice.id),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ] else
+                    const Spacer(),
                   const SizedBox(height: HubSpacing.s16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -142,10 +170,11 @@ class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
 
 /// A choice with a round mark: its place in the order when chosen (0 = a plain check for "Automatic").
 class _ChoiceRow extends StatelessWidget {
-  const _ChoiceRow({required this.name, required this.detail, required this.position, required this.onTap});
+  const _ChoiceRow({required this.name, required this.detail, required this.position, required this.onTap, this.icon});
 
   final String name;
-  final String detail;
+  final String? detail;
+  final Widget? icon;
   final int? position;
   final VoidCallback onTap;
 
@@ -189,17 +218,55 @@ class _ChoiceRow extends StatelessWidget {
                   ),
                 },
               ),
+              ?icon,
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, style: HubTextStyles.body.copyWith(fontSize: 16)),
-                    Text(detail, style: HubTextStyles.secondary.copyWith(fontSize: 13)),
+                    if (detail case final detail?) Text(detail, style: HubTextStyles.secondary.copyWith(fontSize: 13)),
                   ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Whether the widget sits on a card or stands on the dashboard.
+class _BackgroundRow extends StatelessWidget {
+  const _BackgroundRow({required this.card, required this.onChanged});
+
+  final bool card;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onChanged(!card),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(color: HubColorPalette.elevated, borderRadius: BorderRadius.circular(14)),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Background', style: HubTextStyles.body.copyWith(fontSize: 16)),
+                  Text(
+                    card ? 'On a card' : 'Straight on the dashboard',
+                    style: HubTextStyles.secondary.copyWith(fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            HubSwitch(value: card, onChanged: onChanged, semanticLabel: 'Background'),
+          ],
         ),
       ),
     );

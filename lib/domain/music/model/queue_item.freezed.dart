@@ -17,7 +17,8 @@ mixin _$QueueItem {
 
  String get title; String? get artist;/// Small cover for lists.
  String? get artworkUrl;/// Full size cover, as "Now playing" shows it once the track plays; loaded ahead of time.
- String? get coverUrl;
+ String? get coverUrl;/// Place in the speaker's queue, to jump there; `null` where that is not possible (Spotify).
+ int? get position;
 /// Create a copy of QueueItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,20 +30,20 @@ $QueueItemCopyWith<QueueItem> get copyWith => _$QueueItemCopyWithImpl<QueueItem>
 @override
 bool operator ==(Object other) {
   final _this = this as QueueItem;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is QueueItem&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.artworkUrl, _this.artworkUrl) || other.artworkUrl == _this.artworkUrl)&&(identical(other.coverUrl, _this.coverUrl) || other.coverUrl == _this.coverUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is QueueItem&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.artist, _this.artist) || other.artist == _this.artist)&&(identical(other.artworkUrl, _this.artworkUrl) || other.artworkUrl == _this.artworkUrl)&&(identical(other.coverUrl, _this.coverUrl) || other.coverUrl == _this.coverUrl)&&(identical(other.position, _this.position) || other.position == _this.position));
 }
 
 
 @override
 int get hashCode {
   final _this = this as QueueItem;
-  return Object.hash(runtimeType,_this.title,_this.artist,_this.artworkUrl,_this.coverUrl);
+  return Object.hash(runtimeType,_this.title,_this.artist,_this.artworkUrl,_this.coverUrl,_this.position);
 }
 
 @override
 String toString() {
   final _this = this as QueueItem;
-  return 'QueueItem(title: ${_this.title}, artist: ${_this.artist}, artworkUrl: ${_this.artworkUrl}, coverUrl: ${_this.coverUrl})';
+  return 'QueueItem(title: ${_this.title}, artist: ${_this.artist}, artworkUrl: ${_this.artworkUrl}, coverUrl: ${_this.coverUrl}, position: ${_this.position})';
 }
 
 
@@ -53,7 +54,7 @@ abstract mixin class $QueueItemCopyWith<$Res>  {
   factory $QueueItemCopyWith(QueueItem value, $Res Function(QueueItem) _then) = _$QueueItemCopyWithImpl;
 @useResult
 $Res call({
- String title, String? artist, String? artworkUrl, String? coverUrl
+ String title, String? artist, String? artworkUrl, String? coverUrl, int? position
 });
 
 
@@ -70,13 +71,14 @@ class _$QueueItemCopyWithImpl<$Res>
 
 /// Create a copy of QueueItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? artist = freezed,Object? artworkUrl = freezed,Object? coverUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? artist = freezed,Object? artworkUrl = freezed,Object? coverUrl = freezed,Object? position = freezed,}) {
   return _then(QueueItem(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,artworkUrl: freezed == artworkUrl ? _self.artworkUrl : artworkUrl // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,position: freezed == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl,  int? position)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _QueueItem() when $default != null:
-return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _:
+return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl,_that.position);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl,  int? position)  $default,) {final _that = this;
 switch (_that) {
 case _QueueItem():
-return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _:
+return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl,_that.position);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String? artist,  String? artworkUrl,  String? coverUrl,  int? position)?  $default,) {final _that = this;
 switch (_that) {
 case _QueueItem() when $default != null:
-return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _:
+return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl,_that.position);case _:
   return null;
 
 }
@@ -217,7 +219,7 @@ return $default(_that.title,_that.artist,_that.artworkUrl,_that.coverUrl);case _
 
 
 class _QueueItem implements QueueItem {
-  const _QueueItem({required this.title, this.artist, this.artworkUrl, this.coverUrl});
+  const _QueueItem({required this.title, this.artist, this.artworkUrl, this.coverUrl, this.position});
   
 
 @override final  String title;
@@ -226,6 +228,8 @@ class _QueueItem implements QueueItem {
 @override final  String? artworkUrl;
 /// Full size cover, as "Now playing" shows it once the track plays; loaded ahead of time.
 @override final  String? coverUrl;
+/// Place in the speaker's queue, to jump there; `null` where that is not possible (Spotify).
+@override final  int? position;
 
 /// Create a copy of QueueItem
 /// with the given fields replaced by the non-null parameter values.
@@ -237,18 +241,18 @@ _$QueueItemCopyWith<_QueueItem> get copyWith => __$QueueItemCopyWithImpl<_QueueI
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _QueueItem&&(identical(other.title, title) || other.title == title)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.artworkUrl, artworkUrl) || other.artworkUrl == artworkUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _QueueItem&&(identical(other.title, title) || other.title == title)&&(identical(other.artist, artist) || other.artist == artist)&&(identical(other.artworkUrl, artworkUrl) || other.artworkUrl == artworkUrl)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.position, position) || other.position == position));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,title,artist,artworkUrl,coverUrl);
+    return Object.hash(runtimeType,title,artist,artworkUrl,coverUrl,position);
 }
 
 @override
 String toString() {
-    return 'QueueItem(title: $title, artist: $artist, artworkUrl: $artworkUrl, coverUrl: $coverUrl)';
+    return 'QueueItem(title: $title, artist: $artist, artworkUrl: $artworkUrl, coverUrl: $coverUrl, position: $position)';
 }
 
 
@@ -259,7 +263,7 @@ abstract mixin class _$QueueItemCopyWith<$Res> implements $QueueItemCopyWith<$Re
   factory _$QueueItemCopyWith(_QueueItem value, $Res Function(_QueueItem) _then) = __$QueueItemCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String? artist, String? artworkUrl, String? coverUrl
+ String title, String? artist, String? artworkUrl, String? coverUrl, int? position
 });
 
 
@@ -276,13 +280,14 @@ class __$QueueItemCopyWithImpl<$Res>
 
 /// Create a copy of QueueItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? artist = freezed,Object? artworkUrl = freezed,Object? coverUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? artist = freezed,Object? artworkUrl = freezed,Object? coverUrl = freezed,Object? position = freezed,}) {
   return _then(_QueueItem(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,artist: freezed == artist ? _self.artist : artist // ignore: cast_nullable_to_non_nullable
 as String?,artworkUrl: freezed == artworkUrl ? _self.artworkUrl : artworkUrl // ignore: cast_nullable_to_non_nullable
 as String?,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,position: freezed == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

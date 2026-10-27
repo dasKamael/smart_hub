@@ -14,5 +14,12 @@ abstract class DashboardWidget with _$DashboardWidget {
 
     /// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
     @Default(<String>[]) List<String> selection,
+
+    /// Whether the widget sits on a card; `null`: as its kind does by default.
+    bool? card,
   }) = _DashboardWidget;
+
+  const DashboardWidget._();
+
+  bool get showsCard => card ?? kind.cardByDefault;
 }

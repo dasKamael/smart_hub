@@ -128,7 +128,7 @@ void main() {
       final queue = await repository.queue('media_player.kitchen');
 
       // Then
-      expect(queue?.map((item) => '${item.title} – ${item.artist}'), ['One – A', 'Two – B']);
+      expect(queue?.map((item) => '${item.position} ${item.title} – ${item.artist}'), ['0 One – A', '1 Two – B']);
     });
 
     test('Given a player without queue support, when loading the queue, then there is none', () async {

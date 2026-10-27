@@ -90,20 +90,20 @@ void main() {
       },
     );
 
-    test('Given a lights widget, when choosing two rooms, then they are kept in that order after a restart', () async {
+    test('Given a lights widget, when choosing two rooms without a card, then that is kept after a restart', () async {
       // Given
       await service().remove('weather-2');
       await service().add(DashboardWidgetKind.lights, DashboardWidgetSize.medium);
       final id = container.read(dashboardLayoutServiceProvider).value!.last.id;
 
       // When
-      await service().select(id, ['kitchen', 'office']);
+      await service().edit(id, selection: ['kitchen', 'office'], card: false);
       final restarted = createContainer();
       final widgets = await restarted.read(dashboardLayoutServiceProvider.future);
 
       // Then
       expect(widgets.last.selection, ['kitchen', 'office']);
-      expect(widgets.first.selection, isEmpty);
+      expect((widgets.last.showsCard, widgets.first.selection.isEmpty, widgets.first.showsCard), (false, true, true));
     });
   });
 }

@@ -45,7 +45,7 @@ final class DashboardLayoutServiceProvider
   DashboardLayoutService create() => DashboardLayoutService();
 }
 
-String _$dashboardLayoutServiceHash() => r'bb8d330ef05a8ceb1ab8df810ade43b5ab5ef831';
+String _$dashboardLayoutServiceHash() => r'b0f9b6ffd31daafb1ddcf6c3dbd46461dc33eb0d';
 
 /// The widgets on the dashboard in their order. Changes are only made when everything still fits on the page.
 ///

@@ -15,14 +15,18 @@ import 'package:smart_hub/presentation/screens/weather/widgets/weather_parts.dar
 
 /// The weather as a dashboard widget in any [WidgetSize] (`Widget Kit` → Weather). A tap opens the weather page.
 class WeatherWidget extends ConsumerWidget {
-  const WeatherWidget({super.key, required this.size});
+  const WeatherWidget({super.key, required this.size, this.card = true});
 
   final WidgetSize size;
+
+  /// `false`: no card behind the widget (`DashboardWidget.card`).
+  final bool card;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final forecast = ref.watch(weatherServiceProvider);
     return WidgetTile(
+      card: card,
       size: size,
       onTap: () => context.push(HubPage.weather.path),
       // An error stays visible while a retry is loading.

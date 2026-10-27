@@ -6,9 +6,13 @@ enum DashboardWidgetKind {
   home([DashboardWidgetSize.medium]),
   plants(DashboardWidgetSize.values),
   lights(DashboardWidgetSize.values),
-  music(DashboardWidgetSize.values);
+  music(DashboardWidgetSize.values),
+  apps(DashboardWidgetSize.values, cardByDefault: false);
 
-  const DashboardWidgetKind(this.sizes);
+  const DashboardWidgetKind(this.sizes, {this.cardByDefault = true});
 
   final List<DashboardWidgetSize> sizes;
+
+  /// Whether a new widget of this kind sits on a card; app icons stand on the dashboard itself.
+  final bool cardByDefault;
 }

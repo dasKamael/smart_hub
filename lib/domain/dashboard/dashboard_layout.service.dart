@@ -48,10 +48,11 @@ class DashboardLayoutService extends _$DashboardLayoutService {
     return _saveIfFits([for (final widget in _widgets) widget.id == id ? widget.copyWith(size: size) : widget]);
   }
 
-  /// Sets what [id] shows (see `DashboardWidget.selection`); an empty list lets the widget choose.
-  Future<void> select(String id, List<String> selection) {
+  /// Sets what [id] shows (see `DashboardWidget.selection`, an empty list lets the widget choose) and whether it sits
+  /// on a card.
+  Future<void> edit(String id, {required List<String> selection, required bool card}) {
     return _saveIfFits([
-      for (final widget in _widgets) widget.id == id ? widget.copyWith(selection: selection) : widget,
+      for (final widget in _widgets) widget.id == id ? widget.copyWith(selection: selection, card: card) : widget,
     ]);
   }
 

@@ -254,7 +254,7 @@ class _Tile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(dashboardControllerProvider.notifier);
-    final tile = DashboardCatalog.build(widget.kind, widget.size, selection: widget.selection);
+    final tile = DashboardCatalog.build(widget.kind, widget.size, selection: widget.selection, card: widget.card);
     if (!editing) return GestureDetector(onLongPress: controller.startEditing, child: tile);
 
     // Each widget swings a little out of step with the others.
@@ -270,10 +270,8 @@ class _Tile extends ConsumerWidget {
           ),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            // Like Apple's "Edit Widget": a tap while arranging opens the widget's options, if it has any.
-            onTap: DashboardCatalog.selectionName(widget.kind) == null
-                ? null
-                : () => unawaited(showEditWidget(context, widget)),
+            // Like Apple's "Edit Widget": a tap while arranging opens the widget's options.
+            onTap: () => unawaited(showEditWidget(context, widget)),
             onPanStart: (_) => controller.startDrag(widget.id),
             onPanUpdate: (details) => controller.dragBy(details.delta),
             onPanEnd: (_) => controller.endDrag(),

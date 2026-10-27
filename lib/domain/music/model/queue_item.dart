@@ -14,5 +14,8 @@ abstract class QueueItem with _$QueueItem {
 
     /// Full size cover, as "Now playing" shows it once the track plays; loaded ahead of time.
     String? coverUrl,
+
+    /// Place in the speaker's queue, to jump there; `null` where that is not possible (Spotify).
+    int? position,
   }) = _QueueItem;
 }

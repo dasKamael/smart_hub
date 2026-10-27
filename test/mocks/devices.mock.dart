@@ -79,6 +79,9 @@ class FakeSpeakersService extends SpeakersService {
   Future<void> play(String id, MediaItem item) async => commands.add('play ${item.title} on $id');
 
   @override
+  Future<void> playFromQueue(String id, QueueItem item) async => commands.add('queue ${item.title} on $id');
+
+  @override
   Future<void> move(String fromId, List<String> toIds) async => commands.add('move $fromId to ${toIds.join(',')}');
 }
 
@@ -133,4 +136,8 @@ class FakeSpotifyConnectService extends SpotifyConnectService {
 
   @override
   Future<void> transfer(String deviceId) async => commands.add('transfer $deviceId');
+
+  @override
+  Future<void> skipTo(String deviceId, QueueItem item, {required int steps}) async =>
+      commands.add('skip $steps to ${item.title} on $deviceId');
 }

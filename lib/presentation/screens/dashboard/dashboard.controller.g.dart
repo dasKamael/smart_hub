@@ -43,7 +43,7 @@ final class DashboardControllerProvider extends $NotifierProvider<DashboardContr
   }
 }
 
-String _$dashboardControllerHash() => r'50bfb4421a5270692dc0f248aa2b64fab25223f4';
+String _$dashboardControllerHash() => r'a07429f729d34f2fd05bb39a2df5c025df333774';
 
 /// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
 /// drag the corner to resize, remove and add.

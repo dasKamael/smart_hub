@@ -84,6 +84,29 @@ class SpeakersService extends _$SpeakersService {
 
   Future<void> previous(String id) => _skip(id, _repository.previous(id));
 
+  /// Jumps to [item] of the queue of [id]; it shows at once. Does nothing for items without a place in the queue.
+  Future<void> playFromQueue(String id, QueueItem item) {
+    final position = item.position;
+    if (position == null) return Future.value();
+    final group = _groupOf(id);
+    final now = clock.now();
+    for (final speaker in group) {
+      _overlay.add(
+        speaker.id,
+        apply: (speaker) => speaker.copyWith(
+          playback: Playback.playing,
+          title: item.title,
+          artist: item.artist,
+          artworkUrl: item.coverUrl ?? item.artworkUrl,
+          positionSeconds: 0,
+          positionUpdatedAt: now,
+        ),
+        isConfirmed: (speaker) => speaker.title == item.title,
+      );
+    }
+    return _run(group, _repository.playFromQueue(id, position));
+  }
+
   /// Plays [item] on [id] and its group; its name and cover show at once until the first track is reported.
   Future<void> play(String id, MediaItem item) {
     final group = _groupOf(id);

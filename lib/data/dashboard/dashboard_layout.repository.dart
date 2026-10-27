@@ -24,7 +24,7 @@ class DashboardLayoutRepository {
     return [
       for (final row in rows)
         if ((_kind(row.kind), _size(row.size)) case (final kind?, final size?))
-          DashboardWidget(id: row.id, kind: kind, size: size, selection: _selection(row.selection)),
+          DashboardWidget(id: row.id, kind: kind, size: size, selection: _selection(row.selection), card: row.card),
     ];
   }
 
@@ -41,6 +41,7 @@ class DashboardLayoutRepository {
               size: widget.size.name,
               position: position,
               selection: Value(widget.selection.isEmpty ? null : jsonEncode(widget.selection)),
+              card: Value(widget.card),
             ),
         ]);
       });

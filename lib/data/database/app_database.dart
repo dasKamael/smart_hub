@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'smart_hub'));
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration {
@@ -73,6 +73,8 @@ class AppDatabase extends _$AppDatabase {
         },
         // v9: what a dashboard widget shows, e.g. the rooms of a lights widget.
         from8To9: (migrator, schema) => migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.selection),
+        // v10: dashboard widgets with or without a card.
+        from9To10: (migrator, schema) => migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.card),
       ),
     );
   }

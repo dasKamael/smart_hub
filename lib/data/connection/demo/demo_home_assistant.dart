@@ -185,6 +185,9 @@ final class _DemoBehavior {
           _skip(current, 1);
         case ('media_player', 'media_previous_track'):
           _skip(current, -1);
+        // The demo queue starts at the current track, so a place in it is that many tracks ahead.
+        case ('sonos', 'play_queue'):
+          _skip(current, (call.data['queue_position'] as num?)?.toInt() ?? 0);
         case ('media_player', 'volume_set'):
           final volume = (call.data['volume_level'] as num?)?.toDouble() ?? 0;
           home.setState(id, current.state, attributes: {...current.attributes, 'volume_level': volume.clamp(0, 1)});

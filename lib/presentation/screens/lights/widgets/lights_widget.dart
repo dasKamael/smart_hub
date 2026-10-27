@@ -18,9 +18,12 @@ import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart'
 /// The lights as a dashboard widget in any [WidgetSize] (`Widget Kit` → Lights). Tapping a bulb switches its room
 /// (or all lights), tapping elsewhere opens the lights page.
 class LightsWidget extends ConsumerWidget {
-  const LightsWidget({super.key, required this.size, this.roomIds = const []});
+  const LightsWidget({super.key, required this.size, this.roomIds = const [], this.card = true});
 
   final WidgetSize size;
+
+  /// `false`: no card behind the widget (`DashboardWidget.card`).
+  final bool card;
 
   /// The rooms to show, in this order; empty: all rooms in plan order. Rooms that are gone are skipped.
   final List<String> roomIds;
@@ -36,6 +39,7 @@ class LightsWidget extends ConsumerWidget {
     final selected = rooms.where((room) => room.id == selectedId).firstOrNull ?? rooms.firstOrNull;
 
     return WidgetTile(
+      card: card,
       size: size,
       padding: switch (size) {
         WidgetSize.extraLarge => 18,

@@ -86,6 +86,7 @@ void main() {
       await repository.setVolume('media_player.office', 35);
       await repository.join('media_player.office', 'media_player.sleep');
       await repository.leave('media_player.sleep');
+      await repository.playFromQueue('media_player.office', 3);
 
       // Then
       expect(server.serviceCalls.map((c) => '${c.service} ${c.entityIds.join()} ${c.data}'), [
@@ -93,6 +94,7 @@ void main() {
         'volume_set media_player.office {volume_level: 0.35}',
         'join media_player.office {group_members: [media_player.sleep]}',
         'unjoin media_player.sleep {}',
+        'play_queue media_player.office {queue_position: 3}',
       ]);
     });
 

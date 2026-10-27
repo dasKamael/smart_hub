@@ -233,5 +233,21 @@ void main() {
         expect(stateOf(container)?.playback?.title, 'Daybreak');
       });
     });
+
+    test('Given a track three places ahead, when playing it, then it shows at once and Spotify skips three times', () {
+      fakeAsync((async) {
+        // Given
+        final container = createContainer();
+        async.flushMicrotasks();
+
+        // When
+        serviceOf(container).skipTo('d-phone', const QueueItem(title: 'Late Tram'), steps: 3);
+        async.flushMicrotasks();
+
+        // Then
+        expect(stateOf(container)?.playback?.title, 'Late Tram');
+        verify(() => spotify.next('d-phone')).called(3);
+      });
+    });
   });
 }

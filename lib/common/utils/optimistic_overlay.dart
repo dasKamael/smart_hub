@@ -17,13 +17,19 @@ class OptimisticOverlay<T> {
 
   bool isPending(String id) => _pending.containsKey(id);
 
-  /// Lays [apply] over item [id] until an item satisfies [isConfirmed]. Replaces an earlier change of the item.
-  void add(String id, {required T Function(T item) apply, required bool Function(T item) isConfirmed}) {
+  /// Lays [apply] over item [id] until an item satisfies [isConfirmed], at most [timeout] (default: the overlay's).
+  /// Replaces an earlier change of the item.
+  void add(
+    String id, {
+    required T Function(T item) apply,
+    required bool Function(T item) isConfirmed,
+    Duration? timeout,
+  }) {
     _pending.remove(id)?.timer.cancel();
     _pending[id] = _Pending(
       apply: apply,
       isConfirmed: isConfirmed,
-      timer: Timer(timeout, () {
+      timer: Timer(timeout ?? this.timeout, () {
         _pending.remove(id);
         onChanged();
       }),

@@ -21,12 +21,22 @@ enum WidgetSize {
 
 /// A dashboard widget: fixed size, radius 24, surface color; tappable when [onTap] is set.
 class WidgetTile extends StatelessWidget {
-  const WidgetTile({super.key, required this.size, required this.child, this.onTap, this.padding = 18});
+  const WidgetTile({
+    super.key,
+    required this.size,
+    required this.child,
+    this.onTap,
+    this.padding = 18,
+    this.card = true,
+  });
 
   final WidgetSize size;
   final Widget child;
   final VoidCallback? onTap;
   final double padding;
+
+  /// `false`: no card, the content stands on the dashboard (e.g. app icons).
+  final bool card;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +46,10 @@ class WidgetTile extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: DecoratedBox(
-          decoration: BoxDecoration(color: HubColorPalette.surface, borderRadius: BorderRadius.circular(24)),
+          decoration: BoxDecoration(
+            color: card ? HubColorPalette.surface : null,
+            borderRadius: BorderRadius.circular(24),
+          ),
           child: Padding(padding: EdgeInsets.all(padding), child: child),
         ),
       ),

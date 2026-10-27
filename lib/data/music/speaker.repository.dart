@@ -53,6 +53,11 @@ class SpeakerRepository {
     return playable.take(maxFavorites).toList();
   }
 
+  /// Plays the track at [position] of the queue of [id] (`sonos.play_queue`).
+  Future<void> playFromQueue(String id, int position) {
+    return session.callService('sonos', 'play_queue', entityIds: [id], data: {'queue_position': position});
+  }
+
   /// The play queue of [id] via `sonos.get_queue`; `null` when the player has no queue HA can read.
   Future<List<QueueItem>?> queue(String id) async {
     final Object? response;
@@ -64,8 +69,9 @@ class SpeakerRepository {
     final items = response is Map<String, Object?> ? response[id] : null;
     if (items is! List<Object?>) return null;
     return [
-      for (final item in items.whereType<Map<String, Object?>>())
+      for (final (position, item) in items.whereType<Map<String, Object?>>().indexed)
         QueueItem(
+          position: position,
           title: (item['media_title'] as String?) ?? 'Unknown',
           artist: item['media_artist'] as String?,
           artworkUrl: session.resolveUrl(item['media_image'] as String?)?.toString(),

@@ -34,8 +34,8 @@ class DashboardController extends _$DashboardController {
 
   void remove(String id) => _run('remove a widget', ref.read(dashboardLayoutServiceProvider.notifier).remove(id));
 
-  void select(String id, List<String> selection) {
-    _run('choose what a widget shows', ref.read(dashboardLayoutServiceProvider.notifier).select(id, selection));
+  void edit(String id, {required List<String> selection, required bool card}) {
+    _run('edit a widget', ref.read(dashboardLayoutServiceProvider.notifier).edit(id, selection: selection, card: card));
   }
 
   Future<bool> add(DashboardWidgetKind kind, DashboardWidgetSize size) {

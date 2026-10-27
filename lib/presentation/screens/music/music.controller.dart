@@ -83,6 +83,20 @@ class MusicController extends _$MusicController {
     }
   }
 
+  /// Jumps to [item] of the target's "Up next".
+  void playFromQueue(PlaybackTarget target, QueueItem item) {
+    switch (target) {
+      case SpeakerGroupTarget(:final group):
+        _transport('play ${item.title}', _speakers.playFromQueue(group.leaderId, item));
+      case ConnectTarget(:final device):
+        // Spotify's queue starts with the playing track: the place of the item is the number of skips.
+        final queue = ref.read(spotifyQueueProvider).value ?? const <QueueItem>[];
+        final current = queue.indexWhere((queued) => queued.title == target.nowPlaying.title);
+        final steps = queue.indexOf(item) - (current < 0 ? -1 : current);
+        _transport('play ${item.title}', _spotify.skipTo(device.id, item, steps: steps));
+    }
+  }
+
   void previous(PlaybackTarget target) {
     switch (target) {
       case SpeakerGroupTarget(:final group):

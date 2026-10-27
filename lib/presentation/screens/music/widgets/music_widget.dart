@@ -6,6 +6,7 @@ import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
+import 'package:smart_hub/domain/music/play_queue.util.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
@@ -16,15 +17,19 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
+import 'package:smart_hub/presentation/screens/music/widgets/sliding_queue.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/track_progress.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 
 /// What plays as a dashboard widget in any [WidgetSize] (`Widget Kit` → Music): the same target as the music page's
 /// "Now playing". The buttons control it, a tap elsewhere opens the music page.
 class MusicWidget extends ConsumerWidget {
-  const MusicWidget({super.key, required this.size});
+  const MusicWidget({super.key, required this.size, this.card = true});
 
   final WidgetSize size;
+
+  /// `false`: no card behind the widget (`DashboardWidget.card`).
+  final bool card;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,6 +40,7 @@ class MusicWidget extends ConsumerWidget {
     final controller = ref.read(musicControllerProvider.notifier);
 
     return WidgetTile(
+      card: card,
       size: size,
       padding: 0,
       onTap: () => context.go(HubRoute.music.path),
@@ -44,6 +50,7 @@ class MusicWidget extends ConsumerWidget {
           null => const _NothingToPlayOn(),
           final target => _Player(
             size: size,
+            card: card,
             target: target,
             controls: _Controls(
               // Spotify devices work without Home Assistant.
@@ -52,6 +59,7 @@ class MusicWidget extends ConsumerWidget {
               onPlayPause: () => controller.playPause(target),
               onNext: () => controller.next(target),
               onPlay: (item) => controller.play(target, item),
+              onPlayFromQueue: (item) => controller.playFromQueue(target, item),
             ),
           ),
         },
@@ -67,6 +75,7 @@ final class _Controls {
     required this.onPlayPause,
     required this.onNext,
     required this.onPlay,
+    required this.onPlayFromQueue,
   });
 
   final bool enabled;
@@ -74,12 +83,14 @@ final class _Controls {
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
   final ValueChanged<MediaItem> onPlay;
+  final ValueChanged<QueueItem> onPlayFromQueue;
 }
 
 class _Player extends StatelessWidget {
-  const _Player({required this.size, required this.target, required this.controls});
+  const _Player({required this.size, required this.card, required this.target, required this.controls});
 
   final WidgetSize size;
+  final bool card;
   final PlaybackTarget target;
   final _Controls controls;
 
@@ -91,7 +102,7 @@ class _Player extends StatelessWidget {
     return AnimatedContainer(
       duration: HubMotion.glowDuration,
       // The cover's color shines through, as on the music page.
-      color: Color.alphaBlend(Artwork.colorOf(seed).withValues(alpha: 0.22), HubColorPalette.surface),
+      color: card ? Color.alphaBlend(Artwork.colorOf(seed).withValues(alpha: 0.22), HubColorPalette.surface) : null,
       padding: EdgeInsets.all(size == WidgetSize.medium ? 16 : 18),
       child: switch (size) {
         WidgetSize.medium => _Medium(track: track, seed: seed, controls: controls),
@@ -176,7 +187,8 @@ class _Large extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final track = target.nowPlaying;
-    final next = _upNext(ref, target, count: 2);
+    final queue = _queue(ref, target);
+    final hasNext = PlayQueueUtil.nextAfter(queue, track.title) != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 14,
@@ -199,7 +211,7 @@ class _Large extends ConsumerWidget {
         ),
         TrackProgress(track: track, showTimes: false),
         _Transport(playing: track.isPlaying, controls: controls, gap: 28, playSize: 52),
-        if (next.isNotEmpty)
+        if (hasNext)
           Expanded(
             child: Container(
               padding: const EdgeInsets.only(top: 10),
@@ -211,7 +223,20 @@ class _Large extends ConsumerWidget {
                 spacing: 6,
                 children: [
                   Text('Up next', style: HubTextStyles.label.copyWith(fontSize: 12, color: HubColorPalette.text2)),
-                  for (final item in next) _QueueRow(item),
+                  SizedBox(
+                    height: 2 * 34,
+                    child: SlidingQueue(
+                      items: queue ?? const [],
+                      currentTitle: track.title,
+                      showCurrent: false,
+                      maxItems: 2,
+                      itemExtent: 34,
+                      itemBuilder: (context, item, {required current}) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: _QueueRow(item, onTap: controls.enabled ? () => controls.onPlayFromQueue(item) : null),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -309,16 +334,13 @@ class _ExtraLarge extends ConsumerWidget {
   }
 }
 
-/// The next [count] tracks after the current one in the target's queue.
-List<QueueItem> _upNext(WidgetRef ref, PlaybackTarget target, {required int count}) {
-  final queue = switch (target) {
+/// The target's play queue; the last one stays while a new one loads.
+List<QueueItem>? _queue(WidgetRef ref, PlaybackTarget target) {
+  return switch (target) {
     SpeakerGroupTarget(:final group) => ref.watch(playQueueProvider(group.leaderId)).value,
     ConnectTarget(playback: _?) => ref.watch(spotifyQueueProvider).value,
     ConnectTarget() => null,
   };
-  if (queue == null) return const [];
-  final current = queue.indexWhere((item) => item.title == target.nowPlaying.title);
-  return queue.skip(current + 1).take(count).toList();
 }
 
 /// As on the music page: Spotify's recent items when connected, otherwise the favorites of the speaker group.
@@ -513,34 +535,44 @@ class _SkipButton extends StatelessWidget {
 }
 
 class _QueueRow extends StatelessWidget {
-  const _QueueRow(this.item);
+  const _QueueRow(this.item, {required this.onTap});
 
   final QueueItem item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 10,
-      children: [
-        Artwork(seed: item.title, url: item.artworkUrl, size: 28, radius: 6, showNote: false),
-        Expanded(
-          child: Text.rich(
-            TextSpan(
-              text: item.title,
-              children: [
-                if (item.artist case final artist? when artist.isNotEmpty)
-                  TextSpan(
-                    text: ' · $artist',
-                    style: const TextStyle(fontWeight: FontWeight.w400, color: HubColorPalette.text2),
-                  ),
-              ],
+    return Semantics(
+      container: true,
+      button: true,
+      label: item.title,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap ?? () {},
+        child: Row(
+          spacing: 10,
+          children: [
+            Artwork(seed: item.title, url: item.artworkUrl, size: 28, radius: 6, showNote: false),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  text: item.title,
+                  children: [
+                    if (item.artist case final artist? when artist.isNotEmpty)
+                      TextSpan(
+                        text: ' · $artist',
+                        style: const TextStyle(fontWeight: FontWeight.w400, color: HubColorPalette.text2),
+                      ),
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: HubTextStyles.label.copyWith(fontSize: 14),
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: HubTextStyles.label.copyWith(fontSize: 14),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

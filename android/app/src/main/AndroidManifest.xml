@@ -58,6 +58,11 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <!-- The apps widget lists and opens the apps on the tablet. -->
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
         <!-- Opening the Spotify login in a browser tab (url_launcher). -->
         <intent>
             <action android:name="android.intent.action.VIEW"/>

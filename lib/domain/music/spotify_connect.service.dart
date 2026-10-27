@@ -90,6 +90,32 @@ class SpotifyConnectService extends _$SpotifyConnectService {
 
   Future<void> previous(String deviceId) => _skip(_repository.previous(deviceId));
 
+  /// Jumps [steps] tracks ahead to [item]; it shows at once and stays until Spotify plays it. Spotify cannot jump
+  /// into its queue, so it skips.
+  Future<void> skipTo(String deviceId, QueueItem item, {required int steps}) {
+    if (steps <= 0) return Future.value();
+    final now = clock.now();
+    _playback.add(
+      _playbackId,
+      apply: (playback) => playback.copyWith(
+        isPlaying: true,
+        title: item.title,
+        artist: item.artist,
+        artworkUrl: item.coverUrl ?? item.artworkUrl,
+        positionSeconds: 0,
+        positionAt: now,
+      ),
+      isConfirmed: (playback) => playback.title == item.title,
+      // Every skip is a request of its own; the track only shows up in Spotify's state after the last one.
+      timeout: Duration(seconds: 4 + steps),
+    );
+    return _run(() async {
+      for (var step = 0; step < steps; step++) {
+        await _repository.next(deviceId);
+      }
+    }());
+  }
+
   Future<void> setVolume(String deviceId, int percent) {
     final value = percent.clamp(0, 100);
     _devices.add(

@@ -16,6 +16,7 @@ import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
 import 'package:smart_hub/domain/weather/weather.service.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
+import 'package:smart_hub/presentation/screens/dashboard/widgets/home_summary_widget.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/lights_widget.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_widget.dart';
 
@@ -191,6 +192,29 @@ void main() {
 
       // Then
       expect(container.read(dashboardLayoutServiceProvider).value!.last.selection, ['not-placed']);
+    });
+
+    testWidgets('Given editing, when tapping the home widget and switching its background off, then it has no card', (
+      tester,
+    ) async {
+      // Given
+      await pumpScreen(tester);
+      await startEditing(tester);
+
+      // When
+      await tester.tap(find.byType(HomeSummaryWidget), warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 500));
+      final rooms = find.text('Rooms').evaluate().length;
+      await tester.tap(find.text('Background'));
+      await tester.pump();
+      await tester.tap(find.text('Done').last);
+      await tester.pump(const Duration(milliseconds: 500));
+      await stopEditing(tester);
+
+      // Then
+      expect(rooms, 0, reason: 'the home widget has nothing to choose');
+      final home = container.read(dashboardLayoutServiceProvider).value!.firstWhere((widget) => widget.id == 'home-1');
+      expect(home.showsCard, isFalse);
     });
   });
 }

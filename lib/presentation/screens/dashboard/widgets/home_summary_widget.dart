@@ -16,7 +16,10 @@ import 'package:smart_hub/presentation/screens/plants/plants.controller.dart';
 /// "Home" (M): lights on, plants to water and what plays, one row each; a row opens its page
 /// (`README` → "Floor plan – widgets").
 class HomeSummaryWidget extends ConsumerWidget {
-  const HomeSummaryWidget({super.key});
+  const HomeSummaryWidget({super.key, this.card = true});
+
+  /// `false`: no card behind the widget (`DashboardWidget.card`).
+  final bool card;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,6 +34,7 @@ class HomeSummaryWidget extends ConsumerWidget {
     ];
 
     return WidgetTile(
+      card: card,
       size: WidgetSize.medium,
       padding: 16,
       child: Column(

@@ -44,7 +44,7 @@ final class SpeakersServiceProvider extends $AsyncNotifierProvider<SpeakersServi
   SpeakersService create() => SpeakersService();
 }
 
-String _$speakersServiceHash() => r'872cabc2ba7becfd08d102da49152d29c94d06d6';
+String _$speakersServiceHash() => r'f72dba056930ee3e88759e71b205b043cf42cd79';
 
 /// All speakers, sorted by name, and the commands to control them.
 ///

@@ -255,6 +255,22 @@ void main() {
         },
       );
 
+      test('Given a track in the queue, when playing it, then it shows at once on the whole group', () async {
+        // Given
+        when(() => repository.playFromQueue(any(), any())).thenAnswer((_) async {});
+        final (service, container) = await createWithContainer();
+
+        // When
+        unawaited(service.playFromQueue('media_player.office', const QueueItem(title: 'Late Tram', position: 4)));
+
+        // Then
+        expect(container.read(speakersServiceProvider).value!.map((speaker) => speaker.title), [
+          'Late Tram',
+          'Late Tram',
+        ]);
+        verify(() => repository.playFromQueue('media_player.office', 4)).called(1);
+      });
+
       test('Given a playlist, when playing it, then its name and cover show at once', () async {
         // Given
         when(() => repository.play(any(), any())).thenAnswer((_) async {});

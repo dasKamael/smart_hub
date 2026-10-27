@@ -340,6 +340,18 @@ void main() {
       expect(find.text('Connect Spotify'), findsOneWidget);
       expect(find.text('Open settings'), findsOneWidget);
     });
+
+    testWidgets('Given a queue, when tapping the next track under Up next, then the group plays it', (tester) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.tap(find.text('Slow Rivers'));
+      await tester.pump();
+
+      // Then
+      expect(speakers.commands, ['queue Slow Rivers on media_player.office']);
+    });
   });
 }
 

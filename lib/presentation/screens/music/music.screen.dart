@@ -348,6 +348,9 @@ class _UpNext extends ConsumerWidget {
       (leaderId: null, spotifyPlays: true, title: _) => ref.watch(spotifyQueueProvider),
       _ => const AsyncData<List<QueueItem>?>(null),
     };
+    final enabled =
+        ref.watch(currentTargetProvider(visible: visible).select((target) => target is ConnectTarget)) ||
+        _transportEnabled(ref, null);
     return PageCard(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Column(
@@ -356,12 +359,20 @@ class _UpNext extends ConsumerWidget {
         children: [
           const Text('Up next', style: HubTextStyles.widgetTitle),
           Expanded(
-            child: switch (queue) {
-              AsyncData(value: final items?) when items.isNotEmpty => QueueList(
+            // The last queue stays while a new one loads, so the list does not blink.
+            child: switch ((queue.value, queue.isLoading)) {
+              (final items?, _) when items.isNotEmpty => QueueList(
                 items: items,
                 currentTitle: shown.title,
+                onPlay: enabled
+                    ? (item) {
+                        if (ref.read(currentTargetProvider(visible: visible)) case final target?) {
+                          ref.read(musicControllerProvider.notifier).playFromQueue(target, item);
+                        }
+                      }
+                    : null,
               ),
-              AsyncLoading() => const SizedBox.shrink(),
+              (_, true) => const SizedBox.shrink(),
               _ => const Center(child: Text('Nothing queued here', style: HubTextStyles.secondary)),
             },
           ),

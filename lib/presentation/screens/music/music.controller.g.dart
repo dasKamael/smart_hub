@@ -40,7 +40,7 @@ final class MusicControllerProvider extends $NotifierProvider<MusicController, M
   }
 }
 
-String _$musicControllerHash() => r'9a7a74e6da44cba4440f7326f1c28f32bc1d99c1';
+String _$musicControllerHash() => r'e1f54ae2f616ad26b8bac1f08e115d370fdfb44d';
 
 /// Music page: which target is shown, which tile shows its options, and the playback commands.
 

@@ -15,9 +15,12 @@ import 'package:smart_hub/presentation/shared_widgets/plant_photo.dart';
 /// The watering plan as a dashboard widget in any [WidgetSize] (`Widget Kit` → Plants). Tapping a plant waters it
 /// (or undoes today's watering), tapping elsewhere opens the plants page.
 class PlantsWidget extends ConsumerWidget {
-  const PlantsWidget({super.key, required this.size});
+  const PlantsWidget({super.key, required this.size, this.card = true});
 
   final WidgetSize size;
+
+  /// `false`: no card behind the widget (`DashboardWidget.card`).
+  final bool card;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +29,7 @@ class PlantsWidget extends ConsumerWidget {
     void water(ScheduledPlant entry) => ref.read(plantsControllerProvider.notifier).toggleWatered(entry);
 
     return WidgetTile(
+      card: card,
       size: size,
       padding: switch (size) {
         WidgetSize.small => 14,

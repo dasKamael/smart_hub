@@ -2875,8 +2875,18 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _cardMeta = const VerificationMeta('card');
   @override
-  List<GeneratedColumn> get $columns => [id, kind, size, position, selection];
+  late final GeneratedColumn<bool> card = GeneratedColumn<bool>(
+    'card',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("card" IN (0, 1))'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, kind, size, position, selection, card];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2909,6 +2919,9 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
     if (data.containsKey('selection')) {
       context.handle(_selectionMeta, selection.isAcceptableOrUnknown(data['selection']!, _selectionMeta));
     }
+    if (data.containsKey('card')) {
+      context.handle(_cardMeta, card.isAcceptableOrUnknown(data['card']!, _cardMeta));
+    }
     return context;
   }
 
@@ -2923,6 +2936,7 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
       size: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}size'])!,
       position: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}position'])!,
       selection: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}selection']),
+      card: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}card']),
     );
   }
 
@@ -2944,12 +2958,16 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
 
   /// `DashboardWidget.selection` as a JSON list; `null` when chosen automatically.
   final String? selection;
+
+  /// `DashboardWidget.card`; `null` when the kind decides.
+  final bool? card;
   const DashboardWidgetRow({
     required this.id,
     required this.kind,
     required this.size,
     required this.position,
     this.selection,
+    this.card,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2961,6 +2979,9 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     if (!nullToAbsent || selection != null) {
       map['selection'] = Variable<String>(selection);
     }
+    if (!nullToAbsent || card != null) {
+      map['card'] = Variable<bool>(card);
+    }
     return map;
   }
 
@@ -2971,6 +2992,7 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       size: Value(size),
       position: Value(position),
       selection: selection == null && nullToAbsent ? const Value.absent() : Value(selection),
+      card: card == null && nullToAbsent ? const Value.absent() : Value(card),
     );
   }
 
@@ -2982,6 +3004,7 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       size: serializer.fromJson<String>(json['size']),
       position: serializer.fromJson<int>(json['position']),
       selection: serializer.fromJson<String?>(json['selection']),
+      card: serializer.fromJson<bool?>(json['card']),
     );
   }
   @override
@@ -2993,6 +3016,7 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       'size': serializer.toJson<String>(size),
       'position': serializer.toJson<int>(position),
       'selection': serializer.toJson<String?>(selection),
+      'card': serializer.toJson<bool?>(card),
     };
   }
 
@@ -3002,12 +3026,14 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     String? size,
     int? position,
     Value<String?> selection = const Value.absent(),
+    Value<bool?> card = const Value.absent(),
   }) => DashboardWidgetRow(
     id: id ?? this.id,
     kind: kind ?? this.kind,
     size: size ?? this.size,
     position: position ?? this.position,
     selection: selection.present ? selection.value : this.selection,
+    card: card.present ? card.value : this.card,
   );
   DashboardWidgetRow copyWithCompanion(DashboardWidgetsTableCompanion data) {
     return DashboardWidgetRow(
@@ -3016,6 +3042,7 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       size: data.size.present ? data.size.value : this.size,
       position: data.position.present ? data.position.value : this.position,
       selection: data.selection.present ? data.selection.value : this.selection,
+      card: data.card.present ? data.card.value : this.card,
     );
   }
 
@@ -3026,13 +3053,14 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
           ..write('kind: $kind, ')
           ..write('size: $size, ')
           ..write('position: $position, ')
-          ..write('selection: $selection')
+          ..write('selection: $selection, ')
+          ..write('card: $card')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, kind, size, position, selection);
+  int get hashCode => Object.hash(id, kind, size, position, selection, card);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3041,7 +3069,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
           other.kind == this.kind &&
           other.size == this.size &&
           other.position == this.position &&
-          other.selection == this.selection);
+          other.selection == this.selection &&
+          other.card == this.card);
 }
 
 class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow> {
@@ -3050,6 +3079,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
   final Value<String> size;
   final Value<int> position;
   final Value<String?> selection;
+  final Value<bool?> card;
   final Value<int> rowid;
   const DashboardWidgetsTableCompanion({
     this.id = const Value.absent(),
@@ -3057,6 +3087,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     this.size = const Value.absent(),
     this.position = const Value.absent(),
     this.selection = const Value.absent(),
+    this.card = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DashboardWidgetsTableCompanion.insert({
@@ -3065,6 +3096,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     required String size,
     required int position,
     this.selection = const Value.absent(),
+    this.card = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        kind = Value(kind),
@@ -3076,6 +3108,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     Expression<String>? size,
     Expression<int>? position,
     Expression<String>? selection,
+    Expression<bool>? card,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3084,6 +3117,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
       if (size != null) 'size': size,
       if (position != null) 'position': position,
       if (selection != null) 'selection': selection,
+      if (card != null) 'card': card,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3094,6 +3128,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     Value<String>? size,
     Value<int>? position,
     Value<String?>? selection,
+    Value<bool?>? card,
     Value<int>? rowid,
   }) {
     return DashboardWidgetsTableCompanion(
@@ -3102,6 +3137,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
       size: size ?? this.size,
       position: position ?? this.position,
       selection: selection ?? this.selection,
+      card: card ?? this.card,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3124,6 +3160,9 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     if (selection.present) {
       map['selection'] = Variable<String>(selection.value);
     }
+    if (card.present) {
+      map['card'] = Variable<bool>(card.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3138,6 +3177,7 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
           ..write('size: $size, ')
           ..write('position: $position, ')
           ..write('selection: $selection, ')
+          ..write('card: $card, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4675,6 +4715,7 @@ typedef $$DashboardWidgetsTableTableCreateCompanionBuilder = DashboardWidgetsTab
   required String size,
   required int position,
   Value<String?> selection,
+  Value<bool?> card,
   Value<int> rowid,
 });
 typedef $$DashboardWidgetsTableTableUpdateCompanionBuilder = DashboardWidgetsTableCompanion Function({
@@ -4683,6 +4724,7 @@ typedef $$DashboardWidgetsTableTableUpdateCompanionBuilder = DashboardWidgetsTab
   Value<String> size,
   Value<int> position,
   Value<String?> selection,
+  Value<bool?> card,
   Value<int> rowid,
 });
 
@@ -4705,6 +4747,8 @@ class $$DashboardWidgetsTableTableFilterComposer extends Composer<_$AppDatabase,
 
   ColumnFilters<String> get selection =>
       $composableBuilder(column: $table.selection, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get card => $composableBuilder(column: $table.card, builder: (column) => ColumnFilters(column));
 }
 
 class $$DashboardWidgetsTableTableOrderingComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
@@ -4728,6 +4772,9 @@ class $$DashboardWidgetsTableTableOrderingComposer extends Composer<_$AppDatabas
 
   ColumnOrderings<String> get selection =>
       $composableBuilder(column: $table.selection, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get card =>
+      $composableBuilder(column: $table.card, builder: (column) => ColumnOrderings(column));
 }
 
 class $$DashboardWidgetsTableTableAnnotationComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
@@ -4747,6 +4794,8 @@ class $$DashboardWidgetsTableTableAnnotationComposer extends Composer<_$AppDatab
   GeneratedColumn<int> get position => $composableBuilder(column: $table.position, builder: (column) => column);
 
   GeneratedColumn<String> get selection => $composableBuilder(column: $table.selection, builder: (column) => column);
+
+  GeneratedColumn<bool> get card => $composableBuilder(column: $table.card, builder: (column) => column);
 }
 
 class $$DashboardWidgetsTableTableTableManager
@@ -4779,6 +4828,7 @@ class $$DashboardWidgetsTableTableTableManager
                 Value<String> size = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<String?> selection = const Value.absent(),
+                Value<bool?> card = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DashboardWidgetsTableCompanion(
                 id: id,
@@ -4786,6 +4836,7 @@ class $$DashboardWidgetsTableTableTableManager
                 size: size,
                 position: position,
                 selection: selection,
+                card: card,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4795,6 +4846,7 @@ class $$DashboardWidgetsTableTableTableManager
                 required String size,
                 required int position,
                 Value<String?> selection = const Value.absent(),
+                Value<bool?> card = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DashboardWidgetsTableCompanion.insert(
                 id: id,
@@ -4802,6 +4854,7 @@ class $$DashboardWidgetsTableTableTableManager
                 size: size,
                 position: position,
                 selection: selection,
+                card: card,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

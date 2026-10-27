@@ -19,6 +19,9 @@ class DashboardWidgetsTable extends Table {
   /// `DashboardWidget.selection` as a JSON list; `null` when chosen automatically.
   TextColumn get selection => text().nullable()();
 
+  /// `DashboardWidget.card`; `null` when the kind decides.
+  BoolColumn get card => boolean().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

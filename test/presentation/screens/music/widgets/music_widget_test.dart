@@ -132,5 +132,17 @@ void main() {
       // Then
       expect(find.text('Nothing to play on'), findsOneWidget);
     });
+
+    testWidgets('Given a queue, when tapping a track under Up next, then it plays', (tester) async {
+      // Given
+      await load(tester, WidgetSize.large);
+
+      // When
+      await tester.tap(find.text('Slow Rivers · Nadia Hale', findRichText: true));
+      await tester.pump();
+
+      // Then
+      expect(speakers.commands, ['queue Slow Rivers on media_player.office']);
+    });
   });
 }
