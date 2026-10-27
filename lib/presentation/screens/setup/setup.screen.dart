@@ -29,7 +29,7 @@ class SetupScreen extends ConsumerWidget {
     // Starting without Home Assistant keeps the setup reachable, so leave it here.
     ref.listen(connectionConfigServiceProvider, (previous, next) {
       if (next.value is StandaloneConnectionConfig && previous?.value is! StandaloneConnectionConfig) {
-        GoRouter.maybeOf(context)?.go(HubRoute.plan.path);
+        GoRouter.maybeOf(context)?.go(HubRoute.home.path);
       }
     });
 

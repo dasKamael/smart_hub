@@ -91,6 +91,13 @@ Setup → "No Home Assistant? Start with plants and Spotify" (`ConnectionConfig.
 Spotify and the zen mode work; light and speaker parts are hidden or explain what they need (`hasHomeAssistantProvider`,
 `HomeAssistantHint`). Home Assistant can be connected later from the settings.
 
+## Dashboard
+
+Start page (`HubRoute.home`). Widgets use `WidgetTile` / `WidgetSize` (S 1×1 … XL 4×2 on the 170 px grid); built one
+feature at a time (weather first, see `docs/architecture.md` → contexts). Weather: Open-Meteo (open source, no key,
+attribution on the weather page), town names from OpenStreetMap Nominatim (identifying user agent, asked once per
+position), device location via `geolocator` (coarse). The emulator AVD has no GPS – choose a place in the settings.
+
 ## Branding
 
 Logo master: `branding/logo.svg` (floor plan with a glowing light and a plant). Android: adaptive icon as vectors

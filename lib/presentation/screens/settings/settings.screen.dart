@@ -10,6 +10,8 @@ import 'package:smart_hub/domain/connection/model/connection_config.dart';
 import 'package:smart_hub/domain/connection/model/hub_entity.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
+import 'package:smart_hub/domain/weather/model/weather_location.dart';
+import 'package:smart_hub/domain/weather/weather.service.dart';
 import 'package:smart_hub/domain/zen/zen.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
@@ -21,6 +23,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart'
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/settings/settings.controller.dart';
+import 'package:smart_hub/presentation/screens/settings/widgets/weather_location_dialog.dart';
 import 'package:smart_hub/presentation/shared_widgets/connection_indicator.dart';
 import 'package:smart_hub/presentation/shared_widgets/home_assistant_hint.dart';
 
@@ -49,7 +52,7 @@ class SettingsScreen extends ConsumerWidget {
                   HubIconButton(
                     glyph: HubGlyph.back,
                     semanticLabel: 'Back',
-                    onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.plan.path),
+                    onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
                   ),
                   const Expanded(child: Text('Settings', style: HubTextStyles.pageTitle)),
                   const ConnectionIndicator(),
@@ -99,6 +102,7 @@ class SettingsScreen extends ConsumerWidget {
                             const _SpotifyCard(),
                             const _SpeakersCard(),
                             const _ZenCard(),
+                            const _WeatherCard(),
                           ],
                         ),
                       ),
@@ -229,6 +233,45 @@ class _SpeakersCard extends StatelessWidget {
             label: 'Manage',
             variant: HubButtonVariant.secondary,
             onPressed: () => context.push(HubPage.speakers.path),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeatherCard extends ConsumerWidget {
+  const _WeatherCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final location = ref.watch(weatherLocationServiceProvider).value;
+    final here = ref.watch(weatherServiceProvider).value?.place.name;
+    return PageCard(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+      child: Row(
+        spacing: HubSpacing.s16,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: HubSpacing.s4,
+              children: [
+                const Text('Weather', style: HubTextStyles.widgetTitle),
+                Text(switch (location) {
+                  PlaceWeatherLocation(:final place) => describePlace(place),
+                  _ => here == null ? 'Where the hub is' : 'Where the hub is · $here',
+                }, style: HubTextStyles.secondary),
+              ],
+            ),
+          ),
+          HubButton(
+            label: 'Change',
+            variant: HubButtonVariant.secondary,
+            onPressed: () async {
+              final chosen = await showWeatherLocationDialog(context);
+              if (chosen != null) await ref.read(weatherLocationServiceProvider.notifier).set(chosen);
+            },
           ),
         ],
       ),

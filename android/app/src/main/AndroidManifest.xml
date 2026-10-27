@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Home Assistant, Spotify, plant database, weather. Debug builds add it on their own, release builds do not. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Where the hub is, for the weather. Coarse is enough. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:label="Smart Hub"
         android:name="${applicationName}"

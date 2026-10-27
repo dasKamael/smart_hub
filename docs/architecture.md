@@ -56,7 +56,8 @@ smart_hub/
 | `plants` | Plants, watering and fertilizing plan, photos, plant profiles (species care data from Perenual, loaded once per species and kept locally) | drift + local files + Perenual API |
 | `music` | Speaker state, playback, volume, speaker groups, Spotify content and Connect devices, local speaker settings | HA + Spotify Web API + drift |
 | `zen` | Idle time until the zen mode (calm full screen with time and cover) | drift |
-| `dashboard` | Presentation only – composes widgets from the other contexts | – |
+| `weather` | Forecast for where the hub is (device location, town name from Nominatim) or a chosen place; last forecast cached offline | Open-Meteo + drift |
+| `dashboard` | Presentation only – the start page; composes widgets from the other contexts on the 170 px grid | – |
 | `setup` | Presentation only – HA URL / token entry (uses `connection`) | – |
 
 `floorplan` is brand- and device-state-agnostic. It only knows `Placement(deviceId, kind, pos)` with

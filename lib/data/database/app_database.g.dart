@@ -2294,6 +2294,536 @@ class PlantProfilesTableCompanion extends UpdateCompanion<PlantProfileRow> {
   }
 }
 
+class $WeatherSettingsTableTable extends WeatherSettingsTable
+    with TableInfo<$WeatherSettingsTableTable, WeatherSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeatherSettingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeLatitudeMeta = const VerificationMeta('placeLatitude');
+  @override
+  late final GeneratedColumn<double> placeLatitude = GeneratedColumn<double>(
+    'place_latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeLongitudeMeta = const VerificationMeta('placeLongitude');
+  @override
+  late final GeneratedColumn<double> placeLongitude = GeneratedColumn<double>(
+    'place_longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeNameMeta = const VerificationMeta('placeName');
+  @override
+  late final GeneratedColumn<String> placeName = GeneratedColumn<String>(
+    'place_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _placeRegionMeta = const VerificationMeta('placeRegion');
+  @override
+  late final GeneratedColumn<String> placeRegion = GeneratedColumn<String>(
+    'place_region',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedJsonMeta = const VerificationMeta('cachedJson');
+  @override
+  late final GeneratedColumn<String> cachedJson = GeneratedColumn<String>(
+    'cached_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedLatitudeMeta = const VerificationMeta('cachedLatitude');
+  @override
+  late final GeneratedColumn<double> cachedLatitude = GeneratedColumn<double>(
+    'cached_latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedLongitudeMeta = const VerificationMeta('cachedLongitude');
+  @override
+  late final GeneratedColumn<double> cachedLongitude = GeneratedColumn<double>(
+    'cached_longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedPlaceNameMeta = const VerificationMeta('cachedPlaceName');
+  @override
+  late final GeneratedColumn<String> cachedPlaceName = GeneratedColumn<String>(
+    'cached_place_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta('cachedAt');
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    placeLatitude,
+    placeLongitude,
+    placeName,
+    placeRegion,
+    cachedJson,
+    cachedLatitude,
+    cachedLongitude,
+    cachedPlaceName,
+    cachedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weather_settings';
+  @override
+  VerificationContext validateIntegrity(Insertable<WeatherSettingsRow> instance, {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('place_latitude')) {
+      context.handle(
+        _placeLatitudeMeta,
+        placeLatitude.isAcceptableOrUnknown(data['place_latitude']!, _placeLatitudeMeta),
+      );
+    }
+    if (data.containsKey('place_longitude')) {
+      context.handle(
+        _placeLongitudeMeta,
+        placeLongitude.isAcceptableOrUnknown(data['place_longitude']!, _placeLongitudeMeta),
+      );
+    }
+    if (data.containsKey('place_name')) {
+      context.handle(_placeNameMeta, placeName.isAcceptableOrUnknown(data['place_name']!, _placeNameMeta));
+    }
+    if (data.containsKey('place_region')) {
+      context.handle(_placeRegionMeta, placeRegion.isAcceptableOrUnknown(data['place_region']!, _placeRegionMeta));
+    }
+    if (data.containsKey('cached_json')) {
+      context.handle(_cachedJsonMeta, cachedJson.isAcceptableOrUnknown(data['cached_json']!, _cachedJsonMeta));
+    }
+    if (data.containsKey('cached_latitude')) {
+      context.handle(
+        _cachedLatitudeMeta,
+        cachedLatitude.isAcceptableOrUnknown(data['cached_latitude']!, _cachedLatitudeMeta),
+      );
+    }
+    if (data.containsKey('cached_longitude')) {
+      context.handle(
+        _cachedLongitudeMeta,
+        cachedLongitude.isAcceptableOrUnknown(data['cached_longitude']!, _cachedLongitudeMeta),
+      );
+    }
+    if (data.containsKey('cached_place_name')) {
+      context.handle(
+        _cachedPlaceNameMeta,
+        cachedPlaceName.isAcceptableOrUnknown(data['cached_place_name']!, _cachedPlaceNameMeta),
+      );
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(_cachedAtMeta, cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WeatherSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WeatherSettingsRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      placeLatitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}place_latitude']),
+      placeLongitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}place_longitude']),
+      placeName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}place_name']),
+      placeRegion: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}place_region']),
+      cachedJson: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}cached_json']),
+      cachedLatitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}cached_latitude']),
+      cachedLongitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cached_longitude'],
+      ),
+      cachedPlaceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cached_place_name'],
+      ),
+      cachedAt: attachedDatabase.typeMapping.read(DriftSqlType.dateTime, data['${effectivePrefix}cached_at']),
+    );
+  }
+
+  @override
+  $WeatherSettingsTableTable createAlias(String alias) {
+    return $WeatherSettingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class WeatherSettingsRow extends DataClass implements Insertable<WeatherSettingsRow> {
+  final int id;
+
+  /// A chosen place; all `null` = where the hub is.
+  final double? placeLatitude;
+  final double? placeLongitude;
+  final String? placeName;
+  final String? placeRegion;
+
+  /// The last answer of the weather service, where it was for and when.
+  final String? cachedJson;
+  final double? cachedLatitude;
+  final double? cachedLongitude;
+  final String? cachedPlaceName;
+  final DateTime? cachedAt;
+  const WeatherSettingsRow({
+    required this.id,
+    this.placeLatitude,
+    this.placeLongitude,
+    this.placeName,
+    this.placeRegion,
+    this.cachedJson,
+    this.cachedLatitude,
+    this.cachedLongitude,
+    this.cachedPlaceName,
+    this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || placeLatitude != null) {
+      map['place_latitude'] = Variable<double>(placeLatitude);
+    }
+    if (!nullToAbsent || placeLongitude != null) {
+      map['place_longitude'] = Variable<double>(placeLongitude);
+    }
+    if (!nullToAbsent || placeName != null) {
+      map['place_name'] = Variable<String>(placeName);
+    }
+    if (!nullToAbsent || placeRegion != null) {
+      map['place_region'] = Variable<String>(placeRegion);
+    }
+    if (!nullToAbsent || cachedJson != null) {
+      map['cached_json'] = Variable<String>(cachedJson);
+    }
+    if (!nullToAbsent || cachedLatitude != null) {
+      map['cached_latitude'] = Variable<double>(cachedLatitude);
+    }
+    if (!nullToAbsent || cachedLongitude != null) {
+      map['cached_longitude'] = Variable<double>(cachedLongitude);
+    }
+    if (!nullToAbsent || cachedPlaceName != null) {
+      map['cached_place_name'] = Variable<String>(cachedPlaceName);
+    }
+    if (!nullToAbsent || cachedAt != null) {
+      map['cached_at'] = Variable<DateTime>(cachedAt);
+    }
+    return map;
+  }
+
+  WeatherSettingsTableCompanion toCompanion(bool nullToAbsent) {
+    return WeatherSettingsTableCompanion(
+      id: Value(id),
+      placeLatitude: placeLatitude == null && nullToAbsent ? const Value.absent() : Value(placeLatitude),
+      placeLongitude: placeLongitude == null && nullToAbsent ? const Value.absent() : Value(placeLongitude),
+      placeName: placeName == null && nullToAbsent ? const Value.absent() : Value(placeName),
+      placeRegion: placeRegion == null && nullToAbsent ? const Value.absent() : Value(placeRegion),
+      cachedJson: cachedJson == null && nullToAbsent ? const Value.absent() : Value(cachedJson),
+      cachedLatitude: cachedLatitude == null && nullToAbsent ? const Value.absent() : Value(cachedLatitude),
+      cachedLongitude: cachedLongitude == null && nullToAbsent ? const Value.absent() : Value(cachedLongitude),
+      cachedPlaceName: cachedPlaceName == null && nullToAbsent ? const Value.absent() : Value(cachedPlaceName),
+      cachedAt: cachedAt == null && nullToAbsent ? const Value.absent() : Value(cachedAt),
+    );
+  }
+
+  factory WeatherSettingsRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WeatherSettingsRow(
+      id: serializer.fromJson<int>(json['id']),
+      placeLatitude: serializer.fromJson<double?>(json['placeLatitude']),
+      placeLongitude: serializer.fromJson<double?>(json['placeLongitude']),
+      placeName: serializer.fromJson<String?>(json['placeName']),
+      placeRegion: serializer.fromJson<String?>(json['placeRegion']),
+      cachedJson: serializer.fromJson<String?>(json['cachedJson']),
+      cachedLatitude: serializer.fromJson<double?>(json['cachedLatitude']),
+      cachedLongitude: serializer.fromJson<double?>(json['cachedLongitude']),
+      cachedPlaceName: serializer.fromJson<String?>(json['cachedPlaceName']),
+      cachedAt: serializer.fromJson<DateTime?>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'placeLatitude': serializer.toJson<double?>(placeLatitude),
+      'placeLongitude': serializer.toJson<double?>(placeLongitude),
+      'placeName': serializer.toJson<String?>(placeName),
+      'placeRegion': serializer.toJson<String?>(placeRegion),
+      'cachedJson': serializer.toJson<String?>(cachedJson),
+      'cachedLatitude': serializer.toJson<double?>(cachedLatitude),
+      'cachedLongitude': serializer.toJson<double?>(cachedLongitude),
+      'cachedPlaceName': serializer.toJson<String?>(cachedPlaceName),
+      'cachedAt': serializer.toJson<DateTime?>(cachedAt),
+    };
+  }
+
+  WeatherSettingsRow copyWith({
+    int? id,
+    Value<double?> placeLatitude = const Value.absent(),
+    Value<double?> placeLongitude = const Value.absent(),
+    Value<String?> placeName = const Value.absent(),
+    Value<String?> placeRegion = const Value.absent(),
+    Value<String?> cachedJson = const Value.absent(),
+    Value<double?> cachedLatitude = const Value.absent(),
+    Value<double?> cachedLongitude = const Value.absent(),
+    Value<String?> cachedPlaceName = const Value.absent(),
+    Value<DateTime?> cachedAt = const Value.absent(),
+  }) => WeatherSettingsRow(
+    id: id ?? this.id,
+    placeLatitude: placeLatitude.present ? placeLatitude.value : this.placeLatitude,
+    placeLongitude: placeLongitude.present ? placeLongitude.value : this.placeLongitude,
+    placeName: placeName.present ? placeName.value : this.placeName,
+    placeRegion: placeRegion.present ? placeRegion.value : this.placeRegion,
+    cachedJson: cachedJson.present ? cachedJson.value : this.cachedJson,
+    cachedLatitude: cachedLatitude.present ? cachedLatitude.value : this.cachedLatitude,
+    cachedLongitude: cachedLongitude.present ? cachedLongitude.value : this.cachedLongitude,
+    cachedPlaceName: cachedPlaceName.present ? cachedPlaceName.value : this.cachedPlaceName,
+    cachedAt: cachedAt.present ? cachedAt.value : this.cachedAt,
+  );
+  WeatherSettingsRow copyWithCompanion(WeatherSettingsTableCompanion data) {
+    return WeatherSettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      placeLatitude: data.placeLatitude.present ? data.placeLatitude.value : this.placeLatitude,
+      placeLongitude: data.placeLongitude.present ? data.placeLongitude.value : this.placeLongitude,
+      placeName: data.placeName.present ? data.placeName.value : this.placeName,
+      placeRegion: data.placeRegion.present ? data.placeRegion.value : this.placeRegion,
+      cachedJson: data.cachedJson.present ? data.cachedJson.value : this.cachedJson,
+      cachedLatitude: data.cachedLatitude.present ? data.cachedLatitude.value : this.cachedLatitude,
+      cachedLongitude: data.cachedLongitude.present ? data.cachedLongitude.value : this.cachedLongitude,
+      cachedPlaceName: data.cachedPlaceName.present ? data.cachedPlaceName.value : this.cachedPlaceName,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeatherSettingsRow(')
+          ..write('id: $id, ')
+          ..write('placeLatitude: $placeLatitude, ')
+          ..write('placeLongitude: $placeLongitude, ')
+          ..write('placeName: $placeName, ')
+          ..write('placeRegion: $placeRegion, ')
+          ..write('cachedJson: $cachedJson, ')
+          ..write('cachedLatitude: $cachedLatitude, ')
+          ..write('cachedLongitude: $cachedLongitude, ')
+          ..write('cachedPlaceName: $cachedPlaceName, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    placeLatitude,
+    placeLongitude,
+    placeName,
+    placeRegion,
+    cachedJson,
+    cachedLatitude,
+    cachedLongitude,
+    cachedPlaceName,
+    cachedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WeatherSettingsRow &&
+          other.id == this.id &&
+          other.placeLatitude == this.placeLatitude &&
+          other.placeLongitude == this.placeLongitude &&
+          other.placeName == this.placeName &&
+          other.placeRegion == this.placeRegion &&
+          other.cachedJson == this.cachedJson &&
+          other.cachedLatitude == this.cachedLatitude &&
+          other.cachedLongitude == this.cachedLongitude &&
+          other.cachedPlaceName == this.cachedPlaceName &&
+          other.cachedAt == this.cachedAt);
+}
+
+class WeatherSettingsTableCompanion extends UpdateCompanion<WeatherSettingsRow> {
+  final Value<int> id;
+  final Value<double?> placeLatitude;
+  final Value<double?> placeLongitude;
+  final Value<String?> placeName;
+  final Value<String?> placeRegion;
+  final Value<String?> cachedJson;
+  final Value<double?> cachedLatitude;
+  final Value<double?> cachedLongitude;
+  final Value<String?> cachedPlaceName;
+  final Value<DateTime?> cachedAt;
+  const WeatherSettingsTableCompanion({
+    this.id = const Value.absent(),
+    this.placeLatitude = const Value.absent(),
+    this.placeLongitude = const Value.absent(),
+    this.placeName = const Value.absent(),
+    this.placeRegion = const Value.absent(),
+    this.cachedJson = const Value.absent(),
+    this.cachedLatitude = const Value.absent(),
+    this.cachedLongitude = const Value.absent(),
+    this.cachedPlaceName = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+  });
+  WeatherSettingsTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.placeLatitude = const Value.absent(),
+    this.placeLongitude = const Value.absent(),
+    this.placeName = const Value.absent(),
+    this.placeRegion = const Value.absent(),
+    this.cachedJson = const Value.absent(),
+    this.cachedLatitude = const Value.absent(),
+    this.cachedLongitude = const Value.absent(),
+    this.cachedPlaceName = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+  });
+  static Insertable<WeatherSettingsRow> custom({
+    Expression<int>? id,
+    Expression<double>? placeLatitude,
+    Expression<double>? placeLongitude,
+    Expression<String>? placeName,
+    Expression<String>? placeRegion,
+    Expression<String>? cachedJson,
+    Expression<double>? cachedLatitude,
+    Expression<double>? cachedLongitude,
+    Expression<String>? cachedPlaceName,
+    Expression<DateTime>? cachedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (placeLatitude != null) 'place_latitude': placeLatitude,
+      if (placeLongitude != null) 'place_longitude': placeLongitude,
+      if (placeName != null) 'place_name': placeName,
+      if (placeRegion != null) 'place_region': placeRegion,
+      if (cachedJson != null) 'cached_json': cachedJson,
+      if (cachedLatitude != null) 'cached_latitude': cachedLatitude,
+      if (cachedLongitude != null) 'cached_longitude': cachedLongitude,
+      if (cachedPlaceName != null) 'cached_place_name': cachedPlaceName,
+      if (cachedAt != null) 'cached_at': cachedAt,
+    });
+  }
+
+  WeatherSettingsTableCompanion copyWith({
+    Value<int>? id,
+    Value<double?>? placeLatitude,
+    Value<double?>? placeLongitude,
+    Value<String?>? placeName,
+    Value<String?>? placeRegion,
+    Value<String?>? cachedJson,
+    Value<double?>? cachedLatitude,
+    Value<double?>? cachedLongitude,
+    Value<String?>? cachedPlaceName,
+    Value<DateTime?>? cachedAt,
+  }) {
+    return WeatherSettingsTableCompanion(
+      id: id ?? this.id,
+      placeLatitude: placeLatitude ?? this.placeLatitude,
+      placeLongitude: placeLongitude ?? this.placeLongitude,
+      placeName: placeName ?? this.placeName,
+      placeRegion: placeRegion ?? this.placeRegion,
+      cachedJson: cachedJson ?? this.cachedJson,
+      cachedLatitude: cachedLatitude ?? this.cachedLatitude,
+      cachedLongitude: cachedLongitude ?? this.cachedLongitude,
+      cachedPlaceName: cachedPlaceName ?? this.cachedPlaceName,
+      cachedAt: cachedAt ?? this.cachedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (placeLatitude.present) {
+      map['place_latitude'] = Variable<double>(placeLatitude.value);
+    }
+    if (placeLongitude.present) {
+      map['place_longitude'] = Variable<double>(placeLongitude.value);
+    }
+    if (placeName.present) {
+      map['place_name'] = Variable<String>(placeName.value);
+    }
+    if (placeRegion.present) {
+      map['place_region'] = Variable<String>(placeRegion.value);
+    }
+    if (cachedJson.present) {
+      map['cached_json'] = Variable<String>(cachedJson.value);
+    }
+    if (cachedLatitude.present) {
+      map['cached_latitude'] = Variable<double>(cachedLatitude.value);
+    }
+    if (cachedLongitude.present) {
+      map['cached_longitude'] = Variable<double>(cachedLongitude.value);
+    }
+    if (cachedPlaceName.present) {
+      map['cached_place_name'] = Variable<String>(cachedPlaceName.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeatherSettingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('placeLatitude: $placeLatitude, ')
+          ..write('placeLongitude: $placeLongitude, ')
+          ..write('placeName: $placeName, ')
+          ..write('placeRegion: $placeRegion, ')
+          ..write('cachedJson: $cachedJson, ')
+          ..write('cachedLatitude: $cachedLatitude, ')
+          ..write('cachedLongitude: $cachedLongitude, ')
+          ..write('cachedPlaceName: $cachedPlaceName, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2303,6 +2833,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SpeakerSettingsTableTable speakerSettingsTable = $SpeakerSettingsTableTable(this);
   late final $ZenSettingsTableTable zenSettingsTable = $ZenSettingsTableTable(this);
   late final $PlantProfilesTableTable plantProfilesTable = $PlantProfilesTableTable(this);
+  late final $WeatherSettingsTableTable weatherSettingsTable = $WeatherSettingsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
@@ -2313,6 +2844,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     speakerSettingsTable,
     zenSettingsTable,
     plantProfilesTable,
+    weatherSettingsTable,
   ];
   @override
   DriftDatabaseOptions get options => const DriftDatabaseOptions(storeDateTimeAsText: true);
@@ -3427,6 +3959,240 @@ typedef $$PlantProfilesTableTableProcessedTableManager =
       PlantProfileRow,
       PrefetchHooks Function()
     >;
+typedef $$WeatherSettingsTableTableCreateCompanionBuilder = WeatherSettingsTableCompanion Function({
+  Value<int> id,
+  Value<double?> placeLatitude,
+  Value<double?> placeLongitude,
+  Value<String?> placeName,
+  Value<String?> placeRegion,
+  Value<String?> cachedJson,
+  Value<double?> cachedLatitude,
+  Value<double?> cachedLongitude,
+  Value<String?> cachedPlaceName,
+  Value<DateTime?> cachedAt,
+});
+typedef $$WeatherSettingsTableTableUpdateCompanionBuilder = WeatherSettingsTableCompanion Function({
+  Value<int> id,
+  Value<double?> placeLatitude,
+  Value<double?> placeLongitude,
+  Value<String?> placeName,
+  Value<String?> placeRegion,
+  Value<String?> cachedJson,
+  Value<double?> cachedLatitude,
+  Value<double?> cachedLongitude,
+  Value<String?> cachedPlaceName,
+  Value<DateTime?> cachedAt,
+});
+
+class $$WeatherSettingsTableTableFilterComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+  $$WeatherSettingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get placeLatitude =>
+      $composableBuilder(column: $table.placeLatitude, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get placeLongitude =>
+      $composableBuilder(column: $table.placeLongitude, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get placeName =>
+      $composableBuilder(column: $table.placeName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get placeRegion =>
+      $composableBuilder(column: $table.placeRegion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get cachedJson =>
+      $composableBuilder(column: $table.cachedJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get cachedLatitude =>
+      $composableBuilder(column: $table.cachedLatitude, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get cachedLongitude =>
+      $composableBuilder(column: $table.cachedLongitude, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get cachedPlaceName =>
+      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$WeatherSettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+  $$WeatherSettingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get placeLatitude =>
+      $composableBuilder(column: $table.placeLatitude, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get placeLongitude =>
+      $composableBuilder(column: $table.placeLongitude, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get placeName =>
+      $composableBuilder(column: $table.placeName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get placeRegion =>
+      $composableBuilder(column: $table.placeRegion, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get cachedJson =>
+      $composableBuilder(column: $table.cachedJson, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get cachedLatitude =>
+      $composableBuilder(column: $table.cachedLatitude, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get cachedLongitude =>
+      $composableBuilder(column: $table.cachedLongitude, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get cachedPlaceName =>
+      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$WeatherSettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+  $$WeatherSettingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get placeLatitude =>
+      $composableBuilder(column: $table.placeLatitude, builder: (column) => column);
+
+  GeneratedColumn<double> get placeLongitude =>
+      $composableBuilder(column: $table.placeLongitude, builder: (column) => column);
+
+  GeneratedColumn<String> get placeName => $composableBuilder(column: $table.placeName, builder: (column) => column);
+
+  GeneratedColumn<String> get placeRegion =>
+      $composableBuilder(column: $table.placeRegion, builder: (column) => column);
+
+  GeneratedColumn<String> get cachedJson => $composableBuilder(column: $table.cachedJson, builder: (column) => column);
+
+  GeneratedColumn<double> get cachedLatitude =>
+      $composableBuilder(column: $table.cachedLatitude, builder: (column) => column);
+
+  GeneratedColumn<double> get cachedLongitude =>
+      $composableBuilder(column: $table.cachedLongitude, builder: (column) => column);
+
+  GeneratedColumn<String> get cachedPlaceName =>
+      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get cachedAt => $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$WeatherSettingsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WeatherSettingsTableTable,
+          WeatherSettingsRow,
+          $$WeatherSettingsTableTableFilterComposer,
+          $$WeatherSettingsTableTableOrderingComposer,
+          $$WeatherSettingsTableTableAnnotationComposer,
+          $$WeatherSettingsTableTableCreateCompanionBuilder,
+          $$WeatherSettingsTableTableUpdateCompanionBuilder,
+          (WeatherSettingsRow, BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>),
+          WeatherSettingsRow,
+          PrefetchHooks Function()
+        > {
+  $$WeatherSettingsTableTableTableManager(_$AppDatabase db, $WeatherSettingsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () => $$WeatherSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$WeatherSettingsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$WeatherSettingsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<double?> placeLatitude = const Value.absent(),
+                Value<double?> placeLongitude = const Value.absent(),
+                Value<String?> placeName = const Value.absent(),
+                Value<String?> placeRegion = const Value.absent(),
+                Value<String?> cachedJson = const Value.absent(),
+                Value<double?> cachedLatitude = const Value.absent(),
+                Value<double?> cachedLongitude = const Value.absent(),
+                Value<String?> cachedPlaceName = const Value.absent(),
+                Value<DateTime?> cachedAt = const Value.absent(),
+              }) => WeatherSettingsTableCompanion(
+                id: id,
+                placeLatitude: placeLatitude,
+                placeLongitude: placeLongitude,
+                placeName: placeName,
+                placeRegion: placeRegion,
+                cachedJson: cachedJson,
+                cachedLatitude: cachedLatitude,
+                cachedLongitude: cachedLongitude,
+                cachedPlaceName: cachedPlaceName,
+                cachedAt: cachedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<double?> placeLatitude = const Value.absent(),
+                Value<double?> placeLongitude = const Value.absent(),
+                Value<String?> placeName = const Value.absent(),
+                Value<String?> placeRegion = const Value.absent(),
+                Value<String?> cachedJson = const Value.absent(),
+                Value<double?> cachedLatitude = const Value.absent(),
+                Value<double?> cachedLongitude = const Value.absent(),
+                Value<String?> cachedPlaceName = const Value.absent(),
+                Value<DateTime?> cachedAt = const Value.absent(),
+              }) => WeatherSettingsTableCompanion.insert(
+                id: id,
+                placeLatitude: placeLatitude,
+                placeLongitude: placeLongitude,
+                placeName: placeName,
+                placeRegion: placeRegion,
+                cachedJson: cachedJson,
+                cachedLatitude: cachedLatitude,
+                cachedLongitude: cachedLongitude,
+                cachedPlaceName: cachedPlaceName,
+                cachedAt: cachedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WeatherSettingsTableTable, WeatherSettingsRow>(table),
+                  BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WeatherSettingsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WeatherSettingsTableTable,
+      WeatherSettingsRow,
+      $$WeatherSettingsTableTableFilterComposer,
+      $$WeatherSettingsTableTableOrderingComposer,
+      $$WeatherSettingsTableTableAnnotationComposer,
+      $$WeatherSettingsTableTableCreateCompanionBuilder,
+      $$WeatherSettingsTableTableUpdateCompanionBuilder,
+      (WeatherSettingsRow, BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>),
+      WeatherSettingsRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3442,6 +4208,8 @@ class $AppDatabaseManager {
       $$ZenSettingsTableTableTableManager(_db, _db.zenSettingsTable);
   $$PlantProfilesTableTableTableManager get plantProfilesTable =>
       $$PlantProfilesTableTableTableManager(_db, _db.plantProfilesTable);
+  $$WeatherSettingsTableTableTableManager get weatherSettingsTable =>
+      $$WeatherSettingsTableTableTableManager(_db, _db.weatherSettingsTable);
 }
 
 // **************************************************************************

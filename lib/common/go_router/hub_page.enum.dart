@@ -5,7 +5,8 @@ enum HubPage {
   speakers(path: '/settings/speakers'),
 
   /// Profile of one plant: `/plants/<id>`.
-  plantProfile(path: '/plants/:id');
+  plantProfile(path: '/plants/:id'),
+  weather(path: '/weather');
 
   const HubPage({required this.path});
 

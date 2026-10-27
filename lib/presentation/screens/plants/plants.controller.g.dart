@@ -40,7 +40,7 @@ final class PlantsControllerProvider extends $NotifierProvider<PlantsController,
   }
 }
 
-String _$plantsControllerHash() => r'fc79ac510dc847aa9913adef7c4ddb2280ef873f';
+String _$plantsControllerHash() => r'5cdb4ddc2ff77277128d08ccbdb32fb1264bd2d8';
 
 /// Watering plan page: watering, undo and editing plants.
 

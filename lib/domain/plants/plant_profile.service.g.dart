@@ -230,7 +230,7 @@ final class PlantProfileServiceProvider extends $NotifierProvider<PlantProfileSe
   }
 }
 
-String _$plantProfileServiceHash() => r'3ec3117b93180803e88bd45b417e4b2c1123e50d';
+String _$plantProfileServiceHash() => r'c61e31f97c553825ca39490efb3ccf51b514b28c';
 
 /// Links plants with species of the plant database. Profiles are stored with the plant, and a species another plant
 /// already has is copied instead of loaded again.

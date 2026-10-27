@@ -1,5 +1,6 @@
 /// Top level sections of the hub, one tab each.
 enum HubRoute {
+  home(path: '/home', title: 'Home', tabLabel: 'Home'),
   plan(path: '/plan', title: 'Floor plan', tabLabel: 'Plan'),
   lights(path: '/lights', title: 'Lights', tabLabel: 'Lights'),
   plants(path: '/plants', title: 'Plants', tabLabel: 'Plants'),

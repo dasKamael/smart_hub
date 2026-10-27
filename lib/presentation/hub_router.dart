@@ -9,6 +9,7 @@ import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_icon_button.dart';
 import 'package:smart_hub/presentation/design_system/layouts/hub_shell.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
+import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.screen.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.screen.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
@@ -17,6 +18,7 @@ import 'package:smart_hub/presentation/screens/plants/plants.screen.dart';
 import 'package:smart_hub/presentation/screens/settings/settings.screen.dart';
 import 'package:smart_hub/presentation/screens/settings/speakers.screen.dart';
 import 'package:smart_hub/presentation/screens/setup/setup.screen.dart';
+import 'package:smart_hub/presentation/screens/weather/weather.screen.dart';
 import 'package:smart_hub/presentation/screens/zen/widgets/zen_button.dart';
 import 'package:smart_hub/presentation/shared_widgets/connection_indicator.dart';
 
@@ -45,18 +47,19 @@ GoRouter createHubRouter({
   Listenable? refreshListenable,
 }) {
   return GoRouter(
-    initialLocation: HubRoute.plan.path,
+    initialLocation: HubRoute.home.path,
     refreshListenable: refreshListenable,
     redirect: (context, state) {
       final atSetup = state.matchedLocation == HubPage.setup.path;
       if (!isConfigured()) return atSetup ? null : HubPage.setup.path;
       // Without Home Assistant the setup stays reachable, to connect one later.
-      return atSetup && !(isStandalone?.call() ?? false) ? HubRoute.plan.path : null;
+      return atSetup && !(isStandalone?.call() ?? false) ? HubRoute.home.path : null;
     },
     routes: [
       GoRoute(path: HubPage.setup.path, builder: (context, state) => const SetupScreen()),
       GoRoute(path: HubPage.settings.path, builder: (context, state) => const SettingsScreen()),
       GoRoute(path: HubPage.speakers.path, builder: (context, state) => const SpeakersScreen()),
+      GoRoute(path: HubPage.weather.path, builder: (context, state) => const WeatherScreen()),
       GoRoute(
         path: HubPage.plantProfile.path,
         builder: (context, state) => PlantProfileScreen(plantId: state.pathParameters['id'] ?? ''),
@@ -103,6 +106,7 @@ GoRouter createHubRouter({
 
 Widget _screenFor(HubRoute route) {
   return switch (route) {
+    HubRoute.home => const DashboardScreen(),
     HubRoute.plan => const FloorplanScreen(),
     HubRoute.lights => const LightsScreen(),
     HubRoute.plants => const PlantsScreen(),

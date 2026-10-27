@@ -5,9 +5,11 @@ import 'package:smart_hub/domain/connection/model/connection_config.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
+import 'package:smart_hub/domain/weather/model/forecast.dart';
+import 'package:smart_hub/domain/weather/weather.service.dart';
 import 'package:smart_hub/domain/zen/zen.service.dart';
 import 'package:smart_hub/presentation/hub_app.dart';
-import 'package:smart_hub/presentation/screens/floorplan/floorplan.screen.dart';
+import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
 import 'package:smart_hub/presentation/screens/settings/settings.screen.dart';
 import 'package:smart_hub/presentation/screens/setup/setup.screen.dart';
@@ -32,6 +34,8 @@ void main() {
           speakersServiceProvider.overrideWith(FakeSpeakersService.new),
           // No idle timer: these tests are about navigation.
           zenIdleServiceProvider.overrideWith(_ZenOff.new),
+          // No network or location in tests.
+          weatherServiceProvider.overrideWith(_NoWeather.new),
           ...floorplanTestOverrides(),
         ],
       );
@@ -55,7 +59,7 @@ void main() {
 
     testWidgets('Given the setup screen, '
         'when the demo connects, '
-        'then the floor plan is shown', (tester) async {
+        'then the dashboard is shown', (tester) async {
       // Given
       service = FakeConnectionConfigService();
       await pumpApp(tester);
@@ -65,7 +69,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.byType(FloorplanScreen), findsOneWidget);
+      expect(find.byType(DashboardScreen), findsOneWidget);
     });
 
     group('with a configured connection', () {
@@ -73,16 +77,16 @@ void main() {
 
       testWidgets('Given the app starts, '
           'when no location is given, '
-          'then the floor plan is shown with its page title', (tester) async {
+          'then the dashboard is shown with its page title', (tester) async {
         // When
         await pumpApp(tester);
 
         // Then
-        expect(find.byType(FloorplanScreen), findsOneWidget);
-        expect(find.text('Floor plan'), findsWidgets);
+        expect(find.byType(DashboardScreen), findsOneWidget);
+        expect(find.text('Home'), findsWidgets);
       });
 
-      testWidgets('Given the floor plan is shown, '
+      testWidgets('Given the dashboard is shown, '
           'when tapping the Music tab, '
           'then the music page is shown', (tester) async {
         // Given
@@ -96,7 +100,7 @@ void main() {
         expect(find.byType(MusicScreen), findsOneWidget);
       });
 
-      testWidgets('Given the floor plan is shown, '
+      testWidgets('Given the dashboard is shown, '
           'when opening the settings and disconnecting, '
           'then the setup screen is shown', (tester) async {
         // Given
@@ -119,14 +123,14 @@ void main() {
 
       testWidgets('Given the setup screen, '
           'when starting without Home Assistant, '
-          'then the floor plan is shown and lights explain what they need', (tester) async {
+          'then the dashboard is shown and lights explain what they need', (tester) async {
         // Given
         await pumpApp(tester);
 
         // When
         await tester.tap(find.textContaining('No Home Assistant?'));
         await tester.pumpAndSettle();
-        final plan = find.byType(FloorplanScreen).evaluate().length;
+        final plan = find.byType(DashboardScreen).evaluate().length;
         await tester.tap(find.text('Lights').first);
         await tester.pumpAndSettle();
 
@@ -163,4 +167,9 @@ void main() {
 class _ZenOff extends ZenIdleService {
   @override
   Stream<int> build() => Stream.value(0);
+}
+
+class _NoWeather extends WeatherService {
+  @override
+  Future<Forecast> build() async => throw const WeatherLocationUnavailableException();
 }

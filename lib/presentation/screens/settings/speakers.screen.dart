@@ -48,7 +48,7 @@ class SpeakersScreen extends ConsumerWidget {
                     HubIconButton(
                       glyph: HubGlyph.back,
                       semanticLabel: 'Back',
-                      onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.plan.path),
+                      onPressed: () => context.canPop() ? context.pop() : context.go(HubRoute.home.path),
                     ),
                     const Expanded(child: Text('Speakers', style: HubTextStyles.pageTitle)),
                   ],
