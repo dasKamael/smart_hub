@@ -62,19 +62,34 @@ void main() {
     });
 
     testWidgets('Given the kitchen at 12 %, '
-        'when selecting it, '
+        'when long pressing it, '
         'then the room card shows its brightness and Night as active scene', (tester) async {
       // Given
       await pumpScreen(tester);
 
       // When
-      await tester.tap(find.text('Kitchen'));
+      await tester.longPress(find.text('Kitchen'));
       await tester.pumpAndSettle();
 
       // Then
       expect(find.text('On · 12% brightness'), findsOneWidget);
       expect(tester.widget<VerticalSlider>(find.byType(VerticalSlider)).value, 12);
       expect(tester.getSemantics(find.bySemanticsLabel('Night')), isSemantics(isSelected: true));
+    });
+
+    testWidgets('Given the kitchen is on, '
+        'when tapping anywhere on its tile, '
+        'then the kitchen is switched off and selected', (tester) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.tap(find.text('1 of 1 on · 12%'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(lights.commands, ['off light.pendant']);
+      expect(find.text('Kitchen'), findsNWidgets(2), reason: 'tile and selected room card');
     });
 
     testWidgets('Given the office, '
@@ -85,7 +100,7 @@ void main() {
 
       // When
       await tester.tap(find.text('Relax'));
-      await tester.tap(find.bySemanticsLabel('Turn room off').first);
+      await tester.tap(find.text('1 of 2 on · 80%'));
       await tester.tap(find.text('All off'));
       await tester.pump();
 

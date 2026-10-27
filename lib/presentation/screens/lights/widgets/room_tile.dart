@@ -7,7 +7,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/screens/lights/light_room.dart';
 import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart';
 
-/// Room on the lights page: tap the tile to select it, tap the icon to switch the room.
+/// Room on the lights page: a tap anywhere on the tile switches the room and selects it, a long press only selects it.
 class RoomTile extends StatelessWidget {
   const RoomTile({super.key, required this.room, required this.selected, required this.onSelect, this.onToggle});
 
@@ -27,8 +27,14 @@ class RoomTile extends StatelessWidget {
       button: true,
       selected: selected,
       label: room.name,
+      hint: on ? 'Turn room off' : 'Turn room on',
       child: GestureDetector(
-        onTap: onSelect,
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          onSelect();
+          onToggle?.call();
+        },
+        onLongPress: onSelect,
         child: AnimatedContainer(
           duration: HubMotion.fadeDuration,
           curve: HubMotion.fade,
@@ -55,7 +61,7 @@ class RoomTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _RoomPowerButton(on: on, color: color, colors: colors, onTap: onToggle),
+              _RoomPowerButton(on: on, color: color, colors: colors),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -87,12 +93,11 @@ class RoomTile extends StatelessWidget {
 }
 
 class _RoomPowerButton extends StatelessWidget {
-  const _RoomPowerButton({required this.on, required this.color, required this.colors, this.onTap});
+  const _RoomPowerButton({required this.on, required this.color, required this.colors});
 
   final bool on;
   final Color color;
   final List<Color> colors;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -105,8 +110,6 @@ class _RoomPowerButton extends StatelessWidget {
         foreground: on ? HubColorPalette.surface : HubColorPalette.text2,
         glowColor: on ? color : null,
         colors: on ? colors : null,
-        semanticLabel: on ? 'Turn room off' : 'Turn room on',
-        onTap: onTap,
       ),
     );
   }

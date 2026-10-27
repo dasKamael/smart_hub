@@ -101,7 +101,7 @@ void main() {
       expect(lights.commands, ['off light.desk,light.ceiling,light.pendant']);
     });
 
-    testWidgets('Given the extra large widget, when picking the kitchen and a scene, then the scene is applied there', (
+    testWidgets('Given the extra large widget, when tapping the kitchen tile, then the kitchen is switched on', (
       tester,
     ) async {
       // Given
@@ -109,6 +109,20 @@ void main() {
 
       // When
       await tester.tap(find.text('Kitchen'));
+      await tester.pump();
+
+      // Then
+      expect(lights.commands, ['on light.pendant']);
+    });
+
+    testWidgets('Given the extra large widget, when picking the kitchen and a scene, then the scene is applied there', (
+      tester,
+    ) async {
+      // Given
+      await load(tester, WidgetSize.extraLarge);
+
+      // When
+      await tester.longPress(find.text('Kitchen'));
       await tester.pump();
       await tester.tap(find.text('Night'));
       await tester.pump();

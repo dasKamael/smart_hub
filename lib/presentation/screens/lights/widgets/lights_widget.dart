@@ -431,7 +431,7 @@ class _ExtraLarge extends StatelessWidget {
   }
 }
 
-/// A room in the extra large widget: tap the tile to pick it, tap the bulb to switch it.
+/// A room in the extra large widget: a tap switches the room and picks it, a long press only picks it.
 class _RoomTile extends StatelessWidget {
   const _RoomTile(
     this.room, {
@@ -456,9 +456,14 @@ class _RoomTile extends StatelessWidget {
       button: true,
       selected: selected,
       label: room.name,
+      hint: room.isOn ? 'Turn ${room.name} off' : 'Turn ${room.name} on',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: onSelect,
+        onTap: () {
+          onSelect();
+          onToggle?.call();
+        },
+        onLongPress: onSelect,
         child: AnimatedContainer(
           duration: HubMotion.fadeDuration,
           curve: HubMotion.fade,
@@ -478,13 +483,9 @@ class _RoomTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _Bulb(
-                on: room.isOn,
-                color: color,
-                colors: _colorsOf(room),
-                size: compact ? 32 : 42,
-                label: room.isOn ? 'Turn ${room.name} off' : 'Turn ${room.name} on',
-                onTap: onToggle,
+              // The whole tile switches the room.
+              IgnorePointer(
+                child: _Bulb(on: room.isOn, color: color, colors: _colorsOf(room), size: compact ? 32 : 42),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
