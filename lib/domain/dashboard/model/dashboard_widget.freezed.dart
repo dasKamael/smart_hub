@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DashboardWidget {
 
- String get id; DashboardWidgetKind get kind; DashboardWidgetSize get size;
+ String get id; DashboardWidgetKind get kind; DashboardWidgetSize get size;/// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
+ List<String> get selection;
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +28,20 @@ $DashboardWidgetCopyWith<DashboardWidget> get copyWith => _$DashboardWidgetCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as DashboardWidget;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardWidget&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.size, _this.size) || other.size == _this.size));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardWidget&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.size, _this.size) || other.size == _this.size)&&const DeepCollectionEquality().equals(other.selection, _this.selection));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DashboardWidget;
-  return Object.hash(runtimeType,_this.id,_this.kind,_this.size);
+  return Object.hash(runtimeType,_this.id,_this.kind,_this.size,const DeepCollectionEquality().hash(_this.selection));
 }
 
 @override
 String toString() {
   final _this = this as DashboardWidget;
-  return 'DashboardWidget(id: ${_this.id}, kind: ${_this.kind}, size: ${_this.size})';
+  return 'DashboardWidget(id: ${_this.id}, kind: ${_this.kind}, size: ${_this.size}, selection: ${_this.selection})';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $DashboardWidgetCopyWith<$Res>  {
   factory $DashboardWidgetCopyWith(DashboardWidget value, $Res Function(DashboardWidget) _then) = _$DashboardWidgetCopyWithImpl;
 @useResult
 $Res call({
- String id, DashboardWidgetKind kind, DashboardWidgetSize size
+ String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection
 });
 
 
@@ -68,12 +69,13 @@ class _$DashboardWidgetCopyWithImpl<$Res>
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kind = null,Object? size = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,}) {
   return _then(DashboardWidget(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetKind,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as DashboardWidgetSize,
+as DashboardWidgetSize,selection: null == selection ? _self.selection : selection // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -158,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DashboardWidget() when $default != null:
-return $default(_that.id,_that.kind,_that.size);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection);case _:
   return orElse();
 
 }
@@ -179,10 +181,10 @@ return $default(_that.id,_that.kind,_that.size);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection)  $default,) {final _that = this;
 switch (_that) {
 case _DashboardWidget():
-return $default(_that.id,_that.kind,_that.size);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +201,10 @@ return $default(_that.id,_that.kind,_that.size);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection)?  $default,) {final _that = this;
 switch (_that) {
 case _DashboardWidget() when $default != null:
-return $default(_that.id,_that.kind,_that.size);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection);case _:
   return null;
 
 }
@@ -214,12 +216,21 @@ return $default(_that.id,_that.kind,_that.size);case _:
 
 
 class _DashboardWidget implements DashboardWidget {
-  const _DashboardWidget({required this.id, required this.kind, required this.size});
+  const _DashboardWidget({required this.id, required this.kind, required this.size,  List<String> selection = const <String>[]}): _selection = selection;
   
 
 @override final  String id;
 @override final  DashboardWidgetKind kind;
 @override final  DashboardWidgetSize size;
+/// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
+ final  List<String> _selection;
+/// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
+@override@JsonKey() List<String> get selection {
+  if (_selection is EqualUnmodifiableListView) return _selection;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_selection);
+}
+
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
@@ -231,18 +242,18 @@ _$DashboardWidgetCopyWith<_DashboardWidget> get copyWith => __$DashboardWidgetCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardWidget&&(identical(other.id, id) || other.id == id)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.size, size) || other.size == size));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardWidget&&(identical(other.id, id) || other.id == id)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.size, size) || other.size == size)&&const DeepCollectionEquality().equals(other.selection, _selection));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,kind,size);
+    return Object.hash(runtimeType,id,kind,size,const DeepCollectionEquality().hash(_selection));
 }
 
 @override
 String toString() {
-    return 'DashboardWidget(id: $id, kind: $kind, size: $size)';
+    return 'DashboardWidget(id: $id, kind: $kind, size: $size, selection: $selection)';
 }
 
 
@@ -253,7 +264,7 @@ abstract mixin class _$DashboardWidgetCopyWith<$Res> implements $DashboardWidget
   factory _$DashboardWidgetCopyWith(_DashboardWidget value, $Res Function(_DashboardWidget) _then) = __$DashboardWidgetCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DashboardWidgetKind kind, DashboardWidgetSize size
+ String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection
 });
 
 
@@ -270,12 +281,13 @@ class __$DashboardWidgetCopyWithImpl<$Res>
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kind = null,Object? size = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,}) {
   return _then(_DashboardWidget(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetKind,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as DashboardWidgetSize,
+as DashboardWidgetSize,selection: null == selection ? _self._selection : selection // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 

@@ -16,6 +16,9 @@ class DashboardWidgetsTable extends Table {
 
   IntColumn get position => integer()();
 
+  /// `DashboardWidget.selection` as a JSON list; `null` when chosen automatically.
+  TextColumn get selection => text().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

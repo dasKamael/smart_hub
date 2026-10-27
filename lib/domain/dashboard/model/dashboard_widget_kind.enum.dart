@@ -4,7 +4,8 @@ import 'package:smart_hub/domain/dashboard/model/dashboard_widget_size.enum.dart
 enum DashboardWidgetKind {
   weather(DashboardWidgetSize.values),
   home([DashboardWidgetSize.medium]),
-  plants(DashboardWidgetSize.values);
+  plants(DashboardWidgetSize.values),
+  lights(DashboardWidgetSize.values);
 
   const DashboardWidgetKind(this.sizes);
 

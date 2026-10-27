@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/data/database/app_database.dart';
@@ -22,7 +24,7 @@ class DashboardLayoutRepository {
     return [
       for (final row in rows)
         if ((_kind(row.kind), _size(row.size)) case (final kind?, final size?))
-          DashboardWidget(id: row.id, kind: kind, size: size),
+          DashboardWidget(id: row.id, kind: kind, size: size, selection: _selection(row.selection)),
     ];
   }
 
@@ -38,6 +40,7 @@ class DashboardLayoutRepository {
               kind: widget.kind.name,
               size: widget.size.name,
               position: position,
+              selection: Value(widget.selection.isEmpty ? null : jsonEncode(widget.selection)),
             ),
         ]);
       });
@@ -55,6 +58,14 @@ class DashboardLayoutRepository {
     return database
         .into(database.dashboardStateTable)
         .insertOnConflictUpdate(DashboardStateTableCompanion.insert(id: const Value(0), arranged: const Value(true)));
+  }
+
+  static List<String> _selection(String? json) {
+    if (json == null) return const [];
+    return switch (jsonDecode(json)) {
+      final List<Object?> ids => ids.whereType<String>().toList(),
+      _ => const [],
+    };
   }
 
   static DashboardWidgetKind? _kind(String name) =>

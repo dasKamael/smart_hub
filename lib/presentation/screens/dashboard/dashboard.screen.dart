@@ -15,6 +15,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.controller.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.state.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard_catalog.dart';
+import 'package:smart_hub/presentation/screens/dashboard/widgets/edit_widget_dialog.dart';
 import 'package:smart_hub/presentation/screens/dashboard/widgets/widget_gallery_dialog.dart';
 
 /// The start page: the widgets of all parts of the hub on one page of the 170 px grid. Long press to arrange them
@@ -253,7 +254,7 @@ class _Tile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(dashboardControllerProvider.notifier);
-    final tile = DashboardCatalog.build(widget.kind, widget.size);
+    final tile = DashboardCatalog.build(widget.kind, widget.size, selection: widget.selection);
     if (!editing) return GestureDetector(onLongPress: controller.startEditing, child: tile);
 
     // Each widget swings a little out of step with the others.
@@ -269,6 +270,10 @@ class _Tile extends ConsumerWidget {
           ),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
+            // Like Apple's "Edit Widget": a tap while arranging opens the widget's options, if it has any.
+            onTap: DashboardCatalog.selectionName(widget.kind) == null
+                ? null
+                : () => unawaited(showEditWidget(context, widget)),
             onPanStart: (_) => controller.startDrag(widget.id),
             onPanUpdate: (details) => controller.dragBy(details.delta),
             onPanEnd: (_) => controller.endDrag(),

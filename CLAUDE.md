@@ -94,9 +94,10 @@ Spotify and the zen mode work; light and speaker parts are hidden or explain wha
 ## Dashboard
 
 Start page (`HubRoute.home`). Widgets use `WidgetTile` / `WidgetSize` (S 1×1 … XL 4×2 on the 170 px grid); built one
-feature at a time (weather, home, plants so far; see `docs/architecture.md` → contexts). A widget of an existing
+feature at a time (weather, home, plants, lights so far; see `docs/architecture.md` → contexts). A widget of an existing
 feature lives in that feature's `widgets/` folder and uses its services (e.g. `plants/widgets/plants_widget.dart`). Arranged like the iPad home screen: long press
-to jiggle, drag to move (the others make room), corner handle to resize, "–" to remove, gallery to add. One page of
+to jiggle, drag to move (the others make room), corner handle to resize, "–" to remove, gallery to add, tap a
+widget to edit what it shows (`DashboardWidget.selection`, e.g. the rooms of a lights widget; empty = automatic). One page of
 6 × 3 units; widgets flow from the top left in their order (`dashboard_layout.util.dart`), stored in drift. A new widget
 kind needs an entry in `DashboardWidgetKind` (sizes) and `DashboardCatalog` (name, glyph, builder). Weather: Open-Meteo (open source, no key,
 attribution on the weather page), town names from OpenStreetMap Nominatim (identifying user agent, asked once per

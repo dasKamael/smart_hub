@@ -59,14 +59,18 @@ class FakePlacementService extends PlacementService {
 
 /// The apartment plan, [FakePlacementService] and [FakePlantsService] – for widget tests, where a database would
 /// leave timers.
-List<Override> floorplanWidgetTestOverrides(FakePlacementService placements, {FakePlantsService? plants}) {
+List<Override> floorplanWidgetTestOverrides(
+  FakePlacementService placements, {
+  FakePlantsService? plants,
+  bool hasHomeAssistant = true,
+}) {
   return [
     floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
     placementServiceProvider.overrideWith(() => placements),
     plantsServiceProvider.overrideWith(() => plants ?? FakePlantsService()),
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),
     // Lights and speakers on the plan come from Home Assistant.
-    hasHomeAssistantProvider.overrideWithValue(true),
+    hasHomeAssistantProvider.overrideWithValue(hasHomeAssistant),
   ];
 }
 

@@ -11,5 +11,8 @@ abstract class DashboardWidget with _$DashboardWidget {
     required String id,
     required DashboardWidgetKind kind,
     required DashboardWidgetSize size,
+
+    /// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
+    @Default(<String>[]) List<String> selection,
   }) = _DashboardWidget;
 }

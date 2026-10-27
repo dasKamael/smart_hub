@@ -48,6 +48,13 @@ class DashboardLayoutService extends _$DashboardLayoutService {
     return _saveIfFits([for (final widget in _widgets) widget.id == id ? widget.copyWith(size: size) : widget]);
   }
 
+  /// Sets what [id] shows (see `DashboardWidget.selection`); an empty list lets the widget choose.
+  Future<void> select(String id, List<String> selection) {
+    return _saveIfFits([
+      for (final widget in _widgets) widget.id == id ? widget.copyWith(selection: selection) : widget,
+    ]);
+  }
+
   /// Puts the widgets in the order of [ids]; unknown ids are ignored, missing widgets keep their place at the end.
   Future<bool> reorder(List<String> ids) {
     final byId = {for (final widget in _widgets) widget.id: widget};

@@ -89,5 +89,21 @@ void main() {
         expect(layoutOf(restarted), ['weather-2 medium', 'weather-1 extraLarge', 'home-1 medium']);
       },
     );
+
+    test('Given a lights widget, when choosing two rooms, then they are kept in that order after a restart', () async {
+      // Given
+      await service().remove('weather-2');
+      await service().add(DashboardWidgetKind.lights, DashboardWidgetSize.medium);
+      final id = container.read(dashboardLayoutServiceProvider).value!.last.id;
+
+      // When
+      await service().select(id, ['kitchen', 'office']);
+      final restarted = createContainer();
+      final widgets = await restarted.read(dashboardLayoutServiceProvider.future);
+
+      // Then
+      expect(widgets.last.selection, ['kitchen', 'office']);
+      expect(widgets.first.selection, isEmpty);
+    });
   });
 }

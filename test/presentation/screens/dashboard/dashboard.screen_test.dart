@@ -5,6 +5,8 @@ import 'package:smart_hub/data/dashboard/dashboard_layout.repository.dart';
 import 'package:smart_hub/data/database/app_database.dart';
 import 'package:smart_hub/domain/dashboard/dashboard_layout.service.dart';
 import 'package:smart_hub/domain/dashboard/model/dashboard_widget.dart';
+import 'package:smart_hub/domain/dashboard/model/dashboard_widget_kind.enum.dart';
+import 'package:smart_hub/domain/dashboard/model/dashboard_widget_size.enum.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/music/model/playback.enum.dart';
@@ -14,6 +16,7 @@ import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
 import 'package:smart_hub/domain/weather/weather.service.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
+import 'package:smart_hub/presentation/screens/lights/widgets/lights_widget.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_widget.dart';
 
 import '../../../mocks/devices.mock.dart';
@@ -164,6 +167,30 @@ void main() {
       // Then
       expect(layout().last, endsWith('small'));
       expect(layout(), hasLength(4));
+    });
+
+    testWidgets('Given a lights widget, when tapping it while editing and picking a room, then the widget shows it', (
+      tester,
+    ) async {
+      // Given
+      await pumpScreen(tester);
+      await container
+          .read(dashboardLayoutServiceProvider.notifier)
+          .add(DashboardWidgetKind.lights, DashboardWidgetSize.medium);
+      await tester.pump();
+      await startEditing(tester);
+
+      // When
+      await tester.tap(find.byType(LightsWidget));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.tap(find.text('3 lights'));
+      await tester.pump();
+      await tester.tap(find.text('Done').last);
+      await tester.pump(const Duration(milliseconds: 500));
+      await stopEditing(tester);
+
+      // Then
+      expect(container.read(dashboardLayoutServiceProvider).value!.last.selection, ['not-placed']);
     });
   });
 }
