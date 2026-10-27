@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/domain/music/model/connect_device.dart';
@@ -48,7 +49,7 @@ void main() {
 
     test('Given the office plays and the phone too, '
         'when the office is paused, '
-        'then the office stays shown instead of jumping to the phone', () async {
+        'then the phone is shown – music plays in one place only', () async {
       // Given
       final container = await createContainer(
         speakers: [speaker('media_player.office', 'Office', Playback.playing)],
@@ -62,7 +63,7 @@ void main() {
       ]);
 
       // Then
-      expect(shown(container), 'Office');
+      expect(shown(container), 'Pixel 9');
     });
 
     test('Given nothing plays, when the phone starts, then the phone is shown', () async {
@@ -94,7 +95,30 @@ void main() {
       expect(shown(container), 'Sleep');
     });
 
-    test('Given the phone is selected, when the office starts playing, then the phone stays shown', () async {
+    test('Given the phone was selected a while ago and the office plays, '
+        'when the office plays on, then the office is shown – music plays in one place only', () async {
+      // Given
+      final start = DateTime(2026, 10, 27, 20);
+      final container = await withClock(Clock.fixed(start), () async {
+        final container = await createContainer(speakers: [speaker('media_player.office', 'Office', Playback.paused)]);
+        container.read(musicControllerProvider.notifier).selectTarget('spotify-device:d-phone');
+        shown(container);
+        return container;
+      });
+
+      // When
+      final later = withClock(Clock.fixed(start.add(const Duration(seconds: 10))), () {
+        container.read(speakersServiceProvider.notifier).state = AsyncData([
+          speaker('media_player.office', 'Office', Playback.playing),
+        ]);
+        return shown(container);
+      });
+
+      // Then
+      expect(later, 'Office');
+    });
+
+    test('Given the phone was just selected, when the office still plays, then the phone stays shown', () async {
       // Given
       final container = await createContainer(speakers: [speaker('media_player.office', 'Office', Playback.paused)]);
       container.read(musicControllerProvider.notifier).selectTarget('spotify-device:d-phone');
@@ -104,7 +128,7 @@ void main() {
         speaker('media_player.office', 'Office', Playback.playing),
       ]);
 
-      // Then
+      // Then: music is on its way to the phone.
       expect(shown(container), 'Pixel 9');
     });
 

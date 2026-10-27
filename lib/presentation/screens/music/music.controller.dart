@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -260,14 +261,19 @@ List<PlaybackTarget> playbackTargets(Ref ref, {required bool visible}) {
   ];
 }
 
-/// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-/// otherwise the default speaker.
+/// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+/// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+/// one, otherwise the one shown before, otherwise the default speaker.
 ///
-/// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-/// selected, so pausing does not swap the card.
+/// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+/// reports playing. Pausing never swaps the card.
 @riverpod
 class CurrentTarget extends _$CurrentTarget {
+  static const selectionHold = Duration(seconds: 6);
+
   String? _keptId;
+  String? _lastSelected;
+  var _selectedAt = DateTime(0);
 
   @override
   PlaybackTarget? build({required bool visible}) {
@@ -284,13 +290,31 @@ class CurrentTarget extends _$CurrentTarget {
         targets.where((target) => target.id == id).firstOrNull ??
         targets.where((target) => target is SpeakerGroupTarget && target.group.contains(id ?? '')).firstOrNull;
 
-    final target =
-        byId(selected) ??
-        byId(_keptId) ??
-        targets.where((target) => target.nowPlaying.isPlaying).firstOrNull ??
-        targets.where(isDefault).firstOrNull ??
-        targets.firstOrNull;
+    final now = clock.now();
+    if (selected != _lastSelected) {
+      _lastSelected = selected;
+      _selectedAt = now;
+    }
+    final chosen = byId(_keptId) ?? byId(selected);
+    final justSelected = selected != null && now.difference(_selectedAt) < selectionHold;
+    final playing = targets.where((target) => target.nowPlaying.isPlaying).firstOrNull;
+
+    final target = switch ((justSelected, chosen, playing)) {
+      (true, _, _) => byId(selected) ?? chosen ?? playing,
+      // Music plays elsewhere: follow it.
+      (false, final chosen?, final playing?) when !chosen.nowPlaying.isPlaying => playing,
+      (false, final chosen?, _) => chosen,
+      _ => playing ?? targets.where(isDefault).firstOrNull ?? targets.firstOrNull,
+    };
     if (target != null && (target.id == selected || target.nowPlaying.isPlaying)) _keptId = target.id;
+    // Once the music moved there, the hold is done; otherwise ask again when it ends, so a target that plays
+    // meanwhile takes over.
+    if (justSelected && target != null && target.nowPlaying.isPlaying && target.id == byId(selected)?.id) {
+      _selectedAt = DateTime(0);
+    } else if (justSelected) {
+      final timer = Timer(selectionHold - now.difference(_selectedAt), ref.invalidateSelf);
+      ref.onDispose(timer.cancel);
+    }
     return target;
   }
 }

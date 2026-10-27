@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
@@ -270,7 +271,7 @@ class _JumpBackIn extends ConsumerWidget {
                 },
               ),
               AsyncLoading() => const SizedBox.shrink(),
-              _ => const Center(child: Text('Nothing here yet', style: HubTextStyles.secondary)),
+              _ => const EmptyMark(glyph: HubGlyph.library, label: 'Nothing here yet'),
             },
           ),
         ],
@@ -373,7 +374,7 @@ class _UpNext extends ConsumerWidget {
                     : null,
               ),
               (_, true) => const SizedBox.shrink(),
-              _ => const Center(child: Text('Nothing queued here', style: HubTextStyles.secondary)),
+              _ => const EmptyMark(glyph: HubGlyph.note, label: 'Nothing queued here'),
             },
           ),
         ],

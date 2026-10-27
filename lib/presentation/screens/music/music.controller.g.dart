@@ -268,26 +268,29 @@ final class PlaybackTargetsFamily extends $Family with $FunctionalFamilyOverride
   String toString() => r'playbackTargetsProvider';
 }
 
-/// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-/// otherwise the default speaker.
+/// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+/// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+/// one, otherwise the one shown before, otherwise the default speaker.
 ///
-/// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-/// selected, so pausing does not swap the card.
+/// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+/// reports playing. Pausing never swaps the card.
 
 @ProviderFor(CurrentTarget)
 final currentTargetProvider = CurrentTargetFamily._();
 
-/// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-/// otherwise the default speaker.
+/// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+/// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+/// one, otherwise the one shown before, otherwise the default speaker.
 ///
-/// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-/// selected, so pausing does not swap the card.
+/// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+/// reports playing. Pausing never swaps the card.
 final class CurrentTargetProvider extends $NotifierProvider<CurrentTarget, PlaybackTarget?> {
-  /// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-  /// otherwise the default speaker.
+  /// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+  /// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+  /// one, otherwise the one shown before, otherwise the default speaker.
   ///
-  /// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-  /// selected, so pausing does not swap the card.
+  /// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+  /// reports playing. Pausing never swaps the card.
   CurrentTargetProvider._({required CurrentTargetFamily super.from, required bool super.argument})
     : super(
         retry: null,
@@ -327,13 +330,14 @@ final class CurrentTargetProvider extends $NotifierProvider<CurrentTarget, Playb
   }
 }
 
-String _$currentTargetHash() => r'b1ebf82644f80beec2e032e81751ccd7c5dddc21';
+String _$currentTargetHash() => r'5e7400ce1ce84f7942d2c7521ac1e25fe25347ed';
 
-/// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-/// otherwise the default speaker.
+/// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+/// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+/// one, otherwise the one shown before, otherwise the default speaker.
 ///
-/// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-/// selected, so pausing does not swap the card.
+/// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+/// reports playing. Pausing never swaps the card.
 
 final class CurrentTargetFamily extends $Family
     with $ClassFamilyOverride<CurrentTarget, PlaybackTarget?, PlaybackTarget?, PlaybackTarget?, bool> {
@@ -346,11 +350,12 @@ final class CurrentTargetFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-  /// otherwise the default speaker.
+  /// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+  /// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+  /// one, otherwise the one shown before, otherwise the default speaker.
   ///
-  /// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-  /// selected, so pausing does not swap the card.
+  /// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+  /// reports playing. Pausing never swaps the card.
 
   CurrentTargetProvider call({required bool visible}) => CurrentTargetProvider._(argument: visible, from: this);
 
@@ -358,11 +363,12 @@ final class CurrentTargetFamily extends $Family
   String toString() => r'currentTargetProvider';
 }
 
-/// The target shown in "Now playing": the selected one, otherwise the one shown before, otherwise what plays,
-/// otherwise the default speaker.
+/// The target shown in "Now playing". Music plays in one place only, so a target that plays wins: when music
+/// starts somewhere else (e.g. from the laptop), the card follows it. Without anything playing it is the selected
+/// one, otherwise the one shown before, otherwise the default speaker.
 ///
-/// Once a playing target is shown it stays shown – also when it is paused – until it disappears or another one is
-/// selected, so pausing does not swap the card.
+/// Right after a target is selected it stays for [selectionHold], while music moves there and the old place still
+/// reports playing. Pausing never swaps the card.
 
 abstract class _$CurrentTarget extends $Notifier<PlaybackTarget?> {
   late final _$args = ref.$arg as bool;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
@@ -59,7 +60,7 @@ class LightsWidget extends ConsumerWidget {
           text: 'No lights yet',
           detail: size == WidgetSize.small ? null : 'Connect Home Assistant or a light bridge in the settings.',
         ),
-        (_, []) => const _Message(glyph: HubGlyph.bulb, text: 'No lights yet'),
+        (_, []) => const EmptyMark(glyph: HubGlyph.bulb, label: 'No lights yet', size: 48),
         _ => switch (size) {
           WidgetSize.small => _Small(rooms, onToggle: enabled ? () => controller.toggleAll(rooms) : null),
           WidgetSize.medium => _Medium(rooms, onToggle: enabled ? controller.toggleRoom : null),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/light_color_dialog.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
@@ -44,7 +45,7 @@ class LightsScreen extends ConsumerWidget {
     }
     if (rooms.isEmpty) {
       return const PageCard(
-        child: Center(child: Text('No lights yet', style: HubTextStyles.secondary)),
+        child: EmptyMark(glyph: HubGlyph.bulb, label: 'No lights yet'),
       );
     }
 

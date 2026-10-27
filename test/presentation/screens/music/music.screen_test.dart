@@ -15,6 +15,7 @@ import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/connect_device_tile.dart';
+import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/speaker_tile.dart';
 
@@ -142,6 +143,8 @@ void main() {
       expect(tester.widget<SpeakerTile>(tile('Sleep')).active, isTrue);
       expect(tester.widget<SpeakerTile>(tile('Office')).active, isFalse);
       expect(speakers.commands, ['move media_player.office to media_player.sleep']);
+      // Lets the selection hold of the shown target run out.
+      await tester.pump(CurrentTarget.selectionHold);
     });
 
     testWidgets('Given the office group, when rendering, then both of its tiles are active as one', (tester) async {
@@ -241,7 +244,7 @@ void main() {
     testWidgets('Given a player without queue, when rendering, then Up next says so', (tester) async {
       await pumpScreen(tester, queue: null);
 
-      expect(find.text('Nothing queued here'), findsOneWidget);
+      expect(find.bySemanticsLabel('Nothing queued here'), findsOneWidget);
     });
 
     group('with Spotify devices', () {
@@ -299,6 +302,8 @@ void main() {
         // Then
         expect(spotify.commands, ['transfer d-phone']);
         expect(tester.widget<ConnectDeviceTile>(deviceTile('Pixel 9')).active, isTrue);
+        // Lets the selection hold of the shown target run out.
+        await tester.pump(CurrentTarget.selectionHold);
       });
     });
 

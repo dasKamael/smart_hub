@@ -40,7 +40,7 @@ final class LightsControllerProvider extends $NotifierProvider<LightsController,
   }
 }
 
-String _$lightsControllerHash() => r'3cb6a97fe2617bec3a9a38f7f6759013222c3c96';
+String _$lightsControllerHash() => r'a7baf7f9026aec557a972f7b8ca988d06b6de176';
 
 /// Lights page: selected room and room wide commands.
 

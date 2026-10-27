@@ -97,18 +97,19 @@ void main() {
       expect(speakers.commands, ['next media_player.office to Slow Rivers']);
     });
 
-    testWidgets('Given favorites, when tapping one in the extra large widget, then it plays on the office', (
+    testWidgets('Given a queue, when tapping the next track in the extra large widget, then the office plays it', (
       tester,
     ) async {
       // Given
       await load(tester, WidgetSize.extraLarge);
 
       // When
-      await tester.tap(find.text('Focus Flow'));
+      await tester.tap(find.text('Slow Rivers'));
       await tester.pump();
 
       // Then
-      expect(speakers.commands, ['play Focus Flow on media_player.office']);
+      expect(find.text('Up next'), findsOneWidget);
+      expect(speakers.commands, ['queue Slow Rivers on media_player.office']);
     });
 
     testWidgets('Given the hub is offline, when tapping pause, then nothing is sent', (tester) async {

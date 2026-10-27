@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
-import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
-import 'package:smart_hub/domain/music/model/spotify_account.dart';
 import 'package:smart_hub/domain/music/play_queue.util.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
-import 'package:smart_hub/domain/music/spotify.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
@@ -66,7 +64,6 @@ class MusicWidget extends ConsumerWidget {
               onPrevious: () => controller.previous(target),
               onPlayPause: () => controller.playPause(target),
               onNext: () => controller.next(target),
-              onPlay: (item) => controller.play(target, item),
               onPlayFromQueue: (item) => controller.playFromQueue(target, item),
             ),
           ),
@@ -82,7 +79,6 @@ final class _Controls {
     required this.onPrevious,
     required this.onPlayPause,
     required this.onNext,
-    required this.onPlay,
     required this.onPlayFromQueue,
   });
 
@@ -90,7 +86,6 @@ final class _Controls {
   final VoidCallback onPrevious;
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
-  final ValueChanged<MediaItem> onPlay;
   final ValueChanged<QueueItem> onPlayFromQueue;
 }
 
@@ -262,7 +257,8 @@ class _ExtraLarge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final track = target.nowPlaying;
-    final library = _library(ref, target).take(6).toList();
+    final queue = _queue(ref, target);
+    final hasNext = PlayQueueUtil.nextAfter(queue, track.title) != null;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 18,
@@ -296,7 +292,7 @@ class _ExtraLarge extends ConsumerWidget {
             spacing: 10,
             children: [
               Text(
-                'Jump back in',
+                'Up next',
                 style: HubTextStyles.label.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -304,32 +300,22 @@ class _ExtraLarge extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: library.isEmpty
-                    ? Center(child: Text('Nothing here yet', style: HubTextStyles.secondary.copyWith(fontSize: 14)))
-                    : Column(
-                        spacing: 10,
-                        children: [
-                          for (var row = 0; row < 2; row++)
-                            Expanded(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                spacing: 10,
-                                children: [
-                                  for (var column = 0; column < 3; column++)
-                                    Expanded(
-                                      child: switch (row * 3 + column) {
-                                        final i when i < library.length => _LibraryTile(
-                                          library[i],
-                                          onTap: controls.enabled ? () => controls.onPlay(library[i]) : null,
-                                        ),
-                                        _ => const SizedBox(),
-                                      },
-                                    ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
+                child: hasNext
+                    ? LayoutBuilder(
+                        builder: (context, constraints) => SlidingQueue(
+                          items: queue ?? const [],
+                          currentTitle: track.title,
+                          showCurrent: false,
+                          maxItems: (constraints.maxHeight / 52).floor(),
+                          itemExtent: 52,
+                          itemBuilder: (context, item, {required current}) => _QueueRow(
+                            item,
+                            large: true,
+                            onTap: controls.enabled ? () => controls.onPlayFromQueue(item) : null,
+                          ),
+                        ),
+                      )
+                    : const EmptyMark(glyph: HubGlyph.note, label: 'Nothing queued', size: 48),
               ),
             ],
           ),
@@ -346,17 +332,6 @@ List<QueueItem>? _queue(WidgetRef ref, PlaybackTarget target) {
     ConnectTarget(playback: _?) => ref.watch(spotifyQueueProvider).value,
     ConnectTarget() => null,
   };
-}
-
-/// As on the music page: Spotify's recent items when connected, otherwise the favorites of the speaker group.
-List<MediaItem> _library(WidgetRef ref, PlaybackTarget target) {
-  final spotify = ref.watch(spotifyAccountServiceProvider).value is SpotifySignedIn;
-  final items = switch ((spotify, target)) {
-    (true, _) => ref.watch(spotifyRecentProvider),
-    (false, SpeakerGroupTarget(:final group)) => ref.watch(mediaFavoritesProvider(group.leaderId)),
-    (false, ConnectTarget()) => const AsyncData(<MediaItem>[]),
-  };
-  return items.value ?? const [];
 }
 
 class _Cover extends StatelessWidget {
@@ -540,10 +515,13 @@ class _SkipButton extends StatelessWidget {
 }
 
 class _QueueRow extends StatelessWidget {
-  const _QueueRow(this.item, {required this.onTap});
+  const _QueueRow(this.item, {required this.onTap, this.large = false});
 
   final QueueItem item;
   final VoidCallback? onTap;
+
+  /// Bigger cover and text, with the artist below the title (extra large widget).
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
@@ -555,78 +533,56 @@ class _QueueRow extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap ?? () {},
         child: Row(
-          spacing: 10,
+          spacing: large ? 14 : 10,
           children: [
-            Artwork(seed: item.title, url: item.artworkUrl, size: 28, radius: 6, showNote: false),
+            Artwork(
+              seed: item.title,
+              url: item.artworkUrl,
+              size: large ? 42 : 28,
+              radius: large ? 8 : 6,
+              showNote: false,
+            ),
             Expanded(
-              child: Text.rich(
-                TextSpan(
-                  text: item.title,
-                  children: [
-                    if (item.artist case final artist? when artist.isNotEmpty)
+              child: large
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: HubTextStyles.body.copyWith(fontSize: 16),
+                        ),
+                        if (item.artist case final artist? when artist.isNotEmpty)
+                          Text(
+                            artist,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: HubTextStyles.label.copyWith(
+                              fontWeight: FontWeight.w400,
+                              color: HubColorPalette.text2,
+                            ),
+                          ),
+                      ],
+                    )
+                  : Text.rich(
                       TextSpan(
-                        text: ' · $artist',
-                        style: const TextStyle(fontWeight: FontWeight.w400, color: HubColorPalette.text2),
+                        text: item.title,
+                        children: [
+                          if (item.artist case final artist? when artist.isNotEmpty)
+                            TextSpan(
+                              text: ' · $artist',
+                              style: const TextStyle(fontWeight: FontWeight.w400, color: HubColorPalette.text2),
+                            ),
+                        ],
                       ),
-                  ],
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: HubTextStyles.label.copyWith(fontSize: 14),
-              ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: HubTextStyles.label.copyWith(fontSize: 14),
+                    ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// A playlist or album: its cover with the name on a dark fade; a tap plays it.
-class _LibraryTile extends StatelessWidget {
-  const _LibraryTile(this.item, {required this.onTap});
-
-  final MediaItem item;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      container: true,
-      button: true,
-      label: item.title,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap ?? () {},
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Artwork(seed: item.title, url: item.artworkUrl, radius: 0, showNote: false),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.3, 1],
-                    colors: [Color(0x00000000), Color(0x99000000)],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 10,
-                right: 10,
-                bottom: 10,
-                child: Text(
-                  item.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: HubTextStyles.label.copyWith(fontSize: 14, fontWeight: FontWeight.w700, height: 1.2),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

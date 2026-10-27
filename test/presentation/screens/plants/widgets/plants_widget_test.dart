@@ -84,7 +84,7 @@ void main() {
       expect(plants.commands, ['undo p.fern']);
     });
 
-    testWidgets('Given every plant is watered, when shown large, then it says so', (tester) async {
+    testWidgets('Given every plant is watered, when shown large, then a check shows', (tester) async {
       // Given / When
       await load(
         tester,
@@ -93,7 +93,7 @@ void main() {
       );
 
       // Then
-      expect(find.text('Every plant is watered.'), findsOneWidget);
+      expect(find.bySemanticsLabel('All watered'), findsOneWidget);
     });
   });
 }

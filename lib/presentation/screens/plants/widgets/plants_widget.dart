@@ -173,11 +173,6 @@ class _Large extends StatelessWidget {
           child: Text('Plants', style: HubTextStyles.widgetTitle),
         ),
         if (due.isEmpty && upcoming.isEmpty) const Expanded(child: _AllWatered()),
-        if (due.isEmpty && upcoming.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Text('Every plant is watered.', style: HubTextStyles.secondary.copyWith(fontSize: 14)),
-          ),
         if (overdue.isNotEmpty) ...[
           _GroupLabel('Overdue', color: HubColorPalette.dangerText),
           for (final entry in overdue) _PlantRow(entry, onTap: onWater),
@@ -513,24 +508,23 @@ class _Name extends StatelessWidget {
   }
 }
 
-/// Shown when nothing needs water.
+/// Shown when nothing needs water: a green check, no words needed.
 class _AllWatered extends StatelessWidget {
   const _AllWatered();
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 8,
-        children: [
-          const HubGlyphIcon(HubGlyph.check, color: HubColorPalette.success, size: Size(22, 22)),
-          Text(
-            'Every plant is watered.',
-            textAlign: TextAlign.center,
-            style: HubTextStyles.secondary.copyWith(fontSize: 14),
-          ),
-        ],
+      child: Semantics(
+        container: true,
+        label: 'All watered',
+        child: Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: HubColorPalette.success.withValues(alpha: 0.16), shape: BoxShape.circle),
+          child: const HubGlyphIcon(HubGlyph.check, color: HubColorPalette.success, size: Size(20, 20)),
+        ),
       ),
     );
   }
