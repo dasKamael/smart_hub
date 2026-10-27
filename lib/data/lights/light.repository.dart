@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/data/connection/ha_session.repository.dart';
 import 'package:smart_hub/data/lights/ha_light.repository.dart';
 import 'package:smart_hub/data/lights/hue/hue_bridge.repository.dart';
+import 'package:smart_hub/data/lights/hue/hue_bridges.repository.dart';
 import 'package:smart_hub/data/lights/hue/hue_light.repository.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
@@ -22,12 +23,15 @@ abstract interface class LightRepository {
 }
 
 /// Providers
-/// A paired bridge provides the lights; otherwise Home Assistant does.
+/// Paired bridges provide the lights; otherwise Home Assistant does.
 @Riverpod(keepAlive: true)
 LightRepository lightRepository(Ref ref) {
-  final bridge = ref.watch(hueBridgeConfigProvider).value;
-  if (bridge == null) return HaLightRepository(session: ref.watch(haSessionRepositoryProvider));
-  final repository = HueLightRepository(host: bridge.host, appKey: bridge.appKey, client: hueClientFor(bridge.host));
+  final bridges = ref.watch(hueBridgeConfigProvider).value ?? const [];
+  if (bridges.isEmpty) return HaLightRepository(session: ref.watch(haSessionRepositoryProvider));
+  final repository = HueBridgesRepository([
+    for (final bridge in bridges)
+      HueLightRepository(host: bridge.host, appKey: bridge.appKey, client: hueClientFor(bridge.host)),
+  ]);
   ref.onDispose(repository.dispose);
   return repository;
 }

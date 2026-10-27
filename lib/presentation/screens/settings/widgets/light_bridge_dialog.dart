@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
+import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/molecules/hub_text_field.dart';
@@ -88,7 +89,10 @@ class _LightBridgeDialogState extends ConsumerState<LightBridgeDialog> {
   }
 
   List<Widget> _searchStep() {
-    final found = _found;
+    final paired = {
+      for (final bridge in ref.watch(lightBridgeServiceProvider).value ?? const <LightBridge>[]) bridge.host,
+    };
+    final found = _found?.where((host) => !paired.contains(host)).toList();
     return [
       Text(
         'The hub talks to the bridge directly in your home network – no account, no cloud.',
@@ -103,7 +107,12 @@ class _LightBridgeDialogState extends ConsumerState<LightBridgeDialog> {
           ],
         )
       else if (found.isEmpty)
-        Text('No bridge found. Type its address – the app of your lights shows it.', style: HubTextStyles.secondary)
+        Text(
+          paired.isEmpty
+              ? 'No bridge found. Type its address – the app of your lights shows it.'
+              : 'No other bridge found. Type its address – the app of your lights shows it.',
+          style: HubTextStyles.secondary,
+        )
       else
         for (final host in found) _FoundBridge(host: host, onTap: () => unawaited(_pair(host))),
       HubTextField(

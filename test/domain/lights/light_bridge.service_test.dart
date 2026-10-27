@@ -15,11 +15,11 @@ void main() {
     late _MockBridges bridges;
     const bridge = LightBridge(host: '192.168.1.20', appKey: 'key');
 
-    setUpAll(() => registerFallbackValue(bridge));
+    setUpAll(() => registerFallbackValue(const <LightBridge>[]));
 
     setUp(() {
       bridges = _MockBridges();
-      when(() => bridges.load()).thenAnswer((_) async => null);
+      when(() => bridges.load()).thenAnswer((_) async => const <LightBridge>[]);
       when(() => bridges.save(any())).thenAnswer((_) async {});
     });
 
@@ -47,8 +47,8 @@ void main() {
 
         // Then
         expect(paired, isTrue);
-        expect(container.read(lightBridgeServiceProvider).value, bridge);
-        verify(() => bridges.save(bridge)).called(1);
+        expect(container.read(lightBridgeServiceProvider).value, [bridge]);
+        verify(() => bridges.save([bridge])).called(1);
       });
     });
 
@@ -66,7 +66,7 @@ void main() {
 
         // Then
         expect(paired, isFalse);
-        expect(container.read(lightBridgeServiceProvider).value, isNull);
+        expect(container.read(lightBridgeServiceProvider).value, isEmpty);
       });
     });
   });

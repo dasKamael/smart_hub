@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
+import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/presentation/screens/settings/widgets/light_bridge_dialog.dart';
 import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -181,35 +182,58 @@ class _LightsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bridge = ref.watch(lightBridgeServiceProvider).value;
+    final bridges = ref.watch(lightBridgeServiceProvider).value ?? const <LightBridge>[];
     final hasHomeAssistant = ref.watch(hasHomeAssistantProvider);
     return PageCard(
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-      child: Row(
-        spacing: HubSpacing.s16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: HubSpacing.s12,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: HubSpacing.s4,
+          Row(
+            spacing: HubSpacing.s16,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: HubSpacing.s4,
+                  children: [
+                    const Text('Lights', style: HubTextStyles.widgetTitle),
+                    Text(switch ((bridges.length, hasHomeAssistant)) {
+                      (1, _) => 'From the light bridge below.',
+                      (> 1, _) => 'From the ${bridges.length} light bridges below, all together.',
+                      (_, true) => 'From Home Assistant. Paired light bridges would take over.',
+                      _ => 'Pair your light bridge to switch lights without Home Assistant.',
+                    }, style: HubTextStyles.secondary),
+                  ],
+                ),
+              ),
+              HubButton(
+                label: bridges.isEmpty ? 'Pair bridge' : 'Add bridge',
+                variant: bridges.isEmpty ? HubButtonVariant.primary : HubButtonVariant.secondary,
+                onPressed: () => unawaited(showLightBridgeDialog(context)),
+              ),
+            ],
+          ),
+          for (final bridge in bridges)
+            Row(
+              spacing: HubSpacing.s12,
               children: [
-                const Text('Lights', style: HubTextStyles.widgetTitle),
-                Text(switch ((bridge, hasHomeAssistant)) {
-                  (final bridge?, _) => 'From ${bridge.name ?? 'the light bridge'} at ${bridge.host}',
-                  (null, true) => 'From Home Assistant. A paired light bridge would take over.',
-                  (null, false) => 'Pair your light bridge to switch lights without Home Assistant.',
-                }, style: HubTextStyles.secondary),
+                const HubGlyphIcon(HubGlyph.bulb, color: HubColorPalette.lightWarm),
+                Expanded(
+                  child: Text(
+                    '${bridge.name ?? 'Light bridge'} · ${bridge.host}',
+                    style: HubTextStyles.body.copyWith(fontSize: 16),
+                  ),
+                ),
+                HubButton(
+                  label: 'Remove',
+                  variant: HubButtonVariant.destructive,
+                  height: 36,
+                  onPressed: () => unawaited(ref.read(lightBridgeServiceProvider.notifier).disconnect(bridge.host)),
+                ),
               ],
             ),
-          ),
-          if (bridge != null)
-            HubButton(
-              label: 'Disconnect',
-              variant: HubButtonVariant.destructive,
-              onPressed: () => unawaited(ref.read(lightBridgeServiceProvider.notifier).disconnect()),
-            )
-          else
-            HubButton(label: 'Pair bridge', onPressed: () => unawaited(showLightBridgeDialog(context))),
         ],
       ),
     );

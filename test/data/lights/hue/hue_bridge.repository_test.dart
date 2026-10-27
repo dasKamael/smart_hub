@@ -26,6 +26,9 @@ void main() {
     setUp(() {
       values.clear();
       storage = _MockStorage();
+      when(() => storage.delete(key: any(named: 'key'))).thenAnswer((i) async {
+        values.remove(i.namedArguments[#key]);
+      });
       when(() => storage.read(key: any(named: 'key'))).thenAnswer((i) async => values[i.namedArguments[#key]]);
       when(
         () => storage.write(
@@ -73,11 +76,11 @@ void main() {
 
       // When
       final paired = await repo.pair('192.168.1.20');
-      await repo.save(paired);
+      await repo.save([paired]);
       final loaded = await repo.load();
 
       // Then
-      expect(loaded, const LightBridge(host: '192.168.1.20', appKey: 'secret-key', name: 'Living room bridge'));
+      expect(loaded, [const LightBridge(host: '192.168.1.20', appKey: 'secret-key', name: 'Living room bridge')]);
     });
 
     test('Given the discovery service lists a bridge, when discovering, then its address is found', () async {
@@ -93,6 +96,17 @@ void main() {
       expect(await repository(bridge: MockClient((_) async => http.Response('', 404)), internet: internet).discover(), [
         '192.168.1.20',
       ]);
+    });
+
+    test('Given a bridge paired before several could be, when loading, then it is still there', () async {
+      // Given
+      values['hue_bridge'] = jsonEncode({'host': '192.168.1.20', 'appKey': 'old-key', 'name': null});
+
+      // When
+      final loaded = await repository(bridge: MockClient((_) async => http.Response('', 404))).load();
+
+      // Then
+      expect(loaded, [const LightBridge(host: '192.168.1.20', appKey: 'old-key')]);
     });
   });
 }

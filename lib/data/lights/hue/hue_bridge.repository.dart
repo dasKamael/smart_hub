@@ -17,7 +17,10 @@ part 'hue_bridge.repository.g.dart';
 class HueBridgeRepository {
   HueBridgeRepository({required this.storage, required this.client, this.bridgeClientFor = hueClientFor});
 
-  static const _storageKey = 'hue_bridge';
+  static const _storageKey = 'hue_bridges';
+
+  /// Where a single bridge was kept before several could be paired.
+  static const _oldStorageKey = 'hue_bridge';
 
   /// Signify's discovery service: the bridges that reported in from this network.
   static final _discovery = Uri.parse('https://discovery.meethue.com/');
@@ -26,27 +29,31 @@ class HueBridgeRepository {
   final http.Client client;
   final http.Client Function(String host) bridgeClientFor;
 
-  Future<LightBridge?> load() async {
-    final json = await storage.read(key: _storageKey);
-    if (json == null) return null;
-    return switch (jsonDecode(json)) {
-      {'host': final String host, 'appKey': final String appKey, 'name': final String? name} => LightBridge(
-        host: host,
-        appKey: appKey,
-        name: name,
-      ),
-      _ => null,
-    };
+  /// The paired bridges, in the order they were paired.
+  Future<List<LightBridge>> load() async {
+    final json =
+        await storage.read(key: _storageKey) ??
+        switch (await storage.read(key: _oldStorageKey)) {
+          final old? => '[$old]',
+          null => null,
+        };
+    if (json == null) return const [];
+    return [
+      for (final bridge in (jsonDecode(json) as List<Object?>))
+        if (bridge case {'host': final String host, 'appKey': final String appKey})
+          LightBridge(host: host, appKey: appKey, name: bridge['name'] as String?),
+    ];
   }
 
-  Future<void> save(LightBridge bridge) {
-    return storage.write(
+  Future<void> save(List<LightBridge> bridges) async {
+    await storage.write(
       key: _storageKey,
-      value: jsonEncode({'host': bridge.host, 'appKey': bridge.appKey, 'name': bridge.name}),
+      value: jsonEncode([
+        for (final bridge in bridges) {'host': bridge.host, 'appKey': bridge.appKey, 'name': bridge.name},
+      ]),
     );
+    await storage.delete(key: _oldStorageKey);
   }
-
-  Future<void> clear() => storage.delete(key: _storageKey);
 
   /// IP addresses of the bridges in this network; empty when none is found or the service cannot be reached.
   Future<List<String>> discover() async {
@@ -111,15 +118,14 @@ HueBridgeRepository hueBridgeRepository(Ref ref) {
   return HueBridgeRepository(storage: ref.watch(secureStorageProvider), client: ref.watch(httpClientProvider));
 }
 
-/// The paired bridge; `null` when there is none.
+/// The paired bridges; empty when there is none.
 @Riverpod(keepAlive: true)
 class HueBridgeConfig extends _$HueBridgeConfig {
   @override
-  Future<LightBridge?> build() => ref.watch(hueBridgeRepositoryProvider).load();
+  Future<List<LightBridge>> build() => ref.watch(hueBridgeRepositoryProvider).load();
 
-  Future<void> set(LightBridge? bridge) async {
-    final repository = ref.read(hueBridgeRepositoryProvider);
-    bridge == null ? await repository.clear() : await repository.save(bridge);
-    state = AsyncData(bridge);
+  Future<void> set(List<LightBridge> bridges) async {
+    await ref.read(hueBridgeRepositoryProvider).save(bridges);
+    state = AsyncData(bridges);
   }
 }

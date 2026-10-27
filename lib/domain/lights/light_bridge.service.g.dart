@@ -8,14 +8,14 @@ part of 'light_bridge.service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The light bridge the lights come from instead of Home Assistant; `null` when none is paired.
+/// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
 
 @ProviderFor(LightBridgeService)
 final lightBridgeServiceProvider = LightBridgeServiceProvider._();
 
-/// The light bridge the lights come from instead of Home Assistant; `null` when none is paired.
-final class LightBridgeServiceProvider extends $AsyncNotifierProvider<LightBridgeService, LightBridge?> {
-  /// The light bridge the lights come from instead of Home Assistant; `null` when none is paired.
+/// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
+final class LightBridgeServiceProvider extends $AsyncNotifierProvider<LightBridgeService, List<LightBridge>> {
+  /// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
   LightBridgeServiceProvider._()
     : super(
         from: null,
@@ -35,21 +35,21 @@ final class LightBridgeServiceProvider extends $AsyncNotifierProvider<LightBridg
   LightBridgeService create() => LightBridgeService();
 }
 
-String _$lightBridgeServiceHash() => r'54df1f6418a5b8675c97ac2b0f0df98ef4a1b5e2';
+String _$lightBridgeServiceHash() => r'58aa7691bc0b25b0968853f14df44ec6905b863e';
 
-/// The light bridge the lights come from instead of Home Assistant; `null` when none is paired.
+/// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
 
-abstract class _$LightBridgeService extends $AsyncNotifier<LightBridge?> {
-  FutureOr<LightBridge?> build();
+abstract class _$LightBridgeService extends $AsyncNotifier<List<LightBridge>> {
+  FutureOr<List<LightBridge>> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<LightBridge?>, LightBridge?>;
+    final ref = this.ref as $Ref<AsyncValue<List<LightBridge>>, List<LightBridge>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<LightBridge?>, LightBridge?>,
-              AsyncValue<LightBridge?>,
+              AnyNotifier<AsyncValue<List<LightBridge>>, List<LightBridge>>,
+              AsyncValue<List<LightBridge>>,
               Object?,
               Object?
             >;
@@ -95,7 +95,7 @@ final class HasLightsProvider extends $FunctionalProvider<bool, bool, bool> with
   }
 }
 
-String _$hasLightsHash() => r'c65d96f16d0c91e94e84d42a70c722eb10f3c2d2';
+String _$hasLightsHash() => r'58b5287e8d6a73198048baa5dff138c3001b6e27';
 
 /// Whether the lights can be controlled right now: the bridge is reachable, or Home Assistant is online.
 
@@ -135,7 +135,7 @@ final class LightsOnlineProvider extends $FunctionalProvider<bool, bool, bool> w
   }
 }
 
-String _$lightsOnlineHash() => r'fa67a6fac19c6fa716117dbed780f12955eac577';
+String _$lightsOnlineHash() => r'4bede5b0afeb325018940661a37a030a2ed17384';
 
 @ProviderFor(_bridgeOnline)
 final _bridgeOnlineProvider = _BridgeOnlineProvider._();
