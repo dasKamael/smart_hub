@@ -5,6 +5,7 @@ import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
 import 'package:smart_hub/presentation/screens/dashboard/widgets/home_summary_widget.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/lights_widget.dart';
+import 'package:smart_hub/presentation/screens/music/widgets/music_widget.dart';
 import 'package:smart_hub/presentation/screens/plants/widgets/plants_widget.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_widget.dart';
 
@@ -15,6 +16,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.home => 'Home',
     DashboardWidgetKind.plants => 'Plants',
     DashboardWidgetKind.lights => 'Lights',
+    DashboardWidgetKind.music => 'Music',
   };
 
   static String description(DashboardWidgetKind kind) => switch (kind) {
@@ -22,6 +24,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.home => 'Lights on, plants to water and what plays.',
     DashboardWidgetKind.plants => 'Which plants need water – tap one to water it.',
     DashboardWidgetKind.lights => 'Switch rooms, dim them and pick a scene.',
+    DashboardWidgetKind.music => 'What plays, with play, skip and your playlists.',
   };
 
   static HubGlyph glyph(DashboardWidgetKind kind) => switch (kind) {
@@ -29,6 +32,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.home => HubGlyph.pottedPlant,
     DashboardWidgetKind.plants => HubGlyph.drop,
     DashboardWidgetKind.lights => HubGlyph.bulb,
+    DashboardWidgetKind.music => HubGlyph.note,
   };
 
   static String sizeName(DashboardWidgetSize size) => switch (size) {
@@ -53,6 +57,7 @@ abstract final class DashboardCatalog {
       DashboardWidgetKind.home => const HomeSummaryWidget(),
       DashboardWidgetKind.plants => PlantsWidget(size: tileSize(size)),
       DashboardWidgetKind.lights => LightsWidget(size: tileSize(size), roomIds: selection),
+      DashboardWidgetKind.music => MusicWidget(size: tileSize(size)),
     };
   }
 }

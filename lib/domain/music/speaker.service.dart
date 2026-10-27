@@ -79,19 +79,29 @@ class SpeakersService extends _$SpeakersService {
     return _run(group, _repository.playPause(id));
   }
 
-  Future<void> next(String id) => _skip(id, _repository.next(id));
+  /// Skips; [upcoming] (the next track of the queue, when known) shows at once.
+  Future<void> next(String id, {QueueItem? upcoming}) => _skip(id, _repository.next(id), upcoming: upcoming);
 
   Future<void> previous(String id) => _skip(id, _repository.previous(id));
 
-  /// Plays [item] on [id] and its group.
+  /// Plays [item] on [id] and its group; its name and cover show at once until the first track is reported.
   Future<void> play(String id, MediaItem item) {
     final group = _groupOf(id);
     final now = clock.now();
     for (final speaker in group) {
+      final title = speaker.title;
       _overlay.add(
         speaker.id,
-        apply: (speaker) => speaker.copyWith(playback: Playback.playing, positionSeconds: 0, positionUpdatedAt: now),
-        isConfirmed: (speaker) => speaker.playback.isPlaying,
+        apply: (speaker) => speaker.copyWith(
+          playback: Playback.playing,
+          title: item.title,
+          artist: null,
+          playlist: item.title,
+          artworkUrl: item.artworkUrl,
+          positionSeconds: 0,
+          positionUpdatedAt: now,
+        ),
+        isConfirmed: (speaker) => speaker.playback.isPlaying && speaker.title != title,
       );
     }
     return _run(group, _repository.play(id, item));
@@ -175,15 +185,24 @@ class SpeakersService extends _$SpeakersService {
 
   SpeakerRepository get _repository => ref.read(speakerRepositoryProvider);
 
-  /// The track starts over at once; the new title follows from the speaker.
-  Future<void> _skip(String id, Future<void> command) {
+  /// The track starts over at once, as [upcoming] when that is known; the speaker confirms the new title.
+  Future<void> _skip(String id, Future<void> command, {QueueItem? upcoming}) {
     final group = _groupOf(id);
     final now = clock.now();
     for (final speaker in group) {
       final title = speaker.title;
       _overlay.add(
         speaker.id,
-        apply: (speaker) => speaker.copyWith(positionSeconds: 0, positionUpdatedAt: now),
+        apply: (speaker) => switch (upcoming) {
+          null => speaker.copyWith(positionSeconds: 0, positionUpdatedAt: now),
+          final upcoming => speaker.copyWith(
+            title: upcoming.title,
+            artist: upcoming.artist,
+            artworkUrl: upcoming.coverUrl ?? upcoming.artworkUrl,
+            positionSeconds: 0,
+            positionUpdatedAt: now,
+          ),
+        },
         isConfirmed: (speaker) => speaker.title != title,
       );
     }

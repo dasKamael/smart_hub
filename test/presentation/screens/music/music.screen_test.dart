@@ -171,7 +171,7 @@ void main() {
       expect(speakers.commands, [
         'previous media_player.office',
         'playPause media_player.office',
-        'next media_player.office',
+        'next media_player.office to Slow Rivers',
         'play Nightline on media_player.office',
       ]);
     });

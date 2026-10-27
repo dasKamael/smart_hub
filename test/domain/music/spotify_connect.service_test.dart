@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/data/music/spotify/spotify.repository.dart';
 import 'package:smart_hub/domain/music/model/connect_device.dart';
+import 'package:smart_hub/domain/music/model/media_item.dart';
+import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
 import 'package:smart_hub/domain/music/model/spotify_playback.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
@@ -193,6 +195,42 @@ void main() {
 
         // Then
         expect(stateOf(container)?.playback?.positionSeconds, 0);
+      });
+    });
+
+    test('Given the next track of the queue, when skipping, then the next track shows at once', () {
+      fakeAsync((async) {
+        // Given
+        final container = createContainer();
+        async.flushMicrotasks();
+
+        // When
+        serviceOf(container).next(
+          'd-phone',
+          upcoming: const QueueItem(title: 'Slow Rivers', artist: 'Nadia Hale'),
+        );
+        async.flushMicrotasks();
+
+        // Then
+        expect(stateOf(container)?.playback?.title, 'Slow Rivers');
+        expect(stateOf(container)?.playback?.artist, 'Nadia Hale');
+      });
+    });
+
+    test('Given music on the phone, when playing an album, then its name shows at once', () {
+      fakeAsync((async) {
+        // Given
+        when(() => spotify.play(any(), item: any(named: 'item'))).thenAnswer((_) async {});
+        final container = createContainer();
+        async.flushMicrotasks();
+
+        // When
+        serviceOf(container)
+            .play('d-phone', const MediaItem(title: 'Daybreak', contentId: 'spotify:album:d', contentType: 'album'));
+        async.flushMicrotasks();
+
+        // Then
+        expect(stateOf(container)?.playback?.title, 'Daybreak');
       });
     });
   });

@@ -9,6 +9,7 @@ import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/model/speaker_state.dart';
+import 'package:smart_hub/domain/music/play_queue.util.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
@@ -68,12 +69,17 @@ class MusicController extends _$MusicController {
     }
   }
 
+  /// Skips; the next track of the queue shows at once when the queue is loaded. The queue is read here, not in the
+  /// services: it watches them.
   void next(PlaybackTarget target) {
+    final title = target.nowPlaying.title;
     switch (target) {
       case SpeakerGroupTarget(:final group):
-        _transport('skip', _speakers.next(group.leaderId));
+        final upcoming = PlayQueueUtil.nextAfter(ref.read(playQueueProvider(group.leaderId)).value, title);
+        _transport('skip', _speakers.next(group.leaderId, upcoming: upcoming));
       case ConnectTarget(:final device):
-        _transport('skip', _spotify.next(device.id));
+        final upcoming = PlayQueueUtil.nextAfter(ref.read(spotifyQueueProvider).value, title);
+        _transport('skip', _spotify.next(device.id, upcoming: upcoming));
     }
   }
 

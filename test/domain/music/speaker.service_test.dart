@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/data/music/speaker.repository.dart';
+import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/playback.enum.dart';
+import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/model/speaker_state.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
@@ -21,6 +25,8 @@ void main() {
     void givenSpeakers(List<SpeakerState> speakers) {
       when(() => repository.watchSpeakers()).thenAnswer((_) => Stream.value(speakers));
     }
+
+    setUpAll(() => registerFallbackValue(const MediaItem(title: '', contentId: '', contentType: '')));
 
     setUp(() {
       repository = _MockSpeakerRepository();
@@ -223,6 +229,48 @@ void main() {
             () => repository.leave('media_player.office'),
           ]);
         });
+      });
+
+      test(
+        'Given the next track of the queue, when skipping, then the next track shows at once on the whole group',
+        () async {
+          // Given
+          when(() => repository.next(any())).thenAnswer((_) async {});
+          final (service, container) = await createWithContainer();
+
+          // When
+          unawaited(
+            service.next(
+              'media_player.office',
+              upcoming: const QueueItem(title: 'Slow Rivers', artist: 'Nadia Hale', coverUrl: 'https://covers/slow'),
+            ),
+          );
+
+          // Then
+          final speakers = container.read(speakersServiceProvider).value!;
+          expect(speakers.map((speaker) => '${speaker.title} ${speaker.artworkUrl}'), [
+            'Slow Rivers https://covers/slow',
+            'Slow Rivers https://covers/slow',
+          ]);
+        },
+      );
+
+      test('Given a playlist, when playing it, then its name and cover show at once', () async {
+        // Given
+        when(() => repository.play(any(), any())).thenAnswer((_) async {});
+        final (service, container) = await createWithContainer();
+
+        // When
+        unawaited(
+          service.play(
+            'media_player.office',
+            const MediaItem(title: 'Focus Flow', contentId: 'demo:1', contentType: 'playlist', artworkUrl: 'a'),
+          ),
+        );
+
+        // Then
+        final office = container.read(speakersServiceProvider).value!.last;
+        expect((office.title, office.artworkUrl, office.playback), ('Focus Flow', 'a', Playback.playing));
       });
 
       test('Given a failing command, when pausing, then playing shows again at once', () async {

@@ -94,7 +94,7 @@ Spotify and the zen mode work; light and speaker parts are hidden or explain wha
 ## Dashboard
 
 Start page (`HubRoute.home`). Widgets use `WidgetTile` / `WidgetSize` (S 1×1 … XL 4×2 on the 170 px grid); built one
-feature at a time (weather, home, plants, lights so far; see `docs/architecture.md` → contexts). A widget of an existing
+feature at a time (weather, home, plants, lights, music so far; see `docs/architecture.md` → contexts). A widget of an existing
 feature lives in that feature's `widgets/` folder and uses its services (e.g. `plants/widgets/plants_widget.dart`). Arranged like the iPad home screen: long press
 to jiggle, drag to move (the others make room), corner handle to resize, "–" to remove, gallery to add, tap a
 widget to edit what it shows (`DashboardWidget.selection`, e.g. the rooms of a lights widget; empty = automatic). One page of

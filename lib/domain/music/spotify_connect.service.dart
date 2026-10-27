@@ -61,12 +61,22 @@ class SpotifyConnectService extends _$SpotifyConnectService {
     return _applied();
   }
 
+  /// Plays [item] on [deviceId]; its name and cover show at once until Spotify reports the first track.
   Future<void> play(String deviceId, MediaItem item) {
     final now = clock.now();
+    final title = _reported.playback?.title;
     _playback.add(
       _playbackId,
-      apply: (playback) => playback.copyWith(deviceId: deviceId, isPlaying: true, positionSeconds: 0, positionAt: now),
-      isConfirmed: (playback) => playback.deviceId == deviceId && playback.isPlaying,
+      apply: (playback) => playback.copyWith(
+        deviceId: deviceId,
+        isPlaying: true,
+        title: item.title,
+        artist: null,
+        artworkUrl: item.artworkUrl,
+        positionSeconds: 0,
+        positionAt: now,
+      ),
+      isConfirmed: (playback) => playback.deviceId == deviceId && playback.isPlaying && playback.title != title,
     );
     return _run(_repository.play(deviceId, item: item));
   }
@@ -75,7 +85,8 @@ class SpotifyConnectService extends _$SpotifyConnectService {
 
   Future<void> pause(String deviceId) => _setPlaying(_repository.pause(deviceId), playing: false);
 
-  Future<void> next(String deviceId) => _skip(_repository.next(deviceId));
+  /// Skips; [upcoming] (the next track of the queue, when known) shows at once.
+  Future<void> next(String deviceId, {QueueItem? upcoming}) => _skip(_repository.next(deviceId), upcoming: upcoming);
 
   Future<void> previous(String deviceId) => _skip(_repository.previous(deviceId));
 
@@ -112,13 +123,22 @@ class SpotifyConnectService extends _$SpotifyConnectService {
     return _run(command);
   }
 
-  /// The track starts over at once; the new title follows from Spotify.
-  Future<void> _skip(Future<void> command) {
+  /// The track starts over at once, as [upcoming] when that is known; Spotify confirms the new title.
+  Future<void> _skip(Future<void> command, {QueueItem? upcoming}) {
     final title = _reported.playback?.title;
     final now = clock.now();
     _playback.add(
       _playbackId,
-      apply: (playback) => playback.copyWith(positionSeconds: 0, positionAt: now),
+      apply: (playback) => switch (upcoming) {
+        null => playback.copyWith(positionSeconds: 0, positionAt: now),
+        final upcoming => playback.copyWith(
+          title: upcoming.title,
+          artist: upcoming.artist,
+          artworkUrl: upcoming.coverUrl ?? upcoming.artworkUrl,
+          positionSeconds: 0,
+          positionAt: now,
+        ),
+      },
       isConfirmed: (playback) => playback.title != title,
     );
     return _run(command);

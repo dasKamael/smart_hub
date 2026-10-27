@@ -3,6 +3,7 @@ import 'package:smart_hub/domain/lights/model/light_scene.dart';
 import 'package:smart_hub/domain/lights/model/light_state.dart';
 import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
+import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/model/speaker_state.dart';
 import 'package:smart_hub/domain/music/speaker_settings.service.dart';
@@ -68,7 +69,8 @@ class FakeSpeakersService extends SpeakersService {
   Future<void> joinGroup(String id, String leaderId) async => commands.add('join $id to $leaderId');
 
   @override
-  Future<void> next(String id) async => commands.add('next $id');
+  Future<void> next(String id, {QueueItem? upcoming}) async =>
+      commands.add('next $id${upcoming == null ? '' : ' to ${upcoming.title}'}');
 
   @override
   Future<void> previous(String id) async => commands.add('previous $id');
@@ -120,7 +122,8 @@ class FakeSpotifyConnectService extends SpotifyConnectService {
   Future<void> pause(String deviceId) async => commands.add('pause $deviceId');
 
   @override
-  Future<void> next(String deviceId) async => commands.add('next $deviceId');
+  Future<void> next(String deviceId, {QueueItem? upcoming}) async =>
+      commands.add('next $deviceId${upcoming == null ? '' : ' to ${upcoming.title}'}');
 
   @override
   Future<void> previous(String deviceId) async => commands.add('previous $deviceId');

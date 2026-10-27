@@ -5,7 +5,8 @@ enum DashboardWidgetKind {
   weather(DashboardWidgetSize.values),
   home([DashboardWidgetSize.medium]),
   plants(DashboardWidgetSize.values),
-  lights(DashboardWidgetSize.values);
+  lights(DashboardWidgetSize.values),
+  music(DashboardWidgetSize.values);
 
   const DashboardWidgetKind(this.sizes);
 
