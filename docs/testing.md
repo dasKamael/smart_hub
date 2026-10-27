@@ -16,9 +16,8 @@ test/
    ├─ riverpod.test_util.dart     createTestContainer()
    └─ widget.test_util.dart       loadWidgetTestApp()
 packages/ha_client/test/          protocol tests against FakeHomeAssistant
-patrol_test/
-├─ common/              app runner, robots, fixtures
-└─ integration/         full app against FakeHomeAssistant
+integration_test/       performance tests (profile mode, real tablet)
+test_driver/            writes timeline summaries to build/
 ```
 
 ## Test names
@@ -44,14 +43,14 @@ test('Given a plant watered 8 days ago with interval 7, '
 
 | Layer | How | Focus |
 |---|---|---|
-| `domain/*.util.dart` | plain `test` | All edge cases: polygon borders, 34 cm / 40 cm thresholds exactly at the limit, clamping, due today vs. overdue, every HA color mode → caps |
+| `domain/*.util.dart` | plain `test` | All edge cases: polygon borders, 34 cm / 40 cm thresholds exactly at the limit, clamping, due today vs. overdue |
 | `domain/*.service.dart` | `createTestContainer` with repository overrides (mocktail) | Orchestration, optimistic overlay + rollback (`fake_async`), offline behaviour |
-| `data/*.repository.dart` | fixtures from `test/fixtures/ha/` against `FakeHomeAssistant`; drift with `NativeDatabase.memory()` | Mapping HA → domain, service call payloads, persistence round trips |
+| `data/*.repository.dart` | fixtures from `test/fixtures/ha/` against `FakeHomeAssistant`; drift with `NativeDatabase.memory()` | Mapping HA → domain (e.g. every HA color mode → capabilities), service call payloads, persistence round trips |
 | `data/database` | drift migration tests against `drift_schemas/` | Every schema version upgrades cleanly |
 | `presentation/*.controller.dart` | `createTestContainer` with service overrides | Selection, grouping, drag state, throttling |
 | `presentation/**` widgets & screens | `loadWidgetTestApp` | Correct variant rendered (inspector, marker states), gestures (tap, drag threshold 5 px, drop on target), controls disabled while offline, only supported controls shown |
 | `packages/ha_client` | `dart test` + `FakeHomeAssistant` + `fake_async` | Auth, id correlation, error results, reconnect backoff, resubscribe after reconnect |
-| `patrol_test/integration` | app on device/emulator against `FakeHomeAssistant` | Smoke flows per phase, drag performance with ~30 markers (frame timings) |
+| `integration_test/` | `flutter drive --profile --no-dds` on the tablet | Drag performance with ~30 markers (frame timings, see CLAUDE.md) |
 
 The acceptance criterion "a new HA light works without code changes" is covered by fixtures: add the
 `get_states` dump of a new light type (e.g. Govee) and assert capabilities and service calls without

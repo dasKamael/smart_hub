@@ -10,7 +10,13 @@ void main() {
   });
 
   test('no debugPrint() calls in production code', () {
-    checkNoPattern(RegExp(r'debugPrint\('), inDirectory: 'lib', because: 'use the logger instead');
+    checkNoPattern(
+      RegExp(r'debugPrint\('),
+      inDirectory: 'lib',
+      because: 'use the logger instead',
+      // The logger itself writes to the console.
+      knownViolations: ['lib/common/logging/logging.setup.dart'],
+    );
   });
 
   test('no relative imports in lib/', () {
@@ -33,6 +39,14 @@ void main() {
         because: 'the app knows device kinds and capabilities, not brands',
       );
     }
+  });
+
+  test('no Material icons', () {
+    checkNoPattern(
+      RegExp(r'\bIcons\.'),
+      inDirectory: 'lib',
+      because: 'the hub draws its own icons (HubGlyph), no system icon set',
+    );
   });
 
   test('no test files inside lib/', () {

@@ -30,6 +30,9 @@ abstract final class HubColorPalette {
   static const success = Color(0xFF30D158);
   static const playing = Color(0xFF1DB954);
 
+  /// Fertilizing due.
+  static const feed = Color(0xFFE0B04A);
+
   // Light presets
   static const lightWarm = Color(0xFFFFB340);
   static const lightSoft = Color(0xFFFFE08A);

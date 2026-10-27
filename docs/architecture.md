@@ -21,13 +21,15 @@ smart_hub/
 │  │  ├─ floorplan/               floorplan.repository.dart, placement.repository.dart, *.table.dart
 │  │  ├─ lights/                  light.repository.dart
 │  │  ├─ plants/                  plant.repository.dart, plant_photo.repository.dart, *.table.dart
-│  │  └─ music/                   speaker.repository.dart
+│  │  ├─ music/                   speaker.repository.dart, speaker_settings.repository.dart, spotify/
+│  │  └─ zen/                     zen_settings.repository.dart, *.table.dart
 │  ├─ domain/
 │  │  ├─ connection/              connection.service.dart, connection.state.dart, model/
 │  │  ├─ floorplan/               placement.service.dart, room_lookup.util.dart, grouping.util.dart, model/
 │  │  ├─ lights/                  light.service.dart, light_capabilities.util.dart, model/
 │  │  ├─ plants/                  watering.service.dart, watering_due.util.dart, model/
-│  │  └─ music/                   speaker.service.dart, model/
+│  │  ├─ music/                   speaker.service.dart, spotify*.service.dart, model/
+│  │  └─ zen/                     zen.service.dart (idle time)
 │  └─ presentation/
 │     ├─ design_system/
 │     │  ├─ tokens/               hub.color_palette.dart, hub_text_styles.dart, hub_motion.dart, spacing/radii
@@ -40,7 +42,8 @@ smart_hub/
 │        ├─ floorplan/            floorplan.screen.dart, floorplan.controller.dart, floorplan.state.dart, widgets/
 │        ├─ lights/  plants/  music/  dashboard/  setup/
 ├─ test/                          mirrors lib/ + architecture/, mocks/, utils/, fixtures/
-└─ patrol_test/                   integration tests
+├─ integration_test/              performance tests (profile mode)
+└─ test_driver/                   timeline summaries for integration tests
 ```
 
 ## Bounded contexts
@@ -50,8 +53,9 @@ smart_hub/
 | `connection` | HA session: auth, reconnect with backoff, online/offline, entity registry (for the placement picker) | HA |
 | `floorplan` | Rooms, walls, doors, device placements, room derivation, grouping, tray | drift |
 | `lights` | Light state, capabilities, light commands, room scenes | HA |
-| `plants` | Plants, watering interval, last/previous watering, photos | drift + local files |
-| `music` | Speaker state, playback, volume, speaker groups, Spotify content | HA |
+| `plants` | Plants, watering and fertilizing plan, photos, plant profiles (species care data from Perenual, loaded once per species and kept locally) | drift + local files + Perenual API |
+| `music` | Speaker state, playback, volume, speaker groups, Spotify content and Connect devices, local speaker settings | HA + Spotify Web API + drift |
+| `zen` | Idle time until the zen mode (calm full screen with time and cover) | drift |
 | `dashboard` | Presentation only – composes widgets from the other contexts | – |
 | `setup` | Presentation only – HA URL / token entry (uses `connection`) | – |
 
@@ -98,8 +102,8 @@ Repositories wrap one source each (HA session, drift, file system) and map raw t
   and turns commands into `light.turn_on` / `light.turn_off` service calls.
 - `speaker.repository.dart` does the same for `media_player.*`.
 - drift: one `AppDatabase` in `data/database/`, tables live next to their context as `*.table.dart`.
-  Bump `schemaVersion` for every schema change, export the schema with `drift_dev schema dump` into
-  `drift_schemas/` and add a migration test.
+  Bump `schemaVersion` for every schema change and run `dart run drift_dev make-migrations` – it stores the
+  schema in `drift_schemas/` and generates migration tests in `test/data/database/` (config in `build.yaml`).
 - Plant photos are stored as files in the app documents directory; the DB stores the path.
 
 Provider at the bottom of the repository file:
@@ -132,7 +136,8 @@ Business rules, independent of widgets.
   state / commands to presentation.
 - **Utils** (`*.util.dart`): pure logic, no Riverpod, no Flutter imports – exhaustively unit tested.
   Examples: point-in-polygon and room lookup, clamping inside plan bounds, single-linkage grouping
-  (34 cm) and drop target search (40 cm), watering due calculation, capability mapping.
+  (34 cm) and drop target search (40 cm), watering due calculation, color temperature → RGB.
+  Translating HA formats (e.g. `supported_color_modes` → capabilities) is the data layer's job.
 - **Models** (`model/`): freezed classes and enums.
 - Geometry is in **cm** with an own point type. Conversion to pixels happens only in presentation.
 - A device's room is **derived** from its position, never stored.
