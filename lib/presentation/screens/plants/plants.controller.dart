@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/painting.dart';
 import 'package:clock/clock.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/utils/current_day.provider.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
@@ -183,5 +185,15 @@ class PlantsController extends _$PlantsController {
     week: [
       for (final day in WateringDueUtil.week(plants, today)) [for (final plant in day) scheduled(plant)],
     ],
+  );
+}
+
+/// The color of the plants area: overdue plants warm it towards terracotta, a watered home freshens it.
+@riverpod
+Color plantsTint(Ref ref) {
+  final all = ref.watch(wateringPlanProvider).all;
+  return HubAreaColors.plantsFor(
+    overdue: all.where((entry) => entry.state == WateringState.overdue).length,
+    dueToday: all.where((entry) => entry.state == WateringState.dueToday).length,
   );
 }

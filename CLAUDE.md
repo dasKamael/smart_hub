@@ -11,7 +11,8 @@ their live state there and are controlled directly from it.
 - `design_handoff_hub_core/design/*.dc.html` – high-fidelity HTML prototypes. Reference only, not code.
   Colors, sizes, radii, spacing and curves are final – match them exactly.
   Deliberate change (Richard, 2026-10-27): no black background – a calm sky that follows the time of day
-  (`HubBackground`, `HubSky`) and translucent cards and controls (`HubColorPalette.card`, `elevated`, `control`).
+  (`HubBackground`, `HubSky`) with solid cards (`HubColorPalette.card`, white veils for tiles and controls on them).
+  Every area has its own color in its cards and page glow (`HubAreaColors`); weather shows live scenes instead.
 - `design_handoff_hub_core/data/floorplan.json` – the apartment (units: cm), initial plan.
 - `design_handoff_hub_core/design/Roadmap.dc.html` – phases and milestones (German).
 

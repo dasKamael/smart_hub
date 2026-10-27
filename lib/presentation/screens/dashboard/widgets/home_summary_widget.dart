@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
@@ -35,6 +36,7 @@ class HomeSummaryWidget extends ConsumerWidget {
 
     return WidgetTile(
       card: card,
+      tint: HubAreaColors.home,
       size: WidgetSize.medium,
       padding: 16,
       child: Column(

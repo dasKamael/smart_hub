@@ -18,6 +18,7 @@ class RoomDetailCard extends StatelessWidget {
     required this.onBrightnessChanged,
     required this.onBrightnessEnd,
     required this.onScene,
+    this.tint,
   });
 
   final LightRoom room;
@@ -25,11 +26,13 @@ class RoomDetailCard extends StatelessWidget {
   final ValueChanged<int> onBrightnessChanged;
   final ValueChanged<int> onBrightnessEnd;
   final ValueChanged<LightScene> onScene;
+  final Color? tint;
 
   @override
   Widget build(BuildContext context) {
     final active = room.activeScene;
     return PageCard(
+      tint: tint,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: HubSpacing.s16,

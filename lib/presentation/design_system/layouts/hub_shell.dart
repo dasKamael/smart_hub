@@ -15,6 +15,7 @@ class HubShell extends StatelessWidget {
     required this.onTabSelected,
     required this.child,
     this.trailing,
+    this.tint,
   });
 
   final String title;
@@ -24,11 +25,15 @@ class HubShell extends StatelessWidget {
   final Widget? trailing;
   final Widget child;
 
+  /// The shown page's area color for the glows behind it.
+  final Color? tint;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HubColorPalette.bg,
       body: HubBackground(
+        tint: tint,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),

@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/utils/throttler.dart';
 import 'package:smart_hub/domain/music/model/connect_device.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
@@ -312,4 +315,16 @@ QueueItem? upNext(Ref ref, {required bool visible}) {
   if (queue == null || queue.isEmpty) return null;
   final current = queue.indexWhere((item) => item.title == shown.title);
   return current >= 0 && current + 1 < queue.length ? queue[current + 1] : null;
+}
+
+/// The color of the music area: the cover's, paler while nothing plays.
+@riverpod
+Color musicTint(Ref ref, {required bool visible}) {
+  final shown = ref.watch(
+    currentTargetProvider(visible: visible).select(
+      (target) =>
+          (seed: target?.nowPlaying.title ?? target?.name ?? '', playing: target?.nowPlaying.isPlaying ?? false),
+    ),
+  );
+  return HubAreaColors.musicFor(Artwork.colorOf(shown.seed), playing: shown.playing);
 }

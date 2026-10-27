@@ -97,3 +97,43 @@ final class LightRoomsProvider extends $FunctionalProvider<List<LightRoom>, List
 }
 
 String _$lightRoomsHash() => r'3549fe53c84652c1a6e1bc4167bbf571f4afa2a0';
+
+/// The color of the lights area: the colors of the rooms that are on; indigo when all are off.
+
+@ProviderFor(lightsTint)
+final lightsTintProvider = LightsTintProvider._();
+
+/// The color of the lights area: the colors of the rooms that are on; indigo when all are off.
+
+final class LightsTintProvider extends $FunctionalProvider<Color, Color, Color> with $Provider<Color> {
+  /// The color of the lights area: the colors of the rooms that are on; indigo when all are off.
+  LightsTintProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'lightsTintProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$lightsTintHash();
+
+  @$internal
+  @override
+  $ProviderElement<Color> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+
+  @override
+  Color create(Ref ref) {
+    return lightsTint(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Color value) {
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<Color>(value));
+  }
+}
+
+String _$lightsTintHash() => r'b51ca6ebf260d144824db71b39f507562661a5fb';

@@ -49,6 +49,7 @@ class LightsScreen extends ConsumerWidget {
         Expanded(
           flex: 15,
           child: PageCard(
+            tint: ref.watch(lightsTintProvider),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: HubSpacing.s16,
@@ -109,6 +110,7 @@ class LightsScreen extends ConsumerWidget {
           child: selected == null
               ? const SizedBox.shrink()
               : RoomDetailCard(
+                  tint: ref.watch(lightsTintProvider),
                   room: selected,
                   enabled: enabled,
                   onBrightnessChanged: (percent) => controller.changeBrightness(selected, percent),

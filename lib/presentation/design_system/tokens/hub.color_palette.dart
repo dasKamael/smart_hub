@@ -15,8 +15,9 @@ abstract final class HubColorPalette {
   static const controlStrong = Color(0x47FFFFFF);
   static const selected = Color(0xFF636366);
 
-  /// Cards on the sky background: light enough that the sky shines through, with a fine edge.
-  static const card = Color(0x1AFFFFFF);
+  /// Cards on the sky background: solid, a little lighter than the sky, with a fine edge. Tiles and controls on
+  /// them are white veils over this solid ground.
+  static const card = Color(0xFF1F2A39);
   static const cardBorder = Color(0x14FFFFFF);
 
   // Floor plan

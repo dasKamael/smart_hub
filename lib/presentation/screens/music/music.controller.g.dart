@@ -40,7 +40,7 @@ final class MusicControllerProvider extends $NotifierProvider<MusicController, M
   }
 }
 
-String _$musicControllerHash() => r'e1f54ae2f616ad26b8bac1f08e115d370fdfb44d';
+String _$musicControllerHash() => r'6c6d3ff46f7570a2017cd49eb4b3166913b43fa8';
 
 /// Music page: which target is shown, which tile shows its options, and the playback commands.
 
@@ -454,4 +454,80 @@ final class UpNextFamily extends $Family with $FunctionalFamilyOverride<QueueIte
 
   @override
   String toString() => r'upNextProvider';
+}
+
+/// The color of the music area: the cover's, paler while nothing plays.
+
+@ProviderFor(musicTint)
+final musicTintProvider = MusicTintFamily._();
+
+/// The color of the music area: the cover's, paler while nothing plays.
+
+final class MusicTintProvider extends $FunctionalProvider<Color, Color, Color> with $Provider<Color> {
+  /// The color of the music area: the cover's, paler while nothing plays.
+  MusicTintProvider._({required MusicTintFamily super.from, required bool super.argument})
+    : super(
+        retry: null,
+        name: r'musicTintProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$musicTintHash();
+
+  @override
+  String toString() {
+    return r'musicTintProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<Color> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+
+  @override
+  Color create(Ref ref) {
+    final argument = this.argument as bool;
+    return musicTint(ref, visible: argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Color value) {
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<Color>(value));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MusicTintProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$musicTintHash() => r'e0aac7ea9a3a006a217b8d434084bc4bc4018272';
+
+/// The color of the music area: the cover's, paler while nothing plays.
+
+final class MusicTintFamily extends $Family with $FunctionalFamilyOverride<Color, bool> {
+  MusicTintFamily._()
+    : super(
+        retry: null,
+        name: r'musicTintProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The color of the music area: the cover's, paler while nothing plays.
+
+  MusicTintProvider call({required bool visible}) => MusicTintProvider._(argument: visible, from: this);
+
+  @override
+  String toString() => r'musicTintProvider';
 }

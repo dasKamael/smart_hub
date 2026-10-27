@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/lights/model/light_scene.dart';
@@ -40,6 +41,11 @@ class LightsWidget extends ConsumerWidget {
 
     return WidgetTile(
       card: card,
+      // The color of the rooms this widget shows.
+      tint: HubAreaColors.lightsFor([
+        for (final room in rooms)
+          if (room.isOn) _colorOf(room),
+      ]),
       size: size,
       padding: switch (size) {
         WidgetSize.extraLarge => 18,

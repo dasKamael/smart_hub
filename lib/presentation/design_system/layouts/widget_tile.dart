@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 
 /// Dashboard widget sizes on the 170 px grid with 16 px gaps (`README` → "Widget grid").
 enum WidgetSize {
@@ -28,6 +29,8 @@ class WidgetTile extends StatelessWidget {
     this.onTap,
     this.padding = 18,
     this.card = true,
+    this.tint,
+    this.background,
   });
 
   final WidgetSize size;
@@ -38,6 +41,12 @@ class WidgetTile extends StatelessWidget {
   /// `false`: no card, the content stands on the dashboard (e.g. app icons).
   final bool card;
 
+  /// The area's color (`HubAreaColors`), fading over the card from the top left; changes blend over.
+  final Color? tint;
+
+  /// Painted on the card behind the content, e.g. the weather scene.
+  final Widget? background;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox.fromSize(
@@ -45,13 +54,47 @@ class WidgetTile extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: card ? HubColorPalette.card : null,
-            borderRadius: BorderRadius.circular(24),
-            border: card ? Border.all(color: HubColorPalette.cardBorder) : null,
-          ),
-          child: Padding(padding: EdgeInsets.all(padding), child: child),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeInOut,
+          decoration: card
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      switch (tint) {
+                        final tint? => HubAreaColors.cardTop(tint, HubColorPalette.card),
+                        null => HubColorPalette.card,
+                      },
+                      HubColorPalette.card,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                )
+              : const BoxDecoration(),
+          // In front: a border in the decoration would take its width from the content.
+          foregroundDecoration: card
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: switch (tint) {
+                      final tint? => HubAreaColors.cardTop(tint, HubColorPalette.cardBorder, strength: 0.22),
+                      null => HubColorPalette.cardBorder,
+                    },
+                  ),
+                )
+              : null,
+          child: switch (background) {
+            final background? => Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRRect(borderRadius: BorderRadius.circular(24), child: background),
+                Padding(padding: EdgeInsets.all(padding), child: child),
+              ],
+            ),
+            null => Padding(padding: EdgeInsets.all(padding), child: child),
+          },
         ),
       ),
     );

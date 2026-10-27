@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
@@ -11,9 +12,12 @@ import 'package:smart_hub/presentation/design_system/layouts/hub_shell.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.screen.dart';
+import 'package:smart_hub/presentation/screens/lights/lights.controller.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.screen.dart';
+import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
 import 'package:smart_hub/presentation/screens/plants/plant_profile.screen.dart';
+import 'package:smart_hub/presentation/screens/plants/plants.controller.dart';
 import 'package:smart_hub/presentation/screens/plants/plants.screen.dart';
 import 'package:smart_hub/presentation/screens/settings/settings.screen.dart';
 import 'package:smart_hub/presentation/screens/settings/speakers.screen.dart';
@@ -67,25 +71,34 @@ GoRouter createHubRouter({
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) {
           final route = HubRoute.values[shell.currentIndex];
-          return HubShell(
-            title: route.title,
-            tabLabels: [for (final r in HubRoute.values) r.tabLabel],
-            selectedTab: shell.currentIndex,
-            onTabSelected: (index) => shell.goBranch(index, initialLocation: index == shell.currentIndex),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: HubSpacing.s12,
-              children: [
-                const ConnectionIndicator(),
-                const ZenButton(),
-                HubIconButton(
-                  glyph: HubGlyph.gear,
-                  semanticLabel: 'Settings',
-                  onPressed: () => context.push(HubPage.settings.path),
-                ),
-              ],
+          return Consumer(
+            builder: (context, ref, _) => HubShell(
+              // Only the shown page's color is watched, so e.g. Spotify is not polled for it elsewhere.
+              tint: switch (route) {
+                HubRoute.plants => ref.watch(plantsTintProvider),
+                HubRoute.lights => ref.watch(lightsTintProvider),
+                HubRoute.music => ref.watch(musicTintProvider(visible: true)),
+                HubRoute.home || HubRoute.plan => null,
+              },
+              title: route.title,
+              tabLabels: [for (final r in HubRoute.values) r.tabLabel],
+              selectedTab: shell.currentIndex,
+              onTabSelected: (index) => shell.goBranch(index, initialLocation: index == shell.currentIndex),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: HubSpacing.s12,
+                children: [
+                  const ConnectionIndicator(),
+                  const ZenButton(),
+                  HubIconButton(
+                    glyph: HubGlyph.gear,
+                    semanticLabel: 'Settings',
+                    onPressed: () => context.push(HubPage.settings.path),
+                  ),
+                ],
+              ),
+              child: shell,
             ),
-            child: shell,
           );
         },
         branches: [

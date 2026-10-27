@@ -12,6 +12,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.da
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_icon.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_parts.dart';
+import 'package:smart_hub/presentation/screens/weather/widgets/weather_scene.dart';
 
 /// The weather as a dashboard widget in any [WidgetSize] (`Widget Kit` → Weather). A tap opens the weather page.
 class WeatherWidget extends ConsumerWidget {
@@ -27,6 +28,14 @@ class WeatherWidget extends ConsumerWidget {
     final forecast = ref.watch(weatherServiceProvider);
     return WidgetTile(
       card: card,
+      background: switch (forecast.value) {
+        final forecast? when card => WeatherScene(
+          condition: forecast.now.condition,
+          isDay: forecast.now.isDay,
+          precipitation: forecast.hours.firstOrNull?.precipitation ?? 0,
+        ),
+        _ => null,
+      },
       size: size,
       onTap: () => context.push(HubPage.weather.path),
       // An error stays visible while a retry is loading.

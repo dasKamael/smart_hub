@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
@@ -13,7 +14,6 @@ import 'package:smart_hub/domain/music/spotify_connect.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
-import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
@@ -41,6 +41,14 @@ class MusicWidget extends ConsumerWidget {
 
     return WidgetTile(
       card: card,
+      // The small one is all cover.
+      tint: switch (target) {
+        final target? when size != WidgetSize.small => HubAreaColors.musicFor(
+          Artwork.colorOf(target.nowPlaying.title ?? target.name),
+          playing: target.nowPlaying.isPlaying,
+        ),
+        _ => null,
+      },
       size: size,
       padding: 0,
       onTap: () => context.go(HubRoute.music.path),
@@ -99,10 +107,7 @@ class _Player extends StatelessWidget {
     final track = target.nowPlaying;
     final seed = track.title ?? target.name;
     if (size == WidgetSize.small) return _Small(track: track, seed: seed, controls: controls);
-    return AnimatedContainer(
-      duration: HubMotion.glowDuration,
-      // The cover's color shines through, as on the music page.
-      color: card ? Artwork.colorOf(seed).withValues(alpha: 0.28) : null,
+    return Padding(
       padding: EdgeInsets.all(size == WidgetSize.medium ? 16 : 18),
       child: switch (size) {
         WidgetSize.medium => _Medium(track: track, seed: seed, controls: controls),

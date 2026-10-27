@@ -15,6 +15,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart'
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_icon.dart';
 import 'package:smart_hub/presentation/screens/weather/widgets/weather_parts.dart';
+import 'package:smart_hub/presentation/screens/weather/widgets/weather_scene.dart';
 
 /// The weather in full (`Widget Kit` → Weather → Full page): now with a short outlook, the next 12 hours, details
 /// and the next 10 days.
@@ -93,6 +94,11 @@ class _Today extends StatelessWidget {
           flex: 6,
           child: PageCard(
             padding: const EdgeInsets.all(22),
+            background: WeatherScene(
+              condition: now.condition,
+              isDay: now.isDay,
+              precipitation: forecast.hours.firstOrNull?.precipitation ?? 0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

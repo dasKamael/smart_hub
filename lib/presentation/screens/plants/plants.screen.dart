@@ -65,6 +65,7 @@ class PlantsScreen extends ConsumerWidget {
     }
 
     return PageCard(
+      tint: ref.watch(plantsTintProvider),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: HubSpacing.s20,

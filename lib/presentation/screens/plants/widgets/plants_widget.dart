@@ -30,6 +30,7 @@ class PlantsWidget extends ConsumerWidget {
 
     return WidgetTile(
       card: card,
+      tint: ref.watch(plantsTintProvider),
       size: size,
       padding: switch (size) {
         WidgetSize.small => 14,

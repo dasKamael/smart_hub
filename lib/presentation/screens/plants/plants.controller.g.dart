@@ -108,3 +108,43 @@ final class WateringPlanProvider
 }
 
 String _$wateringPlanHash() => r'3f1f93f114efecf83cf5ac0873460e056a6677ae';
+
+/// The color of the plants area: overdue plants warm it towards terracotta, a watered home freshens it.
+
+@ProviderFor(plantsTint)
+final plantsTintProvider = PlantsTintProvider._();
+
+/// The color of the plants area: overdue plants warm it towards terracotta, a watered home freshens it.
+
+final class PlantsTintProvider extends $FunctionalProvider<Color, Color, Color> with $Provider<Color> {
+  /// The color of the plants area: overdue plants warm it towards terracotta, a watered home freshens it.
+  PlantsTintProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'plantsTintProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$plantsTintHash();
+
+  @$internal
+  @override
+  $ProviderElement<Color> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+
+  @override
+  Color create(Ref ref) {
+    return plantsTint(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Color value) {
+    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<Color>(value));
+  }
+}
+
+String _$plantsTintHash() => r'7d16b65377c83c9167a8bbb24912f99ec885aa95';

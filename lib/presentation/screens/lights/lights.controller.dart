@@ -1,7 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/painting.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/presentation/utils/extension/rgb_color.extension.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/utils/throttler.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
@@ -94,4 +98,13 @@ List<LightRoom> lightRooms(Ref ref) {
     if (byRoom[LightRoom.notPlacedId] case final unplaced?)
       LightRoom(id: LightRoom.notPlacedId, name: 'Not placed', lights: unplaced),
   ];
+}
+
+/// The color of the lights area: the colors of the rooms that are on; indigo when all are off.
+@riverpod
+Color lightsTint(Ref ref) {
+  return HubAreaColors.lightsFor([
+    for (final room in ref.watch(lightRoomsProvider))
+      if (room.isOn) room.color?.toColor() ?? HubColorPalette.lightWarm,
+  ]);
 }
