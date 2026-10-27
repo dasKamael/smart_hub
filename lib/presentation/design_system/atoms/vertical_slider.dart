@@ -13,6 +13,7 @@ class VerticalSlider extends StatefulWidget {
     this.onChangeEnd,
     this.width = 110,
     this.fillColors,
+    this.trackColor = HubColorPalette.elevated,
   });
 
   /// 0–100.
@@ -27,6 +28,9 @@ class VerticalSlider extends StatefulWidget {
 
   /// Several colors (e.g. of a mixed room) fill as a gradient from bottom to top instead of [fillColor].
   final List<Color>? fillColors;
+
+  /// Behind the fill; transparent shows what the slider stands on.
+  final Color trackColor;
 
   @override
   State<VerticalSlider> createState() => _VerticalSliderState();
@@ -76,7 +80,7 @@ class _VerticalSliderState extends State<VerticalSlider> {
                   width: widget.width,
                   child: Stack(
                     children: [
-                      const Positioned.fill(child: ColoredBox(color: HubColorPalette.elevated)),
+                      Positioned.fill(child: ColoredBox(color: widget.trackColor)),
                       Positioned(
                         left: 0,
                         right: 0,

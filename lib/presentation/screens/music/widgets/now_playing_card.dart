@@ -5,7 +5,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart'
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/connect_device_tile.dart';
+import 'package:smart_hub/presentation/utils/extension/connect_device_type.extension.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/track_progress.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 
@@ -26,6 +26,12 @@ class NowPlayingCard extends StatelessWidget {
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
 
+  /// The card's gradient in the cover's [tint], from the tinted to the plain end; the volume beside it uses it too.
+  static List<Color> colorsOf(Color tint) => [
+    Color.alphaBlend(tint.withValues(alpha: 0.3), HubColorPalette.surface),
+    HubColorPalette.surface,
+  ];
+
   @override
   Widget build(BuildContext context) {
     final track = target.nowPlaying;
@@ -35,11 +41,7 @@ class NowPlayingCard extends StatelessWidget {
       duration: HubMotion.glowDuration,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(HubRadius.pageCard),
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [Color.alphaBlend(tint.withValues(alpha: 0.3), HubColorPalette.surface), HubColorPalette.surface],
-        ),
+        gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: colorsOf(tint)),
       ),
       padding: const EdgeInsets.fromLTRB(18, 18, 24, 18),
       child: Row(
@@ -63,7 +65,7 @@ class NowPlayingCard extends StatelessWidget {
                   children: [
                     HubGlyphIcon(
                       switch (target) {
-                        ConnectTarget(:final device) => ConnectDeviceTile.glyphOf(device.type),
+                        ConnectTarget(:final device) => device.type.glyph,
                         SpeakerGroupTarget() => HubGlyph.speaker,
                       },
                       color: HubColorPalette.text2,

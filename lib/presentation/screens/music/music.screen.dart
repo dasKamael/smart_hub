@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
+import 'package:smart_hub/presentation/screens/music/widgets/playback_place.dart';
+import 'package:smart_hub/presentation/design_system/atoms/vertical_slider.dart';
 import 'package:smart_hub/domain/music/network_speakers.service.dart';
 import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
@@ -19,11 +22,9 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart
 import 'package:smart_hub/presentation/screens/music/library_view.enum.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/connect_device_tile.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/now_playing_card.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/playlist_grid.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/queue_list.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/speaker_tile.dart';
 
 /// Music page: now playing, speakers and Spotify devices, "Jump back in" and "Up next".
 ///
@@ -31,36 +32,48 @@ import 'package:smart_hub/presentation/screens/music/widgets/speaker_tile.dart';
 class MusicScreen extends ConsumerWidget {
   const MusicScreen({super.key});
 
-  static const _tileWidth = 250.0;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Tabs stay mounted; Spotify is only polled while this tab is on screen.
     final visible = TickerMode.valuesOf(context).enabled;
     final hasTarget = ref.watch(currentTargetProvider(visible: visible).select((target) => target != null));
     if (!hasTarget) return const PageCard(child: _NothingToPlayOn());
-    return GestureDetector(
-      // A tap next to a tile hides its options.
-      behavior: HitTestBehavior.translucent,
-      onTap: ref.read(musicControllerProvider.notifier).closeOptions,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: HubSpacing.s16,
-        children: [
-          _NowPlaying(visible: visible),
-          SizedBox(height: 76, child: _Tiles(visible: visible)),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: HubSpacing.s16,
-              children: [
-                Expanded(flex: 14, child: _JumpBackIn(visible: visible)),
-                Expanded(flex: 10, child: _UpNext(visible: visible)),
-              ],
-            ),
+    // Music plays in one place only: no row of every device, just where it plays and how loud – on the right.
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: HubSpacing.s16,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: HubSpacing.s16,
+            children: [
+              _NowPlaying(visible: visible),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: HubSpacing.s16,
+                  children: [
+                    Expanded(flex: 14, child: _JumpBackIn(visible: visible)),
+                    Expanded(flex: 10, child: _UpNext(visible: visible)),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        SizedBox(
+          width: 150,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: HubSpacing.s12,
+            children: [
+              Expanded(child: _Volume(visible: visible)),
+              PlaybackPlaceButton(visible: visible),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -135,87 +148,60 @@ class _NowPlaying extends ConsumerWidget {
   }
 }
 
-/// One tile per speaker and Spotify device. Grouped speakers stand side by side, linked, and count as one target.
-class _Tiles extends ConsumerWidget {
-  const _Tiles({required this.visible});
+/// The volume where the music plays; for a group all of its speakers together.
+class _Volume extends ConsumerWidget {
+  const _Volume({required this.visible});
 
   final bool visible;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final openTileId = ref.watch(musicControllerProvider.select((state) => state.openTileId));
+    final target = ref.watch(currentTargetProvider(visible: visible));
     final controller = ref.read(musicControllerProvider.notifier);
-    final activeId = ref.watch(currentTargetProvider(visible: visible).select((target) => target?.id));
-    final activeGroup = ref.watch(
-      currentTargetProvider(visible: visible).select((target) => target is SpeakerGroupTarget ? target.group : null),
-    );
-    final groups = ref.watch(speakerGroupsProvider);
-    PlaybackTarget? current() => ref.read(currentTargetProvider(visible: visible));
-    final devices = ref.watch(connectTargetsProvider(visible: visible));
-    final enabled = ref.watch(speakersOnlineProvider);
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: [
-        for (final group in groups)
-          for (final (index, speaker) in group.members.indexed) ...[
-            SizedBox(
-              width: MusicScreen._tileWidth,
-              child: SpeakerTile(
-                speaker: speaker,
-                active: SpeakerGroupTarget(group).id == activeId,
-                optionsShown: openTileId == speaker.id,
-                enabled: enabled,
-                canJoin: activeGroup != null && !activeGroup.contains(speaker.id),
-                onTap: () => controller.tapTile(SpeakerGroupTarget(group), current: current(), tileId: speaker.id),
-                onLongPress: () => controller.showOptions(speaker.id),
-                onVolumeChanged: (percent) => controller.changeVolume(speaker.id, percent),
-                onVolumeEnd: (percent) => controller.endVolume(speaker.id, percent),
-                onToggleGroup: () {
-                  if (activeGroup != null) controller.toggleMembership(speaker, activeGroup);
-                },
-              ),
-            ),
-            if (index < group.members.length - 1)
-              _GroupLink(active: SpeakerGroupTarget(group).id == activeId)
-            else
-              const SizedBox(width: HubSpacing.s12),
-          ],
-        for (final device in devices) ...[
-          SizedBox(
-            width: MusicScreen._tileWidth,
-            child: ConnectDeviceTile(
-              device: device.device,
-              playing: device.nowPlaying.isPlaying,
-              active: device.id == activeId,
-              optionsShown: openTileId == device.id,
-              onTap: () => controller.tapTile(device, current: current(), tileId: device.id),
-              onLongPress: () => controller.showOptions(device.id),
-              onVolumeChanged: (percent) => controller.changeDeviceVolume(device.device, percent),
-              onVolumeEnd: (percent) => controller.endDeviceVolume(device.device, percent),
-            ),
+    final tint = Artwork.colorOf(target?.nowPlaying.title ?? target?.name ?? '');
+    final (value, onChanged, onEnd) = switch (target) {
+      SpeakerGroupTarget(:final group) when ref.watch(speakersOnlineProvider) => (
+        (group.members.map((speaker) => speaker.volumePercent).reduce((a, b) => a + b) / group.members.length).round(),
+        (int percent) {
+          for (final speaker in group.members) {
+            controller.changeVolume(speaker.id, percent);
+          }
+        },
+        (int percent) {
+          for (final speaker in group.members) {
+            controller.endVolume(speaker.id, percent);
+          }
+        },
+      ),
+      SpeakerGroupTarget(:final group) => (group.leader.volumePercent, null, null),
+      ConnectTarget(:final device) when device.supportsVolume => (
+        device.volumePercent ?? 0,
+        (int percent) => controller.changeDeviceVolume(device, percent),
+        (int percent) => controller.endDeviceVolume(device, percent),
+      ),
+      ConnectTarget(:final device) => (device.volumePercent ?? 0, null, null),
+      null => (0, null, null),
+    };
+    return Semantics(
+      label: 'Volume',
+      child: AnimatedContainer(
+        duration: HubMotion.glowDuration,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: NowPlayingCard.colorsOf(tint),
           ),
-          const SizedBox(width: HubSpacing.s12),
-        ],
-      ],
-    );
-  }
-}
-
-/// Joins two tiles of the same speaker group.
-class _GroupLink extends StatelessWidget {
-  const _GroupLink({required this.active});
-
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: HubSpacing.s12,
-      child: Center(
-        child: AnimatedContainer(
-          duration: HubMotion.fadeDuration,
-          height: 3,
-          color: active ? HubColorPalette.text.withValues(alpha: 0.8) : const Color(0x33FFFFFF),
+        ),
+        child: VerticalSlider(
+          width: 150,
+          trackColor: Colors.transparent,
+          value: value,
+          fillColor: Color.lerp(tint, HubColorPalette.text, 0.35)!,
+          label: '$value%',
+          onChanged: onChanged,
+          onChangeEnd: onEnd,
         ),
       ),
     );

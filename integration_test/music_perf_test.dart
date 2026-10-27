@@ -21,7 +21,6 @@ import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_theme.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/speaker_tile.dart';
 
 /// Frame timings of the music page while Spotify is polled and while using it.
 ///
@@ -72,19 +71,22 @@ void main() {
       await frames(60);
       await tester.tap(playPause);
       await frames(60);
-      final kitchen = find.byWidgetPredicate((w) => w is SpeakerTile && w.speaker.name == 'Kitchen');
-      await tester.tap(kitchen);
-      await frames(30);
-      final gesture = await tester.startGesture(tester.getCenter(kitchen) - const Offset(80, 0));
+      final volume = find.bySemanticsLabel('Volume');
+      final gesture = await tester.startGesture(tester.getCenter(volume));
       for (var step = 0; step < 90; step++) {
-        await gesture.moveBy(Offset(step < 45 ? 3 : -3, 0));
+        await gesture.moveBy(Offset(0, step < 45 ? -3 : 3));
         await tester.pump(const Duration(milliseconds: 16));
       }
       await gesture.up();
       await frames(60);
-      await tester.tap(find.text('Pixel 9').first);
+      // Moves the music to the phone and back.
+      await tester.tap(find.bySemanticsLabel(RegExp('^Playing on')));
+      await frames(30);
+      await tester.tap(find.bySemanticsLabel('Pixel 9'));
       await frames(60);
-      await tester.tap(kitchen);
+      await tester.tap(find.bySemanticsLabel(RegExp('^Playing on')));
+      await frames(30);
+      await tester.tap(find.bySemanticsLabel('Kitchen'));
       await frames(60);
     }, reportKey: 'music_use');
   });

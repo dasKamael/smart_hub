@@ -16,27 +16,32 @@ class PageCard extends StatelessWidget {
   /// Painted on the card behind the content, e.g. the weather scene.
   final Widget? background;
 
+  /// The card's solid look, also for controls that stand on the page beside cards.
+  static BoxDecoration decoration({Color? tint, double radius = HubRadius.pageCard}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          switch (tint) {
+            final tint? => HubAreaColors.cardTop(tint, HubColorPalette.card, strength: 0.22),
+            null => HubColorPalette.card,
+          },
+          HubColorPalette.card,
+        ],
+      ),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: HubColorPalette.cardBorder),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 900),
       curve: Curves.easeInOut,
       padding: background == null ? padding : EdgeInsets.zero,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            switch (tint) {
-              final tint? => HubAreaColors.cardTop(tint, HubColorPalette.card, strength: 0.22),
-              null => HubColorPalette.card,
-            },
-            HubColorPalette.card,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(HubRadius.pageCard),
-        border: Border.all(color: HubColorPalette.cardBorder),
-      ),
+      decoration: decoration(tint: tint),
       child: switch (background) {
         final background? => Stack(
           fit: StackFit.expand,

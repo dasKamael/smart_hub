@@ -42,27 +42,17 @@ class MusicController extends _$MusicController {
     return const MusicPageState();
   }
 
-  void selectTarget(String targetId) => state = state.copyWith(targetId: targetId, openTileId: null);
+  void selectTarget(String targetId) => state = state.copyWith(targetId: targetId);
 
-  /// A tap on a tile: the active target shows its options; any other becomes the active target, and when music plays
-  /// on the active one it moves along – music plays in one place only.
-  void tapTile(PlaybackTarget target, {required PlaybackTarget? current, required String tileId}) {
-    if (current?.id == target.id) return toggleOptions(tileId);
+  /// Plays on [target] from now on; when music plays on [current] it moves along – music plays in one place only.
+  void moveTo(PlaybackTarget target, {required PlaybackTarget? current}) {
+    if (current?.id == target.id) return;
     final playing = current != null && current.nowPlaying.isPlaying && !target.nowPlaying.isPlaying;
     selectTarget(target.id);
     if (playing) _run('move playback', _move(current, target));
   }
 
-  void showLibrary(LibraryView view) => state = state.copyWith(libraryView: view, openTileId: null);
-
-  /// Options of any tile, e.g. to add a speaker to the active group.
-  void showOptions(String tileId) => state = state.copyWith(openTileId: tileId);
-
-  void toggleOptions(String tileId) {
-    state = state.copyWith(openTileId: state.openTileId == tileId ? null : tileId);
-  }
-
-  void closeOptions() => state = state.copyWith(openTileId: null);
+  void showLibrary(LibraryView view) => state = state.copyWith(libraryView: view);
 
   void playPause(PlaybackTarget target) {
     switch (target) {
@@ -135,12 +125,13 @@ class MusicController extends _$MusicController {
     _throttler(device.id).flush(() => _run('set volume', _spotify.setVolume(device.id, percent)));
   }
 
-  /// Takes [speaker] out of its group, or adds it to the shown group.
+  /// Takes [speaker] out of the [current] group, or adds it – also when it plays in another group.
   void toggleMembership(SpeakerState speaker, SpeakerGroup current) {
-    closeOptions();
     _run(
       'change group',
-      speaker.isGrouped ? _speakers.leaveGroup(speaker.id) : _speakers.joinGroup(speaker.id, current.leaderId),
+      current.contains(speaker.id)
+          ? _speakers.leaveGroup(speaker.id)
+          : _speakers.joinGroup(speaker.id, current.leaderId),
     );
   }
 
@@ -169,6 +160,11 @@ class MusicController extends _$MusicController {
       }
       return;
     }
+    if ((from, to) case (SpeakerGroupTarget(:final group), ConnectTarget(:final device))) {
+      // Music sent to the speaker over Spotify is not reported by Spotify: pause it there, then resume it on the device.
+      await _speakers.playPause(group.leaderId);
+      return _spotify.transfer(device.id);
+    }
     if ((from, to) case (SpeakerGroupTarget(group: final source), SpeakerGroupTarget(group: final target))) {
       return _speakers.move(source.leaderId, [for (final speaker in target.members) speaker.id]);
     }
@@ -188,11 +184,7 @@ class MusicController extends _$MusicController {
 
   Throttler _throttler(String key) => _throttlers.putIfAbsent(key, () => Throttler(sliderInterval));
 
-  /// Playback commands also hide open tile options.
-  void _transport(String action, Future<void> command) {
-    closeOptions();
-    _run(action, command);
-  }
+  void _transport(String action, Future<void> command) => _run(action, command);
 
   void _run(String action, Future<void> command) {
     unawaited(command.catchError((Object e) => _log.warning('Could not $action: $e')));

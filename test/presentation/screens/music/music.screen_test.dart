@@ -14,10 +14,9 @@ import 'package:smart_hub/domain/music/model/connect_device.dart';
 import 'package:smart_hub/domain/music/model/speaker_setting.dart';
 import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/connect_device_tile.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
+import 'package:smart_hub/presentation/design_system/atoms/vertical_slider.dart';
 import 'package:smart_hub/presentation/screens/music/music.screen.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/speaker_tile.dart';
 
 import '../../../mocks/devices.mock.dart';
 import '../../../utils/widget.test_util.dart';
@@ -105,13 +104,13 @@ void main() {
       );
     }
 
-    Finder tile(String name) => find.byWidgetPredicate((w) => w is SpeakerTile && w.speaker.name == name);
-
-    bool optionsShown(WidgetTester tester, String name) {
-      return tester
-          .widget<SpeakerTile>(find.byWidgetPredicate((w) => w is SpeakerTile && w.speaker.name == name))
-          .optionsShown;
+    /// Opens the places above the place button.
+    Future<void> openPlaces(WidgetTester tester) async {
+      await tester.tap(find.bySemanticsLabel(RegExp('^Playing on')));
+      await tester.pumpAndSettle();
     }
+
+    Finder place(String name) => find.bySemanticsLabel(name);
 
     testWidgets('Given a playing group and a paused speaker, '
         'when rendering, '
@@ -120,7 +119,7 @@ void main() {
       await pumpScreen(tester);
 
       // Then
-      expect(find.text('Kitchen + Office'), findsOneWidget);
+      expect(find.bySemanticsLabel('Playing on Kitchen + Office'), findsOneWidget);
       expect(find.text('Morning Light'), findsNWidgets(2), reason: 'now playing and queue');
       expect(find.text('Lumen Quartet · Morning Coffee'), findsOneWidget);
       expect(find.bySemanticsLabel('Pause'), findsOneWidget);
@@ -129,32 +128,36 @@ void main() {
     });
 
     testWidgets('Given the office group plays, '
-        'when tapping the Sleep tile, '
+        'when choosing Sleep as the place, '
         'then Sleep becomes the active one and the music moves there', (tester) async {
       // Given
       await pumpScreen(tester);
 
       // When
-      await tester.tap(tile('Sleep'));
+      await openPlaces(tester);
+      await tester.tap(place('Sleep'));
       await tester.pumpAndSettle();
 
       // Then
       expect(find.text('Late Tram'), findsOneWidget);
-      expect(tester.widget<SpeakerTile>(tile('Sleep')).active, isTrue);
-      expect(tester.widget<SpeakerTile>(tile('Office')).active, isFalse);
+      expect(find.bySemanticsLabel('Playing on Sleep'), findsOneWidget);
       expect(speakers.commands, ['move media_player.office to media_player.sleep']);
       // Lets the selection hold of the shown target run out.
       await tester.pump(CurrentTarget.selectionHold);
     });
 
-    testWidgets('Given the office group, when rendering, then both of its tiles are active as one', (tester) async {
+    testWidgets('Given the office group, when opening the places, then both of its speakers are marked as one', (
+      tester,
+    ) async {
       // When
       await pumpScreen(tester);
+      await openPlaces(tester);
 
       // Then
-      expect(tester.widget<SpeakerTile>(tile('Office')).active, isTrue);
-      expect(tester.widget<SpeakerTile>(tile('Kitchen')).active, isTrue);
-      expect(tester.widget<SpeakerTile>(tile('Sleep')).active, isFalse);
+      expect(find.bySemanticsLabel('Playing on Kitchen + Office'), findsOneWidget);
+      expect(tester.getSemantics(place('Office')), isSemantics(isSelected: true));
+      expect(tester.getSemantics(place('Kitchen')), isSemantics(isSelected: true));
+      expect(tester.getSemantics(place('Sleep')), isSemantics(isSelected: false));
     });
 
     testWidgets('Given the transport, when using it and starting a playlist, then the group leader gets the commands', (
@@ -179,53 +182,35 @@ void main() {
       ]);
     });
 
-    testWidgets('Given a speaker tile, '
-        'when tapping it and then Leave, '
-        'then options appear and the speaker leaves its group', (tester) async {
-      // Given
-      await pumpScreen(tester);
-
-      // When
-      await tester.tap(tile('Kitchen'));
-      await tester.pumpAndSettle();
-      final shown = optionsShown(tester, 'Kitchen');
-      await tester.tap(find.bySemanticsLabel('Leave group'));
-      await tester.pumpAndSettle();
-
-      // Then
-      expect(shown, isTrue);
-      expect(optionsShown(tester, 'Kitchen'), isFalse);
-      expect(speakers.commands, ['leave media_player.kitchen']);
-    });
-
-    testWidgets('Given a single speaker, when long pressing it and choosing Join, then it joins the active group', (
+    testWidgets('Given the office group, when taking the kitchen out and adding Sleep, then the groups change', (
       tester,
     ) async {
       // Given
       await pumpScreen(tester);
+      await openPlaces(tester);
 
       // When
-      await tester.longPress(tile('Sleep'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.bySemanticsLabel('Join group'));
+      await tester.tap(find.bySemanticsLabel('Remove Kitchen from the group'));
+      await tester.tap(find.bySemanticsLabel('Add Sleep to the group'));
       await tester.pump();
 
       // Then
-      expect(speakers.commands, ['join media_player.sleep to media_player.office']);
+      expect(speakers.commands, ['leave media_player.kitchen', 'join media_player.sleep to media_player.office']);
     });
 
-    testWidgets('Given open speaker options, when starting a playlist, then the options close', (tester) async {
+    testWidgets('Given the office group plays at 35 and 30, when moving the volume up, then both speakers follow', (
+      tester,
+    ) async {
       // Given
       await pumpScreen(tester);
-      await tester.tap(tile('Kitchen'));
-      await tester.pumpAndSettle();
+      final slider = find.byType(VerticalSlider);
 
       // When
-      await tester.tap(find.bySemanticsLabel('Play Focus Flow'));
-      await tester.pumpAndSettle();
+      await tester.tapAt(tester.getTopLeft(slider) + Offset(20, tester.getSize(slider).height * 0.5));
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Then
-      expect(optionsShown(tester, 'Kitchen'), isFalse);
+      expect(speakers.commands, containsAll(['volume media_player.office 50', 'volume media_player.kitchen 50']));
     });
 
     testWidgets('Given the hub is offline, when tapping the transport, then nothing is sent', (tester) async {
@@ -260,19 +245,18 @@ void main() {
         'spotify:MacBook': SpeakerSetting(id: 'spotify:MacBook', displayName: 'Laptop'),
       };
 
-      Finder deviceTile(String name) => find.byWidgetPredicate((w) => w is ConnectDeviceTile && w.device.name == name);
-
       testWidgets('Given devices with Spotify open, '
           'when rendering, '
           'then they are listed without the speakers, without hidden ones and with their hub names', (tester) async {
         // When
         await pumpScreen(tester, devices: devices, settings: settings);
+        await openPlaces(tester);
 
         // Then
-        expect(deviceTile('Pixel 9'), findsOneWidget);
-        expect(deviceTile('Laptop'), findsOneWidget);
-        expect(deviceTile('office'), findsNothing, reason: 'already a speaker');
-        expect(deviceTile('Living room TV'), findsNothing, reason: 'hidden');
+        expect(place('Pixel 9'), findsOneWidget);
+        expect(place('Laptop'), findsOneWidget);
+        expect(find.bySemanticsLabel('office'), findsNothing, reason: 'already a speaker');
+        expect(place('Living room TV'), findsNothing, reason: 'hidden');
       });
 
       testWidgets('Given Spotify plays on the laptop, '
@@ -290,18 +274,18 @@ void main() {
             positionAt: DateTime(2026),
           ),
         );
-        await tester.ensureVisible(deviceTile('Laptop'));
-        await tester.tap(deviceTile('Laptop'));
+        await openPlaces(tester);
+        await tester.tap(place('Laptop'));
         await tester.pumpAndSettle();
 
         // When
-        await tester.ensureVisible(deviceTile('Pixel 9'));
-        await tester.tap(deviceTile('Pixel 9'));
+        await openPlaces(tester);
+        await tester.tap(place('Pixel 9'));
         await tester.pumpAndSettle();
 
         // Then
         expect(spotify.commands, ['transfer d-phone']);
-        expect(tester.widget<ConnectDeviceTile>(deviceTile('Pixel 9')).active, isTrue);
+        expect(find.bySemanticsLabel('Playing on Pixel 9'), findsOneWidget);
         // Lets the selection hold of the shown target run out.
         await tester.pump(CurrentTarget.selectionHold);
       });

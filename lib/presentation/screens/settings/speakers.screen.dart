@@ -10,7 +10,7 @@ import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.da
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
-import 'package:smart_hub/presentation/screens/music/widgets/connect_device_tile.dart';
+import 'package:smart_hub/presentation/utils/extension/connect_device_type.extension.dart';
 import 'package:smart_hub/presentation/screens/settings/speakers.controller.dart';
 import 'package:smart_hub/presentation/screens/settings/widgets/rename_dialog.dart';
 
@@ -113,7 +113,7 @@ class _SpeakerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final hidden = entry.setting.hidden;
     final glyph = switch (entry.deviceType) {
-      final type? => ConnectDeviceTile.glyphOf(type),
+      final type? => type.glyph,
       null => entry.source == SpeakerSource.homeAssistant ? HubGlyph.speaker : HubGlyph.note,
     };
     final status = [

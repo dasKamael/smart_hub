@@ -146,7 +146,7 @@ void main() {
       expect(order, ['Office', 'Pixel 9']);
     });
 
-    group('MusicController.tapTile', () {
+    group('MusicController.moveTo', () {
       const office = SpeakerState(
         id: 'media_player.office',
         name: 'Office',
@@ -184,7 +184,7 @@ void main() {
       void tap(ProviderContainer container, String name) {
         final current = container.read(currentTargetProvider(visible: true));
         final target = container.read(playbackTargetsProvider(visible: true)).firstWhere((t) => t.name == name);
-        container.read(musicControllerProvider.notifier).tapTile(target, current: current, tileId: target.id);
+        container.read(musicControllerProvider.notifier).moveTo(target, current: current);
       }
 
       test('Given Spotify plays on the phone, '
@@ -224,7 +224,35 @@ void main() {
         expect(speakers.commands, isEmpty);
       });
 
-      test('Given the active one, when tapping it, then its options show and nothing moves', () async {
+      test('Given a speaker plays music Spotify does not report, '
+          'when choosing a Spotify device, '
+          'then the speaker pauses and Spotify plays on the device', () async {
+        // Given
+        speakers = FakeSpeakersService([office.copyWith(playback: Playback.playing)]);
+        spotify = FakeSpotifyConnectService((devices: const [phone], playback: phonePlays.copyWith(isPlaying: false)));
+        final container = createTestContainer(
+          overrides: [
+            speakersServiceProvider.overrideWith(() => speakers),
+            speakerSettingsServiceProvider.overrideWith(FakeSpeakerSettingsService.new),
+            spotifyConnectServiceProvider.overrideWith(() => spotify),
+          ],
+        );
+        container.listen(currentTargetProvider(visible: true), (_, _) {});
+        await container.read(speakersServiceProvider.future);
+        await container.read(speakerSettingsServiceProvider.future);
+        await container.read(spotifyConnectServiceProvider.future);
+        expect(container.read(currentTargetProvider(visible: true))?.name, 'Office');
+
+        // When
+        tap(container, 'Pixel 9');
+        await Future<void>.delayed(Duration.zero);
+
+        // Then
+        expect(speakers.commands, ['playPause media_player.office']);
+        expect(spotify.commands, ['transfer d-phone']);
+      });
+
+      test('Given the active one, when choosing it again, then nothing moves', () async {
         // Given
         final container = await createContainer();
 
@@ -232,7 +260,6 @@ void main() {
         tap(container, 'Pixel 9');
 
         // Then
-        expect(container.read(musicControllerProvider).openTileId, 'spotify-device:d-phone');
         expect(spotify.commands, isEmpty);
       });
     });

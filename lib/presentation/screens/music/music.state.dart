@@ -9,8 +9,6 @@ abstract class MusicPageState with _$MusicPageState {
     /// Target shown in "Now playing" (`PlaybackTarget.id`); `null` picks what plays.
     String? targetId,
 
-    /// The tile whose options (volume, group) are shown.
-    String? openTileId,
     @Default(LibraryView.recent) LibraryView libraryView,
   }) = _MusicPageState;
 }
