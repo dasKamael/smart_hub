@@ -4,7 +4,6 @@ import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
-import 'package:smart_hub/presentation/design_system/molecules/stat_chip.dart';
 import 'package:smart_hub/presentation/screens/plants/plants.screen.dart';
 import 'package:smart_hub/presentation/screens/plants/widgets/plant_card.dart';
 
@@ -41,10 +40,6 @@ void main() {
       );
     }
 
-    int stat(WidgetTester tester, String label) {
-      return tester.widget<StatChip>(find.byWidgetPredicate((w) => w is StatChip && w.label == label)).value;
-    }
-
     Finder card(String name) => find.byWidgetPredicate((w) => w is PlantCard && w.entry.plant.name == name);
 
     Finder optionOf(String name, String option) => find.descendant(of: card(name), matching: find.text(option));
@@ -66,9 +61,6 @@ void main() {
       await pumpScreen(tester);
 
       // Then
-      expect(stat(tester, 'to water'), 2);
-      expect(stat(tester, 'overdue'), 1);
-      expect(stat(tester, 'done today'), 1);
       expect(card('Monstera'), findsOneWidget);
       expect(card('Basil'), findsOneWidget);
       expect(card('Fern'), findsOneWidget);
@@ -109,7 +101,6 @@ void main() {
       await pumpScreen(tester, list: [fern, fig]);
 
       expect(find.text('Water all'), findsNothing);
-      expect(stat(tester, 'to water'), 0);
     });
 
     testWidgets('Given the week strip, '

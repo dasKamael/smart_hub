@@ -5,7 +5,7 @@ import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 
-/// Soft color clouds in the colors of the cover that drift slowly; a new cover blends its colors in.
+/// Soft, deeply dimmed color clouds in the colors of the cover that drift slowly; a new cover blends its colors in.
 ///
 /// Ticks 20 times a second instead of every frame, and slower while paused – ambience on a screen that is on all day.
 /// Stands still while the zen mode is not shown.
@@ -82,7 +82,7 @@ class _CloudsPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final palette = colors();
     final base = HSVColor.fromColor(palette.first);
-    canvas.drawRect(Offset.zero & size, Paint()..color = base.withValue(base.value * 0.22).toColor());
+    canvas.drawRect(Offset.zero & size, Paint()..color = base.withValue(base.value * 0.14).toColor());
     final t = phase.value;
     for (final (i, (periodX, periodY)) in _periods.indexed) {
       final color = palette[i % palette.length];
@@ -95,7 +95,7 @@ class _CloudsPainter extends CustomPainter {
         center,
         radius,
         Paint()
-          ..shader = RadialGradient(colors: [color.withValues(alpha: 0.7), color.withValues(alpha: 0)])
+          ..shader = RadialGradient(colors: [color.withValues(alpha: 0.45), color.withValues(alpha: 0)])
               .createShader(Rect.fromCircle(center: center, radius: radius)),
       );
     }
@@ -103,7 +103,7 @@ class _CloudsPainter extends CustomPainter {
     canvas.drawRect(
       Offset.zero & size,
       Paint()
-        ..shader = const LinearGradient(colors: [Color(0xB3000000), Color(0x1A000000)])
+        ..shader = const LinearGradient(colors: [Color(0xCC000000), Color(0x59000000)])
             .createShader(Offset.zero & size),
     );
   }

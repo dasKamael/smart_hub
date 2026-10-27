@@ -12,7 +12,6 @@ import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_icon_button.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
-import 'package:smart_hub/presentation/design_system/molecules/stat_chip.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
@@ -43,9 +42,6 @@ class PlantsScreen extends ConsumerWidget {
       for (final entry in plan.all)
         if (entry.state.isDue) entry,
     ];
-    final overdue = due.where((entry) => entry.state == WateringState.overdue).length;
-    final done = plan.all.where((entry) => entry.state == WateringState.wateredToday).length;
-    final toFeed = plan.all.where((entry) => (entry.feedInDays ?? 1) <= 0).length;
 
     final shown = switch (selectedDay) {
       allPlantsDay => [...plan.all]..sort((a, b) => _order(a).compareTo(_order(b))),
@@ -71,14 +67,9 @@ class PlantsScreen extends ConsumerWidget {
         spacing: HubSpacing.s20,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             spacing: HubSpacing.s12,
             children: [
-              StatChip(glyph: HubGlyph.drop, color: HubColorPalette.accent, value: due.length, label: 'to water'),
-              StatChip(glyph: HubGlyph.alert, color: HubColorPalette.danger, value: overdue, label: 'overdue'),
-              StatChip(glyph: HubGlyph.check, color: HubColorPalette.success, value: done, label: 'done today'),
-              if (toFeed > 0)
-                StatChip(glyph: HubGlyph.feed, color: HubColorPalette.feed, value: toFeed, label: 'to feed'),
-              const Spacer(),
               if (due.isNotEmpty)
                 HubButton(label: 'Water all', glyph: HubGlyph.drop, onPressed: () => controller.waterAll(due)),
               HubIconButton(

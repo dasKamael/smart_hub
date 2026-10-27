@@ -158,7 +158,7 @@ void main() {
         final dim = tester.widget<AnimatedOpacity>(
           find.descendant(of: find.byType(ZenScreen), matching: find.byType(AnimatedOpacity)).last,
         );
-        expect(dim.opacity, 0.6);
+        expect(dim.opacity, ZenScreen.nightDim);
       });
     });
   });

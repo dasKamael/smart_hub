@@ -11,17 +11,23 @@ import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/presentation/screens/zen/widgets/ambient_background.dart';
+import 'package:smart_hub/presentation/screens/zen/widgets/vinyl_record.dart';
 import 'package:smart_hub/presentation/screens/zen/zen.controller.dart';
 import 'package:smart_hub/presentation/shared_widgets/cover_colors.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 
-/// Calm full screen for the time nobody stands at the tablet: the time, what plays and one play / pause button over
-/// the blurred cover. A tap anywhere else goes back. Dimmed at night.
+/// Calm full screen for the time nobody stands at the tablet: the time, what plays and one play / pause button next
+/// to the cover, which turns as the label of a record while the music plays. A tap anywhere else goes back. Dimmed
+/// at night.
 ///
 /// Once a minute the content shifts a few pixels (against burn-in); the background drifts slowly in the cover's
 /// colors. The next track's cover is loaded ahead, so a track change shows no placeholder.
 class ZenScreen extends ConsumerStatefulWidget {
   const ZenScreen({super.key});
+
+  /// How far the whole screen is dimmed by day and from 22:00 to 6:00 – a lit wall at night helps nobody.
+  static const dim = 0.3;
+  static const nightDim = 0.68;
 
   /// From 22:00 to 6:00 the screen is dimmed.
   static bool isNight(DateTime time) => time.hour >= 22 || time.hour < 6;
@@ -153,25 +159,23 @@ class _ZenScreenState extends ConsumerState<ZenScreen> {
                   if (track?.title != null)
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final side = _coverSide = constraints.maxHeight.clamp(0, 520).toDouble();
-                        return DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: const [
-                              BoxShadow(color: Color(0x99000000), blurRadius: 60, offset: Offset(0, 24)),
-                            ],
-                          ),
-                          child: Artwork(seed: seed, url: track?.artworkUrl, size: side, radius: 28),
+                        final side = constraints.maxHeight.clamp(0, 520).toDouble();
+                        _coverSide = side * VinylRecord.labelFraction;
+                        return VinylRecord(
+                          seed: seed,
+                          url: track?.artworkUrl,
+                          size: side,
+                          playing: track?.isPlaying ?? false,
                         );
                       },
                     ),
                 ],
               ),
             ),
-            // Dimmed at night, so the tablet does not light up the hall.
+            // Dark all the time and darker at night, so the tablet does not light up the hall.
             IgnorePointer(
               child: AnimatedOpacity(
-                opacity: night ? 0.6 : 0,
+                opacity: night ? ZenScreen.nightDim : ZenScreen.dim,
                 duration: const Duration(seconds: 2),
                 child: const ColoredBox(color: Color(0xFF000000)),
               ),
