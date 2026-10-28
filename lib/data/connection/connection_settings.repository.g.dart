@@ -11,13 +11,18 @@ part of 'connection_settings.repository.dart';
 /// Providers
 
 @ProviderFor(connectionSettingsRepository)
-final connectionSettingsRepositoryProvider = ConnectionSettingsRepositoryProvider._();
+final connectionSettingsRepositoryProvider =
+    ConnectionSettingsRepositoryProvider._();
 
 /// Providers
 
 final class ConnectionSettingsRepositoryProvider
     extends
-        $FunctionalProvider<ConnectionSettingsRepository, ConnectionSettingsRepository, ConnectionSettingsRepository>
+        $FunctionalProvider<
+          ConnectionSettingsRepository,
+          ConnectionSettingsRepository,
+          ConnectionSettingsRepository
+        >
     with $Provider<ConnectionSettingsRepository> {
   /// Providers
   ConnectionSettingsRepositoryProvider._()
@@ -36,7 +41,9 @@ final class ConnectionSettingsRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<ConnectionSettingsRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<ConnectionSettingsRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ConnectionSettingsRepository create(Ref ref) {
@@ -45,8 +52,12 @@ final class ConnectionSettingsRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ConnectionSettingsRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<ConnectionSettingsRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ConnectionSettingsRepository>(value),
+    );
   }
 }
 
-String _$connectionSettingsRepositoryHash() => r'292ac849d905d08b81f1a9f984b54a4d6dc97ccd';
+String _$connectionSettingsRepositoryHash() =>
+    r'292ac849d905d08b81f1a9f984b54a4d6dc97ccd';

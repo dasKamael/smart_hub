@@ -17,7 +17,9 @@ final currentDayProvider = CurrentDayProvider._();
 /// Today at midnight; emits again right after every midnight, so day based states (e.g. plants due today)
 /// update on their own.
 
-final class CurrentDayProvider extends $FunctionalProvider<AsyncValue<DateTime>, DateTime, Stream<DateTime>>
+final class CurrentDayProvider
+    extends
+        $FunctionalProvider<AsyncValue<DateTime>, DateTime, Stream<DateTime>>
     with $FutureModifier<DateTime>, $StreamProvider<DateTime> {
   /// Today at midnight; emits again right after every midnight, so day based states (e.g. plants due today)
   /// update on their own.
@@ -37,7 +39,8 @@ final class CurrentDayProvider extends $FunctionalProvider<AsyncValue<DateTime>,
 
   @$internal
   @override
-  $StreamProviderElement<DateTime> $createElement($ProviderPointer pointer) => $StreamProviderElement(pointer);
+  $StreamProviderElement<DateTime> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
 
   @override
   Stream<DateTime> create(Ref ref) {

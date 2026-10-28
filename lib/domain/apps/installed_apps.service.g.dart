@@ -14,7 +14,8 @@ part of 'installed_apps.service.dart';
 final installedAppsServiceProvider = InstalledAppsServiceProvider._();
 
 /// The apps on the tablet, loaded while something shows them, and opening one.
-final class InstalledAppsServiceProvider extends $AsyncNotifierProvider<InstalledAppsService, List<InstalledApp>> {
+final class InstalledAppsServiceProvider
+    extends $AsyncNotifierProvider<InstalledAppsService, List<InstalledApp>> {
   /// The apps on the tablet, loaded while something shows them, and opening one.
   InstalledAppsServiceProvider._()
     : super(
@@ -35,16 +36,19 @@ final class InstalledAppsServiceProvider extends $AsyncNotifierProvider<Installe
   InstalledAppsService create() => InstalledAppsService();
 }
 
-String _$installedAppsServiceHash() => r'd2d50544453625494f77c223540f777de2115201';
+String _$installedAppsServiceHash() =>
+    r'd2d50544453625494f77c223540f777de2115201';
 
 /// The apps on the tablet, loaded while something shows them, and opening one.
 
-abstract class _$InstalledAppsService extends $AsyncNotifier<List<InstalledApp>> {
+abstract class _$InstalledAppsService
+    extends $AsyncNotifier<List<InstalledApp>> {
   FutureOr<List<InstalledApp>> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<InstalledApp>>, List<InstalledApp>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<InstalledApp>>, List<InstalledApp>>;
     final element =
         ref.element
             as $ClassProviderElement<

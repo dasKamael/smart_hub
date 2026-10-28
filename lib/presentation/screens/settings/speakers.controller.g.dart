@@ -14,7 +14,8 @@ part of 'speakers.controller.dart';
 final speakersControllerProvider = SpeakersControllerProvider._();
 
 /// Speaker settings page: which row shows its options, and the changes.
-final class SpeakersControllerProvider extends $NotifierProvider<SpeakersController, String?> {
+final class SpeakersControllerProvider
+    extends $NotifierProvider<SpeakersController, String?> {
   /// Speaker settings page: which row shows its options, and the changes.
   SpeakersControllerProvider._()
     : super(
@@ -36,11 +37,15 @@ final class SpeakersControllerProvider extends $NotifierProvider<SpeakersControl
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(String? value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<String?>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
   }
 }
 
-String _$speakersControllerHash() => r'ffdac7b240ca163785c331b3f746225cad7dc672';
+String _$speakersControllerHash() =>
+    r'ffdac7b240ca163785c331b3f746225cad7dc672';
 
 /// Speaker settings page: which row shows its options, and the changes.
 
@@ -50,7 +55,14 @@ abstract class _$SpeakersController extends $Notifier<String?> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<String?, String?>;
-    final element = ref.element as $ClassProviderElement<AnyNotifier<String?, String?>, String?, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String?, String?>,
+              String?,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }
@@ -63,7 +75,12 @@ final speakerEntriesProvider = SpeakerEntriesProvider._();
 /// Speakers from Home Assistant first, then Spotify devices – the ones open now and the ones set up before.
 
 final class SpeakerEntriesProvider
-    extends $FunctionalProvider<List<SpeakerEntry>, List<SpeakerEntry>, List<SpeakerEntry>>
+    extends
+        $FunctionalProvider<
+          List<SpeakerEntry>,
+          List<SpeakerEntry>,
+          List<SpeakerEntry>
+        >
     with $Provider<List<SpeakerEntry>> {
   /// Speakers from Home Assistant first, then Spotify devices – the ones open now and the ones set up before.
   SpeakerEntriesProvider._()
@@ -82,7 +99,9 @@ final class SpeakerEntriesProvider
 
   @$internal
   @override
-  $ProviderElement<List<SpeakerEntry>> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<List<SpeakerEntry>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   List<SpeakerEntry> create(Ref ref) {
@@ -91,7 +110,10 @@ final class SpeakerEntriesProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<SpeakerEntry> value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<List<SpeakerEntry>>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<SpeakerEntry>>(value),
+    );
   }
 }
 

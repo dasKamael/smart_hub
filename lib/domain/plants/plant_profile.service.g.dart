@@ -15,7 +15,9 @@ final plantDatabaseAvailableProvider = PlantDatabaseAvailableProvider._();
 
 /// Whether plants can be linked with the plant database (needs an API key in the build).
 
-final class PlantDatabaseAvailableProvider extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+final class PlantDatabaseAvailableProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
   /// Whether plants can be linked with the plant database (needs an API key in the build).
   PlantDatabaseAvailableProvider._()
     : super(
@@ -33,7 +35,8 @@ final class PlantDatabaseAvailableProvider extends $FunctionalProvider<bool, boo
 
   @$internal
   @override
-  $ProviderElement<bool> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   bool create(Ref ref) {
@@ -42,11 +45,15 @@ final class PlantDatabaseAvailableProvider extends $FunctionalProvider<bool, boo
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<bool>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
   }
 }
 
-String _$plantDatabaseAvailableHash() => r'44e61cbfa27e9859f0991411b80bc9347330c371';
+String _$plantDatabaseAvailableHash() =>
+    r'44e61cbfa27e9859f0991411b80bc9347330c371';
 
 /// The profile of [plantId]; `null` while the plant is not linked with a species.
 
@@ -56,17 +63,24 @@ final plantProfileProvider = PlantProfileFamily._();
 /// The profile of [plantId]; `null` while the plant is not linked with a species.
 
 final class PlantProfileProvider
-    extends $FunctionalProvider<AsyncValue<PlantProfile?>, PlantProfile?, Stream<PlantProfile?>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<PlantProfile?>,
+          PlantProfile?,
+          Stream<PlantProfile?>
+        >
     with $FutureModifier<PlantProfile?>, $StreamProvider<PlantProfile?> {
   /// The profile of [plantId]; `null` while the plant is not linked with a species.
-  PlantProfileProvider._({required PlantProfileFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'plantProfileProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  PlantProfileProvider._({
+    required PlantProfileFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'plantProfileProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$plantProfileHash();
@@ -80,7 +94,9 @@ final class PlantProfileProvider
 
   @$internal
   @override
-  $StreamProviderElement<PlantProfile?> $createElement($ProviderPointer pointer) => $StreamProviderElement(pointer);
+  $StreamProviderElement<PlantProfile?> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
   @override
   Stream<PlantProfile?> create(Ref ref) {
@@ -103,7 +119,8 @@ String _$plantProfileHash() => r'6a42e15d8012590f719c71500f70c0137b4726f9';
 
 /// The profile of [plantId]; `null` while the plant is not linked with a species.
 
-final class PlantProfileFamily extends $Family with $FunctionalFamilyOverride<Stream<PlantProfile?>, String> {
+final class PlantProfileFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<PlantProfile?>, String> {
   PlantProfileFamily._()
     : super(
         retry: null,
@@ -115,7 +132,8 @@ final class PlantProfileFamily extends $Family with $FunctionalFamilyOverride<St
 
   /// The profile of [plantId]; `null` while the plant is not linked with a species.
 
-  PlantProfileProvider call(String plantId) => PlantProfileProvider._(argument: plantId, from: this);
+  PlantProfileProvider call(String plantId) =>
+      PlantProfileProvider._(argument: plantId, from: this);
 
   @override
   String toString() => r'plantProfileProvider';
@@ -129,17 +147,26 @@ final speciesSearchProvider = SpeciesSearchFamily._();
 /// Species matching [query] in the plant database; empty for short queries or without the database.
 
 final class SpeciesSearchProvider
-    extends $FunctionalProvider<AsyncValue<List<SpeciesMatch>>, List<SpeciesMatch>, FutureOr<List<SpeciesMatch>>>
-    with $FutureModifier<List<SpeciesMatch>>, $FutureProvider<List<SpeciesMatch>> {
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<SpeciesMatch>>,
+          List<SpeciesMatch>,
+          FutureOr<List<SpeciesMatch>>
+        >
+    with
+        $FutureModifier<List<SpeciesMatch>>,
+        $FutureProvider<List<SpeciesMatch>> {
   /// Species matching [query] in the plant database; empty for short queries or without the database.
-  SpeciesSearchProvider._({required SpeciesSearchFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'speciesSearchProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  SpeciesSearchProvider._({
+    required SpeciesSearchFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'speciesSearchProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$speciesSearchHash();
@@ -153,8 +180,9 @@ final class SpeciesSearchProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<SpeciesMatch>> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $FutureProviderElement<List<SpeciesMatch>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<SpeciesMatch>> create(Ref ref) {
@@ -177,7 +205,8 @@ String _$speciesSearchHash() => r'c6e3b58363b67d272bb5c85ffb95eb4cc285ecd5';
 
 /// Species matching [query] in the plant database; empty for short queries or without the database.
 
-final class SpeciesSearchFamily extends $Family with $FunctionalFamilyOverride<FutureOr<List<SpeciesMatch>>, String> {
+final class SpeciesSearchFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<SpeciesMatch>>, String> {
   SpeciesSearchFamily._()
     : super(
         retry: null,
@@ -189,7 +218,8 @@ final class SpeciesSearchFamily extends $Family with $FunctionalFamilyOverride<F
 
   /// Species matching [query] in the plant database; empty for short queries or without the database.
 
-  SpeciesSearchProvider call(String query) => SpeciesSearchProvider._(argument: query, from: this);
+  SpeciesSearchProvider call(String query) =>
+      SpeciesSearchProvider._(argument: query, from: this);
 
   @override
   String toString() => r'speciesSearchProvider';
@@ -203,7 +233,8 @@ final plantProfileServiceProvider = PlantProfileServiceProvider._();
 
 /// Links plants with species of the plant database. Profiles are stored with the plant, and a species another plant
 /// already has is copied instead of loaded again.
-final class PlantProfileServiceProvider extends $NotifierProvider<PlantProfileService, void> {
+final class PlantProfileServiceProvider
+    extends $NotifierProvider<PlantProfileService, void> {
   /// Links plants with species of the plant database. Profiles are stored with the plant, and a species another plant
   /// already has is copied instead of loaded again.
   PlantProfileServiceProvider._()
@@ -226,11 +257,15 @@ final class PlantProfileServiceProvider extends $NotifierProvider<PlantProfileSe
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(void value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<void>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
   }
 }
 
-String _$plantProfileServiceHash() => r'c61e31f97c553825ca39490efb3ccf51b514b28c';
+String _$plantProfileServiceHash() =>
+    r'c61e31f97c553825ca39490efb3ccf51b514b28c';
 
 /// Links plants with species of the plant database. Profiles are stored with the plant, and a species another plant
 /// already has is copied instead of loaded again.
@@ -241,7 +276,14 @@ abstract class _$PlantProfileService extends $Notifier<void> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }

@@ -14,7 +14,8 @@ part of 'plants.service.dart';
 final plantsServiceProvider = PlantsServiceProvider._();
 
 /// All plants, sorted by name, and watering.
-final class PlantsServiceProvider extends $StreamNotifierProvider<PlantsService, List<Plant>> {
+final class PlantsServiceProvider
+    extends $StreamNotifierProvider<PlantsService, List<Plant>> {
   /// All plants, sorted by name, and watering.
   PlantsServiceProvider._()
     : super(

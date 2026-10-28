@@ -12,7 +12,13 @@ part of 'floorplan.service.dart';
 @ProviderFor(floorPlanService)
 final floorPlanServiceProvider = FloorPlanServiceProvider._();
 
-final class FloorPlanServiceProvider extends $FunctionalProvider<AsyncValue<FloorPlan>, FloorPlan, FutureOr<FloorPlan>>
+final class FloorPlanServiceProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<FloorPlan>,
+          FloorPlan,
+          FutureOr<FloorPlan>
+        >
     with $FutureModifier<FloorPlan>, $FutureProvider<FloorPlan> {
   FloorPlanServiceProvider._()
     : super(
@@ -30,7 +36,8 @@ final class FloorPlanServiceProvider extends $FunctionalProvider<AsyncValue<Floo
 
   @$internal
   @override
-  $FutureProviderElement<FloorPlan> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<FloorPlan> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
   FutureOr<FloorPlan> create(Ref ref) {
@@ -46,7 +53,8 @@ String _$floorPlanServiceHash() => r'44fb965431fbdbf766675b1334d8247c12752128';
 final placementServiceProvider = PlacementServiceProvider._();
 
 /// Placed devices, live from the database.
-final class PlacementServiceProvider extends $StreamNotifierProvider<PlacementService, List<Placement>> {
+final class PlacementServiceProvider
+    extends $StreamNotifierProvider<PlacementService, List<Placement>> {
   /// Placed devices, live from the database.
   PlacementServiceProvider._()
     : super(

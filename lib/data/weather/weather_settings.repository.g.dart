@@ -16,7 +16,12 @@ final weatherSettingsRepositoryProvider = WeatherSettingsRepositoryProvider._();
 /// Providers
 
 final class WeatherSettingsRepositoryProvider
-    extends $FunctionalProvider<WeatherSettingsRepository, WeatherSettingsRepository, WeatherSettingsRepository>
+    extends
+        $FunctionalProvider<
+          WeatherSettingsRepository,
+          WeatherSettingsRepository,
+          WeatherSettingsRepository
+        >
     with $Provider<WeatherSettingsRepository> {
   /// Providers
   WeatherSettingsRepositoryProvider._()
@@ -35,7 +40,9 @@ final class WeatherSettingsRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<WeatherSettingsRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<WeatherSettingsRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   WeatherSettingsRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class WeatherSettingsRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(WeatherSettingsRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<WeatherSettingsRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WeatherSettingsRepository>(value),
+    );
   }
 }
 
-String _$weatherSettingsRepositoryHash() => r'bbfc316253a189ad34822382467a53d9ec8efe50';
+String _$weatherSettingsRepositoryHash() =>
+    r'bbfc316253a189ad34822382467a53d9ec8efe50';

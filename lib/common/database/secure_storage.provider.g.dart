@@ -13,7 +13,12 @@ part of 'secure_storage.provider.dart';
 final secureStorageProvider = SecureStorageProvider._();
 
 final class SecureStorageProvider
-    extends $FunctionalProvider<FlutterSecureStorage, FlutterSecureStorage, FlutterSecureStorage>
+    extends
+        $FunctionalProvider<
+          FlutterSecureStorage,
+          FlutterSecureStorage,
+          FlutterSecureStorage
+        >
     with $Provider<FlutterSecureStorage> {
   SecureStorageProvider._()
     : super(
@@ -31,7 +36,9 @@ final class SecureStorageProvider
 
   @$internal
   @override
-  $ProviderElement<FlutterSecureStorage> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<FlutterSecureStorage> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   FlutterSecureStorage create(Ref ref) {
@@ -40,7 +47,10 @@ final class SecureStorageProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(FlutterSecureStorage value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<FlutterSecureStorage>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FlutterSecureStorage>(value),
+    );
   }
 }
 

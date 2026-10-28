@@ -14,7 +14,8 @@ part of 'weather.service.dart';
 final weatherLocationServiceProvider = WeatherLocationServiceProvider._();
 
 /// Where the weather is for: where the hub is (default) or a chosen place.
-final class WeatherLocationServiceProvider extends $StreamNotifierProvider<WeatherLocationService, WeatherLocation> {
+final class WeatherLocationServiceProvider
+    extends $StreamNotifierProvider<WeatherLocationService, WeatherLocation> {
   /// Where the weather is for: where the hub is (default) or a chosen place.
   WeatherLocationServiceProvider._()
     : super(
@@ -35,11 +36,13 @@ final class WeatherLocationServiceProvider extends $StreamNotifierProvider<Weath
   WeatherLocationService create() => WeatherLocationService();
 }
 
-String _$weatherLocationServiceHash() => r'bc5827d09941f87f7c7f0912d22be7b90d24280a';
+String _$weatherLocationServiceHash() =>
+    r'bc5827d09941f87f7c7f0912d22be7b90d24280a';
 
 /// Where the weather is for: where the hub is (default) or a chosen place.
 
-abstract class _$WeatherLocationService extends $StreamNotifier<WeatherLocation> {
+abstract class _$WeatherLocationService
+    extends $StreamNotifier<WeatherLocation> {
   Stream<WeatherLocation> build();
   @$mustCallSuper
   @override
@@ -65,17 +68,26 @@ final placeSearchProvider = PlaceSearchFamily._();
 /// Places named like [query]; empty for short queries.
 
 final class PlaceSearchProvider
-    extends $FunctionalProvider<AsyncValue<List<WeatherPlace>>, List<WeatherPlace>, FutureOr<List<WeatherPlace>>>
-    with $FutureModifier<List<WeatherPlace>>, $FutureProvider<List<WeatherPlace>> {
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WeatherPlace>>,
+          List<WeatherPlace>,
+          FutureOr<List<WeatherPlace>>
+        >
+    with
+        $FutureModifier<List<WeatherPlace>>,
+        $FutureProvider<List<WeatherPlace>> {
   /// Places named like [query]; empty for short queries.
-  PlaceSearchProvider._({required PlaceSearchFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'placeSearchProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  PlaceSearchProvider._({
+    required PlaceSearchFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'placeSearchProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$placeSearchHash();
@@ -89,8 +101,9 @@ final class PlaceSearchProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<WeatherPlace>> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $FutureProviderElement<List<WeatherPlace>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<WeatherPlace>> create(Ref ref) {
@@ -113,7 +126,8 @@ String _$placeSearchHash() => r'987bbe0ffee960ccf56e06eec8bf06dfdfae8bae';
 
 /// Places named like [query]; empty for short queries.
 
-final class PlaceSearchFamily extends $Family with $FunctionalFamilyOverride<FutureOr<List<WeatherPlace>>, String> {
+final class PlaceSearchFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<WeatherPlace>>, String> {
   PlaceSearchFamily._()
     : super(
         retry: null,
@@ -125,7 +139,8 @@ final class PlaceSearchFamily extends $Family with $FunctionalFamilyOverride<Fut
 
   /// Places named like [query]; empty for short queries.
 
-  PlaceSearchProvider call(String query) => PlaceSearchProvider._(argument: query, from: this);
+  PlaceSearchProvider call(String query) =>
+      PlaceSearchProvider._(argument: query, from: this);
 
   @override
   String toString() => r'placeSearchProvider';
@@ -139,7 +154,8 @@ final weatherServiceProvider = WeatherServiceProvider._();
 
 /// The forecast for the [WeatherLocationService] location. Shows the last forecast at once after a start, then
 /// loads a fresh one and again every [refreshInterval]. A failed refresh keeps the last forecast.
-final class WeatherServiceProvider extends $AsyncNotifierProvider<WeatherService, Forecast> {
+final class WeatherServiceProvider
+    extends $AsyncNotifierProvider<WeatherService, Forecast> {
   /// The forecast for the [WeatherLocationService] location. Shows the last forecast at once after a start, then
   /// loads a fresh one and again every [refreshInterval]. A failed refresh keeps the last forecast.
   WeatherServiceProvider._()

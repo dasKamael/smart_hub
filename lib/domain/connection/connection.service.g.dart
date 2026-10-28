@@ -14,7 +14,8 @@ part of 'connection.service.dart';
 final connectionConfigServiceProvider = ConnectionConfigServiceProvider._();
 
 /// The saved connection. `null` means the hub is not set up yet.
-final class ConnectionConfigServiceProvider extends $AsyncNotifierProvider<ConnectionConfigService, ConnectionConfig?> {
+final class ConnectionConfigServiceProvider
+    extends $AsyncNotifierProvider<ConnectionConfigService, ConnectionConfig?> {
   /// The saved connection. `null` means the hub is not set up yet.
   ConnectionConfigServiceProvider._()
     : super(
@@ -35,16 +36,19 @@ final class ConnectionConfigServiceProvider extends $AsyncNotifierProvider<Conne
   ConnectionConfigService create() => ConnectionConfigService();
 }
 
-String _$connectionConfigServiceHash() => r'ecd7daf6768c20bf832aaffa770f20f7a153c48f';
+String _$connectionConfigServiceHash() =>
+    r'ecd7daf6768c20bf832aaffa770f20f7a153c48f';
 
 /// The saved connection. `null` means the hub is not set up yet.
 
-abstract class _$ConnectionConfigService extends $AsyncNotifier<ConnectionConfig?> {
+abstract class _$ConnectionConfigService
+    extends $AsyncNotifier<ConnectionConfig?> {
   FutureOr<ConnectionConfig?> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<ConnectionConfig?>, ConnectionConfig?>;
+    final ref =
+        this.ref as $Ref<AsyncValue<ConnectionConfig?>, ConnectionConfig?>;
     final element =
         ref.element
             as $ClassProviderElement<
@@ -66,7 +70,9 @@ final hasHomeAssistantProvider = HasHomeAssistantProvider._();
 /// Whether Home Assistant (or the demo home) provides lights and speakers. Without it, their parts are hidden or
 /// explain how to connect.
 
-final class HasHomeAssistantProvider extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+final class HasHomeAssistantProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
   /// Whether Home Assistant (or the demo home) provides lights and speakers. Without it, their parts are hidden or
   /// explain how to connect.
   HasHomeAssistantProvider._()
@@ -85,7 +91,8 @@ final class HasHomeAssistantProvider extends $FunctionalProvider<bool, bool, boo
 
   @$internal
   @override
-  $ProviderElement<bool> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   bool create(Ref ref) {
@@ -94,7 +101,10 @@ final class HasHomeAssistantProvider extends $FunctionalProvider<bool, bool, boo
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<bool>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
   }
 }
 
@@ -104,7 +114,12 @@ String _$hasHomeAssistantHash() => r'929a250e0af4cad6414509375ce3fff0d940c027';
 final connectionStatusServiceProvider = ConnectionStatusServiceProvider._();
 
 final class ConnectionStatusServiceProvider
-    extends $FunctionalProvider<AsyncValue<ConnectionStatus>, ConnectionStatus, Stream<ConnectionStatus>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<ConnectionStatus>,
+          ConnectionStatus,
+          Stream<ConnectionStatus>
+        >
     with $FutureModifier<ConnectionStatus>, $StreamProvider<ConnectionStatus> {
   ConnectionStatusServiceProvider._()
     : super(
@@ -122,7 +137,9 @@ final class ConnectionStatusServiceProvider
 
   @$internal
   @override
-  $StreamProviderElement<ConnectionStatus> $createElement($ProviderPointer pointer) => $StreamProviderElement(pointer);
+  $StreamProviderElement<ConnectionStatus> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
   @override
   Stream<ConnectionStatus> create(Ref ref) {
@@ -130,7 +147,8 @@ final class ConnectionStatusServiceProvider
   }
 }
 
-String _$connectionStatusServiceHash() => r'5db15bce065c949cd2fc528c1af310b2789ba37e';
+String _$connectionStatusServiceHash() =>
+    r'5db15bce065c949cd2fc528c1af310b2789ba37e';
 
 /// All known entities, sorted by kind and name.
 
@@ -140,7 +158,12 @@ final hubEntitiesServiceProvider = HubEntitiesServiceProvider._();
 /// All known entities, sorted by kind and name.
 
 final class HubEntitiesServiceProvider
-    extends $FunctionalProvider<AsyncValue<List<HubEntity>>, List<HubEntity>, Stream<List<HubEntity>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<HubEntity>>,
+          List<HubEntity>,
+          Stream<List<HubEntity>>
+        >
     with $FutureModifier<List<HubEntity>>, $StreamProvider<List<HubEntity>> {
   /// All known entities, sorted by kind and name.
   HubEntitiesServiceProvider._()
@@ -159,7 +182,9 @@ final class HubEntitiesServiceProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<HubEntity>> $createElement($ProviderPointer pointer) => $StreamProviderElement(pointer);
+  $StreamProviderElement<List<HubEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
   @override
   Stream<List<HubEntity>> create(Ref ref) {
@@ -167,4 +192,5 @@ final class HubEntitiesServiceProvider
   }
 }
 
-String _$hubEntitiesServiceHash() => r'9714f110e3ed372043738f29626fd85c0547991d';
+String _$hubEntitiesServiceHash() =>
+    r'9714f110e3ed372043738f29626fd85c0547991d';

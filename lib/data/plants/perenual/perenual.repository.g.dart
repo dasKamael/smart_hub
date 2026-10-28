@@ -16,7 +16,12 @@ final perenualRepositoryProvider = PerenualRepositoryProvider._();
 /// Providers
 
 final class PerenualRepositoryProvider
-    extends $FunctionalProvider<PerenualRepository, PerenualRepository, PerenualRepository>
+    extends
+        $FunctionalProvider<
+          PerenualRepository,
+          PerenualRepository,
+          PerenualRepository
+        >
     with $Provider<PerenualRepository> {
   /// Providers
   PerenualRepositoryProvider._()
@@ -35,7 +40,9 @@ final class PerenualRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<PerenualRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PerenualRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   PerenualRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class PerenualRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PerenualRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PerenualRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PerenualRepository>(value),
+    );
   }
 }
 
-String _$perenualRepositoryHash() => r'828cff25477ee1e71440b4fa680bc6de28161360';
+String _$perenualRepositoryHash() =>
+    r'828cff25477ee1e71440b4fa680bc6de28161360';

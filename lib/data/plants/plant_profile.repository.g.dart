@@ -16,7 +16,12 @@ final plantProfileRepositoryProvider = PlantProfileRepositoryProvider._();
 /// Providers
 
 final class PlantProfileRepositoryProvider
-    extends $FunctionalProvider<PlantProfileRepository, PlantProfileRepository, PlantProfileRepository>
+    extends
+        $FunctionalProvider<
+          PlantProfileRepository,
+          PlantProfileRepository,
+          PlantProfileRepository
+        >
     with $Provider<PlantProfileRepository> {
   /// Providers
   PlantProfileRepositoryProvider._()
@@ -35,7 +40,9 @@ final class PlantProfileRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<PlantProfileRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PlantProfileRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   PlantProfileRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class PlantProfileRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PlantProfileRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PlantProfileRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlantProfileRepository>(value),
+    );
   }
 }
 
-String _$plantProfileRepositoryHash() => r'b58a53110597742170e83021c04f799968354fe9';
+String _$plantProfileRepositoryHash() =>
+    r'b58a53110597742170e83021c04f799968354fe9';

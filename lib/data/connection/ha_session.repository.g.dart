@@ -16,7 +16,12 @@ final haSessionRepositoryProvider = HaSessionRepositoryProvider._();
 /// Providers
 
 final class HaSessionRepositoryProvider
-    extends $FunctionalProvider<HaSessionRepository, HaSessionRepository, HaSessionRepository>
+    extends
+        $FunctionalProvider<
+          HaSessionRepository,
+          HaSessionRepository,
+          HaSessionRepository
+        >
     with $Provider<HaSessionRepository> {
   /// Providers
   HaSessionRepositoryProvider._()
@@ -35,7 +40,9 @@ final class HaSessionRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<HaSessionRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<HaSessionRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   HaSessionRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class HaSessionRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(HaSessionRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<HaSessionRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<HaSessionRepository>(value),
+    );
   }
 }
 
-String _$haSessionRepositoryHash() => r'3517ead69da4f016c267120b6abbbcbac52465c9';
+String _$haSessionRepositoryHash() =>
+    r'3517ead69da4f016c267120b6abbbcbac52465c9';

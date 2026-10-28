@@ -16,7 +16,12 @@ final installedAppsRepositoryProvider = InstalledAppsRepositoryProvider._();
 /// Providers
 
 final class InstalledAppsRepositoryProvider
-    extends $FunctionalProvider<InstalledAppsRepository, InstalledAppsRepository, InstalledAppsRepository>
+    extends
+        $FunctionalProvider<
+          InstalledAppsRepository,
+          InstalledAppsRepository,
+          InstalledAppsRepository
+        >
     with $Provider<InstalledAppsRepository> {
   /// Providers
   InstalledAppsRepositoryProvider._()
@@ -35,7 +40,9 @@ final class InstalledAppsRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<InstalledAppsRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<InstalledAppsRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   InstalledAppsRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class InstalledAppsRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(InstalledAppsRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<InstalledAppsRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<InstalledAppsRepository>(value),
+    );
   }
 }
 
-String _$installedAppsRepositoryHash() => r'b455307ade8cad6d6de9f06f2b6caad62c963b16';
+String _$installedAppsRepositoryHash() =>
+    r'b455307ade8cad6d6de9f06f2b6caad62c963b16';

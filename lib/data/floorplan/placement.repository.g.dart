@@ -16,7 +16,12 @@ final placementRepositoryProvider = PlacementRepositoryProvider._();
 /// Providers
 
 final class PlacementRepositoryProvider
-    extends $FunctionalProvider<PlacementRepository, PlacementRepository, PlacementRepository>
+    extends
+        $FunctionalProvider<
+          PlacementRepository,
+          PlacementRepository,
+          PlacementRepository
+        >
     with $Provider<PlacementRepository> {
   /// Providers
   PlacementRepositoryProvider._()
@@ -35,7 +40,9 @@ final class PlacementRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<PlacementRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PlacementRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   PlacementRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class PlacementRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PlacementRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PlacementRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlacementRepository>(value),
+    );
   }
 }
 
-String _$placementRepositoryHash() => r'5ca4783c552a913388cb8b71010baea652ae96e4';
+String _$placementRepositoryHash() =>
+    r'5ca4783c552a913388cb8b71010baea652ae96e4';

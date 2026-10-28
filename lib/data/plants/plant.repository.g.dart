@@ -15,7 +15,9 @@ final plantRepositoryProvider = PlantRepositoryProvider._();
 
 /// Providers
 
-final class PlantRepositoryProvider extends $FunctionalProvider<PlantRepository, PlantRepository, PlantRepository>
+final class PlantRepositoryProvider
+    extends
+        $FunctionalProvider<PlantRepository, PlantRepository, PlantRepository>
     with $Provider<PlantRepository> {
   /// Providers
   PlantRepositoryProvider._()
@@ -34,7 +36,8 @@ final class PlantRepositoryProvider extends $FunctionalProvider<PlantRepository,
 
   @$internal
   @override
-  $ProviderElement<PlantRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PlantRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   PlantRepository create(Ref ref) {
@@ -43,7 +46,10 @@ final class PlantRepositoryProvider extends $FunctionalProvider<PlantRepository,
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PlantRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PlantRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlantRepository>(value),
+    );
   }
 }
 

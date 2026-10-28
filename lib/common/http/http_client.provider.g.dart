@@ -12,7 +12,8 @@ part of 'http_client.provider.dart';
 @ProviderFor(httpClient)
 final httpClientProvider = HttpClientProvider._();
 
-final class HttpClientProvider extends $FunctionalProvider<http.Client, http.Client, http.Client>
+final class HttpClientProvider
+    extends $FunctionalProvider<http.Client, http.Client, http.Client>
     with $Provider<http.Client> {
   HttpClientProvider._()
     : super(
@@ -30,7 +31,8 @@ final class HttpClientProvider extends $FunctionalProvider<http.Client, http.Cli
 
   @$internal
   @override
-  $ProviderElement<http.Client> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<http.Client> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   http.Client create(Ref ref) {
@@ -39,7 +41,10 @@ final class HttpClientProvider extends $FunctionalProvider<http.Client, http.Cli
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(http.Client value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<http.Client>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<http.Client>(value),
+    );
   }
 }
 

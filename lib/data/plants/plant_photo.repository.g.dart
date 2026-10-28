@@ -16,7 +16,12 @@ final plantPhotoRepositoryProvider = PlantPhotoRepositoryProvider._();
 /// Providers
 
 final class PlantPhotoRepositoryProvider
-    extends $FunctionalProvider<PlantPhotoRepository, PlantPhotoRepository, PlantPhotoRepository>
+    extends
+        $FunctionalProvider<
+          PlantPhotoRepository,
+          PlantPhotoRepository,
+          PlantPhotoRepository
+        >
     with $Provider<PlantPhotoRepository> {
   /// Providers
   PlantPhotoRepositoryProvider._()
@@ -35,7 +40,9 @@ final class PlantPhotoRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<PlantPhotoRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PlantPhotoRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   PlantPhotoRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class PlantPhotoRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PlantPhotoRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PlantPhotoRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlantPhotoRepository>(value),
+    );
   }
 }
 
-String _$plantPhotoRepositoryHash() => r'8ea25b9d37c19ecc33e1025f19f180c2a28f4a65';
+String _$plantPhotoRepositoryHash() =>
+    r'8ea25b9d37c19ecc33e1025f19f180c2a28f4a65';

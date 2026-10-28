@@ -12,7 +12,8 @@ part of 'kiosk.dart';
 @ProviderFor(kiosk)
 final kioskProvider = KioskProvider._();
 
-final class KioskProvider extends $FunctionalProvider<Kiosk, Kiosk, Kiosk> with $Provider<Kiosk> {
+final class KioskProvider extends $FunctionalProvider<Kiosk, Kiosk, Kiosk>
+    with $Provider<Kiosk> {
   KioskProvider._()
     : super(
         from: null,
@@ -29,7 +30,8 @@ final class KioskProvider extends $FunctionalProvider<Kiosk, Kiosk, Kiosk> with 
 
   @$internal
   @override
-  $ProviderElement<Kiosk> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<Kiosk> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   Kiosk create(Ref ref) {
@@ -38,7 +40,10 @@ final class KioskProvider extends $FunctionalProvider<Kiosk, Kiosk, Kiosk> with 
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(Kiosk value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<Kiosk>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Kiosk>(value),
+    );
   }
 }
 

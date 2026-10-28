@@ -16,7 +16,12 @@ final floorplanRepositoryProvider = FloorplanRepositoryProvider._();
 /// Providers
 
 final class FloorplanRepositoryProvider
-    extends $FunctionalProvider<FloorplanRepository, FloorplanRepository, FloorplanRepository>
+    extends
+        $FunctionalProvider<
+          FloorplanRepository,
+          FloorplanRepository,
+          FloorplanRepository
+        >
     with $Provider<FloorplanRepository> {
   /// Providers
   FloorplanRepositoryProvider._()
@@ -35,7 +40,9 @@ final class FloorplanRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<FloorplanRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<FloorplanRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   FloorplanRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class FloorplanRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(FloorplanRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<FloorplanRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FloorplanRepository>(value),
+    );
   }
 }
 
-String _$floorplanRepositoryHash() => r'3cb1fda506c8089ff569c0e8249911a2fae0f142';
+String _$floorplanRepositoryHash() =>
+    r'3cb1fda506c8089ff569c0e8249911a2fae0f142';

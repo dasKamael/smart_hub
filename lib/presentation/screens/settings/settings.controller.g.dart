@@ -14,7 +14,8 @@ part of 'settings.controller.dart';
 final homeAppControllerProvider = HomeAppControllerProvider._();
 
 /// Whether the hub is the home screen of the tablet (kiosk).
-final class HomeAppControllerProvider extends $AsyncNotifierProvider<HomeAppController, bool> {
+final class HomeAppControllerProvider
+    extends $AsyncNotifierProvider<HomeAppController, bool> {
   /// Whether the hub is the home screen of the tablet (kiosk).
   HomeAppControllerProvider._()
     : super(
@@ -46,7 +47,13 @@ abstract class _$HomeAppController extends $AsyncNotifier<bool> {
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element =
-        ref.element as $ClassProviderElement<AnyNotifier<AsyncValue<bool>, bool>, AsyncValue<bool>, Object?, Object?>;
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<bool>, bool>,
+              AsyncValue<bool>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }
@@ -58,7 +65,11 @@ final spotifyConnectControllerProvider = SpotifyConnectControllerProvider._();
 
 /// Connecting and disconnecting Spotify; [build] holds the last sign-in error.
 final class SpotifyConnectControllerProvider
-    extends $NotifierProvider<SpotifyConnectController, ({bool busy, String? error})> {
+    extends
+        $NotifierProvider<
+          SpotifyConnectController,
+          ({bool busy, String? error})
+        > {
   /// Connecting and disconnecting Spotify; [build] holds the last sign-in error.
   SpotifyConnectControllerProvider._()
     : super(
@@ -80,24 +91,34 @@ final class SpotifyConnectControllerProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(({bool busy, String? error}) value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<({bool busy, String? error})>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<({bool busy, String? error})>(value),
+    );
   }
 }
 
-String _$spotifyConnectControllerHash() => r'a527f655649800189da04dd4a29fd70f02c87ddc';
+String _$spotifyConnectControllerHash() =>
+    r'a527f655649800189da04dd4a29fd70f02c87ddc';
 
 /// Connecting and disconnecting Spotify; [build] holds the last sign-in error.
 
-abstract class _$SpotifyConnectController extends $Notifier<({bool busy, String? error})> {
+abstract class _$SpotifyConnectController
+    extends $Notifier<({bool busy, String? error})> {
   ({bool busy, String? error}) build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<({bool busy, String? error}), ({bool busy, String? error})>;
+    final ref =
+        this.ref
+            as $Ref<({bool busy, String? error}), ({bool busy, String? error})>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<({bool busy, String? error}), ({bool busy, String? error})>,
+              AnyNotifier<
+                ({bool busy, String? error}),
+                ({bool busy, String? error})
+              >,
               ({bool busy, String? error}),
               Object?,
               Object?

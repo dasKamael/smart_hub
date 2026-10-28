@@ -12,7 +12,8 @@ part of 'spotify_config.dart';
 @ProviderFor(spotifyConfig)
 final spotifyConfigProvider = SpotifyConfigProvider._();
 
-final class SpotifyConfigProvider extends $FunctionalProvider<SpotifyConfig, SpotifyConfig, SpotifyConfig>
+final class SpotifyConfigProvider
+    extends $FunctionalProvider<SpotifyConfig, SpotifyConfig, SpotifyConfig>
     with $Provider<SpotifyConfig> {
   SpotifyConfigProvider._()
     : super(
@@ -30,7 +31,8 @@ final class SpotifyConfigProvider extends $FunctionalProvider<SpotifyConfig, Spo
 
   @$internal
   @override
-  $ProviderElement<SpotifyConfig> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<SpotifyConfig> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   SpotifyConfig create(Ref ref) {
@@ -39,7 +41,10 @@ final class SpotifyConfigProvider extends $FunctionalProvider<SpotifyConfig, Spo
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(SpotifyConfig value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<SpotifyConfig>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SpotifyConfig>(value),
+    );
   }
 }
 

@@ -16,7 +16,12 @@ final openMeteoRepositoryProvider = OpenMeteoRepositoryProvider._();
 /// Providers
 
 final class OpenMeteoRepositoryProvider
-    extends $FunctionalProvider<OpenMeteoRepository, OpenMeteoRepository, OpenMeteoRepository>
+    extends
+        $FunctionalProvider<
+          OpenMeteoRepository,
+          OpenMeteoRepository,
+          OpenMeteoRepository
+        >
     with $Provider<OpenMeteoRepository> {
   /// Providers
   OpenMeteoRepositoryProvider._()
@@ -35,7 +40,9 @@ final class OpenMeteoRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<OpenMeteoRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<OpenMeteoRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   OpenMeteoRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class OpenMeteoRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(OpenMeteoRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<OpenMeteoRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<OpenMeteoRepository>(value),
+    );
   }
 }
 
-String _$openMeteoRepositoryHash() => r'100f514f56557976c92367bcc556b8a807b093bf';
+String _$openMeteoRepositoryHash() =>
+    r'100f514f56557976c92367bcc556b8a807b093bf';

@@ -16,7 +16,12 @@ final deviceLocationRepositoryProvider = DeviceLocationRepositoryProvider._();
 /// Providers
 
 final class DeviceLocationRepositoryProvider
-    extends $FunctionalProvider<DeviceLocationRepository, DeviceLocationRepository, DeviceLocationRepository>
+    extends
+        $FunctionalProvider<
+          DeviceLocationRepository,
+          DeviceLocationRepository,
+          DeviceLocationRepository
+        >
     with $Provider<DeviceLocationRepository> {
   /// Providers
   DeviceLocationRepositoryProvider._()
@@ -35,7 +40,9 @@ final class DeviceLocationRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<DeviceLocationRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<DeviceLocationRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   DeviceLocationRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class DeviceLocationRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DeviceLocationRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<DeviceLocationRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DeviceLocationRepository>(value),
+    );
   }
 }
 
-String _$deviceLocationRepositoryHash() => r'4100c39d9679c0d56502d7b937cc40c0e02a8e44';
+String _$deviceLocationRepositoryHash() =>
+    r'4100c39d9679c0d56502d7b937cc40c0e02a8e44';

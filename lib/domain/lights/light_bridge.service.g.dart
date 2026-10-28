@@ -14,7 +14,8 @@ part of 'light_bridge.service.dart';
 final lightBridgeServiceProvider = LightBridgeServiceProvider._();
 
 /// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
-final class LightBridgeServiceProvider extends $AsyncNotifierProvider<LightBridgeService, List<LightBridge>> {
+final class LightBridgeServiceProvider
+    extends $AsyncNotifierProvider<LightBridgeService, List<LightBridge>> {
   /// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
   LightBridgeServiceProvider._()
     : super(
@@ -35,7 +36,8 @@ final class LightBridgeServiceProvider extends $AsyncNotifierProvider<LightBridg
   LightBridgeService create() => LightBridgeService();
 }
 
-String _$lightBridgeServiceHash() => r'58aa7691bc0b25b0968853f14df44ec6905b863e';
+String _$lightBridgeServiceHash() =>
+    r'58aa7691bc0b25b0968853f14df44ec6905b863e';
 
 /// The light bridges the lights come from instead of Home Assistant; empty when none is paired.
 
@@ -44,7 +46,8 @@ abstract class _$LightBridgeService extends $AsyncNotifier<List<LightBridge>> {
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<LightBridge>>, List<LightBridge>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<LightBridge>>, List<LightBridge>>;
     final element =
         ref.element
             as $ClassProviderElement<
@@ -64,7 +67,8 @@ final hasLightsProvider = HasLightsProvider._();
 
 /// Whether the hub has lights: from Home Assistant (or the demo home) or a light bridge.
 
-final class HasLightsProvider extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+final class HasLightsProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
   /// Whether the hub has lights: from Home Assistant (or the demo home) or a light bridge.
   HasLightsProvider._()
     : super(
@@ -82,7 +86,8 @@ final class HasLightsProvider extends $FunctionalProvider<bool, bool, bool> with
 
   @$internal
   @override
-  $ProviderElement<bool> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   bool create(Ref ref) {
@@ -91,7 +96,10 @@ final class HasLightsProvider extends $FunctionalProvider<bool, bool, bool> with
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<bool>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
   }
 }
 
@@ -104,7 +112,8 @@ final lightsOnlineProvider = LightsOnlineProvider._();
 
 /// Whether the lights can be controlled right now: the bridge is reachable, or Home Assistant is online.
 
-final class LightsOnlineProvider extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+final class LightsOnlineProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
   /// Whether the lights can be controlled right now: the bridge is reachable, or Home Assistant is online.
   LightsOnlineProvider._()
     : super(
@@ -122,7 +131,8 @@ final class LightsOnlineProvider extends $FunctionalProvider<bool, bool, bool> w
 
   @$internal
   @override
-  $ProviderElement<bool> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   bool create(Ref ref) {
@@ -131,7 +141,10 @@ final class LightsOnlineProvider extends $FunctionalProvider<bool, bool, bool> w
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<bool>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
   }
 }
 
@@ -140,7 +153,8 @@ String _$lightsOnlineHash() => r'4bede5b0afeb325018940661a37a030a2ed17384';
 @ProviderFor(_bridgeOnline)
 final _bridgeOnlineProvider = _BridgeOnlineProvider._();
 
-final class _BridgeOnlineProvider extends $FunctionalProvider<AsyncValue<bool>, bool, Stream<bool>>
+final class _BridgeOnlineProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, Stream<bool>>
     with $FutureModifier<bool>, $StreamProvider<bool> {
   _BridgeOnlineProvider._()
     : super(
@@ -158,7 +172,8 @@ final class _BridgeOnlineProvider extends $FunctionalProvider<AsyncValue<bool>, 
 
   @$internal
   @override
-  $StreamProviderElement<bool> $createElement($ProviderPointer pointer) => $StreamProviderElement(pointer);
+  $StreamProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
 
   @override
   Stream<bool> create(Ref ref) {

@@ -14,7 +14,8 @@ part of 'floorplan.controller.dart';
 final floorplanControllerProvider = FloorplanControllerProvider._();
 
 /// UI state of the floor plan (selection, visible layers) and the device commands of the inspector.
-final class FloorplanControllerProvider extends $NotifierProvider<FloorplanController, FloorplanState> {
+final class FloorplanControllerProvider
+    extends $NotifierProvider<FloorplanController, FloorplanState> {
   /// UI state of the floor plan (selection, visible layers) and the device commands of the inspector.
   FloorplanControllerProvider._()
     : super(
@@ -36,11 +37,15 @@ final class FloorplanControllerProvider extends $NotifierProvider<FloorplanContr
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(FloorplanState value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<FloorplanState>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FloorplanState>(value),
+    );
   }
 }
 
-String _$floorplanControllerHash() => r'511bc00f58a17c70759017b0d7dab9d592241176';
+String _$floorplanControllerHash() =>
+    r'511bc00f58a17c70759017b0d7dab9d592241176';
 
 /// UI state of the floor plan (selection, visible layers) and the device commands of the inspector.
 
@@ -52,7 +57,12 @@ abstract class _$FloorplanController extends $Notifier<FloorplanState> {
     final ref = this.ref as $Ref<FloorplanState, FloorplanState>;
     final element =
         ref.element
-            as $ClassProviderElement<AnyNotifier<FloorplanState, FloorplanState>, FloorplanState, Object?, Object?>;
+            as $ClassProviderElement<
+              AnyNotifier<FloorplanState, FloorplanState>,
+              FloorplanState,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }
@@ -64,7 +74,13 @@ final planDevicesProvider = PlanDevicesProvider._();
 
 /// Every device the hub knows, joined with its placement (or the position it was just dropped at).
 
-final class PlanDevicesProvider extends $FunctionalProvider<List<PlanDevice>, List<PlanDevice>, List<PlanDevice>>
+final class PlanDevicesProvider
+    extends
+        $FunctionalProvider<
+          List<PlanDevice>,
+          List<PlanDevice>,
+          List<PlanDevice>
+        >
     with $Provider<List<PlanDevice>> {
   /// Every device the hub knows, joined with its placement (or the position it was just dropped at).
   PlanDevicesProvider._()
@@ -83,7 +99,8 @@ final class PlanDevicesProvider extends $FunctionalProvider<List<PlanDevice>, Li
 
   @$internal
   @override
-  $ProviderElement<List<PlanDevice>> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<List<PlanDevice>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   List<PlanDevice> create(Ref ref) {
@@ -92,7 +109,10 @@ final class PlanDevicesProvider extends $FunctionalProvider<List<PlanDevice>, Li
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<PlanDevice> value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<List<PlanDevice>>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<PlanDevice>>(value),
+    );
   }
 }
 
@@ -105,7 +125,13 @@ final planGroupsProvider = PlanGroupsProvider._();
 
 /// Groups of visible placed devices that stand close together. The dragged device never belongs to a group.
 
-final class PlanGroupsProvider extends $FunctionalProvider<List<List<String>>, List<List<String>>, List<List<String>>>
+final class PlanGroupsProvider
+    extends
+        $FunctionalProvider<
+          List<List<String>>,
+          List<List<String>>,
+          List<List<String>>
+        >
     with $Provider<List<List<String>>> {
   /// Groups of visible placed devices that stand close together. The dragged device never belongs to a group.
   PlanGroupsProvider._()
@@ -124,7 +150,9 @@ final class PlanGroupsProvider extends $FunctionalProvider<List<List<String>>, L
 
   @$internal
   @override
-  $ProviderElement<List<List<String>>> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<List<List<String>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   List<List<String>> create(Ref ref) {
@@ -133,7 +161,10 @@ final class PlanGroupsProvider extends $FunctionalProvider<List<List<String>>, L
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(List<List<String>> value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<List<List<String>>>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<List<String>>>(value),
+    );
   }
 }
 

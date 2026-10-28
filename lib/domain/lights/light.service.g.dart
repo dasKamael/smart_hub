@@ -20,7 +20,8 @@ final lightsServiceProvider = LightsServiceProvider._();
 ///
 /// Commands show at once (optimistic) and roll back when the light does not report the change within 3 s or the
 /// command fails (`README` → "Optimistic UI").
-final class LightsServiceProvider extends $AsyncNotifierProvider<LightsService, List<LightState>> {
+final class LightsServiceProvider
+    extends $AsyncNotifierProvider<LightsService, List<LightState>> {
   /// All lights, sorted by name, and the commands to control them.
   ///
   /// Commands show at once (optimistic) and roll back when the light does not report the change within 3 s or the
@@ -56,7 +57,8 @@ abstract class _$LightsService extends $AsyncNotifier<List<LightState>> {
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<LightState>>, List<LightState>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<LightState>>, List<LightState>>;
     final element =
         ref.element
             as $ClassProviderElement<

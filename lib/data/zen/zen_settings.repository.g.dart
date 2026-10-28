@@ -16,7 +16,12 @@ final zenSettingsRepositoryProvider = ZenSettingsRepositoryProvider._();
 /// Providers
 
 final class ZenSettingsRepositoryProvider
-    extends $FunctionalProvider<ZenSettingsRepository, ZenSettingsRepository, ZenSettingsRepository>
+    extends
+        $FunctionalProvider<
+          ZenSettingsRepository,
+          ZenSettingsRepository,
+          ZenSettingsRepository
+        >
     with $Provider<ZenSettingsRepository> {
   /// Providers
   ZenSettingsRepositoryProvider._()
@@ -35,7 +40,9 @@ final class ZenSettingsRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<ZenSettingsRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<ZenSettingsRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ZenSettingsRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class ZenSettingsRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ZenSettingsRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<ZenSettingsRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ZenSettingsRepository>(value),
+    );
   }
 }
 
-String _$zenSettingsRepositoryHash() => r'b678f57704ca01020582482c8e45d598a04f8792';
+String _$zenSettingsRepositoryHash() =>
+    r'b678f57704ca01020582482c8e45d598a04f8792';

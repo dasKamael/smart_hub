@@ -12,7 +12,8 @@ part of 'perenual_config.dart';
 @ProviderFor(perenualConfig)
 final perenualConfigProvider = PerenualConfigProvider._();
 
-final class PerenualConfigProvider extends $FunctionalProvider<PerenualConfig, PerenualConfig, PerenualConfig>
+final class PerenualConfigProvider
+    extends $FunctionalProvider<PerenualConfig, PerenualConfig, PerenualConfig>
     with $Provider<PerenualConfig> {
   PerenualConfigProvider._()
     : super(
@@ -30,7 +31,8 @@ final class PerenualConfigProvider extends $FunctionalProvider<PerenualConfig, P
 
   @$internal
   @override
-  $ProviderElement<PerenualConfig> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<PerenualConfig> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   PerenualConfig create(Ref ref) {
@@ -39,7 +41,10 @@ final class PerenualConfigProvider extends $FunctionalProvider<PerenualConfig, P
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PerenualConfig value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<PerenualConfig>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PerenualConfig>(value),
+    );
   }
 }
 

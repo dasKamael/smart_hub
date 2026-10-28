@@ -14,7 +14,8 @@ part of 'zen.service.dart';
 final zenIdleServiceProvider = ZenIdleServiceProvider._();
 
 /// Minutes without a touch until the zen mode starts; 0 = only by hand.
-final class ZenIdleServiceProvider extends $StreamNotifierProvider<ZenIdleService, int> {
+final class ZenIdleServiceProvider
+    extends $StreamNotifierProvider<ZenIdleService, int> {
   /// Minutes without a touch until the zen mode starts; 0 = only by hand.
   ZenIdleServiceProvider._()
     : super(
@@ -46,7 +47,13 @@ abstract class _$ZenIdleService extends $StreamNotifier<int> {
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<int>, int>;
     final element =
-        ref.element as $ClassProviderElement<AnyNotifier<AsyncValue<int>, int>, AsyncValue<int>, Object?, Object?>;
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<int>, int>,
+              AsyncValue<int>,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, build);
   }
 }
