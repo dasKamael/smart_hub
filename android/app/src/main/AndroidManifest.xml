@@ -3,6 +3,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Where the hub is, for the weather. Coarse is enough. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Plant photos with the hub's own camera view. -->
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:label="Smart Hub"

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
+import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
@@ -70,7 +72,7 @@ class _ChipFrame extends StatelessWidget {
           height: 96,
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           decoration: BoxDecoration(
-            color: selected ? HubColorPalette.accentTint : HubColorPalette.elevated,
+            color: selected ? HubColorPalette.accentTint : HubAreaColors.veil(PageCard.tintOf(context)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: selected ? HubColorPalette.accent : Colors.transparent, width: 2),
           ),

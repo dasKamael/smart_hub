@@ -16,17 +16,20 @@ final plantProfileControllerProvider = PlantProfileControllerFamily._();
 
 /// Profile page of one plant: linking with the plant database and taking over its suggestions. The state says
 /// whether the plant database is being asked.
-final class PlantProfileControllerProvider extends $NotifierProvider<PlantProfileController, bool> {
+final class PlantProfileControllerProvider
+    extends $NotifierProvider<PlantProfileController, bool> {
   /// Profile page of one plant: linking with the plant database and taking over its suggestions. The state says
   /// whether the plant database is being asked.
-  PlantProfileControllerProvider._({required PlantProfileControllerFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'plantProfileControllerProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  PlantProfileControllerProvider._({
+    required PlantProfileControllerFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'plantProfileControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$plantProfileControllerHash();
@@ -44,12 +47,16 @@ final class PlantProfileControllerProvider extends $NotifierProvider<PlantProfil
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<bool>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is PlantProfileControllerProvider && other.argument == argument;
+    return other is PlantProfileControllerProvider &&
+        other.argument == argument;
   }
 
   @override
@@ -58,13 +65,15 @@ final class PlantProfileControllerProvider extends $NotifierProvider<PlantProfil
   }
 }
 
-String _$plantProfileControllerHash() => r'7f5e4cd2c9f751c764933fe91bc1f6d877ff8aae';
+String _$plantProfileControllerHash() =>
+    r'7f5e4cd2c9f751c764933fe91bc1f6d877ff8aae';
 
 /// Profile page of one plant: linking with the plant database and taking over its suggestions. The state says
 /// whether the plant database is being asked.
 
 final class PlantProfileControllerFamily extends $Family
-    with $ClassFamilyOverride<PlantProfileController, bool, bool, bool, String> {
+    with
+        $ClassFamilyOverride<PlantProfileController, bool, bool, bool, String> {
   PlantProfileControllerFamily._()
     : super(
         retry: null,
@@ -96,7 +105,14 @@ abstract class _$PlantProfileController extends $Notifier<bool> {
   @override
   WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
-    final element = ref.element as $ClassProviderElement<AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
     return element.handleCreate(ref, () => build(_$args));
   }
 }

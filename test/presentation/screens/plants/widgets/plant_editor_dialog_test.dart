@@ -47,14 +47,14 @@ void main() {
       await tester.tap(find.text('satin pothos'));
       await tester.tap(find.text('golden pothos'));
       await tester.pumpAndSettle();
-      final suggested = find.text('Suggested for golden pothos – change them as you like.').evaluate().length;
+      final suggested = find.bySemanticsLabel('Suggested for golden pothos').evaluate().length;
       await tester.ensureVisible(find.text('Save'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
       // Then
-      expect(suggested, 1);
+      expect(suggested, 2, reason: 'watering and fertilizing');
       expect(plants.commands, ['add golden pothos every 9 feed 6 photo -']);
       expect(profiles.linked, ['new 2773']);
     });

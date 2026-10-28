@@ -7,9 +7,6 @@ abstract final class FertilizingUtil {
   static const seasonFirstMonth = DateTime.march;
   static const seasonLastMonth = DateTime.september;
 
-  /// Interval choices in the editor; `null` = not fertilized.
-  static const choices = [null, 2, 3, 4, 6, 8];
-
   static bool inSeason(DateTime day) => day.month >= seasonFirstMonth && day.month <= seasonLastMonth;
 
   /// Demanding plants are fed more often than easy ones.

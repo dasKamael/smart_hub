@@ -155,6 +155,34 @@ void main() {
       expect(plants.commands, ['add Calathea every 5 photo -']);
     });
 
+    testWidgets('Given fertilizing off, '
+        'when stepping it up twice and down three times, '
+        'then it goes through one and two weeks back to off', (tester) async {
+      // Given
+      await pumpScreen(tester);
+      await tester.tap(find.text('Plant'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), 'Calathea');
+
+      // When
+      final shown = <String>[];
+      for (final step in ['More weeks', 'More weeks', 'Fewer weeks', 'Fewer weeks']) {
+        await tester.tap(find.bySemanticsLabel(step));
+        await tester.pump();
+        // The fertilizing tile comes after the watering tile; its value is "Off" or a number.
+        final value = find.textContaining(RegExp(r'^(\d+|Off)$')).last;
+        shown.add(tester.widget<Text>(value).data!);
+      }
+      await tester.tap(find.bySemanticsLabel('More weeks'));
+      await tester.pump();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(shown, ['1', '2', '1', 'Off']);
+      expect(plants.commands, ['add Calathea every 7 feed 1 photo -']);
+    });
+
     testWidgets('Given the editor, when the name is empty, then Save does nothing', (tester) async {
       // Given
       await pumpScreen(tester);
@@ -178,7 +206,7 @@ void main() {
 
       // When
       await choose(tester, 'Monstera', 'Edit');
-      await tester.tap(find.text('Delete'));
+      await tester.tap(find.bySemanticsLabel('Delete'));
       await tester.pumpAndSettle();
 
       // Then

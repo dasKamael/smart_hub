@@ -5,7 +5,8 @@ part 'photo_picker.g.dart';
 
 enum PhotoSource { camera, gallery }
 
-/// Takes or picks a photo and returns its temporary path; `null` when cancelled.
+/// Takes or picks a photo and returns its temporary path; `null` when cancelled. The hub takes photos with its own
+/// camera view (`showCameraCapture`) – the system camera app cannot be left in the kiosk.
 class PhotoPicker {
   PhotoPicker({ImagePicker? picker}) : _picker = picker ?? ImagePicker();
 

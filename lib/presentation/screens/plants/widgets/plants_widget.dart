@@ -168,10 +168,6 @@ class _Large extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(bottom: 4),
-          child: Text('Plants', style: HubTextStyles.widgetTitle),
-        ),
         if (due.isEmpty && upcoming.isEmpty) const Expanded(child: _AllWatered()),
         if (overdue.isNotEmpty) ...[
           _GroupLabel('Overdue', color: HubColorPalette.dangerText),

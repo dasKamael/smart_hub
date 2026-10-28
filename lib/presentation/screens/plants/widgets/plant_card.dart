@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
+import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
 import 'package:smart_hub/domain/plants/model/watering_state.enum.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/progress_ring.dart';
@@ -38,6 +40,7 @@ class PlantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final veil = HubAreaColors.veil(PageCard.tintOf(context));
     final state = entry.state;
     final accent = colorOf(state);
     final overdue = state == WateringState.overdue;
@@ -54,8 +57,8 @@ class PlantCard extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color.alphaBlend(accent.withValues(alpha: overdue ? 0.16 : 0.07), HubColorPalette.elevated),
-                HubColorPalette.elevated,
+                Color.alphaBlend(accent.withValues(alpha: overdue ? 0.16 : 0.07), veil),
+                veil,
               ],
             ),
             border: Border.all(

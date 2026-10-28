@@ -41,6 +41,19 @@ enum HubGlyph {
   /// Arrow into a tray.
   import(Size(18, 18), Size(16, 16)),
 
+  camera(Size(18, 18), Size(16, 16)),
+
+  /// A picture with a mountain and the sun, e.g. the photo gallery.
+  image(Size(18, 18), Size(16, 16)),
+
+  /// Two four-pointed stars: a value that was suggested.
+  sparkle(Size(18, 18), Size(16, 16)),
+  trash(Size(18, 18), Size(16, 16)),
+  search(Size(18, 18), Size(16, 16)),
+
+  /// Three rings around a center: a focus point.
+  target(Size(18, 18), Size(16, 16)),
+
   /// Potted plant, the illustration for plants without a photo.
   pottedPlant(Size(24, 24), Size(22, 22));
 
@@ -220,6 +233,51 @@ class _GlyphPainter extends CustomPainter {
         canvas
           ..drawPath(_undoArc, _stroke(2.2))
           ..drawPath(_undoHead, fill);
+      case HubGlyph.camera:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(2, 5.5, 16, 15, const Radius.circular(2.2)), _stroke(1.8))
+          ..drawRRect(RRect.fromLTRBR(6.2, 3, 11.8, 5.8, const Radius.circular(1)), fill)
+          ..drawCircle(const Offset(9, 10.2), 2.6, _stroke(1.8));
+      case HubGlyph.image:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(2, 3, 16, 15, const Radius.circular(2.2)), _stroke(1.8))
+          ..drawCircle(const Offset(6.6, 7.2), 1.5, fill)
+          ..drawPath(
+            Path()
+              ..moveTo(3.5, 13.8)
+              ..lineTo(7.6, 9.6)
+              ..lineTo(10.2, 12.2)
+              ..lineTo(12.2, 10.2)
+              ..lineTo(14.5, 12.6)
+              ..lineTo(14.5, 13.8)
+              ..close(),
+            fill,
+          );
+      case HubGlyph.sparkle:
+        canvas
+          ..drawPath(_star(const Offset(7.5, 10.5), 6), fill)
+          ..drawPath(_star(const Offset(14, 4), 3), fill);
+      case HubGlyph.trash:
+        canvas
+          ..drawLine(const Offset(2.8, 4.6), const Offset(15.2, 4.6), _stroke(1.8))
+          ..drawLine(const Offset(7, 2.4), const Offset(11, 2.4), _stroke(1.8))
+          ..drawPath(
+            Path()
+              ..moveTo(4.6, 6.6)
+              ..lineTo(5.6, 15.6)
+              ..lineTo(12.4, 15.6)
+              ..lineTo(13.4, 6.6),
+            _stroke(1.8),
+          );
+      case HubGlyph.search:
+        canvas
+          ..drawCircle(const Offset(7.8, 7.8), 5, _stroke(2))
+          ..drawLine(const Offset(11.6, 11.6), const Offset(15.4, 15.4), _stroke(2.4));
+      case HubGlyph.target:
+        canvas
+          ..drawCircle(const Offset(9, 9), 7.2, _stroke(1.7))
+          ..drawCircle(const Offset(9, 9), 3.8, _stroke(1.7))
+          ..drawCircle(const Offset(9, 9), 1.4, fill);
       case HubGlyph.pottedPlant:
         canvas
           ..drawPath(_leafLeft, fill)
@@ -248,6 +306,18 @@ class _GlyphPainter extends CustomPainter {
         ..addOval(Rect.fromCircle(center: center, radius: 2.4)),
       fill,
     );
+  }
+
+  /// A four-pointed star with curved sides around [center].
+  static Path _star(Offset center, double radius) {
+    final Offset(dx: x, dy: y) = center;
+    return Path()
+      ..moveTo(x, y - radius)
+      ..quadraticBezierTo(x, y, x + radius, y)
+      ..quadraticBezierTo(x, y, x, y + radius)
+      ..quadraticBezierTo(x, y, x - radius, y)
+      ..quadraticBezierTo(x, y, x, y - radius)
+      ..close();
   }
 
   Paint _stroke(double width) {
