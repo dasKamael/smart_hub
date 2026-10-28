@@ -16,7 +16,12 @@ final hueBridgeRepositoryProvider = HueBridgeRepositoryProvider._();
 /// Providers
 
 final class HueBridgeRepositoryProvider
-    extends $FunctionalProvider<HueBridgeRepository, HueBridgeRepository, HueBridgeRepository>
+    extends
+        $FunctionalProvider<
+          HueBridgeRepository,
+          HueBridgeRepository,
+          HueBridgeRepository
+        >
     with $Provider<HueBridgeRepository> {
   /// Providers
   HueBridgeRepositoryProvider._()
@@ -35,7 +40,9 @@ final class HueBridgeRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<HueBridgeRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<HueBridgeRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   HueBridgeRepository create(Ref ref) {
@@ -44,11 +51,15 @@ final class HueBridgeRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(HueBridgeRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<HueBridgeRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<HueBridgeRepository>(value),
+    );
   }
 }
 
-String _$hueBridgeRepositoryHash() => r'edd35601daf968ef3488f7a19b3fb20c121d7ba5';
+String _$hueBridgeRepositoryHash() =>
+    r'edd35601daf968ef3488f7a19b3fb20c121d7ba5';
 
 /// The paired bridges; empty when there is none.
 
@@ -56,7 +67,8 @@ String _$hueBridgeRepositoryHash() => r'edd35601daf968ef3488f7a19b3fb20c121d7ba5
 final hueBridgeConfigProvider = HueBridgeConfigProvider._();
 
 /// The paired bridges; empty when there is none.
-final class HueBridgeConfigProvider extends $AsyncNotifierProvider<HueBridgeConfig, List<LightBridge>> {
+final class HueBridgeConfigProvider
+    extends $AsyncNotifierProvider<HueBridgeConfig, List<LightBridge>> {
   /// The paired bridges; empty when there is none.
   HueBridgeConfigProvider._()
     : super(
@@ -86,7 +98,8 @@ abstract class _$HueBridgeConfig extends $AsyncNotifier<List<LightBridge>> {
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<LightBridge>>, List<LightBridge>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<LightBridge>>, List<LightBridge>>;
     final element =
         ref.element
             as $ClassProviderElement<

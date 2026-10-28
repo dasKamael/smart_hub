@@ -13,6 +13,7 @@ import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
 import 'package:smart_hub/domain/lights/light.service.dart';
+import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/lights/model/room_scene.dart';
 import 'package:smart_hub/domain/lights/room_scenes.service.dart';
 import 'package:smart_hub/domain/lights/scene.util.dart';
@@ -205,4 +206,21 @@ List<({RoomScene scene, Color color, bool active})> roomScenes(Ref ref, String r
     for (final scene in ref.read(roomScenesServiceProvider.notifier).scenesOf(roomId))
       (scene: scene, color: SceneUtil.colorOf(lights, scene).toColor(), active: SceneUtil.isActive(lights, scene)),
   ];
+}
+
+/// Why the lights page has no rooms to show. Lamps that stand nowhere on the plan are not a reason – they make
+/// up a room of their own.
+enum LightsEmptyReason {
+  /// The bridge or Home Assistant cannot be reached right now.
+  offline,
+
+  /// Nothing reported a lamp.
+  noLights,
+}
+
+/// What is the matter when the page is empty; `null` while there are rooms.
+@riverpod
+LightsEmptyReason? lightsEmptyReason(Ref ref) {
+  if (ref.watch(lightRoomsProvider).isNotEmpty) return null;
+  return ref.watch(lightsOnlineProvider) ? LightsEmptyReason.noLights : LightsEmptyReason.offline;
 }

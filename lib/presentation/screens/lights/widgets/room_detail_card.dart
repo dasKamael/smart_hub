@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/domain/lights/model/room_scene.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/vertical_slider.dart';
@@ -177,7 +178,7 @@ class _SceneButton extends StatelessWidget {
           duration: HubMotion.fadeDuration,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: entry.active ? HubColorPalette.accent : HubColorPalette.elevated,
+            color: entry.active ? HubColorPalette.accent : HubAreaColors.veil(PageCard.tintOf(context)),
             borderRadius: BorderRadius.circular(18),
           ),
           child: Row(

@@ -40,6 +40,24 @@ class LightsWidget extends ConsumerWidget {
     final controller = ref.read(lightsControllerProvider.notifier);
     final selectedId = ref.watch(lightsControllerProvider.select((state) => state.selectedRoomId));
     final selected = rooms.where((room) => room.id == selectedId).firstOrNull ?? rooms.firstOrNull;
+    final shownIds = {
+      for (final room in rooms.take(switch (size) {
+        WidgetSize.small => rooms.length,
+        WidgetSize.medium => _Medium.shown,
+        WidgetSize.large => _Large.shown,
+        WidgetSize.extraLarge => _ExtraLarge.shown,
+      }))
+        room.id,
+    };
+    final litElsewhere = [
+      for (final room in all)
+        // Warm white for lights without a color.
+        if (room.isOn && !shownIds.contains(room.id))
+          ...switch (_colorsOf(room)) {
+            [] => [_colorOf(room)],
+            final colors => colors,
+          },
+    ];
 
     return WidgetTile(
       card: card,
@@ -54,6 +72,7 @@ class LightsWidget extends ConsumerWidget {
         _ => 16,
       },
       onTap: () => context.go(HubRoute.lights.path),
+      background: litElsewhere.isEmpty ? null : _ElsewhereStripe(colors: litElsewhere),
       child: switch ((ref.watch(hasLightsProvider), rooms)) {
         (false, _) => _Message(
           glyph: HubGlyph.bulb,
@@ -160,24 +179,23 @@ class _Small extends StatelessWidget {
 class _Medium extends StatelessWidget {
   const _Medium(this.rooms, {required this.onToggle});
 
-  static const _shown = 4;
+  static const shown = 4;
 
   final List<LightRoom> rooms;
   final ValueChanged<LightRoom>? onToggle;
 
   @override
   Widget build(BuildContext context) {
-    final lit = rooms.where((room) => room.isOn).length;
+    // No title or count: the bulbs say it.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 12,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _Header(title: 'Lights', trailing: lit == 0 ? 'All off' : '$lit on', titleSize: 17),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Fewer rooms share the width instead of leaving gaps.
-            for (var i = 0; i < rooms.length.clamp(1, _shown); i++)
+            for (var i = 0; i < rooms.length.clamp(1, shown); i++)
               Expanded(
                 child: i < rooms.length
                     ? Column(
@@ -212,7 +230,7 @@ class _Medium extends StatelessWidget {
 class _Large extends StatelessWidget {
   const _Large(this.rooms, {required this.onToggle, required this.onToggleAll});
 
-  static const _shown = 8;
+  static const shown = 8;
 
   final List<LightRoom> rooms;
   final ValueChanged<LightRoom>? onToggle;
@@ -220,7 +238,7 @@ class _Large extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shown = rooms.take(_shown).toList();
+    final shown = rooms.take(_Large.shown).toList();
     // Up to three rooms as wide rows, more in two columns; the tiles always fill the widget.
     final columns = shown.length <= 3 ? 1 : 2;
     final rows = (shown.length / columns).ceil().clamp(1, 4);
@@ -229,8 +247,8 @@ class _Large extends StatelessWidget {
       spacing: 10,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Expanded(child: Text('Lights', style: HubTextStyles.widgetTitle)),
             HubButton(
               label: rooms.any((room) => room.isOn) ? 'All off' : 'All on',
               variant: HubButtonVariant.secondary,
@@ -350,6 +368,9 @@ class _ExtraLarge extends StatelessWidget {
     required this.scenes,
     required this.onScene,
   });
+
+  /// Three rows of three rooms at most.
+  static const shown = 9;
 
   final List<LightRoom> rooms;
   final LightRoom selected;
@@ -609,27 +630,33 @@ class _Bulb extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.title, required this.trailing, required this.titleSize});
+/// A thin glowing line along the bottom of the card: lights are on in rooms the widget does not show.
+class _ElsewhereStripe extends StatelessWidget {
+  const _ElsewhereStripe({required this.colors});
 
-  final String title;
-  final String trailing;
-  final double titleSize;
+  final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: HubTextStyles.body.copyWith(fontSize: titleSize, fontWeight: FontWeight.w700),
+    final gradient = colors.length > 1
+        ? LinearGradient(colors: [for (final color in colors) color.withValues(alpha: 0.85)])
+        : null;
+    return Semantics(
+      container: true,
+      label: 'Lights on in other rooms',
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          height: 3,
+          margin: const EdgeInsets.fromLTRB(28, 0, 28, 7),
+          decoration: BoxDecoration(
+            color: colors.first.withValues(alpha: 0.85),
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [BoxShadow(color: colors.first.withValues(alpha: 0.5), blurRadius: 8)],
           ),
         ),
-        Text(trailing, style: HubTextStyles.label.copyWith(color: HubColorPalette.text2)),
-      ],
+      ),
     );
   }
 }

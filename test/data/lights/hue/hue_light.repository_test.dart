@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -143,6 +144,56 @@ void main() {
         await subscription.cancel();
         repository.dispose();
         await events.close();
+      },
+    );
+
+    test(
+      'Given an event stream that went quiet, when turning a lamp off without an echo, then it reads the lights again',
+      () {
+        fakeAsync((async) {
+          // Given
+          var isOn = true;
+          var reads = 0;
+          var streams = 0;
+          final client = MockClient.streaming((request, body) async {
+            if (request.url.path == '/clip/v2/resource/light/a') {
+              isOn = false;
+              return http.StreamedResponse(Stream.value(utf8.encode('{"data":[],"errors":[]}')), 200);
+            }
+            if (request.url.path == '/clip/v2/resource/light') {
+              reads++;
+              return http.StreamedResponse(
+                Stream.value(
+                  utf8.encode(
+                    jsonEncode({
+                      'data': [lamp('a', on: isOn)],
+                    }),
+                  ),
+                ),
+                200,
+              );
+            }
+            streams++;
+            // Open, but never carries anything.
+            return http.StreamedResponse(StreamController<List<int>>().stream, 200);
+          });
+          final repository = HueLightRepository(host: 'bridge', appKey: 'key', client: client);
+          final seen = <bool>[];
+          final subscription = repository.watchLights().listen((lights) => seen.add(lights.single.isOn));
+          async.flushMicrotasks();
+
+          // When
+          unawaited(repository.turnOff(['a']));
+          async
+            ..elapse(const Duration(milliseconds: 1600))
+            ..flushMicrotasks();
+
+          // Then
+          expect((reads, streams), (2, 2));
+          expect(seen, [true, false]);
+          unawaited(subscription.cancel());
+          repository.dispose();
+        });
       },
     );
   });

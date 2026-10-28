@@ -17,7 +17,9 @@ final lightRepositoryProvider = LightRepositoryProvider._();
 /// Providers
 /// Paired bridges provide the lights; otherwise Home Assistant does.
 
-final class LightRepositoryProvider extends $FunctionalProvider<LightRepository, LightRepository, LightRepository>
+final class LightRepositoryProvider
+    extends
+        $FunctionalProvider<LightRepository, LightRepository, LightRepository>
     with $Provider<LightRepository> {
   /// Providers
   /// Paired bridges provide the lights; otherwise Home Assistant does.
@@ -37,7 +39,8 @@ final class LightRepositoryProvider extends $FunctionalProvider<LightRepository,
 
   @$internal
   @override
-  $ProviderElement<LightRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<LightRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   LightRepository create(Ref ref) {
@@ -46,7 +49,10 @@ final class LightRepositoryProvider extends $FunctionalProvider<LightRepository,
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(LightRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<LightRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<LightRepository>(value),
+    );
   }
 }
 

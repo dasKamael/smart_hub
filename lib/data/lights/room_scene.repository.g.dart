@@ -16,7 +16,12 @@ final roomSceneRepositoryProvider = RoomSceneRepositoryProvider._();
 /// Providers
 
 final class RoomSceneRepositoryProvider
-    extends $FunctionalProvider<RoomSceneRepository, RoomSceneRepository, RoomSceneRepository>
+    extends
+        $FunctionalProvider<
+          RoomSceneRepository,
+          RoomSceneRepository,
+          RoomSceneRepository
+        >
     with $Provider<RoomSceneRepository> {
   /// Providers
   RoomSceneRepositoryProvider._()
@@ -35,7 +40,9 @@ final class RoomSceneRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<RoomSceneRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<RoomSceneRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   RoomSceneRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class RoomSceneRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(RoomSceneRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<RoomSceneRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RoomSceneRepository>(value),
+    );
   }
 }
 
-String _$roomSceneRepositoryHash() => r'219b436d2a632061c2fa88052cd8547bf7a60782';
+String _$roomSceneRepositoryHash() =>
+    r'219b436d2a632061c2fa88052cd8547bf7a60782';

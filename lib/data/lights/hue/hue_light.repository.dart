@@ -12,12 +12,15 @@ import 'package:smart_hub/domain/lights/model/rgb_color.dart';
 /// Lights of a Philips Hue Bridge, through its local API (CLIP v2) – no cloud, no Home Assistant.
 ///
 /// Reads all lights once, then follows the bridge's event stream: a change made with a switch or the Hue app shows
-/// at once. When the stream breaks, it reads everything again and reconnects.
+/// at once. When the stream breaks, it reads everything again and reconnects. A stream can also go quiet without
+/// breaking (the connection looks open but carries nothing); the bridge echoes every command, so a command without
+/// an echo restarts it at once.
 class HueLightRepository implements LightRepository {
   HueLightRepository({required this.host, required this.appKey, required this.client});
 
   static final _log = Logger('HueLightRepository');
   static const _reconnectDelay = Duration(seconds: 5);
+  static const _echoTimeout = Duration(milliseconds: 1500);
 
   final String host;
   final String appKey;
@@ -32,6 +35,10 @@ class HueLightRepository implements LightRepository {
   var _started = false;
   var _disposed = false;
   StreamSubscription<String>? _events;
+
+  /// Completes when the event stream ends; with `true` when it went quiet and has to be restarted at once.
+  Completer<bool>? _streamEnd;
+  Timer? _echoWatch;
   Timer? _reconnect;
 
   Map<String, String> get _headers => {'hue-application-key': appKey};
@@ -76,6 +83,7 @@ class HueLightRepository implements LightRepository {
   void dispose() {
     _disposed = true;
     _reconnect?.cancel();
+    _echoWatch?.cancel();
     unawaited(_events?.cancel());
     unawaited(_lights.close());
     unawaited(_online.close());
@@ -90,6 +98,7 @@ class HueLightRepository implements LightRepository {
 
   Future<void> _connect() async {
     if (_disposed) return;
+    var wentQuiet = false;
     try {
       final response = await client.get(Uri.https(host, '/clip/v2/resource/light'), headers: _headers);
       if (response.statusCode != 200) throw StateError('Bridge answered ${response.statusCode}');
@@ -102,32 +111,49 @@ class HueLightRepository implements LightRepository {
         ]);
       _setOnline(true);
       _publish();
-      await _listen();
+      wentQuiet = await _listen();
     } on Object catch (e) {
       _log.warning('Lost the bridge at $host: $e');
       _setOnline(false);
     }
-    if (!_disposed) _reconnect = Timer(_reconnectDelay, () => unawaited(_connect()));
+    if (!_disposed) _reconnect = Timer(wentQuiet ? Duration.zero : _reconnectDelay, () => unawaited(_connect()));
   }
 
-  /// Follows the event stream until it ends.
-  Future<void> _listen() async {
+  /// Follows the event stream until it ends. Returns whether it went quiet.
+  Future<bool> _listen() async {
     final request = http.Request('GET', Uri.https(host, '/eventstream/clip/v2'))
       ..headers.addAll({..._headers, 'Accept': 'text/event-stream'});
     final response = await client.send(request);
-    final done = Completer<void>();
+    final done = _streamEnd = Completer<bool>();
     _events = response.stream
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .listen(
           (line) {
+            _echoWatch?.cancel();
+            _echoWatch = null;
             if (line.startsWith('data:')) _apply(line.substring(5).trim());
           },
-          onDone: done.complete,
+          onDone: () => done.isCompleted ? null : done.complete(false),
           onError: (Object e) => done.isCompleted ? null : done.completeError(e),
           cancelOnError: true,
         );
-    await done.future;
+    try {
+      return await done.future;
+    } finally {
+      _echoWatch?.cancel();
+      _echoWatch = null;
+    }
+  }
+
+  /// Ends a stream that did not echo a command, so [_connect] reads everything again and listens anew.
+  void _restartQuietStream() {
+    _echoWatch = null;
+    final end = _streamEnd;
+    if (end == null || end.isCompleted) return;
+    _log.info('The event stream of $host went quiet – reconnecting');
+    unawaited(_events?.cancel());
+    end.complete(true);
   }
 
   /// Merges the changed parts of lights from one event message.
@@ -166,6 +192,7 @@ class HueLightRepository implements LightRepository {
       body: jsonEncode(body),
     );
     if (response.statusCode >= 400) throw StateError('The bridge refused the command: ${response.body}');
+    if (!_disposed && _streamEnd?.isCompleted == false) _echoWatch ??= Timer(_echoTimeout, _restartQuietStream);
   }
 
   int _mirekFor(String id, int kelvin) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_hub/presentation/shared_widgets/empty_mark.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_hub/common/go_router/hub_page.enum.dart';
 import 'package:smart_hub/domain/lights/model/light_capability.enum.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/light_color_dialog.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
@@ -15,6 +16,7 @@ import 'package:smart_hub/presentation/screens/lights/lights.controller.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/room_detail_card.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/room_tile.dart';
 import 'package:smart_hub/presentation/shared_widgets/home_assistant_hint.dart';
+import 'package:smart_hub/presentation/shared_widgets/page_hint.dart';
 
 /// Lights page: room tiles on the left, brightness and scenes of the selected room on the right.
 class LightsScreen extends ConsumerWidget {
@@ -43,10 +45,8 @@ class LightsScreen extends ConsumerWidget {
         ),
       );
     }
-    if (rooms.isEmpty) {
-      return const PageCard(
-        child: EmptyMark(glyph: HubGlyph.bulb, label: 'No lights yet'),
-      );
+    if (ref.watch(lightsEmptyReasonProvider) case final reason?) {
+      return PageCard(child: _Empty(reason));
     }
 
     return Row(
@@ -152,5 +152,33 @@ class LightsScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+/// What the page says when there are no rooms: what is the matter and what to do about it.
+class _Empty extends StatelessWidget {
+  const _Empty(this.reason);
+
+  final LightsEmptyReason reason;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (reason) {
+      LightsEmptyReason.offline => const PageHint(
+        glyph: HubGlyph.offline,
+        title: 'The lights cannot be reached',
+        text:
+            'The hub does not get through to them right now – usually because the tablet is in another network. '
+            'They come back on their own.',
+      ),
+      LightsEmptyReason.noLights => PageHint(
+        glyph: HubGlyph.bulb,
+        title: 'No lamps reported',
+        text:
+            'Nothing has told the hub about a lamp yet. Pair a light bridge in the settings or check the one '
+            'you have.',
+        action: (label: 'Settings', onPressed: () => context.push(HubPage.settings.path)),
+      ),
+    };
   }
 }

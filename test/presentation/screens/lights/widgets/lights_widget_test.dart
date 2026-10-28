@@ -81,7 +81,6 @@ void main() {
       await tester.pump();
 
       // Then
-      expect(find.text('1 on'), findsOneWidget);
       expect(lights.commands, ['on light.pendant']);
     });
 
@@ -177,6 +176,27 @@ void main() {
       // Then
       expect(find.text('Kitchen'), findsOneWidget);
       expect(lights.commands, ['on light.pendant']);
+    });
+
+    testWidgets('Given the office lit and only the kitchen chosen, '
+        'when shown, '
+        'then a stripe tells that lights are on elsewhere', (tester) async {
+      // Given / When
+      await load(tester, WidgetSize.medium, roomIds: const ['kitchen']);
+
+      // Then
+      expect(find.bySemanticsLabel('Lights on in other rooms'), findsOneWidget);
+    });
+
+    testWidgets('Given the office lit and shown, '
+        'when nothing outside the widget is on, '
+        'then there is no stripe and no count', (tester) async {
+      // Given / When
+      await load(tester, WidgetSize.medium, roomIds: const ['kitchen', 'office']);
+
+      // Then
+      expect(find.bySemanticsLabel('Lights on in other rooms'), findsNothing);
+      expect(find.textContaining(' on'), findsNothing);
     });
   });
 }

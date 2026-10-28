@@ -46,6 +46,52 @@ void main() {
       );
     }
 
+    /// A screen with [lights] of which [placed] stand on the plan, online or not.
+    Future<void> pumpWith(
+      WidgetTester tester, {
+      List<LightState> lights = const [],
+      List<String> placed = const [],
+      ConnectionStatus status = ConnectionStatus.online,
+    }) async {
+      await loadWidgetTestApp(
+        tester: tester,
+        container: createTestContainer(
+          overrides: [
+            lightsServiceProvider.overrideWith(() => FakeLightsService(lights)),
+            connectionStatusServiceProvider.overrideWith((ref) => Stream.value(status)),
+            ...floorplanWidgetTestOverrides(
+              FakePlacementService([
+                for (final id in placed)
+                  Placement(deviceId: id, kind: DeviceKind.light, position: const PlanPoint(100, 60)),
+              ]),
+            ),
+          ],
+        ),
+        underTestWidget: const LightsScreen(),
+      );
+    }
+
+    testWidgets('Given no lamp and no connection, '
+        'when opening the page, '
+        'then it says the lights cannot be reached', (tester) async {
+      // Given / When
+      await pumpWith(tester, status: ConnectionStatus.offline);
+
+      // Then
+      expect(find.text('The lights cannot be reached'), findsOneWidget);
+    });
+
+    testWidgets('Given a connection but no lamp at all, '
+        'when opening the page, '
+        'then it says that nothing reported a lamp', (tester) async {
+      // Given / When
+      await pumpWith(tester);
+
+      // Then
+      expect(find.text('No lamps reported'), findsOneWidget);
+      expect(find.text('Settings'), findsOneWidget);
+    });
+
     testWidgets('Given lights in two rooms and one unplaced, '
         'when rendering, '
         'then there is a tile per room with its summary', (tester) async {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
+import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/power_button.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
@@ -40,7 +42,7 @@ class RoomTile extends StatelessWidget {
           curve: HubMotion.fade,
           padding: const EdgeInsets.all(HubSpacing.s16),
           decoration: BoxDecoration(
-            color: on ? color.withValues(alpha: 0.18) : HubColorPalette.elevated,
+            color: on ? color.withValues(alpha: 0.18) : HubAreaColors.veil(PageCard.tintOf(context)),
             // A mixed room shows all its colors.
             gradient: on && colors.length > 1
                 ? LinearGradient(
