@@ -80,8 +80,6 @@ GoRouter createHubRouter({
                 HubRoute.music => ref.watch(musicTintProvider(visible: true)),
                 HubRoute.home || HubRoute.plan => null,
               },
-              // The music page is all in the cover's color.
-              tintsSky: route == HubRoute.music,
               tabLabels: [for (final r in HubRoute.values) r.tabLabel],
               selectedTab: shell.currentIndex,
               onTabSelected: (index) => shell.goBranch(index, initialLocation: index == shell.currentIndex),

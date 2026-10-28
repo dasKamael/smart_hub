@@ -14,7 +14,6 @@ class HubShell extends StatelessWidget {
     required this.child,
     this.trailing,
     this.tint,
-    this.tintsSky = false,
   });
 
   final List<String> tabLabels;
@@ -23,11 +22,8 @@ class HubShell extends StatelessWidget {
   final Widget? trailing;
   final Widget child;
 
-  /// The shown page's area color for the glows behind it.
+  /// The shown page's area color; the whole sky behind it takes it on.
   final Color? tint;
-
-  /// The tint colors the whole sky, not only the glows (see [HubBackground.tintsSky]).
-  final bool tintsSky;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +31,7 @@ class HubShell extends StatelessWidget {
       backgroundColor: HubColorPalette.bg,
       body: HubBackground(
         tint: tint,
-        tintsSky: tintsSky,
+        tintsSky: true,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(HubSpacing.s24, HubSpacing.s20, HubSpacing.s24, HubSpacing.s24),

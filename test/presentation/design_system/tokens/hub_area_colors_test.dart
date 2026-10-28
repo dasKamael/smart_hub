@@ -19,18 +19,34 @@ void main() {
       expect(HubAreaColors.lightsFor(const []), HubAreaColors.lightsOff);
     });
 
-    test('Given a violet and an orange light, when coloring the lights area, then it mixes them, a bit warmer', () {
+    test('Given one violet light, when coloring the lights area, then it is violet, a bit warmer', () {
+      // Given
+      const violet = Color(0xFFBF5AF2);
+
       // When
-      final color = HubAreaColors.lightsFor(const [Color(0xFFBF5AF2), Color(0xFFFF9F6B)]);
+      final color = HubAreaColors.lightsFor(const [violet, violet]);
 
       // Then
-      final mix = Color.from(
-        alpha: 1,
-        red: (0xBF / 255 + 1) / 2,
-        green: (0x5A + 0x9F) / 2 / 255,
-        blue: (0xF2 + 0x6B) / 2 / 255,
-      );
-      expect(color, Color.lerp(mix, HubAreaColors.lights, 0.3));
+      expect(color.toARGB32(), Color.lerp(violet, HubAreaColors.lights, 0.3)!.toARGB32());
+    });
+
+    test('Given a green and a magenta light, when coloring the lights area, '
+        'then it is the warm amber instead of a grey mix', () {
+      // When
+      final color = HubAreaColors.lightsFor(const [Color(0xFF00FF00), Color(0xFFFF00FF)]);
+
+      // Then
+      expect(color.toARGB32(), HubAreaColors.lights.toARGB32());
+    });
+
+    test('Given a green and a teal light, when coloring the lights area, '
+        'then it is a saturated hue between them, not a grey', () {
+      // When
+      final color = HSLColor.fromColor(HubAreaColors.lightsFor(const [Color(0xFF33CC33), Color(0xFF33CCCC)]));
+
+      // Then
+      expect(color.saturation, greaterThan(0.3));
+      expect(color.hue, inInclusiveRange(60, 180));
     });
 
     test('Given a paused track, when coloring the music area, then the cover color is paler', () {

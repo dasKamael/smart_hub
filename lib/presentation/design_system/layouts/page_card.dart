@@ -27,6 +27,9 @@ class PageCard extends StatelessWidget {
   /// Painted on the card behind the content, e.g. the weather scene.
   final Widget? background;
 
+  /// The tint of the card around [context], e.g. for a hint of it in the tiles on the card.
+  static Color? tintOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<_CardTint>()?.tint;
+
   /// The card's solid look, also for controls that stand on the page beside cards.
   static BoxDecoration decoration({Color? tint, Color? color, double radius = HubRadius.pageCard}) {
     return BoxDecoration(
@@ -38,7 +41,7 @@ class PageCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 switch (tint) {
-                  final tint? => HubAreaColors.cardTop(tint, HubColorPalette.card, strength: 0.22),
+                  final tint? => HubAreaColors.cardTop(tint, HubColorPalette.card, strength: 0.3),
                   null => HubColorPalette.card,
                 },
                 HubColorPalette.card,
@@ -51,6 +54,7 @@ class PageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final child = _CardTint(tint: tint, child: this.child);
     return AnimatedContainer(
       duration: HubMotion.tintDuration,
       curve: HubMotion.tint,
@@ -68,4 +72,13 @@ class PageCard extends StatelessWidget {
       },
     );
   }
+}
+
+class _CardTint extends InheritedWidget {
+  const _CardTint({required this.tint, required super.child});
+
+  final Color? tint;
+
+  @override
+  bool updateShouldNotify(_CardTint oldWidget) => tint != oldWidget.tint;
 }
