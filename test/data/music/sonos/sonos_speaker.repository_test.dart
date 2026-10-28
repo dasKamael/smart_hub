@@ -106,9 +106,13 @@ void main() {
         // When
         await repository.playPause('RINCON_K');
         await repository.setVolume('RINCON_B', 45);
+        await repository.seek('RINCON_K', 75);
 
         // Then
-        expect(sonos.calls, containsAllInOrder(['10.0.0.24 Pause', '10.0.0.25 SetVolume 45']));
+        expect(
+          sonos.calls,
+          containsAllInOrder(['10.0.0.24 Pause', '10.0.0.25 SetVolume 45', '10.0.0.24 Seek REL_TIME 0:01:15']),
+        );
       },
     );
 

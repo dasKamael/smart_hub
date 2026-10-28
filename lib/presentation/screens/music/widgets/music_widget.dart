@@ -42,7 +42,7 @@ class MusicWidget extends ConsumerWidget {
       // The small one is all cover.
       tint: switch (target) {
         final target? when size != WidgetSize.small => HubAreaColors.musicFor(
-          Artwork.colorOf(target.nowPlaying.title ?? target.name),
+          ref.watch(coverTintProvider(visible: visible)),
           playing: target.nowPlaying.isPlaying,
         ),
         _ => null,
@@ -65,6 +65,7 @@ class MusicWidget extends ConsumerWidget {
               onPlayPause: () => controller.playPause(target),
               onNext: () => controller.next(target),
               onPlayFromQueue: (item) => controller.playFromQueue(target, item),
+              onSeek: (seconds) => controller.seek(target, seconds),
             ),
           ),
         },
@@ -80,6 +81,7 @@ final class _Controls {
     required this.onPlayPause,
     required this.onNext,
     required this.onPlayFromQueue,
+    required this.onSeek,
   });
 
   final bool enabled;
@@ -87,6 +89,7 @@ final class _Controls {
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
   final ValueChanged<QueueItem> onPlayFromQueue;
+  final ValueChanged<int> onSeek;
 }
 
 class _Player extends StatelessWidget {
@@ -170,7 +173,7 @@ class _Medium extends StatelessWidget {
             _PlayButton(playing: track.isPlaying, size: 48, controls: controls),
           ],
         ),
-        TrackProgress(track: track),
+        TrackProgress(track: track, onSeek: controls.enabled ? controls.onSeek : null),
       ],
     );
   }
@@ -280,7 +283,7 @@ class _ExtraLarge extends ConsumerWidget {
                 ),
               ),
               _Title(track: track, titleSize: 20, artistSize: 15),
-              TrackProgress(track: track),
+              TrackProgress(track: track, onSeek: controls.enabled ? controls.onSeek : null),
               _Where(target: target),
               _Transport(playing: track.isPlaying, controls: controls, gap: 18, playSize: 50),
             ],

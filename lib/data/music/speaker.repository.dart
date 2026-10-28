@@ -22,6 +22,9 @@ abstract interface class SpeakerRepository {
 
   Future<void> previous(String id);
 
+  /// Jumps to [seconds] into the playing track of [id].
+  Future<void> seek(String id, int seconds);
+
   Future<void> play(String id, MediaItem item);
 
   Future<List<MediaItem>> favorites(String id);

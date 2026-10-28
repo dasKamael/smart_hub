@@ -87,6 +87,7 @@ void main() {
       await repository.join('media_player.office', 'media_player.sleep');
       await repository.leave('media_player.sleep');
       await repository.playFromQueue('media_player.office', 3);
+      await repository.seek('media_player.office', 75);
 
       // Then
       expect(server.serviceCalls.map((c) => '${c.service} ${c.entityIds.join()} ${c.data}'), [
@@ -95,6 +96,7 @@ void main() {
         'join media_player.office {group_members: [media_player.sleep]}',
         'unjoin media_player.sleep {}',
         'play_queue media_player.office {queue_position: 3}',
+        'media_seek media_player.office {seek_position: 75}',
       ]);
     });
 

@@ -9,12 +9,37 @@ import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 abstract final class CoverColors {
   static const _size = 16;
   static const _count = 3;
-  static final _cache = <String, Future<List<Color>>>{};
+  static final _cache = <String, Future<List<Color>?>>{};
+  static final _tints = <String, Color>{};
 
   /// Colors of [url]; the colors of an image-less [seed] cover when there is no URL or it does not load.
-  static Future<List<Color>> of(String? url, {required String seed}) {
-    if (url == null) return Future.value(ofSeed(seed));
-    return _cache.putIfAbsent(url, () => _load(url).catchError((Object _) => ofSeed(seed)));
+  static Future<List<Color>> of(String? url, {required String seed}) async => await _colorsOf(url) ?? ofSeed(seed);
+
+  /// The one color that stands for [url], e.g. to tint the cards around it; the color of an image-less [seed] cover
+  /// when there is no URL or it does not load.
+  static Future<Color> tintOf(String? url, {required String seed}) async {
+    final colors = await _colorsOf(url);
+    if (colors == null) return Artwork.colorOf(seed);
+    return _tints[url!] ??= tintFrom(colors.first);
+  }
+
+  /// The tint of [url] when it was read before, so a known cover shows its color without waiting.
+  static Color? knownTintOf(String? url) => _tints[url];
+
+  /// [main] as bright and about as colorful as the prototype's cover colors, so text on tinted cards stays readable;
+  /// gray stays gray.
+  static Color tintFrom(Color main) {
+    final hsv = HSVColor.fromColor(main);
+    final saturation = hsv.saturation < 0.18 ? hsv.saturation : hsv.saturation.clamp(0.35, 0.65);
+    return hsv.withSaturation(saturation).withValue(0.72).toColor();
+  }
+
+  static Future<List<Color>?> _colorsOf(String? url) {
+    if (url == null) return Future.value();
+    return _cache.putIfAbsent(
+      url,
+      () => _load(url).then<List<Color>?>((colors) => colors).catchError((Object _) => null),
+    );
   }
 
   /// Shades of the color an image-less cover of [seed] gets.

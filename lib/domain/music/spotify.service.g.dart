@@ -14,7 +14,8 @@ part of 'spotify.service.dart';
 final spotifyAccountServiceProvider = SpotifyAccountServiceProvider._();
 
 /// The Spotify account used as content source (playlists, recently played).
-final class SpotifyAccountServiceProvider extends $AsyncNotifierProvider<SpotifyAccountService, SpotifyAccount> {
+final class SpotifyAccountServiceProvider
+    extends $AsyncNotifierProvider<SpotifyAccountService, SpotifyAccount> {
   /// The Spotify account used as content source (playlists, recently played).
   SpotifyAccountServiceProvider._()
     : super(
@@ -35,7 +36,8 @@ final class SpotifyAccountServiceProvider extends $AsyncNotifierProvider<Spotify
   SpotifyAccountService create() => SpotifyAccountService();
 }
 
-String _$spotifyAccountServiceHash() => r'625654a0eda3739a27359a2056c0b972aa4fa0be';
+String _$spotifyAccountServiceHash() =>
+    r'625654a0eda3739a27359a2056c0b972aa4fa0be';
 
 /// The Spotify account used as content source (playlists, recently played).
 
@@ -65,7 +67,12 @@ final spotifyRecentProvider = SpotifyRecentProvider._();
 /// Recently played albums; empty while signed out.
 
 final class SpotifyRecentProvider
-    extends $FunctionalProvider<AsyncValue<List<MediaItem>>, List<MediaItem>, FutureOr<List<MediaItem>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<MediaItem>>,
+          List<MediaItem>,
+          FutureOr<List<MediaItem>>
+        >
     with $FutureModifier<List<MediaItem>>, $FutureProvider<List<MediaItem>> {
   /// Recently played albums; empty while signed out.
   SpotifyRecentProvider._()
@@ -84,7 +91,9 @@ final class SpotifyRecentProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<MediaItem>> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<List<MediaItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<MediaItem>> create(Ref ref) {
@@ -102,7 +111,12 @@ final spotifyPlaylistsProvider = SpotifyPlaylistsProvider._();
 /// Own playlists, "Liked Songs" first; empty while signed out.
 
 final class SpotifyPlaylistsProvider
-    extends $FunctionalProvider<AsyncValue<List<MediaItem>>, List<MediaItem>, FutureOr<List<MediaItem>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<MediaItem>>,
+          List<MediaItem>,
+          FutureOr<List<MediaItem>>
+        >
     with $FutureModifier<List<MediaItem>>, $FutureProvider<List<MediaItem>> {
   /// Own playlists, "Liked Songs" first; empty while signed out.
   SpotifyPlaylistsProvider._()
@@ -121,7 +135,9 @@ final class SpotifyPlaylistsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<MediaItem>> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<List<MediaItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<MediaItem>> create(Ref ref) {

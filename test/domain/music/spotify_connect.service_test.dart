@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -89,6 +92,55 @@ void main() {
 
         // Then
         expect(stateOf(container)?.devices, [laptop, phone]);
+      });
+    });
+
+    test('Given a track with 2 s left, '
+        'when it ends, '
+        'then the next track shows right after, before the next poll', () {
+      fakeAsync((async) {
+        withClock(async.getClock(DateTime(2026)), () {
+          // Given
+          playback = playback?.copyWith(durationSeconds: 200, positionSeconds: 198, positionAt: DateTime(2026));
+          final container = createContainer();
+          async.flushMicrotasks();
+
+          // When
+          playback = playback?.copyWith(
+            title: 'Slow Rivers',
+            positionSeconds: 0,
+            positionAt: DateTime(2026, 1, 1, 0, 0, 2),
+          );
+          async.elapse(const Duration(seconds: 2) + spotifyTrackEndRefreshes.first);
+
+          // Then
+          expect(stateOf(container)?.playback?.title, 'Slow Rivers');
+        });
+      });
+    });
+
+    test('Given a track that ends while Spotify still reports it, '
+        'when reading right at the end, '
+        'then it is read once more shortly after', () {
+      fakeAsync((async) {
+        withClock(async.getClock(DateTime(2026)), () {
+          // Given
+          playback = playback?.copyWith(durationSeconds: 200, positionSeconds: 198, positionAt: DateTime(2026));
+          final container = createContainer();
+          async.flushMicrotasks();
+          async.elapse(const Duration(seconds: 2) + spotifyTrackEndRefreshes.first);
+
+          // When
+          playback = playback?.copyWith(
+            title: 'Slow Rivers',
+            positionSeconds: 0,
+            positionAt: DateTime(2026, 1, 1, 0, 0, 3),
+          );
+          async.elapse(spotifyTrackEndRefreshes.last - spotifyTrackEndRefreshes.first);
+
+          // Then
+          expect(stateOf(container)?.playback?.title, 'Slow Rivers');
+        });
       });
     });
 
@@ -221,6 +273,26 @@ void main() {
 
         // Then
         expect(stateOf(container)?.playback?.positionSeconds, 0);
+      });
+    });
+
+    test('Given a track at 0:10, when jumping to 1:15, then 1:15 shows at once and Spotify is told', () {
+      fakeAsync((async) {
+        withClock(async.getClock(DateTime(2026)), () {
+          // Given
+          when(() => spotify.seek(any(), any())).thenAnswer((_) async {});
+          playback = playback?.copyWith(durationSeconds: 200, positionSeconds: 10, positionAt: DateTime(2026));
+          final container = createContainer();
+          async.flushMicrotasks();
+
+          // When
+          unawaited(serviceOf(container).seek('d-phone', 75));
+          async.flushMicrotasks();
+
+          // Then
+          expect(stateOf(container)?.playback?.positionSeconds, 75);
+          verify(() => spotify.seek('d-phone', 75)).called(1);
+        });
       });
     });
 

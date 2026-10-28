@@ -13,6 +13,9 @@ import 'package:smart_hub/domain/music/speaker_settings.service.dart';
 
 part 'speaker.service.g.dart';
 
+/// How far, in seconds, a reported position may be from a jump and still confirm it: polling and clock drift.
+const seekTolerance = 3.0;
+
 /// All speakers, sorted by name, and the commands to control them.
 ///
 /// Commands show at once (optimistic) and roll back when the speaker does not report the change within 3 s or the
@@ -83,6 +86,24 @@ class SpeakersService extends _$SpeakersService {
   Future<void> next(String id, {QueueItem? upcoming}) => _skip(id, _repository.next(id), upcoming: upcoming);
 
   Future<void> previous(String id) => _skip(id, _repository.previous(id));
+
+  /// Jumps to [seconds] into the track of [id] and its group; the new place shows at once.
+  Future<void> seek(String id, int seconds) {
+    final group = _groupOf(id);
+    final now = clock.now();
+    for (final speaker in group) {
+      _overlay.add(
+        speaker.id,
+        apply: (speaker) => speaker.copyWith(positionSeconds: seconds.toDouble(), positionUpdatedAt: now),
+        isConfirmed: (reported) {
+          final at = clock.now();
+          final expected = seconds + (reported.playback.isPlaying ? at.difference(now).inMilliseconds / 1000 : 0);
+          return ((reported.positionAt(at) ?? -10) - expected).abs() <= seekTolerance;
+        },
+      );
+    }
+    return _run(group, _repository.seek(id, seconds));
+  }
 
   /// Jumps to [item] of the queue of [id]; it shows at once. Does nothing for items without a place in the queue.
   Future<void> playFromQueue(String id, QueueItem item) {

@@ -185,6 +185,11 @@ final class _DemoBehavior {
           _skip(current, 1);
         case ('media_player', 'media_previous_track'):
           _skip(current, -1);
+        case ('media_player', 'media_seek'):
+          _setMedia(current, {
+            'media_position': (call.data['seek_position'] as num?)?.toDouble() ?? 0,
+            'media_position_updated_at': clock.now().toUtc().toIso8601String(),
+          }, current.state);
         // The demo queue starts at the current track, so a place in it is that many tracks ahead.
         case ('sonos', 'play_queue'):
           _skip(current, (call.data['queue_position'] as num?)?.toInt() ?? 0);

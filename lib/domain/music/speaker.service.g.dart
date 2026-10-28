@@ -20,7 +20,8 @@ final speakersServiceProvider = SpeakersServiceProvider._();
 ///
 /// Commands show at once (optimistic) and roll back when the speaker does not report the change within 3 s or the
 /// command fails (`README` → "Optimistic UI").
-final class SpeakersServiceProvider extends $AsyncNotifierProvider<SpeakersService, List<SpeakerState>> {
+final class SpeakersServiceProvider
+    extends $AsyncNotifierProvider<SpeakersService, List<SpeakerState>> {
   /// All speakers, sorted by name, and the commands to control them.
   ///
   /// Commands show at once (optimistic) and roll back when the speaker does not report the change within 3 s or the
@@ -44,7 +45,7 @@ final class SpeakersServiceProvider extends $AsyncNotifierProvider<SpeakersServi
   SpeakersService create() => SpeakersService();
 }
 
-String _$speakersServiceHash() => r'f72dba056930ee3e88759e71b205b043cf42cd79';
+String _$speakersServiceHash() => r'0eed0b93000e0d5a3e5aa1ad07cb3a7c4c3d566a';
 
 /// All speakers, sorted by name, and the commands to control them.
 ///
@@ -56,7 +57,8 @@ abstract class _$SpeakersService extends $AsyncNotifier<List<SpeakerState>> {
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<SpeakerState>>, List<SpeakerState>>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<SpeakerState>>, List<SpeakerState>>;
     final element =
         ref.element
             as $ClassProviderElement<
@@ -77,17 +79,24 @@ final mediaFavoritesProvider = MediaFavoritesFamily._();
 /// Favorites and playlists [speakerId] can play.
 
 final class MediaFavoritesProvider
-    extends $FunctionalProvider<AsyncValue<List<MediaItem>>, List<MediaItem>, FutureOr<List<MediaItem>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<MediaItem>>,
+          List<MediaItem>,
+          FutureOr<List<MediaItem>>
+        >
     with $FutureModifier<List<MediaItem>>, $FutureProvider<List<MediaItem>> {
   /// Favorites and playlists [speakerId] can play.
-  MediaFavoritesProvider._({required MediaFavoritesFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'mediaFavoritesProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  MediaFavoritesProvider._({
+    required MediaFavoritesFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'mediaFavoritesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$mediaFavoritesHash();
@@ -101,7 +110,9 @@ final class MediaFavoritesProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<MediaItem>> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<List<MediaItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<MediaItem>> create(Ref ref) {
@@ -124,7 +135,8 @@ String _$mediaFavoritesHash() => r'5cfc1ec394d1eadfb7126784ad41fcae746e2c0d';
 
 /// Favorites and playlists [speakerId] can play.
 
-final class MediaFavoritesFamily extends $Family with $FunctionalFamilyOverride<FutureOr<List<MediaItem>>, String> {
+final class MediaFavoritesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<MediaItem>>, String> {
   MediaFavoritesFamily._()
     : super(
         retry: null,
@@ -136,7 +148,8 @@ final class MediaFavoritesFamily extends $Family with $FunctionalFamilyOverride<
 
   /// Favorites and playlists [speakerId] can play.
 
-  MediaFavoritesProvider call(String speakerId) => MediaFavoritesProvider._(argument: speakerId, from: this);
+  MediaFavoritesProvider call(String speakerId) =>
+      MediaFavoritesProvider._(argument: speakerId, from: this);
 
   @override
   String toString() => r'mediaFavoritesProvider';
@@ -150,17 +163,24 @@ final playQueueProvider = PlayQueueFamily._();
 /// The play queue of [speakerId]; `null` when the player has none HA can read. Reloads when the track changes.
 
 final class PlayQueueProvider
-    extends $FunctionalProvider<AsyncValue<List<QueueItem>?>, List<QueueItem>?, FutureOr<List<QueueItem>?>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<QueueItem>?>,
+          List<QueueItem>?,
+          FutureOr<List<QueueItem>?>
+        >
     with $FutureModifier<List<QueueItem>?>, $FutureProvider<List<QueueItem>?> {
   /// The play queue of [speakerId]; `null` when the player has none HA can read. Reloads when the track changes.
-  PlayQueueProvider._({required PlayQueueFamily super.from, required String super.argument})
-    : super(
-        retry: null,
-        name: r'playQueueProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  PlayQueueProvider._({
+    required PlayQueueFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'playQueueProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$playQueueHash();
@@ -174,7 +194,9 @@ final class PlayQueueProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<QueueItem>?> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<List<QueueItem>?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<QueueItem>?> create(Ref ref) {
@@ -197,7 +219,8 @@ String _$playQueueHash() => r'71e6094fff24a708910c74cee926c00cd7ed8853';
 
 /// The play queue of [speakerId]; `null` when the player has none HA can read. Reloads when the track changes.
 
-final class PlayQueueFamily extends $Family with $FunctionalFamilyOverride<FutureOr<List<QueueItem>?>, String> {
+final class PlayQueueFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<QueueItem>?>, String> {
   PlayQueueFamily._()
     : super(
         retry: null,
@@ -209,7 +232,8 @@ final class PlayQueueFamily extends $Family with $FunctionalFamilyOverride<Futur
 
   /// The play queue of [speakerId]; `null` when the player has none HA can read. Reloads when the track changes.
 
-  PlayQueueProvider call(String speakerId) => PlayQueueProvider._(argument: speakerId, from: this);
+  PlayQueueProvider call(String speakerId) =>
+      PlayQueueProvider._(argument: speakerId, from: this);
 
   @override
   String toString() => r'playQueueProvider';

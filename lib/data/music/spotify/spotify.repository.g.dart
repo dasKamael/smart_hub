@@ -16,7 +16,12 @@ final spotifyRepositoryProvider = SpotifyRepositoryProvider._();
 /// Providers
 
 final class SpotifyRepositoryProvider
-    extends $FunctionalProvider<SpotifyRepository, SpotifyRepository, SpotifyRepository>
+    extends
+        $FunctionalProvider<
+          SpotifyRepository,
+          SpotifyRepository,
+          SpotifyRepository
+        >
     with $Provider<SpotifyRepository> {
   /// Providers
   SpotifyRepositoryProvider._()
@@ -35,7 +40,9 @@ final class SpotifyRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<SpotifyRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<SpotifyRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   SpotifyRepository create(Ref ref) {
@@ -44,7 +51,10 @@ final class SpotifyRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(SpotifyRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<SpotifyRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SpotifyRepository>(value),
+    );
   }
 }
 

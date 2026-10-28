@@ -12,7 +12,6 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/now_playing_card.dart';
-import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 import 'package:smart_hub/presentation/utils/extension/connect_device_type.extension.dart';
 
 HubGlyph _glyphOf(PlaybackTarget target) => switch (target) {
@@ -42,7 +41,7 @@ class PlaybackPlaceButton extends ConsumerWidget {
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: PageCard.decoration(
-            color: NowPlayingCard.fillOf(Artwork.colorOf(target.nowPlaying.title ?? target.name)),
+            color: NowPlayingCard.fillOf(ref.watch(coverTintProvider(visible: visible))),
             radius: 20,
           ),
           child: Row(

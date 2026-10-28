@@ -16,7 +16,12 @@ final speakerSettingsRepositoryProvider = SpeakerSettingsRepositoryProvider._();
 /// Providers
 
 final class SpeakerSettingsRepositoryProvider
-    extends $FunctionalProvider<SpeakerSettingsRepository, SpeakerSettingsRepository, SpeakerSettingsRepository>
+    extends
+        $FunctionalProvider<
+          SpeakerSettingsRepository,
+          SpeakerSettingsRepository,
+          SpeakerSettingsRepository
+        >
     with $Provider<SpeakerSettingsRepository> {
   /// Providers
   SpeakerSettingsRepositoryProvider._()
@@ -35,7 +40,9 @@ final class SpeakerSettingsRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<SpeakerSettingsRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<SpeakerSettingsRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   SpeakerSettingsRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class SpeakerSettingsRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(SpeakerSettingsRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<SpeakerSettingsRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SpeakerSettingsRepository>(value),
+    );
   }
 }
 
-String _$speakerSettingsRepositoryHash() => r'fb6cd553e26d16f8e8a3b5dffdbe39979a06e317';
+String _$speakerSettingsRepositoryHash() =>
+    r'fb6cd553e26d16f8e8a3b5dffdbe39979a06e317';

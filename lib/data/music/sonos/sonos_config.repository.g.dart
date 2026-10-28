@@ -15,7 +15,8 @@ final sonosHttpClientProvider = SonosHttpClientProvider._();
 
 /// Providers
 
-final class SonosHttpClientProvider extends $FunctionalProvider<http.Client, http.Client, http.Client>
+final class SonosHttpClientProvider
+    extends $FunctionalProvider<http.Client, http.Client, http.Client>
     with $Provider<http.Client> {
   /// Providers
   SonosHttpClientProvider._()
@@ -34,7 +35,8 @@ final class SonosHttpClientProvider extends $FunctionalProvider<http.Client, htt
 
   @$internal
   @override
-  $ProviderElement<http.Client> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<http.Client> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   http.Client create(Ref ref) {
@@ -43,7 +45,10 @@ final class SonosHttpClientProvider extends $FunctionalProvider<http.Client, htt
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(http.Client value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<http.Client>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<http.Client>(value),
+    );
   }
 }
 
@@ -53,7 +58,12 @@ String _$sonosHttpClientHash() => r'2cad7dd447d5f8f0a8ad0a13f9062b04687c3fbc';
 final sonosConfigRepositoryProvider = SonosConfigRepositoryProvider._();
 
 final class SonosConfigRepositoryProvider
-    extends $FunctionalProvider<SonosConfigRepository, SonosConfigRepository, SonosConfigRepository>
+    extends
+        $FunctionalProvider<
+          SonosConfigRepository,
+          SonosConfigRepository,
+          SonosConfigRepository
+        >
     with $Provider<SonosConfigRepository> {
   SonosConfigRepositoryProvider._()
     : super(
@@ -71,7 +81,9 @@ final class SonosConfigRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<SonosConfigRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<SonosConfigRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   SonosConfigRepository create(Ref ref) {
@@ -80,11 +92,15 @@ final class SonosConfigRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(SonosConfigRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<SonosConfigRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SonosConfigRepository>(value),
+    );
   }
 }
 
-String _$sonosConfigRepositoryHash() => r'd7bfa1fa763e6dab36452266bbac711512155c92';
+String _$sonosConfigRepositoryHash() =>
+    r'd7bfa1fa763e6dab36452266bbac711512155c92';
 
 /// The addresses of the speakers the hub talks to directly; empty when the speakers come from Home Assistant.
 
@@ -92,7 +108,8 @@ String _$sonosConfigRepositoryHash() => r'd7bfa1fa763e6dab36452266bbac711512155c
 final sonosHostsProvider = SonosHostsProvider._();
 
 /// The addresses of the speakers the hub talks to directly; empty when the speakers come from Home Assistant.
-final class SonosHostsProvider extends $AsyncNotifierProvider<SonosHosts, List<String>> {
+final class SonosHostsProvider
+    extends $AsyncNotifierProvider<SonosHosts, List<String>> {
   /// The addresses of the speakers the hub talks to directly; empty when the speakers come from Home Assistant.
   SonosHostsProvider._()
     : super(

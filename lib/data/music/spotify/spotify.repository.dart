@@ -145,6 +145,10 @@ class SpotifyRepository {
 
   Future<void> previous(String deviceId) => _send('POST', 'me/player/previous', query: {'device_id': deviceId});
 
+  Future<void> seek(String deviceId, int seconds) {
+    return _send('PUT', 'me/player/seek', query: {'device_id': deviceId, 'position_ms': '${seconds * 1000}'});
+  }
+
   Future<void> setVolume(String deviceId, int percent) {
     return _send('PUT', 'me/player/volume', query: {'device_id': deviceId, 'volume_percent': '$percent'});
   }

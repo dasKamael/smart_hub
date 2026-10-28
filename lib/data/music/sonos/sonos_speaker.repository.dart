@@ -73,6 +73,11 @@ class SonosSpeakerRepository implements SpeakerRepository {
   Future<void> previous(String id) => _command(() => _soap(_coordinator(id)).avTransport('Previous'));
 
   @override
+  Future<void> seek(String id, int seconds) {
+    return _command(() => _soap(_coordinator(id)).avTransport('Seek', {'Unit': 'REL_TIME', 'Target': _time(seconds)}));
+  }
+
+  @override
   Future<void> setVolume(String id, int percent) {
     return _command(() => _soap(id).renderingControl('SetVolume', {'DesiredVolume': '${percent.clamp(0, 100)}'}));
   }

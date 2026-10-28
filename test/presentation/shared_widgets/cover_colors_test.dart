@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 import 'package:smart_hub/presentation/shared_widgets/cover_colors.dart';
 
 void main() {
@@ -47,6 +48,31 @@ void main() {
 
     test('Given a black cover, when reading its colors, then the generated colors are used', () {
       expect(CoverColors.fromPixels(pixels([(const Color(0xFF000000), 256)])), CoverColors.ofSeed(''));
+    });
+
+    test(
+      'Given a dark green cover, when picking its tint, then it stays green and is as bright as the cover colors',
+      () {
+        // When
+        final tint = HSVColor.fromColor(
+          CoverColors.tintFrom(
+            CoverColors.fromPixels(pixels([(const Color(0xFF2E4A1E), 200), (const Color(0xFF8A6A50), 56)])).first,
+          ),
+        );
+
+        // Then
+        expect(tint.hue, inInclusiveRange(80, 140));
+        expect(tint.saturation, inInclusiveRange(0.35, 0.65));
+        expect(tint.value, closeTo(0.72, 0.01));
+      },
+    );
+
+    test('Given a gray color, when picking its tint, then it stays gray', () {
+      expect(HSVColor.fromColor(CoverColors.tintFrom(const Color(0xFF808080))).saturation, lessThan(0.05));
+    });
+
+    test('Given no cover image, when asking for its tint, then it is the color of the generated cover', () async {
+      expect(await CoverColors.tintOf(null, seed: 'Safe With Me'), Artwork.colorOf('Safe With Me'));
     });
   });
 }

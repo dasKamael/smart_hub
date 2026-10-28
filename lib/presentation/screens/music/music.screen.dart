@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
+import 'package:smart_hub/presentation/shared_widgets/cover_colors.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/playback_place.dart';
 import 'package:smart_hub/presentation/design_system/atoms/vertical_slider.dart';
 import 'package:smart_hub/domain/music/network_speakers.service.dart';
@@ -148,23 +149,23 @@ class _NowPlaying extends ConsumerWidget {
         devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
       );
       unawaited(precacheImage(image, context, onError: (_, _) {}));
+      unawaited(CoverColors.tintOf(next, seed: ''));
     }
     return NowPlayingCard(
+      tint: ref.watch(coverTintProvider(visible: visible)),
       target: target,
       enabled: _transportEnabled(ref, target),
       onPrevious: () => controller.previous(target),
       onPlayPause: () => controller.playPause(target),
       onNext: () => controller.next(target),
+      onSeek: (seconds) => controller.seek(target, seconds),
     );
   }
 }
 
 /// The cards below the playing track share its cover's color as a plain tone.
 Color _cardColor(WidgetRef ref, bool visible) {
-  final seed = ref.watch(
-    currentTargetProvider(visible: visible).select((target) => target?.nowPlaying.title ?? target?.name ?? ''),
-  );
-  return NowPlayingCard.fillOf(Artwork.colorOf(seed));
+  return NowPlayingCard.fillOf(ref.watch(coverTintProvider(visible: visible)));
 }
 
 /// The volume where the music plays; for a group all of its speakers together.
@@ -177,7 +178,7 @@ class _Volume extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final target = ref.watch(currentTargetProvider(visible: visible));
     final controller = ref.read(musicControllerProvider.notifier);
-    final tint = Artwork.colorOf(target?.nowPlaying.title ?? target?.name ?? '');
+    final tint = ref.watch(coverTintProvider(visible: visible));
     final (value, onChanged, onEnd) = switch (target) {
       SpeakerGroupTarget(:final group) when ref.watch(speakersOnlineProvider) => (
         (group.members.map((speaker) => speaker.volumePercent).reduce((a, b) => a + b) / group.members.length).round(),

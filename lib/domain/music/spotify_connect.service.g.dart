@@ -22,7 +22,8 @@ final spotifyConnectServiceProvider = SpotifyConnectServiceProvider._();
 ///
 /// Commands show at once (optimistic) and roll back when Spotify does not report the change in time or the command
 /// fails (`README` → "Optimistic UI").
-final class SpotifyConnectServiceProvider extends $AsyncNotifierProvider<SpotifyConnectService, SpotifyConnectState> {
+final class SpotifyConnectServiceProvider
+    extends $AsyncNotifierProvider<SpotifyConnectService, SpotifyConnectState> {
   /// Spotify Connect, polled every [spotifyConnectInterval] while someone listens (Spotify has no push for this),
   /// and the playback commands. Empty while signed out.
   ///
@@ -47,7 +48,8 @@ final class SpotifyConnectServiceProvider extends $AsyncNotifierProvider<Spotify
   SpotifyConnectService create() => SpotifyConnectService();
 }
 
-String _$spotifyConnectServiceHash() => r'9e18596d8bb4b09cb633d3d1a40e3eea1577b6e8';
+String _$spotifyConnectServiceHash() =>
+    r'24af01aabbffec058f11854810c1412587e8a17e';
 
 /// Spotify Connect, polled every [spotifyConnectInterval] while someone listens (Spotify has no push for this),
 /// and the playback commands. Empty while signed out.
@@ -55,12 +57,14 @@ String _$spotifyConnectServiceHash() => r'9e18596d8bb4b09cb633d3d1a40e3eea1577b6
 /// Commands show at once (optimistic) and roll back when Spotify does not report the change in time or the command
 /// fails (`README` → "Optimistic UI").
 
-abstract class _$SpotifyConnectService extends $AsyncNotifier<SpotifyConnectState> {
+abstract class _$SpotifyConnectService
+    extends $AsyncNotifier<SpotifyConnectState> {
   FutureOr<SpotifyConnectState> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<SpotifyConnectState>, SpotifyConnectState>;
+    final ref =
+        this.ref as $Ref<AsyncValue<SpotifyConnectState>, SpotifyConnectState>;
     final element =
         ref.element
             as $ClassProviderElement<
@@ -81,7 +85,12 @@ final spotifyQueueProvider = SpotifyQueueProvider._();
 /// Spotify's play queue; reloaded when the track changes.
 
 final class SpotifyQueueProvider
-    extends $FunctionalProvider<AsyncValue<List<QueueItem>>, List<QueueItem>, FutureOr<List<QueueItem>>>
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<QueueItem>>,
+          List<QueueItem>,
+          FutureOr<List<QueueItem>>
+        >
     with $FutureModifier<List<QueueItem>>, $FutureProvider<List<QueueItem>> {
   /// Spotify's play queue; reloaded when the track changes.
   SpotifyQueueProvider._()
@@ -100,7 +109,9 @@ final class SpotifyQueueProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<QueueItem>> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<List<QueueItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<QueueItem>> create(Ref ref) {

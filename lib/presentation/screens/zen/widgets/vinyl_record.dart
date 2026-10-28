@@ -12,8 +12,8 @@ import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 /// Like a real turntable it needs a moment to come up to speed and runs out slowly when the music stops, and the
 /// sheen stays where it is while the record turns under it.
 ///
-/// Turns 20 times a second instead of every frame and repaints instead of rebuilding – like the drifting background
-/// it is ambience on a screen that is on all day, not an animation.
+/// Turns with every frame while it moves – a coarser step shows on the cover – but only recomposites the turned layer
+/// instead of repainting or rebuilding it, and stands still (no frames at all) once it has run out.
 class VinylRecord extends StatefulWidget {
   const VinylRecord({super.key, required this.seed, required this.size, this.url, this.playing = false});
 
@@ -22,6 +22,9 @@ class VinylRecord extends StatefulWidget {
 
   /// One turn at full speed.
   static const turn = Duration(seconds: 12);
+
+  /// A new cover fading in on the label; calm, like everything in the zen mode.
+  static const labelBlend = Duration(milliseconds: 1200);
 
   /// Time from standing still to full speed and back.
   static const runUp = Duration(milliseconds: 1800);
@@ -47,33 +50,48 @@ class VinylRecord extends StatefulWidget {
   State<VinylRecord> createState() => _VinylRecordState();
 }
 
-class _VinylRecordState extends State<VinylRecord> {
-  static const _tick = Duration(milliseconds: 50);
+class _VinylRecordState extends State<VinylRecord> with SingleTickerProviderStateMixin {
+  /// A longer gap (e.g. after the zen mode was hidden) counts as this, so the record does not leap.
+  static const _maxStep = Duration(milliseconds: 100);
 
   /// How far the record is turned, in turns; only the fraction is kept, so it never grows out of precision.
   final _turns = ValueNotifier(0.0);
 
   /// How far the record is up to speed, 0 … 1.
   var _throttle = 0.0;
-  Timer? _timer;
+  late final _ticker = createTicker(_turnOn);
+  var _last = Duration.zero;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _timer?.cancel();
-    _timer = TickerMode.valuesOf(context).enabled ? Timer.periodic(_tick, (_) => _turnOn()) : null;
+  void initState() {
+    super.initState();
+    if (widget.playing) _start();
   }
 
-  void _turnOn() {
-    _throttle = VinylRecord.throttleAfter(_throttle, _tick, playing: widget.playing);
-    // Standing still costs nothing.
-    if (_throttle == 0) return;
-    _turns.value = VinylRecord.turnsAfter(_turns.value, _throttle, _tick);
+  @override
+  void didUpdateWidget(VinylRecord oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.playing) _start();
+  }
+
+  void _start() {
+    if (_ticker.isActive) return;
+    _last = Duration.zero;
+    unawaited(_ticker.start());
+  }
+
+  void _turnOn(Duration elapsed) {
+    final step = elapsed - _last < _maxStep ? elapsed - _last : _maxStep;
+    _last = elapsed;
+    _throttle = VinylRecord.throttleAfter(_throttle, step, playing: widget.playing);
+    // Run out: standing still costs nothing.
+    if (_throttle == 0 && !widget.playing) return _ticker.stop();
+    _turns.value = VinylRecord.turnsAfter(_turns.value, _throttle, step);
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _ticker.dispose();
     _turns.dispose();
     super.dispose();
   }
@@ -94,15 +112,25 @@ class _VinylRecordState extends State<VinylRecord> {
           children: [
             _Turning(
               turns: _turns,
-              child: CustomPaint(
-                painter: const _DiscPainter(),
-                child: Center(
-                  child: Artwork(
-                    seed: widget.seed,
-                    url: widget.url,
-                    size: side * VinylRecord.labelFraction,
-                    radius: side,
-                    showNote: false,
+              // Painted once; turning only moves the layer.
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: const _DiscPainter(),
+                  child: Center(
+                    // A new cover fades in on the turning label; the next one is preloaded, so it is there at once.
+                    child: AnimatedSwitcher(
+                      duration: VinylRecord.labelBlend,
+                      switchInCurve: Curves.easeInOut,
+                      switchOutCurve: Curves.easeInOut,
+                      child: Artwork(
+                        key: ValueKey(widget.url ?? widget.seed),
+                        seed: widget.seed,
+                        url: widget.url,
+                        size: side * VinylRecord.labelFraction,
+                        radius: side,
+                        showNote: false,
+                      ),
+                    ),
                   ),
                 ),
               ),

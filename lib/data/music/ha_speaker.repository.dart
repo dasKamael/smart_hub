@@ -30,6 +30,11 @@ class HaSpeakerRepository implements SpeakerRepository {
   Future<void> previous(String id) => session.callService('media_player', 'media_previous_track', entityIds: [id]);
 
   @override
+  Future<void> seek(String id, int seconds) {
+    return session.callService('media_player', 'media_seek', entityIds: [id], data: {'seek_position': seconds});
+  }
+
+  @override
   Future<void> play(String id, MediaItem item) {
     return session.callService(
       'media_player',

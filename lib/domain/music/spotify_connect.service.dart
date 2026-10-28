@@ -11,6 +11,7 @@ import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
 import 'package:smart_hub/domain/music/model/spotify_playback.dart';
+import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
 
 part 'spotify_connect.service.g.dart';
@@ -22,6 +23,10 @@ const spotifyConnectInterval = Duration(seconds: 5);
 
 /// Spotify needs a moment until a command shows in its state; it is read again after these delays.
 const spotifyCommandRefreshes = [Duration(seconds: 1), Duration(seconds: 3)];
+
+/// When the playing track runs out it is read again after these delays, so the next track shows without waiting for
+/// the poll.
+const spotifyTrackEndRefreshes = [Duration(milliseconds: 400), Duration(milliseconds: 1500)];
 
 /// Spotify Connect, polled every [spotifyConnectInterval] while someone listens (Spotify has no push for this),
 /// and the playback commands. Empty while signed out.
@@ -41,6 +46,7 @@ class SpotifyConnectService extends _$SpotifyConnectService {
   /// What a transfer moves while Spotify reports nothing, e.g. music it sent to a speaker it does not list.
   SpotifyPlayback? _moving;
   final _refreshes = <Timer>[];
+  final _trackEnd = <Timer>[];
 
   @override
   Future<SpotifyConnectState> build() async {
@@ -48,7 +54,7 @@ class SpotifyConnectService extends _$SpotifyConnectService {
     _devices = OptimisticOverlay(idOf: (device) => device.id, onChanged: _publish, timeout: timeout);
     _playback = OptimisticOverlay(idOf: (_) => _playbackId, onChanged: _publish, timeout: timeout);
     ref.onDispose(() {
-      for (final timer in _refreshes) {
+      for (final timer in [..._refreshes, ..._trackEnd]) {
         timer.cancel();
       }
       _devices.dispose();
@@ -117,6 +123,21 @@ class SpotifyConnectService extends _$SpotifyConnectService {
         await _repository.next(deviceId);
       }
     }());
+  }
+
+  /// Jumps to [seconds] into the playing track; the new place shows at once.
+  Future<void> seek(String deviceId, int seconds) {
+    final now = clock.now();
+    _playback.add(
+      _playbackId,
+      apply: (playback) => playback.copyWith(positionSeconds: seconds.toDouble(), positionAt: now),
+      isConfirmed: (reported) {
+        final at = clock.now();
+        final expected = seconds + (reported.isPlaying ? at.difference(now).inMilliseconds / 1000 : 0);
+        return (_positionOf(reported, at) - expected).abs() <= seekTolerance;
+      },
+    );
+    return _run(_repository.seek(deviceId, seconds));
   }
 
   Future<void> setVolume(String deviceId, int percent) {
@@ -197,9 +218,28 @@ class SpotifyConnectService extends _$SpotifyConnectService {
       if (!ref.mounted) return;
       _reported = (devices: devices, playback: playback);
       _publish();
+      _readAtTrackEnd(repository);
     } on Object catch (e) {
       // Keep the last state; the next poll tries again.
       _log.warning('Could not read Spotify Connect: $e');
+    }
+  }
+
+  /// Plans the reads at the end of the playing track. A read right at the end that still finds the old track leaves
+  /// the later ones planned.
+  void _readAtTrackEnd(SpotifyRepository repository) {
+    final playback = _reported.playback;
+    final duration = playback?.durationSeconds;
+    final left = playback == null || duration == null ? null : duration - _positionOf(playback, clock.now());
+    if (left != null && left <= 0.2 && playback!.isPlaying) return;
+    for (final timer in _trackEnd) {
+      timer.cancel();
+    }
+    _trackEnd.clear();
+    if (left == null || !playback!.isPlaying) return;
+    final end = Duration(milliseconds: (left * 1000).round());
+    for (final delay in spotifyTrackEndRefreshes) {
+      _trackEnd.add(Timer(end + delay, () => unawaited(_load(repository))));
     }
   }
 

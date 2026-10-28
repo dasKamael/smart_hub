@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/domain/music/model/spotify_playback.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
+import 'package:smart_hub/presentation/shared_widgets/cover_colors.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/common/utils/throttler.dart';
 import 'package:smart_hub/domain/music/model/connect_device.dart';
@@ -98,6 +99,15 @@ class MusicController extends _$MusicController {
         _transport('go back', _speakers.previous(group.leaderId));
       case ConnectTarget(:final device):
         _transport('go back', _spotify.previous(device.id));
+    }
+  }
+
+  void seek(PlaybackTarget target, int seconds) {
+    switch (target) {
+      case SpeakerGroupTarget(:final group):
+        _transport('seek', _speakers.seek(group.leaderId, seconds));
+      case ConnectTarget(:final device):
+        _transport('seek', _spotify.seek(device.id, seconds));
     }
   }
 
@@ -363,14 +373,35 @@ QueueItem? upNext(Ref ref, {required bool visible}) {
   return current >= 0 && current + 1 < queue.length ? queue[current + 1] : null;
 }
 
+/// The color of the playing track's cover, read from the image. While a new cover is still being read the previous
+/// color stays, so the page blends once instead of twice.
+@riverpod
+class CoverTint extends _$CoverTint {
+  @override
+  Color build({required bool visible}) {
+    final cover = ref.watch(
+      currentTargetProvider(
+        visible: visible,
+      ).select((target) => (url: target?.nowPlaying.artworkUrl, seed: target?.nowPlaying.title ?? target?.name ?? '')),
+    );
+    if (cover.url == null) return Artwork.colorOf(cover.seed);
+    if (CoverColors.knownTintOf(cover.url) case final known?) return known;
+    var current = true;
+    ref.onDispose(() => current = false);
+    unawaited(
+      CoverColors.tintOf(cover.url, seed: cover.seed).then((tint) {
+        if (current) state = tint;
+      }),
+    );
+    return stateOrNull ?? Artwork.colorOf(cover.seed);
+  }
+}
+
 /// The color of the music area: the cover's, paler while nothing plays.
 @riverpod
 Color musicTint(Ref ref, {required bool visible}) {
-  final shown = ref.watch(
-    currentTargetProvider(visible: visible).select(
-      (target) =>
-          (seed: target?.nowPlaying.title ?? target?.name ?? '', playing: target?.nowPlaying.isPlaying ?? false),
-    ),
+  final playing = ref.watch(
+    currentTargetProvider(visible: visible).select((target) => target?.nowPlaying.isPlaying ?? false),
   );
-  return HubAreaColors.musicFor(Artwork.colorOf(shown.seed), playing: shown.playing);
+  return HubAreaColors.musicFor(ref.watch(coverTintProvider(visible: visible)), playing: playing);
 }

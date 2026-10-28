@@ -14,17 +14,23 @@ class NowPlayingCard extends StatelessWidget {
   const NowPlayingCard({
     super.key,
     required this.target,
+    required this.tint,
     required this.enabled,
     required this.onPrevious,
     required this.onPlayPause,
     required this.onNext,
+    required this.onSeek,
   });
 
   final PlaybackTarget target;
+
+  /// The cover's color (`coverTintProvider`).
+  final Color tint;
   final bool enabled;
   final VoidCallback onPrevious;
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
+  final ValueChanged<int> onSeek;
 
   /// The card's gradient in the cover's [tint], from the tinted to the plain end; the volume beside it uses it too.
   static List<Color> colorsOf(Color tint) => [
@@ -42,7 +48,6 @@ class NowPlayingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final track = target.nowPlaying;
     final seed = track.title ?? target.name;
-    final tint = Artwork.colorOf(seed);
     return AnimatedContainer(
       duration: HubMotion.tintDuration,
       curve: HubMotion.tint,
@@ -127,8 +132,7 @@ class NowPlayingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                TrackProgress(track: track),
+                TrackProgress(track: track, onSeek: enabled ? onSeek : null),
               ],
             ),
           ),

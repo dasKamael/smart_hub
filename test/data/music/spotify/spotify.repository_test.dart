@@ -311,6 +311,7 @@ void main() {
         await repository.next('d1');
         await repository.previous('d1');
         await repository.setVolume('d1', 30);
+        await repository.seek('d1', 75);
         await repository.transfer('d2');
       });
 
@@ -322,6 +323,7 @@ void main() {
         'POST /v1/me/player/next?device_id=d1 ',
         'POST /v1/me/player/previous?device_id=d1 ',
         'PUT /v1/me/player/volume?device_id=d1&volume_percent=30 ',
+        'PUT /v1/me/player/seek?device_id=d1&position_ms=75000 ',
         'PUT /v1/me/player? {"device_ids":["d2"],"play":true}',
       ]);
     });

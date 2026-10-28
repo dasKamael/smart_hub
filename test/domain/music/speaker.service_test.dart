@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -254,6 +256,20 @@ void main() {
           ]);
         },
       );
+
+      test('Given a group at 0:10, when jumping to 1:15, then the whole group shows 1:15 at once', () async {
+        // Given
+        when(() => repository.seek(any(), any())).thenAnswer((_) async {});
+        final (service, container) = await createWithContainer();
+
+        // When
+        await withClock(Clock.fixed(DateTime(2026)), () => service.seek('media_player.office', 75));
+
+        // Then
+        final speakers = container.read(speakersServiceProvider).value!;
+        expect(speakers.map((speaker) => speaker.positionAt(DateTime(2026))), [75, 75]);
+        verify(() => repository.seek('media_player.office', 75)).called(1);
+      });
 
       test('Given a track in the queue, when playing it, then it shows at once on the whole group', () async {
         // Given

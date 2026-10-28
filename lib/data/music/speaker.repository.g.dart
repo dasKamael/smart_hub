@@ -18,7 +18,12 @@ final speakerRepositoryProvider = SpeakerRepositoryProvider._();
 /// Speakers added from the home network provide the speakers; otherwise Home Assistant does.
 
 final class SpeakerRepositoryProvider
-    extends $FunctionalProvider<SpeakerRepository, SpeakerRepository, SpeakerRepository>
+    extends
+        $FunctionalProvider<
+          SpeakerRepository,
+          SpeakerRepository,
+          SpeakerRepository
+        >
     with $Provider<SpeakerRepository> {
   /// Providers
   /// Speakers added from the home network provide the speakers; otherwise Home Assistant does.
@@ -38,7 +43,9 @@ final class SpeakerRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<SpeakerRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<SpeakerRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   SpeakerRepository create(Ref ref) {
@@ -47,7 +54,10 @@ final class SpeakerRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(SpeakerRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<SpeakerRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SpeakerRepository>(value),
+    );
   }
 }
 
