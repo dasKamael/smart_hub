@@ -22,6 +22,10 @@ class DashboardWidgetsTable extends Table {
   /// `DashboardWidget.card`; `null` when the kind decides.
   BoolColumn get card => boolean().nullable()();
 
+  /// `DashboardWidget.cell`; `null` (arranged before widgets kept their place): the first free spot.
+  IntColumn get gridColumn => integer().nullable()();
+  IntColumn get gridRow => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

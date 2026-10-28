@@ -22,6 +22,7 @@ smart_hub/
 │  │  ├─ lights/                  light.repository.dart
 │  │  ├─ plants/                  plant.repository.dart, plant_photo.repository.dart, *.table.dart
 │  │  ├─ music/                   speaker.repository.dart, speaker_settings.repository.dart, spotify/
+│  │  ├─ focus/                   focus.repository.dart, *.table.dart
 │  │  └─ zen/                     zen_settings.repository.dart, *.table.dart
 │  ├─ domain/
 │  │  ├─ connection/              connection.service.dart, connection.state.dart, model/
@@ -29,6 +30,7 @@ smart_hub/
 │  │  ├─ lights/                  light.service.dart, light_capabilities.util.dart, model/
 │  │  ├─ plants/                  watering.service.dart, watering_due.util.dart, model/
 │  │  ├─ music/                   speaker.service.dart, spotify*.service.dart, model/
+│  │  ├─ focus/                   focus.service.dart, focus_state.util.dart, model/
 │  │  └─ zen/                     zen.service.dart (idle time)
 │  └─ presentation/
 │     ├─ design_system/
@@ -55,9 +57,10 @@ smart_hub/
 | `lights` | Light state, capabilities, light commands, scenes per room (templates until changed, adapted to what each lamp can do) | HA + drift |
 | `plants` | Plants, watering and fertilizing plan, photos, plant profiles (species care data from Perenual, loaded once per species and kept locally) | drift + local files + Perenual API |
 | `music` | Speaker state, playback, volume, speaker groups, Spotify content and Connect devices, local speaker settings | HA + Spotify Web API + drift |
+| `focus` | At most three goals that are currently yours, the days they were worked on, and when one has been quiet long enough to be questioned | drift |
 | `zen` | Idle time until the zen mode (calm full screen with time and cover) | drift |
 | `weather` | Forecast for where the hub is (device location, town name from Nominatim) or a chosen place; last forecast cached offline | Open-Meteo + drift |
-| `dashboard` | Which widgets the start page shows, their size and order; the widgets themselves come from the other contexts | drift |
+| `dashboard` | Which widgets the start page shows, their size and the cell each was put in; the widgets themselves come from the other contexts | drift |
 | `setup` | Presentation only – HA URL / token entry (uses `connection`) | – |
 
 `floorplan` is brand- and device-state-agnostic. It only knows `Placement(deviceId, kind, pos)` with

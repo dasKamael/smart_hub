@@ -7,6 +7,7 @@ import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
+import 'package:smart_hub/presentation/screens/focus/widgets/focus_whisper.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
@@ -149,6 +150,8 @@ class _ZenScreenState extends ConsumerState<ZenScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(date, style: HubTextStyles.sectionTitle.copyWith(color: HubColorPalette.text2)),
+                        const SizedBox(height: 32),
+                        FocusWhisper(now: _now),
                         if (target != null && track?.title != null) ...[
                           const SizedBox(height: 64),
                           _TrackInfo(target: target),

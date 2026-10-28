@@ -16,7 +16,12 @@ final dashboardLayoutRepositoryProvider = DashboardLayoutRepositoryProvider._();
 /// Providers
 
 final class DashboardLayoutRepositoryProvider
-    extends $FunctionalProvider<DashboardLayoutRepository, DashboardLayoutRepository, DashboardLayoutRepository>
+    extends
+        $FunctionalProvider<
+          DashboardLayoutRepository,
+          DashboardLayoutRepository,
+          DashboardLayoutRepository
+        >
     with $Provider<DashboardLayoutRepository> {
   /// Providers
   DashboardLayoutRepositoryProvider._()
@@ -35,7 +40,9 @@ final class DashboardLayoutRepositoryProvider
 
   @$internal
   @override
-  $ProviderElement<DashboardLayoutRepository> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<DashboardLayoutRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   DashboardLayoutRepository create(Ref ref) {
@@ -44,8 +51,12 @@ final class DashboardLayoutRepositoryProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DashboardLayoutRepository value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<DashboardLayoutRepository>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DashboardLayoutRepository>(value),
+    );
   }
 }
 
-String _$dashboardLayoutRepositoryHash() => r'dcd67c8c8ce83f56924faabf8b3d1ea3d003aa3f';
+String _$dashboardLayoutRepositoryHash() =>
+    r'dcd67c8c8ce83f56924faabf8b3d1ea3d003aa3f';

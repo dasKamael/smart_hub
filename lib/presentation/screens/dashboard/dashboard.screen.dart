@@ -412,7 +412,6 @@ class _Empty extends ConsumerWidget {
         spacing: HubSpacing.s12,
         children: [
           const Text('No widgets yet', style: HubTextStyles.widgetTitle),
-          Text('Add weather and more – or long press to arrange.', style: HubTextStyles.secondary),
           HubButton(label: 'Add widget', glyph: HubGlyph.plus, onPressed: () => unawaited(showWidgetGallery(context))),
         ],
       ),

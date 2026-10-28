@@ -70,6 +70,22 @@ void main() {
         '${widget.id} ${widget.size.name}',
     ];
 
+    Map<String, GridCell?> cells() => {
+      for (final widget in container.read(dashboardLayoutServiceProvider).value ?? const <DashboardWidget>[])
+        widget.id: widget.cell,
+    };
+
+    /// Drags the widget at [from] by [by] in small steps, like a finger.
+    Future<void> drag(WidgetTester tester, Offset from, Offset by) async {
+      final gesture = await tester.startGesture(from);
+      for (var i = 0; i < 20; i++) {
+        await gesture.moveBy(by / 20);
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+
     Future<void> startEditing(WidgetTester tester) async {
       await tester.longPress(find.text('Home').first);
       await tester.pump(const Duration(milliseconds: 500));
@@ -112,26 +128,41 @@ void main() {
       expect(layout(), ['weather-1 extraLarge', 'weather-2 medium']);
     });
 
-    testWidgets('Given editing, when dragging the small weather to the top left, then the others make room', (
-      tester,
-    ) async {
+    testWidgets('Given editing, when dragging the small weather into the empty bottom right, '
+        'then it stays there and the others keep their place', (tester) async {
+      // Given
+      await pumpScreen(tester);
+      await startEditing(tester);
+
+      // When: weather-2 from column 4, row 1 one row down.
+      await drag(tester, tester.getCenter(find.byType(WeatherWidget).last), const Offset(0, DashboardScreen.step));
+      await stopEditing(tester);
+
+      // Then
+      expect(cells(), {
+        'weather-1': (column: 0, row: 0),
+        'home-1': (column: 4, row: 0),
+        'weather-2': (column: 4, row: 2),
+      });
+    });
+
+    testWidgets('Given editing, when dragging the small weather onto the big one, '
+        'then the big one moves aside to the nearest free place', (tester) async {
       // Given
       await pumpScreen(tester);
       await startEditing(tester);
       const step = DashboardScreen.step;
 
-      // When: from the middle of weather-2 (column 4, row 1) to the top left corner.
-      final gesture = await tester.startGesture(tester.getCenter(find.byType(WeatherWidget).last));
-      for (var i = 0; i < 20; i++) {
-        await gesture.moveBy(const Offset(-4 * step / 20, -step / 20));
-        await tester.pump(const Duration(milliseconds: 16));
-      }
-      await gesture.up();
-      await tester.pump(const Duration(milliseconds: 500));
+      // When: weather-2 from column 4, row 1 to the top left corner.
+      await drag(tester, tester.getCenter(find.byType(WeatherWidget).last), const Offset(-4 * step, -step));
       await stopEditing(tester);
 
       // Then
-      expect(layout(), ['weather-2 medium', 'weather-1 extraLarge', 'home-1 medium']);
+      expect(cells(), {
+        'weather-1': (column: 0, row: 1),
+        'home-1': (column: 4, row: 0),
+        'weather-2': (column: 0, row: 0),
+      });
     });
 
     testWidgets('Given editing, when dragging the corner of the big weather to half its width, then it is large', (

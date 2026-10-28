@@ -97,13 +97,15 @@ Spotify and the zen mode work; light and speaker parts are hidden or explain wha
 ## Dashboard
 
 Start page (`HubRoute.home`). Widgets use `WidgetTile` / `WidgetSize` (S 1×1 … XL 4×2 on the 170 px grid); built one
-feature at a time (weather, home, plants, lights, music, apps so far; see `docs/architecture.md` → contexts). A widget of an existing
+feature at a time (weather, home, plants, lights, music, apps, focus so far; see `docs/architecture.md` → contexts). A widget of an existing
 feature lives in that feature's `widgets/` folder and uses its services (e.g. `plants/widgets/plants_widget.dart`). Arranged like the iPad home screen: long press
-to jiggle, drag to move (the others make room), corner handle to resize, "–" to remove, gallery to add, tap a
+to jiggle, drag to any cell (one widget in the way swaps with it, others move aside to the nearest free place; gaps
+stay), corner handle to resize, "–" to remove, gallery to add, tap a
 widget to edit it (`DashboardWidget.selection`, e.g. the rooms of a lights widget, empty = automatic; `card` = with or
 without background card). The apps widget lists and opens the tablet's apps via the `smart_hub/apps` channel
 (`MainActivity.kt`). One page of
-6 × 3 units; widgets flow from the top left in their order (`dashboard_layout.util.dart`), stored in drift. A new widget
+6 × 3 units; each widget keeps the cell it was put in; one without a cell
+(new, or saved before cells were kept) takes the first free spot (`dashboard_layout.util.dart`), stored in drift. A new widget
 kind needs an entry in `DashboardWidgetKind` (sizes) and `DashboardCatalog` (name, glyph, builder). Weather: Open-Meteo (open source, no key,
 attribution on the weather page), town names from OpenStreetMap Nominatim (identifying user agent, asked once per
 position), device location via `geolocator` (coarse). The emulator AVD has no GPS – choose a place in the settings.
@@ -149,6 +151,9 @@ launcher and starts on boot; switching it off restores the normal launcher (`lib
 - New feature: read the handoff section, then propose a short plan (context, files per layer, tests)
   before implementing.
 - Visual work: after each component, run it and compare with the prototype; share a screenshot.
+- Text check after every finished piece of UI: remove any text the main element already explains – above all
+  subtitles, headings and counts (e.g. "Lights" over lamp tiles, "1 light on" next to a lit bulb, "Every plant is
+  watered" over an empty list). Keep text only when it says something the element itself cannot show.
 - Done means: formatted, `flutter analyze` clean, all tests green (including architecture tests),
   new logic covered by tests.
 

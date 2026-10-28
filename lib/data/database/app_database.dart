@@ -5,6 +5,7 @@ import 'package:smart_hub/data/lights/room_scenes.table.dart';
 import 'package:smart_hub/data/dashboard/dashboard_state.table.dart';
 import 'package:smart_hub/data/dashboard/dashboard_widgets.table.dart';
 import 'package:smart_hub/data/database/app_database.steps.dart';
+import 'package:smart_hub/data/focus/focus_points.table.dart';
 import 'package:smart_hub/data/floorplan/floor_plans.table.dart';
 import 'package:smart_hub/data/floorplan/placements.table.dart';
 import 'package:smart_hub/data/music/speaker_settings.table.dart';
@@ -30,13 +31,14 @@ part 'app_database.g.dart';
     DashboardWidgetsTable,
     DashboardStateTable,
     RoomScenesTable,
+    FocusPointsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'smart_hub'));
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration {
@@ -79,6 +81,27 @@ class AppDatabase extends _$AppDatabase {
         from9To10: (migrator, schema) => migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.card),
         // v11: light scenes per room.
         from10To11: (migrator, schema) => migrator.createTable(schema.roomScenes),
+        // v12: focus points and the days they were worked on.
+        from11To12: (migrator, schema) async {
+          await migrator.createTable(schema.focusPoints);
+          await migrator.createTable(schema.focusTouches);
+        },
+        // v13: dashboard widgets keep the cell they were put in, and a focus point is a name and the day it is
+        // due – the days worked on and the rest are gone.
+        from12To13: (migrator, schema) async {
+          await migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.gridColumn);
+          await migrator.addColumn(schema.dashboardWidgets, schema.dashboardWidgets.gridRow);
+          await migrator.deleteTable('focus_touches');
+          await migrator.deleteTable(schema.focusPoints.actualTableName);
+          await migrator.createTable(schema.focusPoints);
+        },
+        // v14: builds the focus points again for databases that reached v13 while the focus tables still had their
+        // first shape. Everywhere else it only writes the same empty table once more.
+        from13To14: (migrator, schema) async {
+          await migrator.deleteTable('focus_touches');
+          await migrator.deleteTable(schema.focusPoints.actualTableName);
+          await migrator.createTable(schema.focusPoints);
+        },
       ),
     );
   }

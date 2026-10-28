@@ -17,7 +17,8 @@ mixin _$DashboardWidget {
 
  String get id; DashboardWidgetKind get kind; DashboardWidgetSize get size;/// What the widget shows, in this order – e.g. room ids for the lights widget. Empty: chosen automatically.
  List<String> get selection;/// Whether the widget sits on a card; `null`: as its kind does by default.
- bool? get card;
+ bool? get card;/// Where it was put; `null` (e.g. arranged before widgets kept their place): the first free spot.
+ GridCell? get cell;
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,20 +30,20 @@ $DashboardWidgetCopyWith<DashboardWidget> get copyWith => _$DashboardWidgetCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as DashboardWidget;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardWidget&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.size, _this.size) || other.size == _this.size)&&const DeepCollectionEquality().equals(other.selection, _this.selection)&&(identical(other.card, _this.card) || other.card == _this.card));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardWidget&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.size, _this.size) || other.size == _this.size)&&const DeepCollectionEquality().equals(other.selection, _this.selection)&&(identical(other.card, _this.card) || other.card == _this.card)&&(identical(other.cell, _this.cell) || other.cell == _this.cell));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DashboardWidget;
-  return Object.hash(runtimeType,_this.id,_this.kind,_this.size,const DeepCollectionEquality().hash(_this.selection),_this.card);
+  return Object.hash(runtimeType,_this.id,_this.kind,_this.size,const DeepCollectionEquality().hash(_this.selection),_this.card,_this.cell);
 }
 
 @override
 String toString() {
   final _this = this as DashboardWidget;
-  return 'DashboardWidget(id: ${_this.id}, kind: ${_this.kind}, size: ${_this.size}, selection: ${_this.selection}, card: ${_this.card})';
+  return 'DashboardWidget(id: ${_this.id}, kind: ${_this.kind}, size: ${_this.size}, selection: ${_this.selection}, card: ${_this.card}, cell: ${_this.cell})';
 }
 
 
@@ -53,7 +54,7 @@ abstract mixin class $DashboardWidgetCopyWith<$Res>  {
   factory $DashboardWidgetCopyWith(DashboardWidget value, $Res Function(DashboardWidget) _then) = _$DashboardWidgetCopyWithImpl;
 @useResult
 $Res call({
- String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection, bool? card
+ String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection, bool? card, GridCell? cell
 });
 
 
@@ -70,14 +71,15 @@ class _$DashboardWidgetCopyWithImpl<$Res>
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,Object? card = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,Object? card = freezed,Object? cell = freezed,}) {
   return _then(DashboardWidget(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetKind,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetSize,selection: null == selection ? _self.selection : selection // ignore: cast_nullable_to_non_nullable
 as List<String>,card: freezed == card ? _self.card : card // ignore: cast_nullable_to_non_nullable
-as bool?,
+as bool?,cell: freezed == cell ? _self.cell : cell // ignore: cast_nullable_to_non_nullable
+as GridCell?,
   ));
 }
 
@@ -162,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card,  GridCell? cell)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DashboardWidget() when $default != null:
-return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card,_that.cell);case _:
   return orElse();
 
 }
@@ -183,10 +185,10 @@ return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card,  GridCell? cell)  $default,) {final _that = this;
 switch (_that) {
 case _DashboardWidget():
-return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card,_that.cell);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +205,10 @@ return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DashboardWidgetKind kind,  DashboardWidgetSize size,  List<String> selection,  bool? card,  GridCell? cell)?  $default,) {final _that = this;
 switch (_that) {
 case _DashboardWidget() when $default != null:
-return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case _:
+return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card,_that.cell);case _:
   return null;
 
 }
@@ -218,7 +220,7 @@ return $default(_that.id,_that.kind,_that.size,_that.selection,_that.card);case 
 
 
 class _DashboardWidget extends DashboardWidget {
-  const _DashboardWidget({required this.id, required this.kind, required this.size,  List<String> selection = const <String>[], this.card}): _selection = selection,super._();
+  const _DashboardWidget({required this.id, required this.kind, required this.size,  List<String> selection = const <String>[], this.card, this.cell}): _selection = selection,super._();
   
 
 @override final  String id;
@@ -235,6 +237,8 @@ class _DashboardWidget extends DashboardWidget {
 
 /// Whether the widget sits on a card; `null`: as its kind does by default.
 @override final  bool? card;
+/// Where it was put; `null` (e.g. arranged before widgets kept their place): the first free spot.
+@override final  GridCell? cell;
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
@@ -246,18 +250,18 @@ _$DashboardWidgetCopyWith<_DashboardWidget> get copyWith => __$DashboardWidgetCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardWidget&&(identical(other.id, id) || other.id == id)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.size, size) || other.size == size)&&const DeepCollectionEquality().equals(other.selection, _selection)&&(identical(other.card, card) || other.card == card));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DashboardWidget&&(identical(other.id, id) || other.id == id)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.size, size) || other.size == size)&&const DeepCollectionEquality().equals(other.selection, _selection)&&(identical(other.card, card) || other.card == card)&&(identical(other.cell, cell) || other.cell == cell));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,kind,size,const DeepCollectionEquality().hash(_selection),card);
+    return Object.hash(runtimeType,id,kind,size,const DeepCollectionEquality().hash(_selection),card,cell);
 }
 
 @override
 String toString() {
-    return 'DashboardWidget(id: $id, kind: $kind, size: $size, selection: $selection, card: $card)';
+    return 'DashboardWidget(id: $id, kind: $kind, size: $size, selection: $selection, card: $card, cell: $cell)';
 }
 
 
@@ -268,7 +272,7 @@ abstract mixin class _$DashboardWidgetCopyWith<$Res> implements $DashboardWidget
   factory _$DashboardWidgetCopyWith(_DashboardWidget value, $Res Function(_DashboardWidget) _then) = __$DashboardWidgetCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection, bool? card
+ String id, DashboardWidgetKind kind, DashboardWidgetSize size, List<String> selection, bool? card, GridCell? cell
 });
 
 
@@ -285,14 +289,15 @@ class __$DashboardWidgetCopyWithImpl<$Res>
 
 /// Create a copy of DashboardWidget
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,Object? card = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kind = null,Object? size = null,Object? selection = null,Object? card = freezed,Object? cell = freezed,}) {
   return _then(_DashboardWidget(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetKind,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
 as DashboardWidgetSize,selection: null == selection ? _self._selection : selection // ignore: cast_nullable_to_non_nullable
 as List<String>,card: freezed == card ? _self.card : card // ignore: cast_nullable_to_non_nullable
-as bool?,
+as bool?,cell: freezed == cell ? _self.cell : cell // ignore: cast_nullable_to_non_nullable
+as GridCell?,
   ));
 }
 

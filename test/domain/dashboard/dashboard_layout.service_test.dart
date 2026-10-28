@@ -77,18 +77,32 @@ void main() {
     });
 
     test(
-      'Given the default widgets, when moving the last to the front, then the order is kept after a restart',
+      'Given the default widgets, when moving one into the empty bottom right, then it stays there after a restart',
       () async {
         // When
-        final moved = await service().reorder(['weather-2', 'weather-1', 'home-1']);
+        final moved = await service().move('weather-2', (column: 4, row: 2));
         final restarted = createContainer();
-        await restarted.read(dashboardLayoutServiceProvider.future);
+        final widgets = await restarted.read(dashboardLayoutServiceProvider.future);
 
         // Then
         expect(moved, isTrue);
-        expect(layoutOf(restarted), ['weather-2 medium', 'weather-1 extraLarge', 'home-1 medium']);
+        expect(
+          {for (final widget in widgets) widget.id: widget.cell},
+          {'weather-1': (column: 0, row: 0), 'home-1': (column: 4, row: 0), 'weather-2': (column: 4, row: 2)},
+        );
       },
     );
+
+    test('Given a gap left by a removed widget, when adding nothing, then the others stay where they are', () async {
+      // When
+      await service().remove('home-1');
+
+      // Then
+      expect(
+        {for (final widget in container.read(dashboardLayoutServiceProvider).value!) widget.id: widget.cell},
+        {'weather-1': (column: 0, row: 0), 'weather-2': (column: 4, row: 1)},
+      );
+    });
 
     test('Given a lights widget, when choosing two rooms without a card, then that is kept after a restart', () async {
       // Given

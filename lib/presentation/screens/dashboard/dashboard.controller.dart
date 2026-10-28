@@ -16,8 +16,8 @@ part 'dashboard.controller.g.dart';
 /// The widgets as shown, with their cells: the saved arrangement, or the preview while dragging or resizing.
 typedef DashboardLayout = ({List<DashboardWidget> widgets, Map<String, GridCell> cells});
 
-/// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
-/// drag the corner to resize, remove and add.
+/// Editing the dashboard like the iPad home screen: long press to jiggle, drag a widget to any free cell (one in the
+/// way swaps with it or moves aside), drag the corner to resize, remove and add.
 @riverpod
 class DashboardController extends _$DashboardController {
   static final _log = Logger('DashboardController');
@@ -50,46 +50,40 @@ class DashboardController extends _$DashboardController {
       draggedId: id,
       dragOrigin: Offset(cell.column * step, cell.row * step),
       dragOffset: Offset.zero,
-      order: [for (final widget in _saved) widget.id],
+      dropCell: cell,
+      preview: null,
     );
   }
 
-  /// Moves the dragged widget by [delta]; the order changes to where it would land closest to the finger.
+  /// Moves the dragged widget by [delta]; the page previews it in the cell under it, with the others swapped or moved
+  /// aside. A cell without room for that keeps the last preview.
   void dragBy(Offset delta) {
     final id = state.draggedId;
-    final order = state.order;
-    if (id == null || order == null) return;
+    if (id == null) return;
     final offset = state.dragOffset + delta;
-    final widgets = _saved;
-    final dragged = widgets.where((widget) => widget.id == id).firstOrNull;
+    final dragged = _saved.where((widget) => widget.id == id).firstOrNull;
     if (dragged == null) return;
-    final size = Offset(dragged.size.columns * step, dragged.size.rows * step);
-    final center = state.dragOrigin + offset + size / 2;
-
-    final others = [
-      for (final other in order)
-        if (other != id) other,
-    ];
-    List<String>? best;
-    var bestDistance = double.infinity;
-    for (var index = 0; index <= others.length; index++) {
-      final candidate = [...others]..insert(index, id);
-      final cells = DashboardLayoutUtil.place(_inOrder(widgets, candidate));
-      final cell = cells[id];
-      if (cells.length != widgets.length || cell == null) continue;
-      final distance = (Offset(cell.column * step, cell.row * step) + size / 2 - center).distance;
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        best = candidate;
-      }
+    final corner = state.dragOrigin + offset;
+    final cell = (
+      column: (corner.dx / step).round().clamp(0, DashboardLayoutUtil.columns - dragged.size.columns),
+      row: (corner.dy / step).round().clamp(0, DashboardLayoutUtil.rows - dragged.size.rows),
+    );
+    if (cell == state.dropCell) {
+      state = state.copyWith(dragOffset: offset);
+      return;
     }
-    state = state.copyWith(dragOffset: offset, order: best ?? order);
+    final preview = DashboardLayoutUtil.move(_saved, id, cell);
+    state = preview == null
+        ? state.copyWith(dragOffset: offset)
+        : state.copyWith(dragOffset: offset, dropCell: cell, preview: preview);
   }
 
   void endDrag() {
-    final order = state.order;
-    state = state.copyWith(draggedId: null, dragOffset: Offset.zero, order: null);
-    if (order != null) _run('move a widget', ref.read(dashboardLayoutServiceProvider.notifier).reorder(order));
+    final (id, cell, preview) = (state.draggedId, state.dropCell, state.preview);
+    state = state.copyWith(draggedId: null, dragOffset: Offset.zero, dropCell: null, preview: null);
+    if (id != null && cell != null && preview != null) {
+      _run('move a widget', ref.read(dashboardLayoutServiceProvider.notifier).move(id, cell));
+    }
   }
 
   /// Resizes [id] by dragging its corner [delta] pixels; the closest size of its kind that fits is previewed.
@@ -98,9 +92,12 @@ class DashboardController extends _$DashboardController {
     if (widget == null) return;
     final columns = (widget.size.columns + delta.dx / step).clamp(1, DashboardLayoutUtil.columns).toDouble();
     final rows = (widget.size.rows + delta.dy / step).clamp(1, DashboardLayoutUtil.rows).toDouble();
+    // It grows from its top left corner, as far as the others leave room.
     final fitting = [
       for (final size in widget.kind.sizes)
-        if (DashboardLayoutUtil.fits([for (final other in _saved) other.id == id ? other.copyWith(size: size) : other]))
+        if (DashboardLayoutUtil.fitsInPlace([
+          for (final other in DashboardLayoutUtil.pinned(_saved)) other.id == id ? other.copyWith(size: size) : other,
+        ]))
           size,
     ];
     if (fitting.isEmpty) return;
@@ -120,11 +117,6 @@ class DashboardController extends _$DashboardController {
 
   List<DashboardWidget> get _saved => ref.read(dashboardLayoutServiceProvider).value ?? const [];
 
-  static List<DashboardWidget> _inOrder(List<DashboardWidget> widgets, List<String> order) {
-    final byId = {for (final widget in widgets) widget.id: widget};
-    return [for (final id in order) ?byId[id]];
-  }
-
   void _run(String action, Future<Object?> command) {
     unawaited(
       command.catchError((Object e) {
@@ -143,9 +135,6 @@ DashboardLayout dashboardLayout(Ref ref) {
     for (final widget in saved)
       widget.id == page.resizedId && page.resizeTo != null ? widget.copyWith(size: page.resizeTo!) : widget,
   ];
-  if (page.order case final order?) {
-    final byId = {for (final widget in widgets) widget.id: widget};
-    widgets = [for (final id in order) ?byId[id]];
-  }
+  if (page.preview case final preview?) widgets = preview;
   return (widgets: widgets, cells: DashboardLayoutUtil.place(widgets));
 }

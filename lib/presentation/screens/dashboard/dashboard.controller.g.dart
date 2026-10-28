@@ -8,17 +8,18 @@ part of 'dashboard.controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
-/// drag the corner to resize, remove and add.
+/// Editing the dashboard like the iPad home screen: long press to jiggle, drag a widget to any free cell (one in the
+/// way swaps with it or moves aside), drag the corner to resize, remove and add.
 
 @ProviderFor(DashboardController)
 final dashboardControllerProvider = DashboardControllerProvider._();
 
-/// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
-/// drag the corner to resize, remove and add.
-final class DashboardControllerProvider extends $NotifierProvider<DashboardController, DashboardPageState> {
-  /// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
-  /// drag the corner to resize, remove and add.
+/// Editing the dashboard like the iPad home screen: long press to jiggle, drag a widget to any free cell (one in the
+/// way swaps with it or moves aside), drag the corner to resize, remove and add.
+final class DashboardControllerProvider
+    extends $NotifierProvider<DashboardController, DashboardPageState> {
+  /// Editing the dashboard like the iPad home screen: long press to jiggle, drag a widget to any free cell (one in the
+  /// way swaps with it or moves aside), drag the corner to resize, remove and add.
   DashboardControllerProvider._()
     : super(
         from: null,
@@ -39,14 +40,18 @@ final class DashboardControllerProvider extends $NotifierProvider<DashboardContr
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DashboardPageState value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<DashboardPageState>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DashboardPageState>(value),
+    );
   }
 }
 
-String _$dashboardControllerHash() => r'a07429f729d34f2fd05bb39a2df5c025df333774';
+String _$dashboardControllerHash() =>
+    r'579cf5ad3189325ffea262f148a60051066efaa1';
 
-/// Editing the dashboard like the iPad home screen: long press to jiggle, drag to move (the others make room),
-/// drag the corner to resize, remove and add.
+/// Editing the dashboard like the iPad home screen: long press to jiggle, drag a widget to any free cell (one in the
+/// way swaps with it or moves aside), drag the corner to resize, remove and add.
 
 abstract class _$DashboardController extends $Notifier<DashboardPageState> {
   DashboardPageState build();
@@ -69,7 +74,9 @@ abstract class _$DashboardController extends $Notifier<DashboardPageState> {
 @ProviderFor(dashboardLayout)
 final dashboardLayoutProvider = DashboardLayoutProvider._();
 
-final class DashboardLayoutProvider extends $FunctionalProvider<DashboardLayout, DashboardLayout, DashboardLayout>
+final class DashboardLayoutProvider
+    extends
+        $FunctionalProvider<DashboardLayout, DashboardLayout, DashboardLayout>
     with $Provider<DashboardLayout> {
   DashboardLayoutProvider._()
     : super(
@@ -87,7 +94,8 @@ final class DashboardLayoutProvider extends $FunctionalProvider<DashboardLayout,
 
   @$internal
   @override
-  $ProviderElement<DashboardLayout> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<DashboardLayout> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   DashboardLayout create(Ref ref) {
@@ -96,8 +104,11 @@ final class DashboardLayoutProvider extends $FunctionalProvider<DashboardLayout,
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(DashboardLayout value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<DashboardLayout>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DashboardLayout>(value),
+    );
   }
 }
 
-String _$dashboardLayoutHash() => r'07020a950408db92a3560508386d9a9d63abf740';
+String _$dashboardLayoutHash() => r'a838b2cca253bdc5a44d155fedd1d250583b2ba3';

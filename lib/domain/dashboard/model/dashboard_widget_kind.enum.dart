@@ -7,7 +7,8 @@ enum DashboardWidgetKind {
   plants(DashboardWidgetSize.values),
   lights(DashboardWidgetSize.values),
   music(DashboardWidgetSize.values),
-  apps(DashboardWidgetSize.values, cardByDefault: false);
+  apps(DashboardWidgetSize.values, cardByDefault: false),
+  focus(DashboardWidgetSize.values);
 
   const DashboardWidgetKind(this.sizes, {this.cardByDefault = true});
 

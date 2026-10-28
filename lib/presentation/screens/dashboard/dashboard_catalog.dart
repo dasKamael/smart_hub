@@ -5,6 +5,7 @@ import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
 import 'package:smart_hub/presentation/screens/apps/widgets/apps_widget.dart';
 import 'package:smart_hub/presentation/screens/dashboard/widgets/home_summary_widget.dart';
+import 'package:smart_hub/presentation/screens/focus/widgets/focus_widget.dart';
 import 'package:smart_hub/presentation/screens/lights/widgets/lights_widget.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/music_widget.dart';
 import 'package:smart_hub/presentation/screens/plants/widgets/plants_widget.dart';
@@ -19,6 +20,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.lights => 'Lights',
     DashboardWidgetKind.music => 'Music',
     DashboardWidgetKind.apps => 'Apps',
+    DashboardWidgetKind.focus => 'Focus',
   };
 
   static String description(DashboardWidgetKind kind) => switch (kind) {
@@ -28,6 +30,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.lights => 'Switch rooms, dim them and pick a scene.',
     DashboardWidgetKind.music => 'What plays, with play, skip and your playlists.',
     DashboardWidgetKind.apps => 'Open the apps on the tablet with one tap.',
+    DashboardWidgetKind.focus => 'Up to three goals and the days left until each is due.',
   };
 
   static HubGlyph glyph(DashboardWidgetKind kind) => switch (kind) {
@@ -37,6 +40,7 @@ abstract final class DashboardCatalog {
     DashboardWidgetKind.lights => HubGlyph.bulb,
     DashboardWidgetKind.music => HubGlyph.note,
     DashboardWidgetKind.apps => HubGlyph.tablet,
+    DashboardWidgetKind.focus => HubGlyph.target,
   };
 
   static String sizeName(DashboardWidgetSize size) => switch (size) {
@@ -76,6 +80,7 @@ abstract final class DashboardCatalog {
       DashboardWidgetKind.lights => LightsWidget(size: tileSize(size), roomIds: selection, card: onCard),
       DashboardWidgetKind.music => MusicWidget(size: tileSize(size), card: onCard),
       DashboardWidgetKind.apps => AppsWidget(size: tileSize(size), packageNames: selection, card: onCard),
+      DashboardWidgetKind.focus => FocusWidget(size: tileSize(size), card: onCard),
     };
   }
 }

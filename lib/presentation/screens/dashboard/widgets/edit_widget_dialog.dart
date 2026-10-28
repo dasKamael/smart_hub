@@ -114,10 +114,6 @@ class _EditWidgetDialogState extends ConsumerState<EditWidgetDialog> {
                   if (DashboardCatalog.selectionName(kind) case final selectionName?) ...[
                     const SizedBox(height: HubSpacing.s20),
                     Text(selectionName, style: HubTextStyles.body),
-                    Text(
-                      'Pick ${selectionName.toLowerCase()} – the widget shows them in this order.',
-                      style: HubTextStyles.secondary.copyWith(fontSize: 14),
-                    ),
                     const SizedBox(height: HubSpacing.s12),
                     Expanded(
                       child: ListView(
@@ -253,18 +249,7 @@ class _BackgroundRow extends StatelessWidget {
         decoration: BoxDecoration(color: HubColorPalette.elevated, borderRadius: BorderRadius.circular(14)),
         child: Row(
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Background', style: HubTextStyles.body.copyWith(fontSize: 16)),
-                  Text(
-                    card ? 'On a card' : 'Straight on the dashboard',
-                    style: HubTextStyles.secondary.copyWith(fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
+            Expanded(child: Text('Background', style: HubTextStyles.body.copyWith(fontSize: 16))),
             HubSwitch(value: card, onChanged: onChanged, semanticLabel: 'Background'),
           ],
         ),

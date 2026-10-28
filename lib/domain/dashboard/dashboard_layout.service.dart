@@ -8,7 +8,8 @@ import 'package:smart_hub/domain/dashboard/model/dashboard_widget_size.enum.dart
 
 part 'dashboard_layout.service.g.dart';
 
-/// The widgets on the dashboard in their order. Changes are only made when everything still fits on the page.
+/// The widgets on the dashboard and where they were put. Changes are only made when everything still fits on the
+/// page; once changed, every widget keeps its cell.
 ///
 /// This service is the only writer: it loads the arrangement once and keeps it, so quick changes build on each
 /// other instead of on what the database reports back later.
@@ -35,7 +36,7 @@ class DashboardLayoutService extends _$DashboardLayoutService {
     ];
   }
 
-  /// Adds a widget at the end; `false` when it does not fit.
+  /// Adds a widget in the first free spot; `false` when it does not fit.
   Future<bool> add(DashboardWidgetKind kind, DashboardWidgetSize size) {
     final id = '${kind.name}-${clock.now().microsecondsSinceEpoch}';
     return _saveIfFits([..._widgets, DashboardWidget(id: id, kind: kind, size: size)]);
@@ -43,9 +44,11 @@ class DashboardLayoutService extends _$DashboardLayoutService {
 
   Future<void> remove(String id) => _saveIfFits([..._widgets.where((widget) => widget.id != id)]);
 
-  /// Changes the size of [id]; `false` when the page has no room for it.
-  Future<bool> resize(String id, DashboardWidgetSize size) {
-    return _saveIfFits([for (final widget in _widgets) widget.id == id ? widget.copyWith(size: size) : widget]);
+  /// Changes the size of [id], growing from its top left corner; `false` when another widget is in the way.
+  Future<bool> resize(String id, DashboardWidgetSize size) async {
+    final resized = [for (final widget in _widgets) widget.id == id ? widget.copyWith(size: size) : widget];
+    if (!DashboardLayoutUtil.fitsInPlace(resized)) return false;
+    return _saveIfFits(resized);
   }
 
   /// Sets what [id] shows (see `DashboardWidget.selection`, an empty list lets the widget choose) and whether it sits
@@ -56,20 +59,19 @@ class DashboardLayoutService extends _$DashboardLayoutService {
     ]);
   }
 
-  /// Puts the widgets in the order of [ids]; unknown ids are ignored, missing widgets keep their place at the end.
-  Future<bool> reorder(List<String> ids) {
-    final byId = {for (final widget in _widgets) widget.id: widget};
-    return _saveIfFits([
-      for (final id in ids) ?byId[id],
-      for (final widget in _widgets)
-        if (!ids.contains(widget.id)) widget,
-    ]);
+  /// Puts [id] at [cell] (see `DashboardLayoutUtil.move`); `false` when there is no room for that.
+  Future<bool> move(String id, GridCell cell) async {
+    final moved = DashboardLayoutUtil.move(_widgets, id, cell);
+    if (moved == null) return false;
+    return _saveIfFits(moved);
   }
 
-  List<DashboardWidget> get _widgets => state.value ?? defaultLayout;
+  /// Where the widgets are now, each with its cell – so removing one leaves its gap instead of moving the others up.
+  List<DashboardWidget> get _widgets => DashboardLayoutUtil.pinned(state.value ?? defaultLayout);
 
-  Future<bool> _saveIfFits(List<DashboardWidget> widgets) async {
-    if (!DashboardLayoutUtil.fits(widgets)) return false;
+  Future<bool> _saveIfFits(List<DashboardWidget> changed) async {
+    if (!DashboardLayoutUtil.fits(changed)) return false;
+    final widgets = DashboardLayoutUtil.pinned(changed);
     state = AsyncData(widgets);
     await ref.read(dashboardLayoutRepositoryProvider).save(widgets);
     return true;

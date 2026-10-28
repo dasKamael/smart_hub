@@ -3,7 +3,8 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $FloorPlansTableTable extends FloorPlansTable with TableInfo<$FloorPlansTableTable, FloorPlanRow> {
+class $FloorPlansTableTable extends FloorPlansTable
+    with TableInfo<$FloorPlansTableTable, FloorPlanRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -34,14 +35,20 @@ class $FloorPlansTableTable extends FloorPlansTable with TableInfo<$FloorPlansTa
   String get actualTableName => $name;
   static const String $name = 'floor_plans';
   @override
-  VerificationContext validateIntegrity(Insertable<FloorPlanRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<FloorPlanRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('json')) {
-      context.handle(_jsonMeta, json.isAcceptableOrUnknown(data['json']!, _jsonMeta));
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
     } else if (isInserting) {
       context.missing(_jsonMeta);
     }
@@ -54,8 +61,14 @@ class $FloorPlansTableTable extends FloorPlansTable with TableInfo<$FloorPlansTa
   FloorPlanRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return FloorPlanRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      json: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}json'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
     );
   }
 
@@ -81,17 +94,27 @@ class FloorPlanRow extends DataClass implements Insertable<FloorPlanRow> {
     return FloorPlansTableCompanion(id: Value(id), json: Value(json));
   }
 
-  factory FloorPlanRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory FloorPlanRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FloorPlanRow(id: serializer.fromJson<int>(json['id']), json: serializer.fromJson<String>(json['json']));
+    return FloorPlanRow(
+      id: serializer.fromJson<int>(json['id']),
+      json: serializer.fromJson<String>(json['json']),
+    );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'id': serializer.toJson<int>(id), 'json': serializer.toJson<String>(json)};
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'json': serializer.toJson<String>(json),
+    };
   }
 
-  FloorPlanRow copyWith({int? id, String? json}) => FloorPlanRow(id: id ?? this.id, json: json ?? this.json);
+  FloorPlanRow copyWith({int? id, String? json}) =>
+      FloorPlanRow(id: id ?? this.id, json: json ?? this.json);
   FloorPlanRow copyWithCompanion(FloorPlansTableCompanion data) {
     return FloorPlanRow(
       id: data.id.present ? data.id.value : this.id,
@@ -112,16 +135,29 @@ class FloorPlanRow extends DataClass implements Insertable<FloorPlanRow> {
   int get hashCode => Object.hash(id, json);
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is FloorPlanRow && other.id == this.id && other.json == this.json);
+      identical(this, other) ||
+      (other is FloorPlanRow && other.id == this.id && other.json == this.json);
 }
 
 class FloorPlansTableCompanion extends UpdateCompanion<FloorPlanRow> {
   final Value<int> id;
   final Value<String> json;
-  const FloorPlansTableCompanion({this.id = const Value.absent(), this.json = const Value.absent()});
-  FloorPlansTableCompanion.insert({this.id = const Value.absent(), required String json}) : json = Value(json);
-  static Insertable<FloorPlanRow> custom({Expression<int>? id, Expression<String>? json}) {
-    return RawValuesInsertable({if (id != null) 'id': id, if (json != null) 'json': json});
+  const FloorPlansTableCompanion({
+    this.id = const Value.absent(),
+    this.json = const Value.absent(),
+  });
+  FloorPlansTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String json,
+  }) : json = Value(json);
+  static Insertable<FloorPlanRow> custom({
+    Expression<int>? id,
+    Expression<String>? json,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (json != null) 'json': json,
+    });
   }
 
   FloorPlansTableCompanion copyWith({Value<int>? id, Value<String>? json}) {
@@ -150,12 +186,15 @@ class FloorPlansTableCompanion extends UpdateCompanion<FloorPlanRow> {
   }
 }
 
-class $PlacementsTableTable extends PlacementsTable with TableInfo<$PlacementsTableTable, PlacementRow> {
+class $PlacementsTableTable extends PlacementsTable
+    with TableInfo<$PlacementsTableTable, PlacementRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $PlacementsTableTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _deviceIdMeta = const VerificationMeta('deviceId');
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
   @override
   late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
     'device_id',
@@ -165,13 +204,14 @@ class $PlacementsTableTable extends PlacementsTable with TableInfo<$PlacementsTa
     requiredDuringInsert: true,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<DeviceKind, String> kind = GeneratedColumn<String>(
-    'kind',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<DeviceKind>($PlacementsTableTable.$converterkind);
+  late final GeneratedColumnWithTypeConverter<DeviceKind, String> kind =
+      GeneratedColumn<String>(
+        'kind',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DeviceKind>($PlacementsTableTable.$converterkind);
   static const VerificationMeta _xMeta = const VerificationMeta('x');
   @override
   late final GeneratedColumn<double> x = GeneratedColumn<double>(
@@ -198,11 +238,17 @@ class $PlacementsTableTable extends PlacementsTable with TableInfo<$PlacementsTa
   String get actualTableName => $name;
   static const String $name = 'placements';
   @override
-  VerificationContext validateIntegrity(Insertable<PlacementRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<PlacementRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('device_id')) {
-      context.handle(_deviceIdMeta, deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta));
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_deviceIdMeta);
     }
@@ -225,12 +271,24 @@ class $PlacementsTableTable extends PlacementsTable with TableInfo<$PlacementsTa
   PlacementRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PlacementRow(
-      deviceId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}device_id'])!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
       kind: $PlacementsTableTable.$converterkind.fromSql(
-        attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}kind'],
+        )!,
       ),
-      x: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}x'])!,
-      y: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}y'])!,
+      x: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}x'],
+      )!,
+      y: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}y'],
+      )!,
     );
   }
 
@@ -239,9 +297,8 @@ class $PlacementsTableTable extends PlacementsTable with TableInfo<$PlacementsTa
     return $PlacementsTableTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<DeviceKind, String, String> $converterkind = const EnumNameConverter<DeviceKind>(
-    DeviceKind.values,
-  );
+  static JsonTypeConverter2<DeviceKind, String, String> $converterkind =
+      const EnumNameConverter<DeviceKind>(DeviceKind.values);
 }
 
 class PlacementRow extends DataClass implements Insertable<PlacementRow> {
@@ -249,13 +306,20 @@ class PlacementRow extends DataClass implements Insertable<PlacementRow> {
   final DeviceKind kind;
   final double x;
   final double y;
-  const PlacementRow({required this.deviceId, required this.kind, required this.x, required this.y});
+  const PlacementRow({
+    required this.deviceId,
+    required this.kind,
+    required this.x,
+    required this.y,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['device_id'] = Variable<String>(deviceId);
     {
-      map['kind'] = Variable<String>($PlacementsTableTable.$converterkind.toSql(kind));
+      map['kind'] = Variable<String>(
+        $PlacementsTableTable.$converterkind.toSql(kind),
+      );
     }
     map['x'] = Variable<double>(x);
     map['y'] = Variable<double>(y);
@@ -263,14 +327,24 @@ class PlacementRow extends DataClass implements Insertable<PlacementRow> {
   }
 
   PlacementsTableCompanion toCompanion(bool nullToAbsent) {
-    return PlacementsTableCompanion(deviceId: Value(deviceId), kind: Value(kind), x: Value(x), y: Value(y));
+    return PlacementsTableCompanion(
+      deviceId: Value(deviceId),
+      kind: Value(kind),
+      x: Value(x),
+      y: Value(y),
+    );
   }
 
-  factory PlacementRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory PlacementRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PlacementRow(
       deviceId: serializer.fromJson<String>(json['deviceId']),
-      kind: $PlacementsTableTable.$converterkind.fromJson(serializer.fromJson<String>(json['kind'])),
+      kind: $PlacementsTableTable.$converterkind.fromJson(
+        serializer.fromJson<String>(json['kind']),
+      ),
       x: serializer.fromJson<double>(json['x']),
       y: serializer.fromJson<double>(json['y']),
     );
@@ -280,14 +354,25 @@ class PlacementRow extends DataClass implements Insertable<PlacementRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'deviceId': serializer.toJson<String>(deviceId),
-      'kind': serializer.toJson<String>($PlacementsTableTable.$converterkind.toJson(kind)),
+      'kind': serializer.toJson<String>(
+        $PlacementsTableTable.$converterkind.toJson(kind),
+      ),
       'x': serializer.toJson<double>(x),
       'y': serializer.toJson<double>(y),
     };
   }
 
-  PlacementRow copyWith({String? deviceId, DeviceKind? kind, double? x, double? y}) =>
-      PlacementRow(deviceId: deviceId ?? this.deviceId, kind: kind ?? this.kind, x: x ?? this.x, y: y ?? this.y);
+  PlacementRow copyWith({
+    String? deviceId,
+    DeviceKind? kind,
+    double? x,
+    double? y,
+  }) => PlacementRow(
+    deviceId: deviceId ?? this.deviceId,
+    kind: kind ?? this.kind,
+    x: x ?? this.x,
+    y: y ?? this.y,
+  );
   PlacementRow copyWithCompanion(PlacementsTableCompanion data) {
     return PlacementRow(
       deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
@@ -382,7 +467,9 @@ class PlacementsTableCompanion extends UpdateCompanion<PlacementRow> {
       map['device_id'] = Variable<String>(deviceId.value);
     }
     if (kind.present) {
-      map['kind'] = Variable<String>($PlacementsTableTable.$converterkind.toSql(kind.value));
+      map['kind'] = Variable<String>(
+        $PlacementsTableTable.$converterkind.toSql(kind.value),
+      );
     }
     if (x.present) {
       map['x'] = Variable<double>(x.value);
@@ -409,7 +496,8 @@ class PlacementsTableCompanion extends UpdateCompanion<PlacementRow> {
   }
 }
 
-class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, PlantRow> {
+class $PlantsTableTable extends PlantsTable
+    with TableInfo<$PlantsTableTable, PlantRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -432,7 +520,9 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _everyDaysMeta = const VerificationMeta('everyDays');
+  static const VerificationMeta _everyDaysMeta = const VerificationMeta(
+    'everyDays',
+  );
   @override
   late final GeneratedColumn<int> everyDays = GeneratedColumn<int>(
     'every_days',
@@ -441,7 +531,9 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _lastWateredMeta = const VerificationMeta('lastWatered');
+  static const VerificationMeta _lastWateredMeta = const VerificationMeta(
+    'lastWatered',
+  );
   @override
   late final GeneratedColumn<DateTime> lastWatered = GeneratedColumn<DateTime>(
     'last_watered',
@@ -450,16 +542,21 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _previousWateredMeta = const VerificationMeta('previousWatered');
-  @override
-  late final GeneratedColumn<DateTime> previousWatered = GeneratedColumn<DateTime>(
-    'previous_watered',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
+  static const VerificationMeta _previousWateredMeta = const VerificationMeta(
+    'previousWatered',
   );
-  static const VerificationMeta _photoPathMeta = const VerificationMeta('photoPath');
+  @override
+  late final GeneratedColumn<DateTime> previousWatered =
+      GeneratedColumn<DateTime>(
+        'previous_watered',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
   @override
   late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
     'photo_path',
@@ -468,7 +565,8 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _fertilizeEveryWeeksMeta = const VerificationMeta('fertilizeEveryWeeks');
+  static const VerificationMeta _fertilizeEveryWeeksMeta =
+      const VerificationMeta('fertilizeEveryWeeks');
   @override
   late final GeneratedColumn<int> fertilizeEveryWeeks = GeneratedColumn<int>(
     'fertilize_every_weeks',
@@ -477,15 +575,18 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _lastFertilizedMeta = const VerificationMeta('lastFertilized');
-  @override
-  late final GeneratedColumn<DateTime> lastFertilized = GeneratedColumn<DateTime>(
-    'last_fertilized',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
+  static const VerificationMeta _lastFertilizedMeta = const VerificationMeta(
+    'lastFertilized',
   );
+  @override
+  late final GeneratedColumn<DateTime> lastFertilized =
+      GeneratedColumn<DateTime>(
+        'last_fertilized',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -503,7 +604,10 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
   String get actualTableName => $name;
   static const String $name = 'plants';
   @override
-  VerificationContext validateIntegrity(Insertable<PlantRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<PlantRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -512,39 +616,63 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
       context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
-      context.handle(_nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('every_days')) {
-      context.handle(_everyDaysMeta, everyDays.isAcceptableOrUnknown(data['every_days']!, _everyDaysMeta));
+      context.handle(
+        _everyDaysMeta,
+        everyDays.isAcceptableOrUnknown(data['every_days']!, _everyDaysMeta),
+      );
     } else if (isInserting) {
       context.missing(_everyDaysMeta);
     }
     if (data.containsKey('last_watered')) {
-      context.handle(_lastWateredMeta, lastWatered.isAcceptableOrUnknown(data['last_watered']!, _lastWateredMeta));
+      context.handle(
+        _lastWateredMeta,
+        lastWatered.isAcceptableOrUnknown(
+          data['last_watered']!,
+          _lastWateredMeta,
+        ),
+      );
     } else if (isInserting) {
       context.missing(_lastWateredMeta);
     }
     if (data.containsKey('previous_watered')) {
       context.handle(
         _previousWateredMeta,
-        previousWatered.isAcceptableOrUnknown(data['previous_watered']!, _previousWateredMeta),
+        previousWatered.isAcceptableOrUnknown(
+          data['previous_watered']!,
+          _previousWateredMeta,
+        ),
       );
     }
     if (data.containsKey('photo_path')) {
-      context.handle(_photoPathMeta, photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta));
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
     }
     if (data.containsKey('fertilize_every_weeks')) {
       context.handle(
         _fertilizeEveryWeeksMeta,
-        fertilizeEveryWeeks.isAcceptableOrUnknown(data['fertilize_every_weeks']!, _fertilizeEveryWeeksMeta),
+        fertilizeEveryWeeks.isAcceptableOrUnknown(
+          data['fertilize_every_weeks']!,
+          _fertilizeEveryWeeksMeta,
+        ),
       );
     }
     if (data.containsKey('last_fertilized')) {
       context.handle(
         _lastFertilizedMeta,
-        lastFertilized.isAcceptableOrUnknown(data['last_fertilized']!, _lastFertilizedMeta),
+        lastFertilized.isAcceptableOrUnknown(
+          data['last_fertilized']!,
+          _lastFertilizedMeta,
+        ),
       );
     }
     return context;
@@ -556,15 +684,30 @@ class $PlantsTableTable extends PlantsTable with TableInfo<$PlantsTableTable, Pl
   PlantRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PlantRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      everyDays: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}every_days'])!,
-      lastWatered: attachedDatabase.typeMapping.read(DriftSqlType.dateTime, data['${effectivePrefix}last_watered'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      everyDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}every_days'],
+      )!,
+      lastWatered: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_watered'],
+      )!,
       previousWatered: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}previous_watered'],
       ),
-      photoPath: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}photo_path']),
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
       fertilizeEveryWeeks: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}fertilize_every_weeks'],
@@ -631,16 +774,25 @@ class PlantRow extends DataClass implements Insertable<PlantRow> {
       name: Value(name),
       everyDays: Value(everyDays),
       lastWatered: Value(lastWatered),
-      previousWatered: previousWatered == null && nullToAbsent ? const Value.absent() : Value(previousWatered),
-      photoPath: photoPath == null && nullToAbsent ? const Value.absent() : Value(photoPath),
+      previousWatered: previousWatered == null && nullToAbsent
+          ? const Value.absent()
+          : Value(previousWatered),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
       fertilizeEveryWeeks: fertilizeEveryWeeks == null && nullToAbsent
           ? const Value.absent()
           : Value(fertilizeEveryWeeks),
-      lastFertilized: lastFertilized == null && nullToAbsent ? const Value.absent() : Value(lastFertilized),
+      lastFertilized: lastFertilized == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastFertilized),
     );
   }
 
-  factory PlantRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory PlantRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PlantRow(
       id: serializer.fromJson<String>(json['id']),
@@ -649,7 +801,9 @@ class PlantRow extends DataClass implements Insertable<PlantRow> {
       lastWatered: serializer.fromJson<DateTime>(json['lastWatered']),
       previousWatered: serializer.fromJson<DateTime?>(json['previousWatered']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
-      fertilizeEveryWeeks: serializer.fromJson<int?>(json['fertilizeEveryWeeks']),
+      fertilizeEveryWeeks: serializer.fromJson<int?>(
+        json['fertilizeEveryWeeks'],
+      ),
       lastFertilized: serializer.fromJson<DateTime?>(json['lastFertilized']),
     );
   }
@@ -682,21 +836,35 @@ class PlantRow extends DataClass implements Insertable<PlantRow> {
     name: name ?? this.name,
     everyDays: everyDays ?? this.everyDays,
     lastWatered: lastWatered ?? this.lastWatered,
-    previousWatered: previousWatered.present ? previousWatered.value : this.previousWatered,
+    previousWatered: previousWatered.present
+        ? previousWatered.value
+        : this.previousWatered,
     photoPath: photoPath.present ? photoPath.value : this.photoPath,
-    fertilizeEveryWeeks: fertilizeEveryWeeks.present ? fertilizeEveryWeeks.value : this.fertilizeEveryWeeks,
-    lastFertilized: lastFertilized.present ? lastFertilized.value : this.lastFertilized,
+    fertilizeEveryWeeks: fertilizeEveryWeeks.present
+        ? fertilizeEveryWeeks.value
+        : this.fertilizeEveryWeeks,
+    lastFertilized: lastFertilized.present
+        ? lastFertilized.value
+        : this.lastFertilized,
   );
   PlantRow copyWithCompanion(PlantsTableCompanion data) {
     return PlantRow(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       everyDays: data.everyDays.present ? data.everyDays.value : this.everyDays,
-      lastWatered: data.lastWatered.present ? data.lastWatered.value : this.lastWatered,
-      previousWatered: data.previousWatered.present ? data.previousWatered.value : this.previousWatered,
+      lastWatered: data.lastWatered.present
+          ? data.lastWatered.value
+          : this.lastWatered,
+      previousWatered: data.previousWatered.present
+          ? data.previousWatered.value
+          : this.previousWatered,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
-      fertilizeEveryWeeks: data.fertilizeEveryWeeks.present ? data.fertilizeEveryWeeks.value : this.fertilizeEveryWeeks,
-      lastFertilized: data.lastFertilized.present ? data.lastFertilized.value : this.lastFertilized,
+      fertilizeEveryWeeks: data.fertilizeEveryWeeks.present
+          ? data.fertilizeEveryWeeks.value
+          : this.fertilizeEveryWeeks,
+      lastFertilized: data.lastFertilized.present
+          ? data.lastFertilized.value
+          : this.lastFertilized,
     );
   }
 
@@ -716,8 +884,16 @@ class PlantRow extends DataClass implements Insertable<PlantRow> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, everyDays, lastWatered, previousWatered, photoPath, fertilizeEveryWeeks, lastFertilized);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    everyDays,
+    lastWatered,
+    previousWatered,
+    photoPath,
+    fertilizeEveryWeeks,
+    lastFertilized,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -785,7 +961,8 @@ class PlantsTableCompanion extends UpdateCompanion<PlantRow> {
       if (lastWatered != null) 'last_watered': lastWatered,
       if (previousWatered != null) 'previous_watered': previousWatered,
       if (photoPath != null) 'photo_path': photoPath,
-      if (fertilizeEveryWeeks != null) 'fertilize_every_weeks': fertilizeEveryWeeks,
+      if (fertilizeEveryWeeks != null)
+        'fertilize_every_weeks': fertilizeEveryWeeks,
       if (lastFertilized != null) 'last_fertilized': lastFertilized,
       if (rowid != null) 'rowid': rowid,
     });
@@ -880,7 +1057,9 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _displayNameMeta = const VerificationMeta('displayName');
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
   @override
   late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
     'display_name',
@@ -897,10 +1076,14 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("hidden" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("hidden" IN (0, 1))',
+    ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _isDefaultMeta = const VerificationMeta('isDefault');
+  static const VerificationMeta _isDefaultMeta = const VerificationMeta(
+    'isDefault',
+  );
   @override
   late final GeneratedColumn<bool> isDefault = GeneratedColumn<bool>(
     'is_default',
@@ -908,7 +1091,9 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("is_default" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_default" IN (0, 1))',
+    ),
     defaultValue: const Constant(false),
   );
   @override
@@ -919,7 +1104,10 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
   String get actualTableName => $name;
   static const String $name = 'speaker_settings';
   @override
-  VerificationContext validateIntegrity(Insertable<SpeakerSettingRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<SpeakerSettingRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -928,13 +1116,25 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
       context.missing(_idMeta);
     }
     if (data.containsKey('display_name')) {
-      context.handle(_displayNameMeta, displayName.isAcceptableOrUnknown(data['display_name']!, _displayNameMeta));
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
     }
     if (data.containsKey('hidden')) {
-      context.handle(_hiddenMeta, hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta));
+      context.handle(
+        _hiddenMeta,
+        hidden.isAcceptableOrUnknown(data['hidden']!, _hiddenMeta),
+      );
     }
     if (data.containsKey('is_default')) {
-      context.handle(_isDefaultMeta, isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta));
+      context.handle(
+        _isDefaultMeta,
+        isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta),
+      );
     }
     return context;
   }
@@ -945,10 +1145,22 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
   SpeakerSettingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SpeakerSettingRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      displayName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}display_name']),
-      hidden: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}hidden'])!,
-      isDefault: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}is_default'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      ),
+      hidden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}hidden'],
+      )!,
+      isDefault: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_default'],
+      )!,
     );
   }
 
@@ -958,7 +1170,8 @@ class $SpeakerSettingsTableTable extends SpeakerSettingsTable
   }
 }
 
-class SpeakerSettingRow extends DataClass implements Insertable<SpeakerSettingRow> {
+class SpeakerSettingRow extends DataClass
+    implements Insertable<SpeakerSettingRow> {
   final String id;
 
   /// Shown instead of the name the device reports.
@@ -967,7 +1180,12 @@ class SpeakerSettingRow extends DataClass implements Insertable<SpeakerSettingRo
 
   /// Plays "Jump back in" when nothing is playing.
   final bool isDefault;
-  const SpeakerSettingRow({required this.id, this.displayName, required this.hidden, required this.isDefault});
+  const SpeakerSettingRow({
+    required this.id,
+    this.displayName,
+    required this.hidden,
+    required this.isDefault,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -983,13 +1201,18 @@ class SpeakerSettingRow extends DataClass implements Insertable<SpeakerSettingRo
   SpeakerSettingsTableCompanion toCompanion(bool nullToAbsent) {
     return SpeakerSettingsTableCompanion(
       id: Value(id),
-      displayName: displayName == null && nullToAbsent ? const Value.absent() : Value(displayName),
+      displayName: displayName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(displayName),
       hidden: Value(hidden),
       isDefault: Value(isDefault),
     );
   }
 
-  factory SpeakerSettingRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory SpeakerSettingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SpeakerSettingRow(
       id: serializer.fromJson<String>(json['id']),
@@ -1023,7 +1246,9 @@ class SpeakerSettingRow extends DataClass implements Insertable<SpeakerSettingRo
   SpeakerSettingRow copyWithCompanion(SpeakerSettingsTableCompanion data) {
     return SpeakerSettingRow(
       id: data.id.present ? data.id.value : this.id,
-      displayName: data.displayName.present ? data.displayName.value : this.displayName,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
       hidden: data.hidden.present ? data.hidden.value : this.hidden,
       isDefault: data.isDefault.present ? data.isDefault.value : this.isDefault,
     );
@@ -1138,7 +1363,8 @@ class SpeakerSettingsTableCompanion extends UpdateCompanion<SpeakerSettingRow> {
   }
 }
 
-class $ZenSettingsTableTable extends ZenSettingsTable with TableInfo<$ZenSettingsTableTable, ZenSettingsRow> {
+class $ZenSettingsTableTable extends ZenSettingsTable
+    with TableInfo<$ZenSettingsTableTable, ZenSettingsRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1152,7 +1378,9 @@ class $ZenSettingsTableTable extends ZenSettingsTable with TableInfo<$ZenSetting
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _idleMinutesMeta = const VerificationMeta('idleMinutes');
+  static const VerificationMeta _idleMinutesMeta = const VerificationMeta(
+    'idleMinutes',
+  );
   @override
   late final GeneratedColumn<int> idleMinutes = GeneratedColumn<int>(
     'idle_minutes',
@@ -1170,14 +1398,23 @@ class $ZenSettingsTableTable extends ZenSettingsTable with TableInfo<$ZenSetting
   String get actualTableName => $name;
   static const String $name = 'zen_settings';
   @override
-  VerificationContext validateIntegrity(Insertable<ZenSettingsRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ZenSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('idle_minutes')) {
-      context.handle(_idleMinutesMeta, idleMinutes.isAcceptableOrUnknown(data['idle_minutes']!, _idleMinutesMeta));
+      context.handle(
+        _idleMinutesMeta,
+        idleMinutes.isAcceptableOrUnknown(
+          data['idle_minutes']!,
+          _idleMinutesMeta,
+        ),
+      );
     }
     return context;
   }
@@ -1188,8 +1425,14 @@ class $ZenSettingsTableTable extends ZenSettingsTable with TableInfo<$ZenSetting
   ZenSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ZenSettingsRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      idleMinutes: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}idle_minutes'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      idleMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}idle_minutes'],
+      )!,
     );
   }
 
@@ -1214,10 +1457,16 @@ class ZenSettingsRow extends DataClass implements Insertable<ZenSettingsRow> {
   }
 
   ZenSettingsTableCompanion toCompanion(bool nullToAbsent) {
-    return ZenSettingsTableCompanion(id: Value(id), idleMinutes: Value(idleMinutes));
+    return ZenSettingsTableCompanion(
+      id: Value(id),
+      idleMinutes: Value(idleMinutes),
+    );
   }
 
-  factory ZenSettingsRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory ZenSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ZenSettingsRow(
       id: serializer.fromJson<int>(json['id']),
@@ -1227,15 +1476,22 @@ class ZenSettingsRow extends DataClass implements Insertable<ZenSettingsRow> {
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'id': serializer.toJson<int>(id), 'idleMinutes': serializer.toJson<int>(idleMinutes)};
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'idleMinutes': serializer.toJson<int>(idleMinutes),
+    };
   }
 
-  ZenSettingsRow copyWith({int? id, int? idleMinutes}) =>
-      ZenSettingsRow(id: id ?? this.id, idleMinutes: idleMinutes ?? this.idleMinutes);
+  ZenSettingsRow copyWith({int? id, int? idleMinutes}) => ZenSettingsRow(
+    id: id ?? this.id,
+    idleMinutes: idleMinutes ?? this.idleMinutes,
+  );
   ZenSettingsRow copyWithCompanion(ZenSettingsTableCompanion data) {
     return ZenSettingsRow(
       id: data.id.present ? data.id.value : this.id,
-      idleMinutes: data.idleMinutes.present ? data.idleMinutes.value : this.idleMinutes,
+      idleMinutes: data.idleMinutes.present
+          ? data.idleMinutes.value
+          : this.idleMinutes,
     );
   }
 
@@ -1253,20 +1509,40 @@ class ZenSettingsRow extends DataClass implements Insertable<ZenSettingsRow> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ZenSettingsRow && other.id == this.id && other.idleMinutes == this.idleMinutes);
+      (other is ZenSettingsRow &&
+          other.id == this.id &&
+          other.idleMinutes == this.idleMinutes);
 }
 
 class ZenSettingsTableCompanion extends UpdateCompanion<ZenSettingsRow> {
   final Value<int> id;
   final Value<int> idleMinutes;
-  const ZenSettingsTableCompanion({this.id = const Value.absent(), this.idleMinutes = const Value.absent()});
-  ZenSettingsTableCompanion.insert({this.id = const Value.absent(), this.idleMinutes = const Value.absent()});
-  static Insertable<ZenSettingsRow> custom({Expression<int>? id, Expression<int>? idleMinutes}) {
-    return RawValuesInsertable({if (id != null) 'id': id, if (idleMinutes != null) 'idle_minutes': idleMinutes});
+  const ZenSettingsTableCompanion({
+    this.id = const Value.absent(),
+    this.idleMinutes = const Value.absent(),
+  });
+  ZenSettingsTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.idleMinutes = const Value.absent(),
+  });
+  static Insertable<ZenSettingsRow> custom({
+    Expression<int>? id,
+    Expression<int>? idleMinutes,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (idleMinutes != null) 'idle_minutes': idleMinutes,
+    });
   }
 
-  ZenSettingsTableCompanion copyWith({Value<int>? id, Value<int>? idleMinutes}) {
-    return ZenSettingsTableCompanion(id: id ?? this.id, idleMinutes: idleMinutes ?? this.idleMinutes);
+  ZenSettingsTableCompanion copyWith({
+    Value<int>? id,
+    Value<int>? idleMinutes,
+  }) {
+    return ZenSettingsTableCompanion(
+      id: id ?? this.id,
+      idleMinutes: idleMinutes ?? this.idleMinutes,
+    );
   }
 
   @override
@@ -1291,12 +1567,15 @@ class ZenSettingsTableCompanion extends UpdateCompanion<ZenSettingsRow> {
   }
 }
 
-class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantProfilesTableTable, PlantProfileRow> {
+class $PlantProfilesTableTable extends PlantProfilesTable
+    with TableInfo<$PlantProfilesTableTable, PlantProfileRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $PlantProfilesTableTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _plantIdMeta = const VerificationMeta('plantId');
+  static const VerificationMeta _plantIdMeta = const VerificationMeta(
+    'plantId',
+  );
   @override
   late final GeneratedColumn<String> plantId = GeneratedColumn<String>(
     'plant_id',
@@ -1305,7 +1584,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _speciesIdMeta = const VerificationMeta('speciesId');
+  static const VerificationMeta _speciesIdMeta = const VerificationMeta(
+    'speciesId',
+  );
   @override
   late final GeneratedColumn<int> speciesId = GeneratedColumn<int>(
     'species_id',
@@ -1324,7 +1605,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     requiredDuringInsert: false,
     defaultValue: const Constant('perenual'),
   );
-  static const VerificationMeta _commonNameMeta = const VerificationMeta('commonName');
+  static const VerificationMeta _commonNameMeta = const VerificationMeta(
+    'commonName',
+  );
   @override
   late final GeneratedColumn<String> commonName = GeneratedColumn<String>(
     'common_name',
@@ -1333,7 +1616,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _scientificNameMeta = const VerificationMeta('scientificName');
+  static const VerificationMeta _scientificNameMeta = const VerificationMeta(
+    'scientificName',
+  );
   @override
   late final GeneratedColumn<String> scientificName = GeneratedColumn<String>(
     'scientific_name',
@@ -1342,7 +1627,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _imageUrlMeta = const VerificationMeta('imageUrl');
+  static const VerificationMeta _imageUrlMeta = const VerificationMeta(
+    'imageUrl',
+  );
   @override
   late final GeneratedColumn<String> imageUrl = GeneratedColumn<String>(
     'image_url',
@@ -1351,7 +1638,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _wateringMeta = const VerificationMeta('watering');
+  static const VerificationMeta _wateringMeta = const VerificationMeta(
+    'watering',
+  );
   @override
   late final GeneratedColumn<String> watering = GeneratedColumn<String>(
     'watering',
@@ -1360,7 +1649,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _wateringMinDaysMeta = const VerificationMeta('wateringMinDays');
+  static const VerificationMeta _wateringMinDaysMeta = const VerificationMeta(
+    'wateringMinDays',
+  );
   @override
   late final GeneratedColumn<int> wateringMinDays = GeneratedColumn<int>(
     'watering_min_days',
@@ -1369,7 +1660,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _wateringMaxDaysMeta = const VerificationMeta('wateringMaxDays');
+  static const VerificationMeta _wateringMaxDaysMeta = const VerificationMeta(
+    'wateringMaxDays',
+  );
   @override
   late final GeneratedColumn<int> wateringMaxDays = GeneratedColumn<int>(
     'watering_max_days',
@@ -1378,7 +1671,8 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _wateringWinterMinDaysMeta = const VerificationMeta('wateringWinterMinDays');
+  static const VerificationMeta _wateringWinterMinDaysMeta =
+      const VerificationMeta('wateringWinterMinDays');
   @override
   late final GeneratedColumn<int> wateringWinterMinDays = GeneratedColumn<int>(
     'watering_winter_min_days',
@@ -1387,7 +1681,8 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _wateringWinterMaxDaysMeta = const VerificationMeta('wateringWinterMaxDays');
+  static const VerificationMeta _wateringWinterMaxDaysMeta =
+      const VerificationMeta('wateringWinterMaxDays');
   @override
   late final GeneratedColumn<int> wateringWinterMaxDays = GeneratedColumn<int>(
     'watering_winter_max_days',
@@ -1396,7 +1691,8 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _fertilizeEveryWeeksMeta = const VerificationMeta('fertilizeEveryWeeks');
+  static const VerificationMeta _fertilizeEveryWeeksMeta =
+      const VerificationMeta('fertilizeEveryWeeks');
   @override
   late final GeneratedColumn<int> fertilizeEveryWeeks = GeneratedColumn<int>(
     'fertilize_every_weeks',
@@ -1405,7 +1701,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _sunlightMeta = const VerificationMeta('sunlight');
+  static const VerificationMeta _sunlightMeta = const VerificationMeta(
+    'sunlight',
+  );
   @override
   late final GeneratedColumn<String> sunlight = GeneratedColumn<String>(
     'sunlight',
@@ -1415,7 +1713,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _careLevelMeta = const VerificationMeta('careLevel');
+  static const VerificationMeta _careLevelMeta = const VerificationMeta(
+    'careLevel',
+  );
   @override
   late final GeneratedColumn<String> careLevel = GeneratedColumn<String>(
     'care_level',
@@ -1432,9 +1732,13 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     true,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("indoor" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("indoor" IN (0, 1))',
+    ),
   );
-  static const VerificationMeta _poisonousToPetsMeta = const VerificationMeta('poisonousToPets');
+  static const VerificationMeta _poisonousToPetsMeta = const VerificationMeta(
+    'poisonousToPets',
+  );
   @override
   late final GeneratedColumn<bool> poisonousToPets = GeneratedColumn<bool>(
     'poisonous_to_pets',
@@ -1442,9 +1746,13 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     true,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("poisonous_to_pets" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("poisonous_to_pets" IN (0, 1))',
+    ),
   );
-  static const VerificationMeta _pruningMonthsMeta = const VerificationMeta('pruningMonths');
+  static const VerificationMeta _pruningMonthsMeta = const VerificationMeta(
+    'pruningMonths',
+  );
   @override
   late final GeneratedColumn<String> pruningMonths = GeneratedColumn<String>(
     'pruning_months',
@@ -1454,7 +1762,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
-  static const VerificationMeta _wateringGuideMeta = const VerificationMeta('wateringGuide');
+  static const VerificationMeta _wateringGuideMeta = const VerificationMeta(
+    'wateringGuide',
+  );
   @override
   late final GeneratedColumn<String> wateringGuide = GeneratedColumn<String>(
     'watering_guide',
@@ -1463,7 +1773,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _sunlightGuideMeta = const VerificationMeta('sunlightGuide');
+  static const VerificationMeta _sunlightGuideMeta = const VerificationMeta(
+    'sunlightGuide',
+  );
   @override
   late final GeneratedColumn<String> sunlightGuide = GeneratedColumn<String>(
     'sunlight_guide',
@@ -1472,7 +1784,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _pruningGuideMeta = const VerificationMeta('pruningGuide');
+  static const VerificationMeta _pruningGuideMeta = const VerificationMeta(
+    'pruningGuide',
+  );
   @override
   late final GeneratedColumn<String> pruningGuide = GeneratedColumn<String>(
     'pruning_guide',
@@ -1481,7 +1795,9 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _fetchedAtMeta = const VerificationMeta('fetchedAt');
+  static const VerificationMeta _fetchedAtMeta = const VerificationMeta(
+    'fetchedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> fetchedAt = GeneratedColumn<DateTime>(
     'fetched_at',
@@ -1520,105 +1836,174 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
   String get actualTableName => $name;
   static const String $name = 'plant_profiles';
   @override
-  VerificationContext validateIntegrity(Insertable<PlantProfileRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<PlantProfileRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('plant_id')) {
-      context.handle(_plantIdMeta, plantId.isAcceptableOrUnknown(data['plant_id']!, _plantIdMeta));
+      context.handle(
+        _plantIdMeta,
+        plantId.isAcceptableOrUnknown(data['plant_id']!, _plantIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_plantIdMeta);
     }
     if (data.containsKey('species_id')) {
-      context.handle(_speciesIdMeta, speciesId.isAcceptableOrUnknown(data['species_id']!, _speciesIdMeta));
+      context.handle(
+        _speciesIdMeta,
+        speciesId.isAcceptableOrUnknown(data['species_id']!, _speciesIdMeta),
+      );
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta, source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
     }
     if (data.containsKey('common_name')) {
-      context.handle(_commonNameMeta, commonName.isAcceptableOrUnknown(data['common_name']!, _commonNameMeta));
+      context.handle(
+        _commonNameMeta,
+        commonName.isAcceptableOrUnknown(data['common_name']!, _commonNameMeta),
+      );
     } else if (isInserting) {
       context.missing(_commonNameMeta);
     }
     if (data.containsKey('scientific_name')) {
       context.handle(
         _scientificNameMeta,
-        scientificName.isAcceptableOrUnknown(data['scientific_name']!, _scientificNameMeta),
+        scientificName.isAcceptableOrUnknown(
+          data['scientific_name']!,
+          _scientificNameMeta,
+        ),
       );
     }
     if (data.containsKey('image_url')) {
-      context.handle(_imageUrlMeta, imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta));
+      context.handle(
+        _imageUrlMeta,
+        imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta),
+      );
     }
     if (data.containsKey('watering')) {
-      context.handle(_wateringMeta, watering.isAcceptableOrUnknown(data['watering']!, _wateringMeta));
+      context.handle(
+        _wateringMeta,
+        watering.isAcceptableOrUnknown(data['watering']!, _wateringMeta),
+      );
     }
     if (data.containsKey('watering_min_days')) {
       context.handle(
         _wateringMinDaysMeta,
-        wateringMinDays.isAcceptableOrUnknown(data['watering_min_days']!, _wateringMinDaysMeta),
+        wateringMinDays.isAcceptableOrUnknown(
+          data['watering_min_days']!,
+          _wateringMinDaysMeta,
+        ),
       );
     }
     if (data.containsKey('watering_max_days')) {
       context.handle(
         _wateringMaxDaysMeta,
-        wateringMaxDays.isAcceptableOrUnknown(data['watering_max_days']!, _wateringMaxDaysMeta),
+        wateringMaxDays.isAcceptableOrUnknown(
+          data['watering_max_days']!,
+          _wateringMaxDaysMeta,
+        ),
       );
     }
     if (data.containsKey('watering_winter_min_days')) {
       context.handle(
         _wateringWinterMinDaysMeta,
-        wateringWinterMinDays.isAcceptableOrUnknown(data['watering_winter_min_days']!, _wateringWinterMinDaysMeta),
+        wateringWinterMinDays.isAcceptableOrUnknown(
+          data['watering_winter_min_days']!,
+          _wateringWinterMinDaysMeta,
+        ),
       );
     }
     if (data.containsKey('watering_winter_max_days')) {
       context.handle(
         _wateringWinterMaxDaysMeta,
-        wateringWinterMaxDays.isAcceptableOrUnknown(data['watering_winter_max_days']!, _wateringWinterMaxDaysMeta),
+        wateringWinterMaxDays.isAcceptableOrUnknown(
+          data['watering_winter_max_days']!,
+          _wateringWinterMaxDaysMeta,
+        ),
       );
     }
     if (data.containsKey('fertilize_every_weeks')) {
       context.handle(
         _fertilizeEveryWeeksMeta,
-        fertilizeEveryWeeks.isAcceptableOrUnknown(data['fertilize_every_weeks']!, _fertilizeEveryWeeksMeta),
+        fertilizeEveryWeeks.isAcceptableOrUnknown(
+          data['fertilize_every_weeks']!,
+          _fertilizeEveryWeeksMeta,
+        ),
       );
     }
     if (data.containsKey('sunlight')) {
-      context.handle(_sunlightMeta, sunlight.isAcceptableOrUnknown(data['sunlight']!, _sunlightMeta));
+      context.handle(
+        _sunlightMeta,
+        sunlight.isAcceptableOrUnknown(data['sunlight']!, _sunlightMeta),
+      );
     }
     if (data.containsKey('care_level')) {
-      context.handle(_careLevelMeta, careLevel.isAcceptableOrUnknown(data['care_level']!, _careLevelMeta));
+      context.handle(
+        _careLevelMeta,
+        careLevel.isAcceptableOrUnknown(data['care_level']!, _careLevelMeta),
+      );
     }
     if (data.containsKey('indoor')) {
-      context.handle(_indoorMeta, indoor.isAcceptableOrUnknown(data['indoor']!, _indoorMeta));
+      context.handle(
+        _indoorMeta,
+        indoor.isAcceptableOrUnknown(data['indoor']!, _indoorMeta),
+      );
     }
     if (data.containsKey('poisonous_to_pets')) {
       context.handle(
         _poisonousToPetsMeta,
-        poisonousToPets.isAcceptableOrUnknown(data['poisonous_to_pets']!, _poisonousToPetsMeta),
+        poisonousToPets.isAcceptableOrUnknown(
+          data['poisonous_to_pets']!,
+          _poisonousToPetsMeta,
+        ),
       );
     }
     if (data.containsKey('pruning_months')) {
       context.handle(
         _pruningMonthsMeta,
-        pruningMonths.isAcceptableOrUnknown(data['pruning_months']!, _pruningMonthsMeta),
+        pruningMonths.isAcceptableOrUnknown(
+          data['pruning_months']!,
+          _pruningMonthsMeta,
+        ),
       );
     }
     if (data.containsKey('watering_guide')) {
       context.handle(
         _wateringGuideMeta,
-        wateringGuide.isAcceptableOrUnknown(data['watering_guide']!, _wateringGuideMeta),
+        wateringGuide.isAcceptableOrUnknown(
+          data['watering_guide']!,
+          _wateringGuideMeta,
+        ),
       );
     }
     if (data.containsKey('sunlight_guide')) {
       context.handle(
         _sunlightGuideMeta,
-        sunlightGuide.isAcceptableOrUnknown(data['sunlight_guide']!, _sunlightGuideMeta),
+        sunlightGuide.isAcceptableOrUnknown(
+          data['sunlight_guide']!,
+          _sunlightGuideMeta,
+        ),
       );
     }
     if (data.containsKey('pruning_guide')) {
-      context.handle(_pruningGuideMeta, pruningGuide.isAcceptableOrUnknown(data['pruning_guide']!, _pruningGuideMeta));
+      context.handle(
+        _pruningGuideMeta,
+        pruningGuide.isAcceptableOrUnknown(
+          data['pruning_guide']!,
+          _pruningGuideMeta,
+        ),
+      );
     }
     if (data.containsKey('fetched_at')) {
-      context.handle(_fetchedAtMeta, fetchedAt.isAcceptableOrUnknown(data['fetched_at']!, _fetchedAtMeta));
+      context.handle(
+        _fetchedAtMeta,
+        fetchedAt.isAcceptableOrUnknown(data['fetched_at']!, _fetchedAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_fetchedAtMeta);
     }
@@ -1631,15 +2016,42 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
   PlantProfileRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PlantProfileRow(
-      plantId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}plant_id'])!,
-      speciesId: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}species_id']),
-      source: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}source'])!,
-      commonName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}common_name'])!,
-      scientificName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}scientific_name']),
-      imageUrl: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}image_url']),
-      watering: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}watering']),
-      wateringMinDays: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}watering_min_days']),
-      wateringMaxDays: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}watering_max_days']),
+      plantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}plant_id'],
+      )!,
+      speciesId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}species_id'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      commonName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}common_name'],
+      )!,
+      scientificName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scientific_name'],
+      ),
+      imageUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_url'],
+      ),
+      watering: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}watering'],
+      ),
+      wateringMinDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}watering_min_days'],
+      ),
+      wateringMaxDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}watering_max_days'],
+      ),
       wateringWinterMinDays: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}watering_winter_min_days'],
@@ -1652,18 +2064,42 @@ class $PlantProfilesTableTable extends PlantProfilesTable with TableInfo<$PlantP
         DriftSqlType.int,
         data['${effectivePrefix}fertilize_every_weeks'],
       ),
-      sunlight: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}sunlight'])!,
-      careLevel: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}care_level']),
-      indoor: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}indoor']),
+      sunlight: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sunlight'],
+      )!,
+      careLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}care_level'],
+      ),
+      indoor: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}indoor'],
+      ),
       poisonousToPets: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}poisonous_to_pets'],
       ),
-      pruningMonths: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}pruning_months'])!,
-      wateringGuide: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}watering_guide']),
-      sunlightGuide: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}sunlight_guide']),
-      pruningGuide: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}pruning_guide']),
-      fetchedAt: attachedDatabase.typeMapping.read(DriftSqlType.dateTime, data['${effectivePrefix}fetched_at'])!,
+      pruningMonths: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pruning_months'],
+      )!,
+      wateringGuide: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}watering_guide'],
+      ),
+      sunlightGuide: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sunlight_guide'],
+      ),
+      pruningGuide: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pruning_guide'],
+      ),
+      fetchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}fetched_at'],
+      )!,
     );
   }
 
@@ -1782,14 +2218,26 @@ class PlantProfileRow extends DataClass implements Insertable<PlantProfileRow> {
   PlantProfilesTableCompanion toCompanion(bool nullToAbsent) {
     return PlantProfilesTableCompanion(
       plantId: Value(plantId),
-      speciesId: speciesId == null && nullToAbsent ? const Value.absent() : Value(speciesId),
+      speciesId: speciesId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(speciesId),
       source: Value(source),
       commonName: Value(commonName),
-      scientificName: scientificName == null && nullToAbsent ? const Value.absent() : Value(scientificName),
-      imageUrl: imageUrl == null && nullToAbsent ? const Value.absent() : Value(imageUrl),
-      watering: watering == null && nullToAbsent ? const Value.absent() : Value(watering),
-      wateringMinDays: wateringMinDays == null && nullToAbsent ? const Value.absent() : Value(wateringMinDays),
-      wateringMaxDays: wateringMaxDays == null && nullToAbsent ? const Value.absent() : Value(wateringMaxDays),
+      scientificName: scientificName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(scientificName),
+      imageUrl: imageUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageUrl),
+      watering: watering == null && nullToAbsent
+          ? const Value.absent()
+          : Value(watering),
+      wateringMinDays: wateringMinDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wateringMinDays),
+      wateringMaxDays: wateringMaxDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wateringMaxDays),
       wateringWinterMinDays: wateringWinterMinDays == null && nullToAbsent
           ? const Value.absent()
           : Value(wateringWinterMinDays),
@@ -1800,18 +2248,33 @@ class PlantProfileRow extends DataClass implements Insertable<PlantProfileRow> {
           ? const Value.absent()
           : Value(fertilizeEveryWeeks),
       sunlight: Value(sunlight),
-      careLevel: careLevel == null && nullToAbsent ? const Value.absent() : Value(careLevel),
-      indoor: indoor == null && nullToAbsent ? const Value.absent() : Value(indoor),
-      poisonousToPets: poisonousToPets == null && nullToAbsent ? const Value.absent() : Value(poisonousToPets),
+      careLevel: careLevel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(careLevel),
+      indoor: indoor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(indoor),
+      poisonousToPets: poisonousToPets == null && nullToAbsent
+          ? const Value.absent()
+          : Value(poisonousToPets),
       pruningMonths: Value(pruningMonths),
-      wateringGuide: wateringGuide == null && nullToAbsent ? const Value.absent() : Value(wateringGuide),
-      sunlightGuide: sunlightGuide == null && nullToAbsent ? const Value.absent() : Value(sunlightGuide),
-      pruningGuide: pruningGuide == null && nullToAbsent ? const Value.absent() : Value(pruningGuide),
+      wateringGuide: wateringGuide == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wateringGuide),
+      sunlightGuide: sunlightGuide == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sunlightGuide),
+      pruningGuide: pruningGuide == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pruningGuide),
       fetchedAt: Value(fetchedAt),
     );
   }
 
-  factory PlantProfileRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory PlantProfileRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PlantProfileRow(
       plantId: serializer.fromJson<String>(json['plantId']),
@@ -1823,9 +2286,15 @@ class PlantProfileRow extends DataClass implements Insertable<PlantProfileRow> {
       watering: serializer.fromJson<String?>(json['watering']),
       wateringMinDays: serializer.fromJson<int?>(json['wateringMinDays']),
       wateringMaxDays: serializer.fromJson<int?>(json['wateringMaxDays']),
-      wateringWinterMinDays: serializer.fromJson<int?>(json['wateringWinterMinDays']),
-      wateringWinterMaxDays: serializer.fromJson<int?>(json['wateringWinterMaxDays']),
-      fertilizeEveryWeeks: serializer.fromJson<int?>(json['fertilizeEveryWeeks']),
+      wateringWinterMinDays: serializer.fromJson<int?>(
+        json['wateringWinterMinDays'],
+      ),
+      wateringWinterMaxDays: serializer.fromJson<int?>(
+        json['wateringWinterMaxDays'],
+      ),
+      fertilizeEveryWeeks: serializer.fromJson<int?>(
+        json['fertilizeEveryWeeks'],
+      ),
       sunlight: serializer.fromJson<String>(json['sunlight']),
       careLevel: serializer.fromJson<String?>(json['careLevel']),
       indoor: serializer.fromJson<bool?>(json['indoor']),
@@ -1892,21 +2361,39 @@ class PlantProfileRow extends DataClass implements Insertable<PlantProfileRow> {
     speciesId: speciesId.present ? speciesId.value : this.speciesId,
     source: source ?? this.source,
     commonName: commonName ?? this.commonName,
-    scientificName: scientificName.present ? scientificName.value : this.scientificName,
+    scientificName: scientificName.present
+        ? scientificName.value
+        : this.scientificName,
     imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
     watering: watering.present ? watering.value : this.watering,
-    wateringMinDays: wateringMinDays.present ? wateringMinDays.value : this.wateringMinDays,
-    wateringMaxDays: wateringMaxDays.present ? wateringMaxDays.value : this.wateringMaxDays,
-    wateringWinterMinDays: wateringWinterMinDays.present ? wateringWinterMinDays.value : this.wateringWinterMinDays,
-    wateringWinterMaxDays: wateringWinterMaxDays.present ? wateringWinterMaxDays.value : this.wateringWinterMaxDays,
-    fertilizeEveryWeeks: fertilizeEveryWeeks.present ? fertilizeEveryWeeks.value : this.fertilizeEveryWeeks,
+    wateringMinDays: wateringMinDays.present
+        ? wateringMinDays.value
+        : this.wateringMinDays,
+    wateringMaxDays: wateringMaxDays.present
+        ? wateringMaxDays.value
+        : this.wateringMaxDays,
+    wateringWinterMinDays: wateringWinterMinDays.present
+        ? wateringWinterMinDays.value
+        : this.wateringWinterMinDays,
+    wateringWinterMaxDays: wateringWinterMaxDays.present
+        ? wateringWinterMaxDays.value
+        : this.wateringWinterMaxDays,
+    fertilizeEveryWeeks: fertilizeEveryWeeks.present
+        ? fertilizeEveryWeeks.value
+        : this.fertilizeEveryWeeks,
     sunlight: sunlight ?? this.sunlight,
     careLevel: careLevel.present ? careLevel.value : this.careLevel,
     indoor: indoor.present ? indoor.value : this.indoor,
-    poisonousToPets: poisonousToPets.present ? poisonousToPets.value : this.poisonousToPets,
+    poisonousToPets: poisonousToPets.present
+        ? poisonousToPets.value
+        : this.poisonousToPets,
     pruningMonths: pruningMonths ?? this.pruningMonths,
-    wateringGuide: wateringGuide.present ? wateringGuide.value : this.wateringGuide,
-    sunlightGuide: sunlightGuide.present ? sunlightGuide.value : this.sunlightGuide,
+    wateringGuide: wateringGuide.present
+        ? wateringGuide.value
+        : this.wateringGuide,
+    sunlightGuide: sunlightGuide.present
+        ? sunlightGuide.value
+        : this.sunlightGuide,
     pruningGuide: pruningGuide.present ? pruningGuide.value : this.pruningGuide,
     fetchedAt: fetchedAt ?? this.fetchedAt,
   );
@@ -1915,27 +2402,47 @@ class PlantProfileRow extends DataClass implements Insertable<PlantProfileRow> {
       plantId: data.plantId.present ? data.plantId.value : this.plantId,
       speciesId: data.speciesId.present ? data.speciesId.value : this.speciesId,
       source: data.source.present ? data.source.value : this.source,
-      commonName: data.commonName.present ? data.commonName.value : this.commonName,
-      scientificName: data.scientificName.present ? data.scientificName.value : this.scientificName,
+      commonName: data.commonName.present
+          ? data.commonName.value
+          : this.commonName,
+      scientificName: data.scientificName.present
+          ? data.scientificName.value
+          : this.scientificName,
       imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
       watering: data.watering.present ? data.watering.value : this.watering,
-      wateringMinDays: data.wateringMinDays.present ? data.wateringMinDays.value : this.wateringMinDays,
-      wateringMaxDays: data.wateringMaxDays.present ? data.wateringMaxDays.value : this.wateringMaxDays,
+      wateringMinDays: data.wateringMinDays.present
+          ? data.wateringMinDays.value
+          : this.wateringMinDays,
+      wateringMaxDays: data.wateringMaxDays.present
+          ? data.wateringMaxDays.value
+          : this.wateringMaxDays,
       wateringWinterMinDays: data.wateringWinterMinDays.present
           ? data.wateringWinterMinDays.value
           : this.wateringWinterMinDays,
       wateringWinterMaxDays: data.wateringWinterMaxDays.present
           ? data.wateringWinterMaxDays.value
           : this.wateringWinterMaxDays,
-      fertilizeEveryWeeks: data.fertilizeEveryWeeks.present ? data.fertilizeEveryWeeks.value : this.fertilizeEveryWeeks,
+      fertilizeEveryWeeks: data.fertilizeEveryWeeks.present
+          ? data.fertilizeEveryWeeks.value
+          : this.fertilizeEveryWeeks,
       sunlight: data.sunlight.present ? data.sunlight.value : this.sunlight,
       careLevel: data.careLevel.present ? data.careLevel.value : this.careLevel,
       indoor: data.indoor.present ? data.indoor.value : this.indoor,
-      poisonousToPets: data.poisonousToPets.present ? data.poisonousToPets.value : this.poisonousToPets,
-      pruningMonths: data.pruningMonths.present ? data.pruningMonths.value : this.pruningMonths,
-      wateringGuide: data.wateringGuide.present ? data.wateringGuide.value : this.wateringGuide,
-      sunlightGuide: data.sunlightGuide.present ? data.sunlightGuide.value : this.sunlightGuide,
-      pruningGuide: data.pruningGuide.present ? data.pruningGuide.value : this.pruningGuide,
+      poisonousToPets: data.poisonousToPets.present
+          ? data.poisonousToPets.value
+          : this.poisonousToPets,
+      pruningMonths: data.pruningMonths.present
+          ? data.pruningMonths.value
+          : this.pruningMonths,
+      wateringGuide: data.wateringGuide.present
+          ? data.wateringGuide.value
+          : this.wateringGuide,
+      sunlightGuide: data.sunlightGuide.present
+          ? data.sunlightGuide.value
+          : this.sunlightGuide,
+      pruningGuide: data.pruningGuide.present
+          ? data.pruningGuide.value
+          : this.pruningGuide,
       fetchedAt: data.fetchedAt.present ? data.fetchedAt.value : this.fetchedAt,
     );
   }
@@ -2126,9 +2633,12 @@ class PlantProfilesTableCompanion extends UpdateCompanion<PlantProfileRow> {
       if (watering != null) 'watering': watering,
       if (wateringMinDays != null) 'watering_min_days': wateringMinDays,
       if (wateringMaxDays != null) 'watering_max_days': wateringMaxDays,
-      if (wateringWinterMinDays != null) 'watering_winter_min_days': wateringWinterMinDays,
-      if (wateringWinterMaxDays != null) 'watering_winter_max_days': wateringWinterMaxDays,
-      if (fertilizeEveryWeeks != null) 'fertilize_every_weeks': fertilizeEveryWeeks,
+      if (wateringWinterMinDays != null)
+        'watering_winter_min_days': wateringWinterMinDays,
+      if (wateringWinterMaxDays != null)
+        'watering_winter_max_days': wateringWinterMaxDays,
+      if (fertilizeEveryWeeks != null)
+        'fertilize_every_weeks': fertilizeEveryWeeks,
       if (sunlight != null) 'sunlight': sunlight,
       if (careLevel != null) 'care_level': careLevel,
       if (indoor != null) 'indoor': indoor,
@@ -2176,8 +2686,10 @@ class PlantProfilesTableCompanion extends UpdateCompanion<PlantProfileRow> {
       watering: watering ?? this.watering,
       wateringMinDays: wateringMinDays ?? this.wateringMinDays,
       wateringMaxDays: wateringMaxDays ?? this.wateringMaxDays,
-      wateringWinterMinDays: wateringWinterMinDays ?? this.wateringWinterMinDays,
-      wateringWinterMaxDays: wateringWinterMaxDays ?? this.wateringWinterMaxDays,
+      wateringWinterMinDays:
+          wateringWinterMinDays ?? this.wateringWinterMinDays,
+      wateringWinterMaxDays:
+          wateringWinterMaxDays ?? this.wateringWinterMaxDays,
       fertilizeEveryWeeks: fertilizeEveryWeeks ?? this.fertilizeEveryWeeks,
       sunlight: sunlight ?? this.sunlight,
       careLevel: careLevel ?? this.careLevel,
@@ -2223,10 +2735,14 @@ class PlantProfilesTableCompanion extends UpdateCompanion<PlantProfileRow> {
       map['watering_max_days'] = Variable<int>(wateringMaxDays.value);
     }
     if (wateringWinterMinDays.present) {
-      map['watering_winter_min_days'] = Variable<int>(wateringWinterMinDays.value);
+      map['watering_winter_min_days'] = Variable<int>(
+        wateringWinterMinDays.value,
+      );
     }
     if (wateringWinterMaxDays.present) {
-      map['watering_winter_max_days'] = Variable<int>(wateringWinterMaxDays.value);
+      map['watering_winter_max_days'] = Variable<int>(
+        wateringWinterMaxDays.value,
+      );
     }
     if (fertilizeEveryWeeks.present) {
       map['fertilize_every_weeks'] = Variable<int>(fertilizeEveryWeeks.value);
@@ -2309,7 +2825,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _placeLatitudeMeta = const VerificationMeta('placeLatitude');
+  static const VerificationMeta _placeLatitudeMeta = const VerificationMeta(
+    'placeLatitude',
+  );
   @override
   late final GeneratedColumn<double> placeLatitude = GeneratedColumn<double>(
     'place_latitude',
@@ -2318,7 +2836,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _placeLongitudeMeta = const VerificationMeta('placeLongitude');
+  static const VerificationMeta _placeLongitudeMeta = const VerificationMeta(
+    'placeLongitude',
+  );
   @override
   late final GeneratedColumn<double> placeLongitude = GeneratedColumn<double>(
     'place_longitude',
@@ -2327,7 +2847,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _placeNameMeta = const VerificationMeta('placeName');
+  static const VerificationMeta _placeNameMeta = const VerificationMeta(
+    'placeName',
+  );
   @override
   late final GeneratedColumn<String> placeName = GeneratedColumn<String>(
     'place_name',
@@ -2336,7 +2858,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _placeRegionMeta = const VerificationMeta('placeRegion');
+  static const VerificationMeta _placeRegionMeta = const VerificationMeta(
+    'placeRegion',
+  );
   @override
   late final GeneratedColumn<String> placeRegion = GeneratedColumn<String>(
     'place_region',
@@ -2345,7 +2869,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cachedJsonMeta = const VerificationMeta('cachedJson');
+  static const VerificationMeta _cachedJsonMeta = const VerificationMeta(
+    'cachedJson',
+  );
   @override
   late final GeneratedColumn<String> cachedJson = GeneratedColumn<String>(
     'cached_json',
@@ -2354,7 +2880,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cachedLatitudeMeta = const VerificationMeta('cachedLatitude');
+  static const VerificationMeta _cachedLatitudeMeta = const VerificationMeta(
+    'cachedLatitude',
+  );
   @override
   late final GeneratedColumn<double> cachedLatitude = GeneratedColumn<double>(
     'cached_latitude',
@@ -2363,7 +2891,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cachedLongitudeMeta = const VerificationMeta('cachedLongitude');
+  static const VerificationMeta _cachedLongitudeMeta = const VerificationMeta(
+    'cachedLongitude',
+  );
   @override
   late final GeneratedColumn<double> cachedLongitude = GeneratedColumn<double>(
     'cached_longitude',
@@ -2372,7 +2902,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cachedPlaceNameMeta = const VerificationMeta('cachedPlaceName');
+  static const VerificationMeta _cachedPlaceNameMeta = const VerificationMeta(
+    'cachedPlaceName',
+  );
   @override
   late final GeneratedColumn<String> cachedPlaceName = GeneratedColumn<String>(
     'cached_place_name',
@@ -2381,7 +2913,9 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cachedAtMeta = const VerificationMeta('cachedAt');
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
     'cached_at',
@@ -2409,7 +2943,10 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
   String get actualTableName => $name;
   static const String $name = 'weather_settings';
   @override
-  VerificationContext validateIntegrity(Insertable<WeatherSettingsRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<WeatherSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -2418,44 +2955,74 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
     if (data.containsKey('place_latitude')) {
       context.handle(
         _placeLatitudeMeta,
-        placeLatitude.isAcceptableOrUnknown(data['place_latitude']!, _placeLatitudeMeta),
+        placeLatitude.isAcceptableOrUnknown(
+          data['place_latitude']!,
+          _placeLatitudeMeta,
+        ),
       );
     }
     if (data.containsKey('place_longitude')) {
       context.handle(
         _placeLongitudeMeta,
-        placeLongitude.isAcceptableOrUnknown(data['place_longitude']!, _placeLongitudeMeta),
+        placeLongitude.isAcceptableOrUnknown(
+          data['place_longitude']!,
+          _placeLongitudeMeta,
+        ),
       );
     }
     if (data.containsKey('place_name')) {
-      context.handle(_placeNameMeta, placeName.isAcceptableOrUnknown(data['place_name']!, _placeNameMeta));
+      context.handle(
+        _placeNameMeta,
+        placeName.isAcceptableOrUnknown(data['place_name']!, _placeNameMeta),
+      );
     }
     if (data.containsKey('place_region')) {
-      context.handle(_placeRegionMeta, placeRegion.isAcceptableOrUnknown(data['place_region']!, _placeRegionMeta));
+      context.handle(
+        _placeRegionMeta,
+        placeRegion.isAcceptableOrUnknown(
+          data['place_region']!,
+          _placeRegionMeta,
+        ),
+      );
     }
     if (data.containsKey('cached_json')) {
-      context.handle(_cachedJsonMeta, cachedJson.isAcceptableOrUnknown(data['cached_json']!, _cachedJsonMeta));
+      context.handle(
+        _cachedJsonMeta,
+        cachedJson.isAcceptableOrUnknown(data['cached_json']!, _cachedJsonMeta),
+      );
     }
     if (data.containsKey('cached_latitude')) {
       context.handle(
         _cachedLatitudeMeta,
-        cachedLatitude.isAcceptableOrUnknown(data['cached_latitude']!, _cachedLatitudeMeta),
+        cachedLatitude.isAcceptableOrUnknown(
+          data['cached_latitude']!,
+          _cachedLatitudeMeta,
+        ),
       );
     }
     if (data.containsKey('cached_longitude')) {
       context.handle(
         _cachedLongitudeMeta,
-        cachedLongitude.isAcceptableOrUnknown(data['cached_longitude']!, _cachedLongitudeMeta),
+        cachedLongitude.isAcceptableOrUnknown(
+          data['cached_longitude']!,
+          _cachedLongitudeMeta,
+        ),
       );
     }
     if (data.containsKey('cached_place_name')) {
       context.handle(
         _cachedPlaceNameMeta,
-        cachedPlaceName.isAcceptableOrUnknown(data['cached_place_name']!, _cachedPlaceNameMeta),
+        cachedPlaceName.isAcceptableOrUnknown(
+          data['cached_place_name']!,
+          _cachedPlaceNameMeta,
+        ),
       );
     }
     if (data.containsKey('cached_at')) {
-      context.handle(_cachedAtMeta, cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
     }
     return context;
   }
@@ -2466,13 +3033,34 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
   WeatherSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return WeatherSettingsRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      placeLatitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}place_latitude']),
-      placeLongitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}place_longitude']),
-      placeName: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}place_name']),
-      placeRegion: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}place_region']),
-      cachedJson: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}cached_json']),
-      cachedLatitude: attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}cached_latitude']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      placeLatitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}place_latitude'],
+      ),
+      placeLongitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}place_longitude'],
+      ),
+      placeName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_name'],
+      ),
+      placeRegion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_region'],
+      ),
+      cachedJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cached_json'],
+      ),
+      cachedLatitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cached_latitude'],
+      ),
       cachedLongitude: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}cached_longitude'],
@@ -2481,7 +3069,10 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
         DriftSqlType.string,
         data['${effectivePrefix}cached_place_name'],
       ),
-      cachedAt: attachedDatabase.typeMapping.read(DriftSqlType.dateTime, data['${effectivePrefix}cached_at']),
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      ),
     );
   }
 
@@ -2491,7 +3082,8 @@ class $WeatherSettingsTableTable extends WeatherSettingsTable
   }
 }
 
-class WeatherSettingsRow extends DataClass implements Insertable<WeatherSettingsRow> {
+class WeatherSettingsRow extends DataClass
+    implements Insertable<WeatherSettingsRow> {
   final int id;
 
   /// A chosen place; all `null` = where the hub is.
@@ -2555,19 +3147,40 @@ class WeatherSettingsRow extends DataClass implements Insertable<WeatherSettings
   WeatherSettingsTableCompanion toCompanion(bool nullToAbsent) {
     return WeatherSettingsTableCompanion(
       id: Value(id),
-      placeLatitude: placeLatitude == null && nullToAbsent ? const Value.absent() : Value(placeLatitude),
-      placeLongitude: placeLongitude == null && nullToAbsent ? const Value.absent() : Value(placeLongitude),
-      placeName: placeName == null && nullToAbsent ? const Value.absent() : Value(placeName),
-      placeRegion: placeRegion == null && nullToAbsent ? const Value.absent() : Value(placeRegion),
-      cachedJson: cachedJson == null && nullToAbsent ? const Value.absent() : Value(cachedJson),
-      cachedLatitude: cachedLatitude == null && nullToAbsent ? const Value.absent() : Value(cachedLatitude),
-      cachedLongitude: cachedLongitude == null && nullToAbsent ? const Value.absent() : Value(cachedLongitude),
-      cachedPlaceName: cachedPlaceName == null && nullToAbsent ? const Value.absent() : Value(cachedPlaceName),
-      cachedAt: cachedAt == null && nullToAbsent ? const Value.absent() : Value(cachedAt),
+      placeLatitude: placeLatitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeLatitude),
+      placeLongitude: placeLongitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeLongitude),
+      placeName: placeName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeName),
+      placeRegion: placeRegion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(placeRegion),
+      cachedJson: cachedJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cachedJson),
+      cachedLatitude: cachedLatitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cachedLatitude),
+      cachedLongitude: cachedLongitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cachedLongitude),
+      cachedPlaceName: cachedPlaceName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cachedPlaceName),
+      cachedAt: cachedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cachedAt),
     );
   }
 
-  factory WeatherSettingsRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory WeatherSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return WeatherSettingsRow(
       id: serializer.fromJson<int>(json['id']),
@@ -2612,27 +3225,51 @@ class WeatherSettingsRow extends DataClass implements Insertable<WeatherSettings
     Value<DateTime?> cachedAt = const Value.absent(),
   }) => WeatherSettingsRow(
     id: id ?? this.id,
-    placeLatitude: placeLatitude.present ? placeLatitude.value : this.placeLatitude,
-    placeLongitude: placeLongitude.present ? placeLongitude.value : this.placeLongitude,
+    placeLatitude: placeLatitude.present
+        ? placeLatitude.value
+        : this.placeLatitude,
+    placeLongitude: placeLongitude.present
+        ? placeLongitude.value
+        : this.placeLongitude,
     placeName: placeName.present ? placeName.value : this.placeName,
     placeRegion: placeRegion.present ? placeRegion.value : this.placeRegion,
     cachedJson: cachedJson.present ? cachedJson.value : this.cachedJson,
-    cachedLatitude: cachedLatitude.present ? cachedLatitude.value : this.cachedLatitude,
-    cachedLongitude: cachedLongitude.present ? cachedLongitude.value : this.cachedLongitude,
-    cachedPlaceName: cachedPlaceName.present ? cachedPlaceName.value : this.cachedPlaceName,
+    cachedLatitude: cachedLatitude.present
+        ? cachedLatitude.value
+        : this.cachedLatitude,
+    cachedLongitude: cachedLongitude.present
+        ? cachedLongitude.value
+        : this.cachedLongitude,
+    cachedPlaceName: cachedPlaceName.present
+        ? cachedPlaceName.value
+        : this.cachedPlaceName,
     cachedAt: cachedAt.present ? cachedAt.value : this.cachedAt,
   );
   WeatherSettingsRow copyWithCompanion(WeatherSettingsTableCompanion data) {
     return WeatherSettingsRow(
       id: data.id.present ? data.id.value : this.id,
-      placeLatitude: data.placeLatitude.present ? data.placeLatitude.value : this.placeLatitude,
-      placeLongitude: data.placeLongitude.present ? data.placeLongitude.value : this.placeLongitude,
+      placeLatitude: data.placeLatitude.present
+          ? data.placeLatitude.value
+          : this.placeLatitude,
+      placeLongitude: data.placeLongitude.present
+          ? data.placeLongitude.value
+          : this.placeLongitude,
       placeName: data.placeName.present ? data.placeName.value : this.placeName,
-      placeRegion: data.placeRegion.present ? data.placeRegion.value : this.placeRegion,
-      cachedJson: data.cachedJson.present ? data.cachedJson.value : this.cachedJson,
-      cachedLatitude: data.cachedLatitude.present ? data.cachedLatitude.value : this.cachedLatitude,
-      cachedLongitude: data.cachedLongitude.present ? data.cachedLongitude.value : this.cachedLongitude,
-      cachedPlaceName: data.cachedPlaceName.present ? data.cachedPlaceName.value : this.cachedPlaceName,
+      placeRegion: data.placeRegion.present
+          ? data.placeRegion.value
+          : this.placeRegion,
+      cachedJson: data.cachedJson.present
+          ? data.cachedJson.value
+          : this.cachedJson,
+      cachedLatitude: data.cachedLatitude.present
+          ? data.cachedLatitude.value
+          : this.cachedLatitude,
+      cachedLongitude: data.cachedLongitude.present
+          ? data.cachedLongitude.value
+          : this.cachedLongitude,
+      cachedPlaceName: data.cachedPlaceName.present
+          ? data.cachedPlaceName.value
+          : this.cachedPlaceName,
       cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
     );
   }
@@ -2683,7 +3320,8 @@ class WeatherSettingsRow extends DataClass implements Insertable<WeatherSettings
           other.cachedAt == this.cachedAt);
 }
 
-class WeatherSettingsTableCompanion extends UpdateCompanion<WeatherSettingsRow> {
+class WeatherSettingsTableCompanion
+    extends UpdateCompanion<WeatherSettingsRow> {
   final Value<int> id;
   final Value<double?> placeLatitude;
   final Value<double?> placeLongitude;
@@ -2857,7 +3495,9 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _positionMeta = const VerificationMeta('position');
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
   @override
   late final GeneratedColumn<int> position = GeneratedColumn<int>(
     'position',
@@ -2866,7 +3506,9 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _selectionMeta = const VerificationMeta('selection');
+  static const VerificationMeta _selectionMeta = const VerificationMeta(
+    'selection',
+  );
   @override
   late final GeneratedColumn<String> selection = GeneratedColumn<String>(
     'selection',
@@ -2883,17 +3525,53 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
     true,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("card" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("card" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _gridColumnMeta = const VerificationMeta(
+    'gridColumn',
   );
   @override
-  List<GeneratedColumn> get $columns => [id, kind, size, position, selection, card];
+  late final GeneratedColumn<int> gridColumn = GeneratedColumn<int>(
+    'grid_column',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gridRowMeta = const VerificationMeta(
+    'gridRow',
+  );
+  @override
+  late final GeneratedColumn<int> gridRow = GeneratedColumn<int>(
+    'grid_row',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    kind,
+    size,
+    position,
+    selection,
+    card,
+    gridColumn,
+    gridRow,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'dashboard_widgets';
   @override
-  VerificationContext validateIntegrity(Insertable<DashboardWidgetRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<DashboardWidgetRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -2902,25 +3580,52 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
       context.missing(_idMeta);
     }
     if (data.containsKey('kind')) {
-      context.handle(_kindMeta, kind.isAcceptableOrUnknown(data['kind']!, _kindMeta));
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
     } else if (isInserting) {
       context.missing(_kindMeta);
     }
     if (data.containsKey('size')) {
-      context.handle(_sizeMeta, size.isAcceptableOrUnknown(data['size']!, _sizeMeta));
+      context.handle(
+        _sizeMeta,
+        size.isAcceptableOrUnknown(data['size']!, _sizeMeta),
+      );
     } else if (isInserting) {
       context.missing(_sizeMeta);
     }
     if (data.containsKey('position')) {
-      context.handle(_positionMeta, position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
     } else if (isInserting) {
       context.missing(_positionMeta);
     }
     if (data.containsKey('selection')) {
-      context.handle(_selectionMeta, selection.isAcceptableOrUnknown(data['selection']!, _selectionMeta));
+      context.handle(
+        _selectionMeta,
+        selection.isAcceptableOrUnknown(data['selection']!, _selectionMeta),
+      );
     }
     if (data.containsKey('card')) {
-      context.handle(_cardMeta, card.isAcceptableOrUnknown(data['card']!, _cardMeta));
+      context.handle(
+        _cardMeta,
+        card.isAcceptableOrUnknown(data['card']!, _cardMeta),
+      );
+    }
+    if (data.containsKey('grid_column')) {
+      context.handle(
+        _gridColumnMeta,
+        gridColumn.isAcceptableOrUnknown(data['grid_column']!, _gridColumnMeta),
+      );
+    }
+    if (data.containsKey('grid_row')) {
+      context.handle(
+        _gridRowMeta,
+        gridRow.isAcceptableOrUnknown(data['grid_row']!, _gridRowMeta),
+      );
     }
     return context;
   }
@@ -2931,12 +3636,38 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
   DashboardWidgetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DashboardWidgetRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      kind: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
-      size: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}size'])!,
-      position: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}position'])!,
-      selection: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}selection']),
-      card: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}card']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      size: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}size'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      selection: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selection'],
+      ),
+      card: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}card'],
+      ),
+      gridColumn: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}grid_column'],
+      ),
+      gridRow: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}grid_row'],
+      ),
     );
   }
 
@@ -2946,7 +3677,8 @@ class $DashboardWidgetsTableTable extends DashboardWidgetsTable
   }
 }
 
-class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidgetRow> {
+class DashboardWidgetRow extends DataClass
+    implements Insertable<DashboardWidgetRow> {
   final String id;
 
   /// `DashboardWidgetKind` name.
@@ -2961,6 +3693,10 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
 
   /// `DashboardWidget.card`; `null` when the kind decides.
   final bool? card;
+
+  /// `DashboardWidget.cell`; `null` (arranged before widgets kept their place): the first free spot.
+  final int? gridColumn;
+  final int? gridRow;
   const DashboardWidgetRow({
     required this.id,
     required this.kind,
@@ -2968,6 +3704,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     required this.position,
     this.selection,
     this.card,
+    this.gridColumn,
+    this.gridRow,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2982,6 +3720,12 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     if (!nullToAbsent || card != null) {
       map['card'] = Variable<bool>(card);
     }
+    if (!nullToAbsent || gridColumn != null) {
+      map['grid_column'] = Variable<int>(gridColumn);
+    }
+    if (!nullToAbsent || gridRow != null) {
+      map['grid_row'] = Variable<int>(gridRow);
+    }
     return map;
   }
 
@@ -2991,12 +3735,23 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       kind: Value(kind),
       size: Value(size),
       position: Value(position),
-      selection: selection == null && nullToAbsent ? const Value.absent() : Value(selection),
+      selection: selection == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selection),
       card: card == null && nullToAbsent ? const Value.absent() : Value(card),
+      gridColumn: gridColumn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gridColumn),
+      gridRow: gridRow == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gridRow),
     );
   }
 
-  factory DashboardWidgetRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory DashboardWidgetRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DashboardWidgetRow(
       id: serializer.fromJson<String>(json['id']),
@@ -3005,6 +3760,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       position: serializer.fromJson<int>(json['position']),
       selection: serializer.fromJson<String?>(json['selection']),
       card: serializer.fromJson<bool?>(json['card']),
+      gridColumn: serializer.fromJson<int?>(json['gridColumn']),
+      gridRow: serializer.fromJson<int?>(json['gridRow']),
     );
   }
   @override
@@ -3017,6 +3774,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       'position': serializer.toJson<int>(position),
       'selection': serializer.toJson<String?>(selection),
       'card': serializer.toJson<bool?>(card),
+      'gridColumn': serializer.toJson<int?>(gridColumn),
+      'gridRow': serializer.toJson<int?>(gridRow),
     };
   }
 
@@ -3027,6 +3786,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     int? position,
     Value<String?> selection = const Value.absent(),
     Value<bool?> card = const Value.absent(),
+    Value<int?> gridColumn = const Value.absent(),
+    Value<int?> gridRow = const Value.absent(),
   }) => DashboardWidgetRow(
     id: id ?? this.id,
     kind: kind ?? this.kind,
@@ -3034,6 +3795,8 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
     position: position ?? this.position,
     selection: selection.present ? selection.value : this.selection,
     card: card.present ? card.value : this.card,
+    gridColumn: gridColumn.present ? gridColumn.value : this.gridColumn,
+    gridRow: gridRow.present ? gridRow.value : this.gridRow,
   );
   DashboardWidgetRow copyWithCompanion(DashboardWidgetsTableCompanion data) {
     return DashboardWidgetRow(
@@ -3043,6 +3806,10 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
       position: data.position.present ? data.position.value : this.position,
       selection: data.selection.present ? data.selection.value : this.selection,
       card: data.card.present ? data.card.value : this.card,
+      gridColumn: data.gridColumn.present
+          ? data.gridColumn.value
+          : this.gridColumn,
+      gridRow: data.gridRow.present ? data.gridRow.value : this.gridRow,
     );
   }
 
@@ -3054,13 +3821,24 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
           ..write('size: $size, ')
           ..write('position: $position, ')
           ..write('selection: $selection, ')
-          ..write('card: $card')
+          ..write('card: $card, ')
+          ..write('gridColumn: $gridColumn, ')
+          ..write('gridRow: $gridRow')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, kind, size, position, selection, card);
+  int get hashCode => Object.hash(
+    id,
+    kind,
+    size,
+    position,
+    selection,
+    card,
+    gridColumn,
+    gridRow,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3070,16 +3848,21 @@ class DashboardWidgetRow extends DataClass implements Insertable<DashboardWidget
           other.size == this.size &&
           other.position == this.position &&
           other.selection == this.selection &&
-          other.card == this.card);
+          other.card == this.card &&
+          other.gridColumn == this.gridColumn &&
+          other.gridRow == this.gridRow);
 }
 
-class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow> {
+class DashboardWidgetsTableCompanion
+    extends UpdateCompanion<DashboardWidgetRow> {
   final Value<String> id;
   final Value<String> kind;
   final Value<String> size;
   final Value<int> position;
   final Value<String?> selection;
   final Value<bool?> card;
+  final Value<int?> gridColumn;
+  final Value<int?> gridRow;
   final Value<int> rowid;
   const DashboardWidgetsTableCompanion({
     this.id = const Value.absent(),
@@ -3088,6 +3871,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     this.position = const Value.absent(),
     this.selection = const Value.absent(),
     this.card = const Value.absent(),
+    this.gridColumn = const Value.absent(),
+    this.gridRow = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DashboardWidgetsTableCompanion.insert({
@@ -3097,6 +3882,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     required int position,
     this.selection = const Value.absent(),
     this.card = const Value.absent(),
+    this.gridColumn = const Value.absent(),
+    this.gridRow = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        kind = Value(kind),
@@ -3109,6 +3896,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     Expression<int>? position,
     Expression<String>? selection,
     Expression<bool>? card,
+    Expression<int>? gridColumn,
+    Expression<int>? gridRow,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3118,6 +3907,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
       if (position != null) 'position': position,
       if (selection != null) 'selection': selection,
       if (card != null) 'card': card,
+      if (gridColumn != null) 'grid_column': gridColumn,
+      if (gridRow != null) 'grid_row': gridRow,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3129,6 +3920,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     Value<int>? position,
     Value<String?>? selection,
     Value<bool?>? card,
+    Value<int?>? gridColumn,
+    Value<int?>? gridRow,
     Value<int>? rowid,
   }) {
     return DashboardWidgetsTableCompanion(
@@ -3138,6 +3931,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
       position: position ?? this.position,
       selection: selection ?? this.selection,
       card: card ?? this.card,
+      gridColumn: gridColumn ?? this.gridColumn,
+      gridRow: gridRow ?? this.gridRow,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3163,6 +3958,12 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
     if (card.present) {
       map['card'] = Variable<bool>(card.value);
     }
+    if (gridColumn.present) {
+      map['grid_column'] = Variable<int>(gridColumn.value);
+    }
+    if (gridRow.present) {
+      map['grid_row'] = Variable<int>(gridRow.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3178,6 +3979,8 @@ class DashboardWidgetsTableCompanion extends UpdateCompanion<DashboardWidgetRow>
           ..write('position: $position, ')
           ..write('selection: $selection, ')
           ..write('card: $card, ')
+          ..write('gridColumn: $gridColumn, ')
+          ..write('gridRow: $gridRow, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3199,7 +4002,9 @@ class $DashboardStateTableTable extends DashboardStateTable
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _arrangedMeta = const VerificationMeta('arranged');
+  static const VerificationMeta _arrangedMeta = const VerificationMeta(
+    'arranged',
+  );
   @override
   late final GeneratedColumn<bool> arranged = GeneratedColumn<bool>(
     'arranged',
@@ -3207,7 +4012,9 @@ class $DashboardStateTableTable extends DashboardStateTable
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("arranged" IN (0, 1))'),
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("arranged" IN (0, 1))',
+    ),
     defaultValue: const Constant(false),
   );
   @override
@@ -3218,14 +4025,20 @@ class $DashboardStateTableTable extends DashboardStateTable
   String get actualTableName => $name;
   static const String $name = 'dashboard_state';
   @override
-  VerificationContext validateIntegrity(Insertable<DashboardStateRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<DashboardStateRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('arranged')) {
-      context.handle(_arrangedMeta, arranged.isAcceptableOrUnknown(data['arranged']!, _arrangedMeta));
+      context.handle(
+        _arrangedMeta,
+        arranged.isAcceptableOrUnknown(data['arranged']!, _arrangedMeta),
+      );
     }
     return context;
   }
@@ -3236,8 +4049,14 @@ class $DashboardStateTableTable extends DashboardStateTable
   DashboardStateRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DashboardStateRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      arranged: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}arranged'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      arranged: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}arranged'],
+      )!,
     );
   }
 
@@ -3247,7 +4066,8 @@ class $DashboardStateTableTable extends DashboardStateTable
   }
 }
 
-class DashboardStateRow extends DataClass implements Insertable<DashboardStateRow> {
+class DashboardStateRow extends DataClass
+    implements Insertable<DashboardStateRow> {
   final int id;
   final bool arranged;
   const DashboardStateRow({required this.id, required this.arranged});
@@ -3260,10 +4080,16 @@ class DashboardStateRow extends DataClass implements Insertable<DashboardStateRo
   }
 
   DashboardStateTableCompanion toCompanion(bool nullToAbsent) {
-    return DashboardStateTableCompanion(id: Value(id), arranged: Value(arranged));
+    return DashboardStateTableCompanion(
+      id: Value(id),
+      arranged: Value(arranged),
+    );
   }
 
-  factory DashboardStateRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory DashboardStateRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DashboardStateRow(
       id: serializer.fromJson<int>(json['id']),
@@ -3273,7 +4099,10 @@ class DashboardStateRow extends DataClass implements Insertable<DashboardStateRo
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'id': serializer.toJson<int>(id), 'arranged': serializer.toJson<bool>(arranged)};
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'arranged': serializer.toJson<bool>(arranged),
+    };
   }
 
   DashboardStateRow copyWith({int? id, bool? arranged}) =>
@@ -3298,20 +4127,41 @@ class DashboardStateRow extends DataClass implements Insertable<DashboardStateRo
   int get hashCode => Object.hash(id, arranged);
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is DashboardStateRow && other.id == this.id && other.arranged == this.arranged);
+      identical(this, other) ||
+      (other is DashboardStateRow &&
+          other.id == this.id &&
+          other.arranged == this.arranged);
 }
 
 class DashboardStateTableCompanion extends UpdateCompanion<DashboardStateRow> {
   final Value<int> id;
   final Value<bool> arranged;
-  const DashboardStateTableCompanion({this.id = const Value.absent(), this.arranged = const Value.absent()});
-  DashboardStateTableCompanion.insert({this.id = const Value.absent(), this.arranged = const Value.absent()});
-  static Insertable<DashboardStateRow> custom({Expression<int>? id, Expression<bool>? arranged}) {
-    return RawValuesInsertable({if (id != null) 'id': id, if (arranged != null) 'arranged': arranged});
+  const DashboardStateTableCompanion({
+    this.id = const Value.absent(),
+    this.arranged = const Value.absent(),
+  });
+  DashboardStateTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.arranged = const Value.absent(),
+  });
+  static Insertable<DashboardStateRow> custom({
+    Expression<int>? id,
+    Expression<bool>? arranged,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (arranged != null) 'arranged': arranged,
+    });
   }
 
-  DashboardStateTableCompanion copyWith({Value<int>? id, Value<bool>? arranged}) {
-    return DashboardStateTableCompanion(id: id ?? this.id, arranged: arranged ?? this.arranged);
+  DashboardStateTableCompanion copyWith({
+    Value<int>? id,
+    Value<bool>? arranged,
+  }) {
+    return DashboardStateTableCompanion(
+      id: id ?? this.id,
+      arranged: arranged ?? this.arranged,
+    );
   }
 
   @override
@@ -3336,7 +4186,8 @@ class DashboardStateTableCompanion extends UpdateCompanion<DashboardStateRow> {
   }
 }
 
-class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTableTable, RoomSceneRow> {
+class $RoomScenesTableTable extends RoomScenesTable
+    with TableInfo<$RoomScenesTableTable, RoomSceneRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3368,7 +4219,9 @@ class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTa
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _positionMeta = const VerificationMeta('position');
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
   @override
   late final GeneratedColumn<int> position = GeneratedColumn<int>(
     'position',
@@ -3377,7 +4230,9 @@ class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTa
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _brightnessPercentMeta = const VerificationMeta('brightnessPercent');
+  static const VerificationMeta _brightnessPercentMeta = const VerificationMeta(
+    'brightnessPercent',
+  );
   @override
   late final GeneratedColumn<int> brightnessPercent = GeneratedColumn<int>(
     'brightness_percent',
@@ -3414,14 +4269,26 @@ class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTa
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, roomId, name, position, brightnessPercent, color, kelvin, lights];
+  List<GeneratedColumn> get $columns => [
+    id,
+    roomId,
+    name,
+    position,
+    brightnessPercent,
+    color,
+    kelvin,
+    lights,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'room_scenes';
   @override
-  VerificationContext validateIntegrity(Insertable<RoomSceneRow> instance, {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<RoomSceneRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -3430,40 +4297,61 @@ class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTa
       context.missing(_idMeta);
     }
     if (data.containsKey('room_id')) {
-      context.handle(_roomIdMeta, roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta));
+      context.handle(
+        _roomIdMeta,
+        roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_roomIdMeta);
     }
     if (data.containsKey('name')) {
-      context.handle(_nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('position')) {
-      context.handle(_positionMeta, position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
     } else if (isInserting) {
       context.missing(_positionMeta);
     }
     if (data.containsKey('brightness_percent')) {
       context.handle(
         _brightnessPercentMeta,
-        brightnessPercent.isAcceptableOrUnknown(data['brightness_percent']!, _brightnessPercentMeta),
+        brightnessPercent.isAcceptableOrUnknown(
+          data['brightness_percent']!,
+          _brightnessPercentMeta,
+        ),
       );
     } else if (isInserting) {
       context.missing(_brightnessPercentMeta);
     }
     if (data.containsKey('color')) {
-      context.handle(_colorMeta, color.isAcceptableOrUnknown(data['color']!, _colorMeta));
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
     } else if (isInserting) {
       context.missing(_colorMeta);
     }
     if (data.containsKey('kelvin')) {
-      context.handle(_kelvinMeta, kelvin.isAcceptableOrUnknown(data['kelvin']!, _kelvinMeta));
+      context.handle(
+        _kelvinMeta,
+        kelvin.isAcceptableOrUnknown(data['kelvin']!, _kelvinMeta),
+      );
     } else if (isInserting) {
       context.missing(_kelvinMeta);
     }
     if (data.containsKey('lights')) {
-      context.handle(_lightsMeta, lights.isAcceptableOrUnknown(data['lights']!, _lightsMeta));
+      context.handle(
+        _lightsMeta,
+        lights.isAcceptableOrUnknown(data['lights']!, _lightsMeta),
+      );
     } else if (isInserting) {
       context.missing(_lightsMeta);
     }
@@ -3476,17 +4364,38 @@ class $RoomScenesTableTable extends RoomScenesTable with TableInfo<$RoomScenesTa
   RoomSceneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return RoomSceneRow(
-      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      roomId: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}room_id'])!,
-      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      position: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      roomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}room_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
       brightnessPercent: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}brightness_percent'],
       )!,
-      color: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}color'])!,
-      kelvin: attachedDatabase.typeMapping.read(DriftSqlType.int, data['${effectivePrefix}kelvin'])!,
-      lights: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}lights'])!,
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}color'],
+      )!,
+      kelvin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}kelvin'],
+      )!,
+      lights: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lights'],
+      )!,
     );
   }
 
@@ -3546,7 +4455,10 @@ class RoomSceneRow extends DataClass implements Insertable<RoomSceneRow> {
     );
   }
 
-  factory RoomSceneRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+  factory RoomSceneRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return RoomSceneRow(
       id: serializer.fromJson<String>(json['id']),
@@ -3599,7 +4511,9 @@ class RoomSceneRow extends DataClass implements Insertable<RoomSceneRow> {
       roomId: data.roomId.present ? data.roomId.value : this.roomId,
       name: data.name.present ? data.name.value : this.name,
       position: data.position.present ? data.position.value : this.position,
-      brightnessPercent: data.brightnessPercent.present ? data.brightnessPercent.value : this.brightnessPercent,
+      brightnessPercent: data.brightnessPercent.present
+          ? data.brightnessPercent.value
+          : this.brightnessPercent,
       color: data.color.present ? data.color.value : this.color,
       kelvin: data.kelvin.present ? data.kelvin.value : this.kelvin,
       lights: data.lights.present ? data.lights.value : this.lights,
@@ -3622,7 +4536,16 @@ class RoomSceneRow extends DataClass implements Insertable<RoomSceneRow> {
   }
 
   @override
-  int get hashCode => Object.hash(id, roomId, name, position, brightnessPercent, color, kelvin, lights);
+  int get hashCode => Object.hash(
+    id,
+    roomId,
+    name,
+    position,
+    brightnessPercent,
+    color,
+    kelvin,
+    lights,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3774,21 +4697,455 @@ class RoomScenesTableCompanion extends UpdateCompanion<RoomSceneRow> {
   }
 }
 
+class $FocusPointsTableTable extends FocusPointsTable
+    with TableInfo<$FocusPointsTableTable, FocusPointRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FocusPointsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dueDateMeta = const VerificationMeta(
+    'dueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dueDate = GeneratedColumn<DateTime>(
+    'due_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _achievedAtMeta = const VerificationMeta(
+    'achievedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> achievedAt = GeneratedColumn<DateTime>(
+    'achieved_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    dueDate,
+    position,
+    createdAt,
+    achievedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'focus_points';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FocusPointRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('due_date')) {
+      context.handle(
+        _dueDateMeta,
+        dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueDateMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('achieved_at')) {
+      context.handle(
+        _achievedAtMeta,
+        achievedAt.isAcceptableOrUnknown(data['achieved_at']!, _achievedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FocusPointRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FocusPointRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      dueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}due_date'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      achievedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}achieved_at'],
+      ),
+    );
+  }
+
+  @override
+  $FocusPointsTableTable createAlias(String alias) {
+    return $FocusPointsTableTable(attachedDatabase, alias);
+  }
+}
+
+class FocusPointRow extends DataClass implements Insertable<FocusPointRow> {
+  final String id;
+  final String title;
+
+  /// The day it has to be done, local midnight.
+  final DateTime dueDate;
+
+  /// Order in the widget, smallest first.
+  final int position;
+  final DateTime createdAt;
+
+  /// Done; the point moves out of the active three.
+  final DateTime? achievedAt;
+  const FocusPointRow({
+    required this.id,
+    required this.title,
+    required this.dueDate,
+    required this.position,
+    required this.createdAt,
+    this.achievedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['due_date'] = Variable<DateTime>(dueDate);
+    map['position'] = Variable<int>(position);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || achievedAt != null) {
+      map['achieved_at'] = Variable<DateTime>(achievedAt);
+    }
+    return map;
+  }
+
+  FocusPointsTableCompanion toCompanion(bool nullToAbsent) {
+    return FocusPointsTableCompanion(
+      id: Value(id),
+      title: Value(title),
+      dueDate: Value(dueDate),
+      position: Value(position),
+      createdAt: Value(createdAt),
+      achievedAt: achievedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(achievedAt),
+    );
+  }
+
+  factory FocusPointRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FocusPointRow(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      dueDate: serializer.fromJson<DateTime>(json['dueDate']),
+      position: serializer.fromJson<int>(json['position']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      achievedAt: serializer.fromJson<DateTime?>(json['achievedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'dueDate': serializer.toJson<DateTime>(dueDate),
+      'position': serializer.toJson<int>(position),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'achievedAt': serializer.toJson<DateTime?>(achievedAt),
+    };
+  }
+
+  FocusPointRow copyWith({
+    String? id,
+    String? title,
+    DateTime? dueDate,
+    int? position,
+    DateTime? createdAt,
+    Value<DateTime?> achievedAt = const Value.absent(),
+  }) => FocusPointRow(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    dueDate: dueDate ?? this.dueDate,
+    position: position ?? this.position,
+    createdAt: createdAt ?? this.createdAt,
+    achievedAt: achievedAt.present ? achievedAt.value : this.achievedAt,
+  );
+  FocusPointRow copyWithCompanion(FocusPointsTableCompanion data) {
+    return FocusPointRow(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
+      position: data.position.present ? data.position.value : this.position,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      achievedAt: data.achievedAt.present
+          ? data.achievedAt.value
+          : this.achievedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusPointRow(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('achievedAt: $achievedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, title, dueDate, position, createdAt, achievedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FocusPointRow &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.dueDate == this.dueDate &&
+          other.position == this.position &&
+          other.createdAt == this.createdAt &&
+          other.achievedAt == this.achievedAt);
+}
+
+class FocusPointsTableCompanion extends UpdateCompanion<FocusPointRow> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<DateTime> dueDate;
+  final Value<int> position;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> achievedAt;
+  final Value<int> rowid;
+  const FocusPointsTableCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.dueDate = const Value.absent(),
+    this.position = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.achievedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FocusPointsTableCompanion.insert({
+    required String id,
+    required String title,
+    required DateTime dueDate,
+    required int position,
+    required DateTime createdAt,
+    this.achievedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       dueDate = Value(dueDate),
+       position = Value(position),
+       createdAt = Value(createdAt);
+  static Insertable<FocusPointRow> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<DateTime>? dueDate,
+    Expression<int>? position,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? achievedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (dueDate != null) 'due_date': dueDate,
+      if (position != null) 'position': position,
+      if (createdAt != null) 'created_at': createdAt,
+      if (achievedAt != null) 'achieved_at': achievedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FocusPointsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<DateTime>? dueDate,
+    Value<int>? position,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? achievedAt,
+    Value<int>? rowid,
+  }) {
+    return FocusPointsTableCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      dueDate: dueDate ?? this.dueDate,
+      position: position ?? this.position,
+      createdAt: createdAt ?? this.createdAt,
+      achievedAt: achievedAt ?? this.achievedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (dueDate.present) {
+      map['due_date'] = Variable<DateTime>(dueDate.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (achievedAt.present) {
+      map['achieved_at'] = Variable<DateTime>(achievedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusPointsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('achievedAt: $achievedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $FloorPlansTableTable floorPlansTable = $FloorPlansTableTable(this);
-  late final $PlacementsTableTable placementsTable = $PlacementsTableTable(this);
+  late final $FloorPlansTableTable floorPlansTable = $FloorPlansTableTable(
+    this,
+  );
+  late final $PlacementsTableTable placementsTable = $PlacementsTableTable(
+    this,
+  );
   late final $PlantsTableTable plantsTable = $PlantsTableTable(this);
-  late final $SpeakerSettingsTableTable speakerSettingsTable = $SpeakerSettingsTableTable(this);
-  late final $ZenSettingsTableTable zenSettingsTable = $ZenSettingsTableTable(this);
-  late final $PlantProfilesTableTable plantProfilesTable = $PlantProfilesTableTable(this);
-  late final $WeatherSettingsTableTable weatherSettingsTable = $WeatherSettingsTableTable(this);
-  late final $DashboardWidgetsTableTable dashboardWidgetsTable = $DashboardWidgetsTableTable(this);
-  late final $DashboardStateTableTable dashboardStateTable = $DashboardStateTableTable(this);
-  late final $RoomScenesTableTable roomScenesTable = $RoomScenesTableTable(this);
+  late final $SpeakerSettingsTableTable speakerSettingsTable =
+      $SpeakerSettingsTableTable(this);
+  late final $ZenSettingsTableTable zenSettingsTable = $ZenSettingsTableTable(
+    this,
+  );
+  late final $PlantProfilesTableTable plantProfilesTable =
+      $PlantProfilesTableTable(this);
+  late final $WeatherSettingsTableTable weatherSettingsTable =
+      $WeatherSettingsTableTable(this);
+  late final $DashboardWidgetsTableTable dashboardWidgetsTable =
+      $DashboardWidgetsTableTable(this);
+  late final $DashboardStateTableTable dashboardStateTable =
+      $DashboardStateTableTable(this);
+  late final $RoomScenesTableTable roomScenesTable = $RoomScenesTableTable(
+    this,
+  );
+  late final $FocusPointsTableTable focusPointsTable = $FocusPointsTableTable(
+    this,
+  );
   @override
-  Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     floorPlansTable,
@@ -3801,21 +5158,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dashboardWidgetsTable,
     dashboardStateTable,
     roomScenesTable,
+    focusPointsTable,
   ];
   @override
-  DriftDatabaseOptions get options => const DriftDatabaseOptions(storeDateTimeAsText: true);
+  DriftDatabaseOptions get options =>
+      const DriftDatabaseOptions(storeDateTimeAsText: true);
 }
 
-typedef $$FloorPlansTableTableCreateCompanionBuilder = FloorPlansTableCompanion Function({
-  Value<int> id,
-  required String json,
-});
-typedef $$FloorPlansTableTableUpdateCompanionBuilder = FloorPlansTableCompanion Function({
-  Value<int> id,
-  Value<String> json,
-});
+typedef $$FloorPlansTableTableCreateCompanionBuilder =
+    FloorPlansTableCompanion Function({Value<int> id, required String json});
+typedef $$FloorPlansTableTableUpdateCompanionBuilder =
+    FloorPlansTableCompanion Function({Value<int> id, Value<String> json});
 
-class $$FloorPlansTableTableFilterComposer extends Composer<_$AppDatabase, $FloorPlansTableTable> {
+class $$FloorPlansTableTableFilterComposer
+    extends Composer<_$AppDatabase, $FloorPlansTableTable> {
   $$FloorPlansTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3823,12 +5179,19 @@ class $$FloorPlansTableTableFilterComposer extends Composer<_$AppDatabase, $Floo
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get json => $composableBuilder(column: $table.json, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$FloorPlansTableTableOrderingComposer extends Composer<_$AppDatabase, $FloorPlansTableTable> {
+class $$FloorPlansTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $FloorPlansTableTable> {
   $$FloorPlansTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3836,13 +5199,19 @@ class $$FloorPlansTableTableOrderingComposer extends Composer<_$AppDatabase, $Fl
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get json =>
-      $composableBuilder(column: $table.json, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$FloorPlansTableTableAnnotationComposer extends Composer<_$AppDatabase, $FloorPlansTableTable> {
+class $$FloorPlansTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FloorPlansTableTable> {
   $$FloorPlansTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3850,9 +5219,11 @@ class $$FloorPlansTableTableAnnotationComposer extends Composer<_$AppDatabase, $
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get json => $composableBuilder(column: $table.json, builder: (column) => column);
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
 }
 
 class $$FloorPlansTableTableTableManager
@@ -3866,29 +5237,43 @@ class $$FloorPlansTableTableTableManager
           $$FloorPlansTableTableAnnotationComposer,
           $$FloorPlansTableTableCreateCompanionBuilder,
           $$FloorPlansTableTableUpdateCompanionBuilder,
-          (FloorPlanRow, BaseReferences<_$AppDatabase, $FloorPlansTableTable, FloorPlanRow>),
+          (
+            FloorPlanRow,
+            BaseReferences<_$AppDatabase, $FloorPlansTableTable, FloorPlanRow>,
+          ),
           FloorPlanRow,
           PrefetchHooks Function()
         > {
-  $$FloorPlansTableTableTableManager(_$AppDatabase db, $FloorPlansTableTable table)
-    : super(
+  $$FloorPlansTableTableTableManager(
+    _$AppDatabase db,
+    $FloorPlansTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$FloorPlansTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$FloorPlansTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$FloorPlansTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$FloorPlansTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FloorPlansTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FloorPlansTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> json = const Value.absent(),
           }) => FloorPlansTableCompanion(id: id, json: json),
-          createCompanionCallback: ({Value<int> id = const Value.absent(), required String json}) =>
-              FloorPlansTableCompanion.insert(id: id, json: json),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String json,
+          }) => FloorPlansTableCompanion.insert(id: id, json: json),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable<$FloorPlansTableTable, FloorPlanRow>(table),
-                  BaseReferences<_$AppDatabase, $FloorPlansTableTable, FloorPlanRow>(db, table, e),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $FloorPlansTableTable,
+                    FloorPlanRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -3907,26 +5292,32 @@ typedef $$FloorPlansTableTableProcessedTableManager =
       $$FloorPlansTableTableAnnotationComposer,
       $$FloorPlansTableTableCreateCompanionBuilder,
       $$FloorPlansTableTableUpdateCompanionBuilder,
-      (FloorPlanRow, BaseReferences<_$AppDatabase, $FloorPlansTableTable, FloorPlanRow>),
+      (
+        FloorPlanRow,
+        BaseReferences<_$AppDatabase, $FloorPlansTableTable, FloorPlanRow>,
+      ),
       FloorPlanRow,
       PrefetchHooks Function()
     >;
-typedef $$PlacementsTableTableCreateCompanionBuilder = PlacementsTableCompanion Function({
-  required String deviceId,
-  required DeviceKind kind,
-  required double x,
-  required double y,
-  Value<int> rowid,
-});
-typedef $$PlacementsTableTableUpdateCompanionBuilder = PlacementsTableCompanion Function({
-  Value<String> deviceId,
-  Value<DeviceKind> kind,
-  Value<double> x,
-  Value<double> y,
-  Value<int> rowid,
-});
+typedef $$PlacementsTableTableCreateCompanionBuilder =
+    PlacementsTableCompanion Function({
+      required String deviceId,
+      required DeviceKind kind,
+      required double x,
+      required double y,
+      Value<int> rowid,
+    });
+typedef $$PlacementsTableTableUpdateCompanionBuilder =
+    PlacementsTableCompanion Function({
+      Value<String> deviceId,
+      Value<DeviceKind> kind,
+      Value<double> x,
+      Value<double> y,
+      Value<int> rowid,
+    });
 
-class $$PlacementsTableTableFilterComposer extends Composer<_$AppDatabase, $PlacementsTableTable> {
+class $$PlacementsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PlacementsTableTable> {
   $$PlacementsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3934,18 +5325,30 @@ class $$PlacementsTableTableFilterComposer extends Composer<_$AppDatabase, $Plac
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get deviceId =>
-      $composableBuilder(column: $table.deviceId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnWithTypeConverterFilters<DeviceKind, DeviceKind, String> get kind =>
-      $composableBuilder(column: $table.kind, builder: (column) => ColumnWithTypeConverterFilters(column));
+      $composableBuilder(
+        column: $table.kind,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
-  ColumnFilters<double> get x => $composableBuilder(column: $table.x, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get x => $composableBuilder(
+    column: $table.x,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<double> get y => $composableBuilder(column: $table.y, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$PlacementsTableTableOrderingComposer extends Composer<_$AppDatabase, $PlacementsTableTable> {
+class $$PlacementsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlacementsTableTable> {
   $$PlacementsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3953,18 +5356,29 @@ class $$PlacementsTableTableOrderingComposer extends Composer<_$AppDatabase, $Pl
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get deviceId =>
-      $composableBuilder(column: $table.deviceId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get kind =>
-      $composableBuilder(column: $table.kind, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get x => $composableBuilder(column: $table.x, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get x => $composableBuilder(
+    column: $table.x,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get y => $composableBuilder(column: $table.y, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$PlacementsTableTableAnnotationComposer extends Composer<_$AppDatabase, $PlacementsTableTable> {
+class $$PlacementsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlacementsTableTable> {
   $$PlacementsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3972,14 +5386,17 @@ class $$PlacementsTableTableAnnotationComposer extends Composer<_$AppDatabase, $
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get deviceId => $composableBuilder(column: $table.deviceId, builder: (column) => column);
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<DeviceKind, String> get kind =>
       $composableBuilder(column: $table.kind, builder: (column) => column);
 
-  GeneratedColumn<double> get x => $composableBuilder(column: $table.x, builder: (column) => column);
+  GeneratedColumn<double> get x =>
+      $composableBuilder(column: $table.x, builder: (column) => column);
 
-  GeneratedColumn<double> get y => $composableBuilder(column: $table.y, builder: (column) => column);
+  GeneratedColumn<double> get y =>
+      $composableBuilder(column: $table.y, builder: (column) => column);
 }
 
 class $$PlacementsTableTableTableManager
@@ -3993,37 +5410,63 @@ class $$PlacementsTableTableTableManager
           $$PlacementsTableTableAnnotationComposer,
           $$PlacementsTableTableCreateCompanionBuilder,
           $$PlacementsTableTableUpdateCompanionBuilder,
-          (PlacementRow, BaseReferences<_$AppDatabase, $PlacementsTableTable, PlacementRow>),
+          (
+            PlacementRow,
+            BaseReferences<_$AppDatabase, $PlacementsTableTable, PlacementRow>,
+          ),
           PlacementRow,
           PrefetchHooks Function()
         > {
-  $$PlacementsTableTableTableManager(_$AppDatabase db, $PlacementsTableTable table)
-    : super(
+  $$PlacementsTableTableTableManager(
+    _$AppDatabase db,
+    $PlacementsTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$PlacementsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$PlacementsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$PlacementsTableTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> deviceId = const Value.absent(),
-            Value<DeviceKind> kind = const Value.absent(),
-            Value<double> x = const Value.absent(),
-            Value<double> y = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) => PlacementsTableCompanion(deviceId: deviceId, kind: kind, x: x, y: y, rowid: rowid),
-          createCompanionCallback: ({
-            required String deviceId,
-            required DeviceKind kind,
-            required double x,
-            required double y,
-            Value<int> rowid = const Value.absent(),
-          }) => PlacementsTableCompanion.insert(deviceId: deviceId, kind: kind, x: x, y: y, rowid: rowid),
+          createFilteringComposer: () =>
+              $$PlacementsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlacementsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlacementsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> deviceId = const Value.absent(),
+                Value<DeviceKind> kind = const Value.absent(),
+                Value<double> x = const Value.absent(),
+                Value<double> y = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PlacementsTableCompanion(
+                deviceId: deviceId,
+                kind: kind,
+                x: x,
+                y: y,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String deviceId,
+                required DeviceKind kind,
+                required double x,
+                required double y,
+                Value<int> rowid = const Value.absent(),
+              }) => PlacementsTableCompanion.insert(
+                deviceId: deviceId,
+                kind: kind,
+                x: x,
+                y: y,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable<$PlacementsTableTable, PlacementRow>(table),
-                  BaseReferences<_$AppDatabase, $PlacementsTableTable, PlacementRow>(db, table, e),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PlacementsTableTable,
+                    PlacementRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -4042,34 +5485,40 @@ typedef $$PlacementsTableTableProcessedTableManager =
       $$PlacementsTableTableAnnotationComposer,
       $$PlacementsTableTableCreateCompanionBuilder,
       $$PlacementsTableTableUpdateCompanionBuilder,
-      (PlacementRow, BaseReferences<_$AppDatabase, $PlacementsTableTable, PlacementRow>),
+      (
+        PlacementRow,
+        BaseReferences<_$AppDatabase, $PlacementsTableTable, PlacementRow>,
+      ),
       PlacementRow,
       PrefetchHooks Function()
     >;
-typedef $$PlantsTableTableCreateCompanionBuilder = PlantsTableCompanion Function({
-  required String id,
-  required String name,
-  required int everyDays,
-  required DateTime lastWatered,
-  Value<DateTime?> previousWatered,
-  Value<String?> photoPath,
-  Value<int?> fertilizeEveryWeeks,
-  Value<DateTime?> lastFertilized,
-  Value<int> rowid,
-});
-typedef $$PlantsTableTableUpdateCompanionBuilder = PlantsTableCompanion Function({
-  Value<String> id,
-  Value<String> name,
-  Value<int> everyDays,
-  Value<DateTime> lastWatered,
-  Value<DateTime?> previousWatered,
-  Value<String?> photoPath,
-  Value<int?> fertilizeEveryWeeks,
-  Value<DateTime?> lastFertilized,
-  Value<int> rowid,
-});
+typedef $$PlantsTableTableCreateCompanionBuilder =
+    PlantsTableCompanion Function({
+      required String id,
+      required String name,
+      required int everyDays,
+      required DateTime lastWatered,
+      Value<DateTime?> previousWatered,
+      Value<String?> photoPath,
+      Value<int?> fertilizeEveryWeeks,
+      Value<DateTime?> lastFertilized,
+      Value<int> rowid,
+    });
+typedef $$PlantsTableTableUpdateCompanionBuilder =
+    PlantsTableCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<int> everyDays,
+      Value<DateTime> lastWatered,
+      Value<DateTime?> previousWatered,
+      Value<String?> photoPath,
+      Value<int?> fertilizeEveryWeeks,
+      Value<DateTime?> lastFertilized,
+      Value<int> rowid,
+    });
 
-class $$PlantsTableTableFilterComposer extends Composer<_$AppDatabase, $PlantsTableTable> {
+class $$PlantsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PlantsTableTable> {
   $$PlantsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4077,30 +5526,49 @@ class $$PlantsTableTableFilterComposer extends Composer<_$AppDatabase, $PlantsTa
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get name => $composableBuilder(column: $table.name, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get everyDays =>
-      $composableBuilder(column: $table.everyDays, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get everyDays => $composableBuilder(
+    column: $table.everyDays,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get lastWatered =>
-      $composableBuilder(column: $table.lastWatered, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get lastWatered => $composableBuilder(
+    column: $table.lastWatered,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get previousWatered =>
-      $composableBuilder(column: $table.previousWatered, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get previousWatered => $composableBuilder(
+    column: $table.previousWatered,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get photoPath =>
-      $composableBuilder(column: $table.photoPath, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get lastFertilized =>
-      $composableBuilder(column: $table.lastFertilized, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get lastFertilized => $composableBuilder(
+    column: $table.lastFertilized,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$PlantsTableTableOrderingComposer extends Composer<_$AppDatabase, $PlantsTableTable> {
+class $$PlantsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlantsTableTable> {
   $$PlantsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4108,31 +5576,49 @@ class $$PlantsTableTableOrderingComposer extends Composer<_$AppDatabase, $Plants
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get everyDays =>
-      $composableBuilder(column: $table.everyDays, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get everyDays => $composableBuilder(
+    column: $table.everyDays,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get lastWatered =>
-      $composableBuilder(column: $table.lastWatered, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get lastWatered => $composableBuilder(
+    column: $table.lastWatered,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get previousWatered =>
-      $composableBuilder(column: $table.previousWatered, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get previousWatered => $composableBuilder(
+    column: $table.previousWatered,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get photoPath =>
-      $composableBuilder(column: $table.photoPath, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get lastFertilized =>
-      $composableBuilder(column: $table.lastFertilized, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get lastFertilized => $composableBuilder(
+    column: $table.lastFertilized,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$PlantsTableTableAnnotationComposer extends Composer<_$AppDatabase, $PlantsTableTable> {
+class $$PlantsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlantsTableTable> {
   $$PlantsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4140,25 +5626,37 @@ class $$PlantsTableTableAnnotationComposer extends Composer<_$AppDatabase, $Plan
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get name => $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumn<int> get everyDays => $composableBuilder(column: $table.everyDays, builder: (column) => column);
+  GeneratedColumn<int> get everyDays =>
+      $composableBuilder(column: $table.everyDays, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get lastWatered =>
-      $composableBuilder(column: $table.lastWatered, builder: (column) => column);
+  GeneratedColumn<DateTime> get lastWatered => $composableBuilder(
+    column: $table.lastWatered,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<DateTime> get previousWatered =>
-      $composableBuilder(column: $table.previousWatered, builder: (column) => column);
+  GeneratedColumn<DateTime> get previousWatered => $composableBuilder(
+    column: $table.previousWatered,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get photoPath => $composableBuilder(column: $table.photoPath, builder: (column) => column);
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
 
-  GeneratedColumn<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => column);
+  GeneratedColumn<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<DateTime> get lastFertilized =>
-      $composableBuilder(column: $table.lastFertilized, builder: (column) => column);
+  GeneratedColumn<DateTime> get lastFertilized => $composableBuilder(
+    column: $table.lastFertilized,
+    builder: (column) => column,
+  );
 }
 
 class $$PlantsTableTableTableManager
@@ -4172,7 +5670,10 @@ class $$PlantsTableTableTableManager
           $$PlantsTableTableAnnotationComposer,
           $$PlantsTableTableCreateCompanionBuilder,
           $$PlantsTableTableUpdateCompanionBuilder,
-          (PlantRow, BaseReferences<_$AppDatabase, $PlantsTableTable, PlantRow>),
+          (
+            PlantRow,
+            BaseReferences<_$AppDatabase, $PlantsTableTable, PlantRow>,
+          ),
           PlantRow,
           PrefetchHooks Function()
         > {
@@ -4181,9 +5682,12 @@ class $$PlantsTableTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$PlantsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$PlantsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$PlantsTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$PlantsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlantsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlantsTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -4232,7 +5736,11 @@ class $$PlantsTableTableTableManager
               .map(
                 (e) => (
                   e.readTable<$PlantsTableTable, PlantRow>(table),
-                  BaseReferences<_$AppDatabase, $PlantsTableTable, PlantRow>(db, table, e),
+                  BaseReferences<_$AppDatabase, $PlantsTableTable, PlantRow>(
+                    db,
+                    table,
+                    e,
+                  ),
                 ),
               )
               .toList(),
@@ -4255,22 +5763,25 @@ typedef $$PlantsTableTableProcessedTableManager =
       PlantRow,
       PrefetchHooks Function()
     >;
-typedef $$SpeakerSettingsTableTableCreateCompanionBuilder = SpeakerSettingsTableCompanion Function({
-  required String id,
-  Value<String?> displayName,
-  Value<bool> hidden,
-  Value<bool> isDefault,
-  Value<int> rowid,
-});
-typedef $$SpeakerSettingsTableTableUpdateCompanionBuilder = SpeakerSettingsTableCompanion Function({
-  Value<String> id,
-  Value<String?> displayName,
-  Value<bool> hidden,
-  Value<bool> isDefault,
-  Value<int> rowid,
-});
+typedef $$SpeakerSettingsTableTableCreateCompanionBuilder =
+    SpeakerSettingsTableCompanion Function({
+      required String id,
+      Value<String?> displayName,
+      Value<bool> hidden,
+      Value<bool> isDefault,
+      Value<int> rowid,
+    });
+typedef $$SpeakerSettingsTableTableUpdateCompanionBuilder =
+    SpeakerSettingsTableCompanion Function({
+      Value<String> id,
+      Value<String?> displayName,
+      Value<bool> hidden,
+      Value<bool> isDefault,
+      Value<int> rowid,
+    });
 
-class $$SpeakerSettingsTableTableFilterComposer extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
+class $$SpeakerSettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
   $$SpeakerSettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4278,19 +5789,29 @@ class $$SpeakerSettingsTableTableFilterComposer extends Composer<_$AppDatabase, 
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get displayName =>
-      $composableBuilder(column: $table.displayName, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get hidden =>
-      $composableBuilder(column: $table.hidden, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get isDefault =>
-      $composableBuilder(column: $table.isDefault, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$SpeakerSettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
+class $$SpeakerSettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
   $$SpeakerSettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4298,19 +5819,29 @@ class $$SpeakerSettingsTableTableOrderingComposer extends Composer<_$AppDatabase
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get displayName =>
-      $composableBuilder(column: $table.displayName, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get hidden =>
-      $composableBuilder(column: $table.hidden, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get hidden => $composableBuilder(
+    column: $table.hidden,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get isDefault =>
-      $composableBuilder(column: $table.isDefault, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$SpeakerSettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
+class $$SpeakerSettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SpeakerSettingsTableTable> {
   $$SpeakerSettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4318,14 +5849,19 @@ class $$SpeakerSettingsTableTableAnnotationComposer extends Composer<_$AppDataba
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get displayName =>
-      $composableBuilder(column: $table.displayName, builder: (column) => column);
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<bool> get hidden => $composableBuilder(column: $table.hidden, builder: (column) => column);
+  GeneratedColumn<bool> get hidden =>
+      $composableBuilder(column: $table.hidden, builder: (column) => column);
 
-  GeneratedColumn<bool> get isDefault => $composableBuilder(column: $table.isDefault, builder: (column) => column);
+  GeneratedColumn<bool> get isDefault =>
+      $composableBuilder(column: $table.isDefault, builder: (column) => column);
 }
 
 class $$SpeakerSettingsTableTableTableManager
@@ -4339,18 +5875,36 @@ class $$SpeakerSettingsTableTableTableManager
           $$SpeakerSettingsTableTableAnnotationComposer,
           $$SpeakerSettingsTableTableCreateCompanionBuilder,
           $$SpeakerSettingsTableTableUpdateCompanionBuilder,
-          (SpeakerSettingRow, BaseReferences<_$AppDatabase, $SpeakerSettingsTableTable, SpeakerSettingRow>),
+          (
+            SpeakerSettingRow,
+            BaseReferences<
+              _$AppDatabase,
+              $SpeakerSettingsTableTable,
+              SpeakerSettingRow
+            >,
+          ),
           SpeakerSettingRow,
           PrefetchHooks Function()
         > {
-  $$SpeakerSettingsTableTableTableManager(_$AppDatabase db, $SpeakerSettingsTableTable table)
-    : super(
+  $$SpeakerSettingsTableTableTableManager(
+    _$AppDatabase db,
+    $SpeakerSettingsTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$SpeakerSettingsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$SpeakerSettingsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$SpeakerSettingsTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$SpeakerSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SpeakerSettingsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$SpeakerSettingsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -4382,8 +5936,14 @@ class $$SpeakerSettingsTableTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$SpeakerSettingsTableTable, SpeakerSettingRow>(table),
-                  BaseReferences<_$AppDatabase, $SpeakerSettingsTableTable, SpeakerSettingRow>(db, table, e),
+                  e.readTable<$SpeakerSettingsTableTable, SpeakerSettingRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $SpeakerSettingsTableTable,
+                    SpeakerSettingRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -4402,20 +5962,24 @@ typedef $$SpeakerSettingsTableTableProcessedTableManager =
       $$SpeakerSettingsTableTableAnnotationComposer,
       $$SpeakerSettingsTableTableCreateCompanionBuilder,
       $$SpeakerSettingsTableTableUpdateCompanionBuilder,
-      (SpeakerSettingRow, BaseReferences<_$AppDatabase, $SpeakerSettingsTableTable, SpeakerSettingRow>),
+      (
+        SpeakerSettingRow,
+        BaseReferences<
+          _$AppDatabase,
+          $SpeakerSettingsTableTable,
+          SpeakerSettingRow
+        >,
+      ),
       SpeakerSettingRow,
       PrefetchHooks Function()
     >;
-typedef $$ZenSettingsTableTableCreateCompanionBuilder = ZenSettingsTableCompanion Function({
-  Value<int> id,
-  Value<int> idleMinutes,
-});
-typedef $$ZenSettingsTableTableUpdateCompanionBuilder = ZenSettingsTableCompanion Function({
-  Value<int> id,
-  Value<int> idleMinutes,
-});
+typedef $$ZenSettingsTableTableCreateCompanionBuilder =
+    ZenSettingsTableCompanion Function({Value<int> id, Value<int> idleMinutes});
+typedef $$ZenSettingsTableTableUpdateCompanionBuilder =
+    ZenSettingsTableCompanion Function({Value<int> id, Value<int> idleMinutes});
 
-class $$ZenSettingsTableTableFilterComposer extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
+class $$ZenSettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
   $$ZenSettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4423,13 +5987,19 @@ class $$ZenSettingsTableTableFilterComposer extends Composer<_$AppDatabase, $Zen
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get idleMinutes =>
-      $composableBuilder(column: $table.idleMinutes, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get idleMinutes => $composableBuilder(
+    column: $table.idleMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$ZenSettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
+class $$ZenSettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
   $$ZenSettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4437,13 +6007,19 @@ class $$ZenSettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $Z
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get idleMinutes =>
-      $composableBuilder(column: $table.idleMinutes, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get idleMinutes => $composableBuilder(
+    column: $table.idleMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$ZenSettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
+class $$ZenSettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZenSettingsTableTable> {
   $$ZenSettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4451,9 +6027,13 @@ class $$ZenSettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, 
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get idleMinutes => $composableBuilder(column: $table.idleMinutes, builder: (column) => column);
+  GeneratedColumn<int> get idleMinutes => $composableBuilder(
+    column: $table.idleMinutes,
+    builder: (column) => column,
+  );
 }
 
 class $$ZenSettingsTableTableTableManager
@@ -4467,31 +6047,51 @@ class $$ZenSettingsTableTableTableManager
           $$ZenSettingsTableTableAnnotationComposer,
           $$ZenSettingsTableTableCreateCompanionBuilder,
           $$ZenSettingsTableTableUpdateCompanionBuilder,
-          (ZenSettingsRow, BaseReferences<_$AppDatabase, $ZenSettingsTableTable, ZenSettingsRow>),
+          (
+            ZenSettingsRow,
+            BaseReferences<
+              _$AppDatabase,
+              $ZenSettingsTableTable,
+              ZenSettingsRow
+            >,
+          ),
           ZenSettingsRow,
           PrefetchHooks Function()
         > {
-  $$ZenSettingsTableTableTableManager(_$AppDatabase db, $ZenSettingsTableTable table)
-    : super(
+  $$ZenSettingsTableTableTableManager(
+    _$AppDatabase db,
+    $ZenSettingsTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ZenSettingsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ZenSettingsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$ZenSettingsTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ZenSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZenSettingsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZenSettingsTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> idleMinutes = const Value.absent(),
           }) => ZenSettingsTableCompanion(id: id, idleMinutes: idleMinutes),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> idleMinutes = const Value.absent(),
-          }) => ZenSettingsTableCompanion.insert(id: id, idleMinutes: idleMinutes),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> idleMinutes = const Value.absent(),
+              }) => ZenSettingsTableCompanion.insert(
+                id: id,
+                idleMinutes: idleMinutes,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable<$ZenSettingsTableTable, ZenSettingsRow>(table),
-                  BaseReferences<_$AppDatabase, $ZenSettingsTableTable, ZenSettingsRow>(db, table, e),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ZenSettingsTableTable,
+                    ZenSettingsRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -4510,60 +6110,66 @@ typedef $$ZenSettingsTableTableProcessedTableManager =
       $$ZenSettingsTableTableAnnotationComposer,
       $$ZenSettingsTableTableCreateCompanionBuilder,
       $$ZenSettingsTableTableUpdateCompanionBuilder,
-      (ZenSettingsRow, BaseReferences<_$AppDatabase, $ZenSettingsTableTable, ZenSettingsRow>),
+      (
+        ZenSettingsRow,
+        BaseReferences<_$AppDatabase, $ZenSettingsTableTable, ZenSettingsRow>,
+      ),
       ZenSettingsRow,
       PrefetchHooks Function()
     >;
-typedef $$PlantProfilesTableTableCreateCompanionBuilder = PlantProfilesTableCompanion Function({
-  required String plantId,
-  Value<int?> speciesId,
-  Value<String> source,
-  required String commonName,
-  Value<String?> scientificName,
-  Value<String?> imageUrl,
-  Value<String?> watering,
-  Value<int?> wateringMinDays,
-  Value<int?> wateringMaxDays,
-  Value<int?> wateringWinterMinDays,
-  Value<int?> wateringWinterMaxDays,
-  Value<int?> fertilizeEveryWeeks,
-  Value<String> sunlight,
-  Value<String?> careLevel,
-  Value<bool?> indoor,
-  Value<bool?> poisonousToPets,
-  Value<String> pruningMonths,
-  Value<String?> wateringGuide,
-  Value<String?> sunlightGuide,
-  Value<String?> pruningGuide,
-  required DateTime fetchedAt,
-  Value<int> rowid,
-});
-typedef $$PlantProfilesTableTableUpdateCompanionBuilder = PlantProfilesTableCompanion Function({
-  Value<String> plantId,
-  Value<int?> speciesId,
-  Value<String> source,
-  Value<String> commonName,
-  Value<String?> scientificName,
-  Value<String?> imageUrl,
-  Value<String?> watering,
-  Value<int?> wateringMinDays,
-  Value<int?> wateringMaxDays,
-  Value<int?> wateringWinterMinDays,
-  Value<int?> wateringWinterMaxDays,
-  Value<int?> fertilizeEveryWeeks,
-  Value<String> sunlight,
-  Value<String?> careLevel,
-  Value<bool?> indoor,
-  Value<bool?> poisonousToPets,
-  Value<String> pruningMonths,
-  Value<String?> wateringGuide,
-  Value<String?> sunlightGuide,
-  Value<String?> pruningGuide,
-  Value<DateTime> fetchedAt,
-  Value<int> rowid,
-});
+typedef $$PlantProfilesTableTableCreateCompanionBuilder =
+    PlantProfilesTableCompanion Function({
+      required String plantId,
+      Value<int?> speciesId,
+      Value<String> source,
+      required String commonName,
+      Value<String?> scientificName,
+      Value<String?> imageUrl,
+      Value<String?> watering,
+      Value<int?> wateringMinDays,
+      Value<int?> wateringMaxDays,
+      Value<int?> wateringWinterMinDays,
+      Value<int?> wateringWinterMaxDays,
+      Value<int?> fertilizeEveryWeeks,
+      Value<String> sunlight,
+      Value<String?> careLevel,
+      Value<bool?> indoor,
+      Value<bool?> poisonousToPets,
+      Value<String> pruningMonths,
+      Value<String?> wateringGuide,
+      Value<String?> sunlightGuide,
+      Value<String?> pruningGuide,
+      required DateTime fetchedAt,
+      Value<int> rowid,
+    });
+typedef $$PlantProfilesTableTableUpdateCompanionBuilder =
+    PlantProfilesTableCompanion Function({
+      Value<String> plantId,
+      Value<int?> speciesId,
+      Value<String> source,
+      Value<String> commonName,
+      Value<String?> scientificName,
+      Value<String?> imageUrl,
+      Value<String?> watering,
+      Value<int?> wateringMinDays,
+      Value<int?> wateringMaxDays,
+      Value<int?> wateringWinterMinDays,
+      Value<int?> wateringWinterMaxDays,
+      Value<int?> fertilizeEveryWeeks,
+      Value<String> sunlight,
+      Value<String?> careLevel,
+      Value<bool?> indoor,
+      Value<bool?> poisonousToPets,
+      Value<String> pruningMonths,
+      Value<String?> wateringGuide,
+      Value<String?> sunlightGuide,
+      Value<String?> pruningGuide,
+      Value<DateTime> fetchedAt,
+      Value<int> rowid,
+    });
 
-class $$PlantProfilesTableTableFilterComposer extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
+class $$PlantProfilesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
   $$PlantProfilesTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4571,71 +6177,114 @@ class $$PlantProfilesTableTableFilterComposer extends Composer<_$AppDatabase, $P
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get plantId =>
-      $composableBuilder(column: $table.plantId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get plantId => $composableBuilder(
+    column: $table.plantId,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get speciesId =>
-      $composableBuilder(column: $table.speciesId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get speciesId => $composableBuilder(
+    column: $table.speciesId,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get source =>
-      $composableBuilder(column: $table.source, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get commonName =>
-      $composableBuilder(column: $table.commonName, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get commonName => $composableBuilder(
+    column: $table.commonName,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get scientificName =>
-      $composableBuilder(column: $table.scientificName, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get scientificName => $composableBuilder(
+    column: $table.scientificName,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get imageUrl =>
-      $composableBuilder(column: $table.imageUrl, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get imageUrl => $composableBuilder(
+    column: $table.imageUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get watering =>
-      $composableBuilder(column: $table.watering, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get watering => $composableBuilder(
+    column: $table.watering,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get wateringMinDays =>
-      $composableBuilder(column: $table.wateringMinDays, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get wateringMinDays => $composableBuilder(
+    column: $table.wateringMinDays,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get wateringMaxDays =>
-      $composableBuilder(column: $table.wateringMaxDays, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get wateringMaxDays => $composableBuilder(
+    column: $table.wateringMaxDays,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get wateringWinterMinDays =>
-      $composableBuilder(column: $table.wateringWinterMinDays, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get wateringWinterMinDays => $composableBuilder(
+    column: $table.wateringWinterMinDays,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get wateringWinterMaxDays =>
-      $composableBuilder(column: $table.wateringWinterMaxDays, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get wateringWinterMaxDays => $composableBuilder(
+    column: $table.wateringWinterMaxDays,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get sunlight =>
-      $composableBuilder(column: $table.sunlight, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get sunlight => $composableBuilder(
+    column: $table.sunlight,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get careLevel =>
-      $composableBuilder(column: $table.careLevel, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get careLevel => $composableBuilder(
+    column: $table.careLevel,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get indoor =>
-      $composableBuilder(column: $table.indoor, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get indoor => $composableBuilder(
+    column: $table.indoor,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get poisonousToPets =>
-      $composableBuilder(column: $table.poisonousToPets, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get poisonousToPets => $composableBuilder(
+    column: $table.poisonousToPets,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get pruningMonths =>
-      $composableBuilder(column: $table.pruningMonths, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get pruningMonths => $composableBuilder(
+    column: $table.pruningMonths,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get wateringGuide =>
-      $composableBuilder(column: $table.wateringGuide, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get wateringGuide => $composableBuilder(
+    column: $table.wateringGuide,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get sunlightGuide =>
-      $composableBuilder(column: $table.sunlightGuide, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get sunlightGuide => $composableBuilder(
+    column: $table.sunlightGuide,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get pruningGuide =>
-      $composableBuilder(column: $table.pruningGuide, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get pruningGuide => $composableBuilder(
+    column: $table.pruningGuide,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get fetchedAt =>
-      $composableBuilder(column: $table.fetchedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$PlantProfilesTableTableOrderingComposer extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
+class $$PlantProfilesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
   $$PlantProfilesTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4643,71 +6292,114 @@ class $$PlantProfilesTableTableOrderingComposer extends Composer<_$AppDatabase, 
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get plantId =>
-      $composableBuilder(column: $table.plantId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get plantId => $composableBuilder(
+    column: $table.plantId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get speciesId =>
-      $composableBuilder(column: $table.speciesId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get speciesId => $composableBuilder(
+    column: $table.speciesId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get source =>
-      $composableBuilder(column: $table.source, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get commonName =>
-      $composableBuilder(column: $table.commonName, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get commonName => $composableBuilder(
+    column: $table.commonName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get scientificName =>
-      $composableBuilder(column: $table.scientificName, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get scientificName => $composableBuilder(
+    column: $table.scientificName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get imageUrl =>
-      $composableBuilder(column: $table.imageUrl, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get imageUrl => $composableBuilder(
+    column: $table.imageUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get watering =>
-      $composableBuilder(column: $table.watering, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get watering => $composableBuilder(
+    column: $table.watering,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get wateringMinDays =>
-      $composableBuilder(column: $table.wateringMinDays, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get wateringMinDays => $composableBuilder(
+    column: $table.wateringMinDays,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get wateringMaxDays =>
-      $composableBuilder(column: $table.wateringMaxDays, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get wateringMaxDays => $composableBuilder(
+    column: $table.wateringMaxDays,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get wateringWinterMinDays =>
-      $composableBuilder(column: $table.wateringWinterMinDays, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get wateringWinterMinDays => $composableBuilder(
+    column: $table.wateringWinterMinDays,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get wateringWinterMaxDays =>
-      $composableBuilder(column: $table.wateringWinterMaxDays, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get wateringWinterMaxDays => $composableBuilder(
+    column: $table.wateringWinterMaxDays,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get sunlight =>
-      $composableBuilder(column: $table.sunlight, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get sunlight => $composableBuilder(
+    column: $table.sunlight,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get careLevel =>
-      $composableBuilder(column: $table.careLevel, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get careLevel => $composableBuilder(
+    column: $table.careLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get indoor =>
-      $composableBuilder(column: $table.indoor, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get indoor => $composableBuilder(
+    column: $table.indoor,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get poisonousToPets =>
-      $composableBuilder(column: $table.poisonousToPets, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get poisonousToPets => $composableBuilder(
+    column: $table.poisonousToPets,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get pruningMonths =>
-      $composableBuilder(column: $table.pruningMonths, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get pruningMonths => $composableBuilder(
+    column: $table.pruningMonths,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get wateringGuide =>
-      $composableBuilder(column: $table.wateringGuide, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get wateringGuide => $composableBuilder(
+    column: $table.wateringGuide,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get sunlightGuide =>
-      $composableBuilder(column: $table.sunlightGuide, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get sunlightGuide => $composableBuilder(
+    column: $table.sunlightGuide,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get pruningGuide =>
-      $composableBuilder(column: $table.pruningGuide, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get pruningGuide => $composableBuilder(
+    column: $table.pruningGuide,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get fetchedAt =>
-      $composableBuilder(column: $table.fetchedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$PlantProfilesTableTableAnnotationComposer extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
+class $$PlantProfilesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlantProfilesTableTable> {
   $$PlantProfilesTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4715,58 +6407,92 @@ class $$PlantProfilesTableTableAnnotationComposer extends Composer<_$AppDatabase
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get plantId => $composableBuilder(column: $table.plantId, builder: (column) => column);
+  GeneratedColumn<String> get plantId =>
+      $composableBuilder(column: $table.plantId, builder: (column) => column);
 
-  GeneratedColumn<int> get speciesId => $composableBuilder(column: $table.speciesId, builder: (column) => column);
+  GeneratedColumn<int> get speciesId =>
+      $composableBuilder(column: $table.speciesId, builder: (column) => column);
 
-  GeneratedColumn<String> get source => $composableBuilder(column: $table.source, builder: (column) => column);
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
 
-  GeneratedColumn<String> get commonName => $composableBuilder(column: $table.commonName, builder: (column) => column);
+  GeneratedColumn<String> get commonName => $composableBuilder(
+    column: $table.commonName,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get scientificName =>
-      $composableBuilder(column: $table.scientificName, builder: (column) => column);
+  GeneratedColumn<String> get scientificName => $composableBuilder(
+    column: $table.scientificName,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get imageUrl => $composableBuilder(column: $table.imageUrl, builder: (column) => column);
+  GeneratedColumn<String> get imageUrl =>
+      $composableBuilder(column: $table.imageUrl, builder: (column) => column);
 
-  GeneratedColumn<String> get watering => $composableBuilder(column: $table.watering, builder: (column) => column);
+  GeneratedColumn<String> get watering =>
+      $composableBuilder(column: $table.watering, builder: (column) => column);
 
-  GeneratedColumn<int> get wateringMinDays =>
-      $composableBuilder(column: $table.wateringMinDays, builder: (column) => column);
+  GeneratedColumn<int> get wateringMinDays => $composableBuilder(
+    column: $table.wateringMinDays,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get wateringMaxDays =>
-      $composableBuilder(column: $table.wateringMaxDays, builder: (column) => column);
+  GeneratedColumn<int> get wateringMaxDays => $composableBuilder(
+    column: $table.wateringMaxDays,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get wateringWinterMinDays =>
-      $composableBuilder(column: $table.wateringWinterMinDays, builder: (column) => column);
+  GeneratedColumn<int> get wateringWinterMinDays => $composableBuilder(
+    column: $table.wateringWinterMinDays,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get wateringWinterMaxDays =>
-      $composableBuilder(column: $table.wateringWinterMaxDays, builder: (column) => column);
+  GeneratedColumn<int> get wateringWinterMaxDays => $composableBuilder(
+    column: $table.wateringWinterMaxDays,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get fertilizeEveryWeeks =>
-      $composableBuilder(column: $table.fertilizeEveryWeeks, builder: (column) => column);
+  GeneratedColumn<int> get fertilizeEveryWeeks => $composableBuilder(
+    column: $table.fertilizeEveryWeeks,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get sunlight => $composableBuilder(column: $table.sunlight, builder: (column) => column);
+  GeneratedColumn<String> get sunlight =>
+      $composableBuilder(column: $table.sunlight, builder: (column) => column);
 
-  GeneratedColumn<String> get careLevel => $composableBuilder(column: $table.careLevel, builder: (column) => column);
+  GeneratedColumn<String> get careLevel =>
+      $composableBuilder(column: $table.careLevel, builder: (column) => column);
 
-  GeneratedColumn<bool> get indoor => $composableBuilder(column: $table.indoor, builder: (column) => column);
+  GeneratedColumn<bool> get indoor =>
+      $composableBuilder(column: $table.indoor, builder: (column) => column);
 
-  GeneratedColumn<bool> get poisonousToPets =>
-      $composableBuilder(column: $table.poisonousToPets, builder: (column) => column);
+  GeneratedColumn<bool> get poisonousToPets => $composableBuilder(
+    column: $table.poisonousToPets,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get pruningMonths =>
-      $composableBuilder(column: $table.pruningMonths, builder: (column) => column);
+  GeneratedColumn<String> get pruningMonths => $composableBuilder(
+    column: $table.pruningMonths,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get wateringGuide =>
-      $composableBuilder(column: $table.wateringGuide, builder: (column) => column);
+  GeneratedColumn<String> get wateringGuide => $composableBuilder(
+    column: $table.wateringGuide,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get sunlightGuide =>
-      $composableBuilder(column: $table.sunlightGuide, builder: (column) => column);
+  GeneratedColumn<String> get sunlightGuide => $composableBuilder(
+    column: $table.sunlightGuide,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get pruningGuide =>
-      $composableBuilder(column: $table.pruningGuide, builder: (column) => column);
+  GeneratedColumn<String> get pruningGuide => $composableBuilder(
+    column: $table.pruningGuide,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<DateTime> get fetchedAt => $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get fetchedAt =>
+      $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
 }
 
 class $$PlantProfilesTableTableTableManager
@@ -4780,18 +6506,33 @@ class $$PlantProfilesTableTableTableManager
           $$PlantProfilesTableTableAnnotationComposer,
           $$PlantProfilesTableTableCreateCompanionBuilder,
           $$PlantProfilesTableTableUpdateCompanionBuilder,
-          (PlantProfileRow, BaseReferences<_$AppDatabase, $PlantProfilesTableTable, PlantProfileRow>),
+          (
+            PlantProfileRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PlantProfilesTableTable,
+              PlantProfileRow
+            >,
+          ),
           PlantProfileRow,
           PrefetchHooks Function()
         > {
-  $$PlantProfilesTableTableTableManager(_$AppDatabase db, $PlantProfilesTableTable table)
-    : super(
+  $$PlantProfilesTableTableTableManager(
+    _$AppDatabase db,
+    $PlantProfilesTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$PlantProfilesTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$PlantProfilesTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$PlantProfilesTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$PlantProfilesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlantProfilesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlantProfilesTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<String> plantId = const Value.absent(),
@@ -4892,7 +6633,11 @@ class $$PlantProfilesTableTableTableManager
               .map(
                 (e) => (
                   e.readTable<$PlantProfilesTableTable, PlantProfileRow>(table),
-                  BaseReferences<_$AppDatabase, $PlantProfilesTableTable, PlantProfileRow>(db, table, e),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PlantProfilesTableTable,
+                    PlantProfileRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -4911,36 +6656,46 @@ typedef $$PlantProfilesTableTableProcessedTableManager =
       $$PlantProfilesTableTableAnnotationComposer,
       $$PlantProfilesTableTableCreateCompanionBuilder,
       $$PlantProfilesTableTableUpdateCompanionBuilder,
-      (PlantProfileRow, BaseReferences<_$AppDatabase, $PlantProfilesTableTable, PlantProfileRow>),
+      (
+        PlantProfileRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PlantProfilesTableTable,
+          PlantProfileRow
+        >,
+      ),
       PlantProfileRow,
       PrefetchHooks Function()
     >;
-typedef $$WeatherSettingsTableTableCreateCompanionBuilder = WeatherSettingsTableCompanion Function({
-  Value<int> id,
-  Value<double?> placeLatitude,
-  Value<double?> placeLongitude,
-  Value<String?> placeName,
-  Value<String?> placeRegion,
-  Value<String?> cachedJson,
-  Value<double?> cachedLatitude,
-  Value<double?> cachedLongitude,
-  Value<String?> cachedPlaceName,
-  Value<DateTime?> cachedAt,
-});
-typedef $$WeatherSettingsTableTableUpdateCompanionBuilder = WeatherSettingsTableCompanion Function({
-  Value<int> id,
-  Value<double?> placeLatitude,
-  Value<double?> placeLongitude,
-  Value<String?> placeName,
-  Value<String?> placeRegion,
-  Value<String?> cachedJson,
-  Value<double?> cachedLatitude,
-  Value<double?> cachedLongitude,
-  Value<String?> cachedPlaceName,
-  Value<DateTime?> cachedAt,
-});
+typedef $$WeatherSettingsTableTableCreateCompanionBuilder =
+    WeatherSettingsTableCompanion Function({
+      Value<int> id,
+      Value<double?> placeLatitude,
+      Value<double?> placeLongitude,
+      Value<String?> placeName,
+      Value<String?> placeRegion,
+      Value<String?> cachedJson,
+      Value<double?> cachedLatitude,
+      Value<double?> cachedLongitude,
+      Value<String?> cachedPlaceName,
+      Value<DateTime?> cachedAt,
+    });
+typedef $$WeatherSettingsTableTableUpdateCompanionBuilder =
+    WeatherSettingsTableCompanion Function({
+      Value<int> id,
+      Value<double?> placeLatitude,
+      Value<double?> placeLongitude,
+      Value<String?> placeName,
+      Value<String?> placeRegion,
+      Value<String?> cachedJson,
+      Value<double?> cachedLatitude,
+      Value<double?> cachedLongitude,
+      Value<String?> cachedPlaceName,
+      Value<DateTime?> cachedAt,
+    });
 
-class $$WeatherSettingsTableTableFilterComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+class $$WeatherSettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
   $$WeatherSettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4948,37 +6703,59 @@ class $$WeatherSettingsTableTableFilterComposer extends Composer<_$AppDatabase, 
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<double> get placeLatitude =>
-      $composableBuilder(column: $table.placeLatitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get placeLatitude => $composableBuilder(
+    column: $table.placeLatitude,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<double> get placeLongitude =>
-      $composableBuilder(column: $table.placeLongitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get placeLongitude => $composableBuilder(
+    column: $table.placeLongitude,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get placeName =>
-      $composableBuilder(column: $table.placeName, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get placeName => $composableBuilder(
+    column: $table.placeName,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get placeRegion =>
-      $composableBuilder(column: $table.placeRegion, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get placeRegion => $composableBuilder(
+    column: $table.placeRegion,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get cachedJson =>
-      $composableBuilder(column: $table.cachedJson, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get cachedJson => $composableBuilder(
+    column: $table.cachedJson,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<double> get cachedLatitude =>
-      $composableBuilder(column: $table.cachedLatitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get cachedLatitude => $composableBuilder(
+    column: $table.cachedLatitude,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<double> get cachedLongitude =>
-      $composableBuilder(column: $table.cachedLongitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get cachedLongitude => $composableBuilder(
+    column: $table.cachedLongitude,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get cachedPlaceName =>
-      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get cachedPlaceName => $composableBuilder(
+    column: $table.cachedPlaceName,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get cachedAt =>
-      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$WeatherSettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+class $$WeatherSettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
   $$WeatherSettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4986,37 +6763,59 @@ class $$WeatherSettingsTableTableOrderingComposer extends Composer<_$AppDatabase
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get placeLatitude =>
-      $composableBuilder(column: $table.placeLatitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get placeLatitude => $composableBuilder(
+    column: $table.placeLatitude,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get placeLongitude =>
-      $composableBuilder(column: $table.placeLongitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get placeLongitude => $composableBuilder(
+    column: $table.placeLongitude,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get placeName =>
-      $composableBuilder(column: $table.placeName, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get placeName => $composableBuilder(
+    column: $table.placeName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get placeRegion =>
-      $composableBuilder(column: $table.placeRegion, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get placeRegion => $composableBuilder(
+    column: $table.placeRegion,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get cachedJson =>
-      $composableBuilder(column: $table.cachedJson, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get cachedJson => $composableBuilder(
+    column: $table.cachedJson,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get cachedLatitude =>
-      $composableBuilder(column: $table.cachedLatitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get cachedLatitude => $composableBuilder(
+    column: $table.cachedLatitude,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<double> get cachedLongitude =>
-      $composableBuilder(column: $table.cachedLongitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get cachedLongitude => $composableBuilder(
+    column: $table.cachedLongitude,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get cachedPlaceName =>
-      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get cachedPlaceName => $composableBuilder(
+    column: $table.cachedPlaceName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get cachedAt =>
-      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$WeatherSettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
+class $$WeatherSettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WeatherSettingsTableTable> {
   $$WeatherSettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5024,31 +6823,49 @@ class $$WeatherSettingsTableTableAnnotationComposer extends Composer<_$AppDataba
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<double> get placeLatitude =>
-      $composableBuilder(column: $table.placeLatitude, builder: (column) => column);
+  GeneratedColumn<double> get placeLatitude => $composableBuilder(
+    column: $table.placeLatitude,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<double> get placeLongitude =>
-      $composableBuilder(column: $table.placeLongitude, builder: (column) => column);
+  GeneratedColumn<double> get placeLongitude => $composableBuilder(
+    column: $table.placeLongitude,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get placeName => $composableBuilder(column: $table.placeName, builder: (column) => column);
+  GeneratedColumn<String> get placeName =>
+      $composableBuilder(column: $table.placeName, builder: (column) => column);
 
-  GeneratedColumn<String> get placeRegion =>
-      $composableBuilder(column: $table.placeRegion, builder: (column) => column);
+  GeneratedColumn<String> get placeRegion => $composableBuilder(
+    column: $table.placeRegion,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get cachedJson => $composableBuilder(column: $table.cachedJson, builder: (column) => column);
+  GeneratedColumn<String> get cachedJson => $composableBuilder(
+    column: $table.cachedJson,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<double> get cachedLatitude =>
-      $composableBuilder(column: $table.cachedLatitude, builder: (column) => column);
+  GeneratedColumn<double> get cachedLatitude => $composableBuilder(
+    column: $table.cachedLatitude,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<double> get cachedLongitude =>
-      $composableBuilder(column: $table.cachedLongitude, builder: (column) => column);
+  GeneratedColumn<double> get cachedLongitude => $composableBuilder(
+    column: $table.cachedLongitude,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<String> get cachedPlaceName =>
-      $composableBuilder(column: $table.cachedPlaceName, builder: (column) => column);
+  GeneratedColumn<String> get cachedPlaceName => $composableBuilder(
+    column: $table.cachedPlaceName,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<DateTime> get cachedAt => $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
 }
 
 class $$WeatherSettingsTableTableTableManager
@@ -5062,18 +6879,36 @@ class $$WeatherSettingsTableTableTableManager
           $$WeatherSettingsTableTableAnnotationComposer,
           $$WeatherSettingsTableTableCreateCompanionBuilder,
           $$WeatherSettingsTableTableUpdateCompanionBuilder,
-          (WeatherSettingsRow, BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>),
+          (
+            WeatherSettingsRow,
+            BaseReferences<
+              _$AppDatabase,
+              $WeatherSettingsTableTable,
+              WeatherSettingsRow
+            >,
+          ),
           WeatherSettingsRow,
           PrefetchHooks Function()
         > {
-  $$WeatherSettingsTableTableTableManager(_$AppDatabase db, $WeatherSettingsTableTable table)
-    : super(
+  $$WeatherSettingsTableTableTableManager(
+    _$AppDatabase db,
+    $WeatherSettingsTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$WeatherSettingsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$WeatherSettingsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$WeatherSettingsTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$WeatherSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WeatherSettingsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$WeatherSettingsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -5125,8 +6960,14 @@ class $$WeatherSettingsTableTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$WeatherSettingsTableTable, WeatherSettingsRow>(table),
-                  BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>(db, table, e),
+                  e.readTable<$WeatherSettingsTableTable, WeatherSettingsRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $WeatherSettingsTableTable,
+                    WeatherSettingsRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -5145,30 +6986,44 @@ typedef $$WeatherSettingsTableTableProcessedTableManager =
       $$WeatherSettingsTableTableAnnotationComposer,
       $$WeatherSettingsTableTableCreateCompanionBuilder,
       $$WeatherSettingsTableTableUpdateCompanionBuilder,
-      (WeatherSettingsRow, BaseReferences<_$AppDatabase, $WeatherSettingsTableTable, WeatherSettingsRow>),
+      (
+        WeatherSettingsRow,
+        BaseReferences<
+          _$AppDatabase,
+          $WeatherSettingsTableTable,
+          WeatherSettingsRow
+        >,
+      ),
       WeatherSettingsRow,
       PrefetchHooks Function()
     >;
-typedef $$DashboardWidgetsTableTableCreateCompanionBuilder = DashboardWidgetsTableCompanion Function({
-  required String id,
-  required String kind,
-  required String size,
-  required int position,
-  Value<String?> selection,
-  Value<bool?> card,
-  Value<int> rowid,
-});
-typedef $$DashboardWidgetsTableTableUpdateCompanionBuilder = DashboardWidgetsTableCompanion Function({
-  Value<String> id,
-  Value<String> kind,
-  Value<String> size,
-  Value<int> position,
-  Value<String?> selection,
-  Value<bool?> card,
-  Value<int> rowid,
-});
+typedef $$DashboardWidgetsTableTableCreateCompanionBuilder =
+    DashboardWidgetsTableCompanion Function({
+      required String id,
+      required String kind,
+      required String size,
+      required int position,
+      Value<String?> selection,
+      Value<bool?> card,
+      Value<int?> gridColumn,
+      Value<int?> gridRow,
+      Value<int> rowid,
+    });
+typedef $$DashboardWidgetsTableTableUpdateCompanionBuilder =
+    DashboardWidgetsTableCompanion Function({
+      Value<String> id,
+      Value<String> kind,
+      Value<String> size,
+      Value<int> position,
+      Value<String?> selection,
+      Value<bool?> card,
+      Value<int?> gridColumn,
+      Value<int?> gridRow,
+      Value<int> rowid,
+    });
 
-class $$DashboardWidgetsTableTableFilterComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+class $$DashboardWidgetsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
   $$DashboardWidgetsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5176,22 +7031,49 @@ class $$DashboardWidgetsTableTableFilterComposer extends Composer<_$AppDatabase,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get kind => $composableBuilder(column: $table.kind, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get size => $composableBuilder(column: $table.size, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get selection =>
-      $composableBuilder(column: $table.selection, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get selection => $composableBuilder(
+    column: $table.selection,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get card => $composableBuilder(column: $table.card, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get card => $composableBuilder(
+    column: $table.card,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gridColumn => $composableBuilder(
+    column: $table.gridColumn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gridRow => $composableBuilder(
+    column: $table.gridRow,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$DashboardWidgetsTableTableOrderingComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+class $$DashboardWidgetsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
   $$DashboardWidgetsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5199,25 +7081,49 @@ class $$DashboardWidgetsTableTableOrderingComposer extends Composer<_$AppDatabas
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get kind =>
-      $composableBuilder(column: $table.kind, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get size =>
-      $composableBuilder(column: $table.size, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get selection =>
-      $composableBuilder(column: $table.selection, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get selection => $composableBuilder(
+    column: $table.selection,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get card =>
-      $composableBuilder(column: $table.card, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get card => $composableBuilder(
+    column: $table.card,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gridColumn => $composableBuilder(
+    column: $table.gridColumn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gridRow => $composableBuilder(
+    column: $table.gridRow,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$DashboardWidgetsTableTableAnnotationComposer extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
+class $$DashboardWidgetsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DashboardWidgetsTableTable> {
   $$DashboardWidgetsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5225,17 +7131,31 @@ class $$DashboardWidgetsTableTableAnnotationComposer extends Composer<_$AppDatab
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get kind => $composableBuilder(column: $table.kind, builder: (column) => column);
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
 
-  GeneratedColumn<String> get size => $composableBuilder(column: $table.size, builder: (column) => column);
+  GeneratedColumn<String> get size =>
+      $composableBuilder(column: $table.size, builder: (column) => column);
 
-  GeneratedColumn<int> get position => $composableBuilder(column: $table.position, builder: (column) => column);
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
 
-  GeneratedColumn<String> get selection => $composableBuilder(column: $table.selection, builder: (column) => column);
+  GeneratedColumn<String> get selection =>
+      $composableBuilder(column: $table.selection, builder: (column) => column);
 
-  GeneratedColumn<bool> get card => $composableBuilder(column: $table.card, builder: (column) => column);
+  GeneratedColumn<bool> get card =>
+      $composableBuilder(column: $table.card, builder: (column) => column);
+
+  GeneratedColumn<int> get gridColumn => $composableBuilder(
+    column: $table.gridColumn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get gridRow =>
+      $composableBuilder(column: $table.gridRow, builder: (column) => column);
 }
 
 class $$DashboardWidgetsTableTableTableManager
@@ -5249,18 +7169,39 @@ class $$DashboardWidgetsTableTableTableManager
           $$DashboardWidgetsTableTableAnnotationComposer,
           $$DashboardWidgetsTableTableCreateCompanionBuilder,
           $$DashboardWidgetsTableTableUpdateCompanionBuilder,
-          (DashboardWidgetRow, BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>),
+          (
+            DashboardWidgetRow,
+            BaseReferences<
+              _$AppDatabase,
+              $DashboardWidgetsTableTable,
+              DashboardWidgetRow
+            >,
+          ),
           DashboardWidgetRow,
           PrefetchHooks Function()
         > {
-  $$DashboardWidgetsTableTableTableManager(_$AppDatabase db, $DashboardWidgetsTableTable table)
-    : super(
+  $$DashboardWidgetsTableTableTableManager(
+    _$AppDatabase db,
+    $DashboardWidgetsTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$DashboardWidgetsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$DashboardWidgetsTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$DashboardWidgetsTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$DashboardWidgetsTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$DashboardWidgetsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DashboardWidgetsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -5269,6 +7210,8 @@ class $$DashboardWidgetsTableTableTableManager
                 Value<int> position = const Value.absent(),
                 Value<String?> selection = const Value.absent(),
                 Value<bool?> card = const Value.absent(),
+                Value<int?> gridColumn = const Value.absent(),
+                Value<int?> gridRow = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DashboardWidgetsTableCompanion(
                 id: id,
@@ -5277,6 +7220,8 @@ class $$DashboardWidgetsTableTableTableManager
                 position: position,
                 selection: selection,
                 card: card,
+                gridColumn: gridColumn,
+                gridRow: gridRow,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5287,6 +7232,8 @@ class $$DashboardWidgetsTableTableTableManager
                 required int position,
                 Value<String?> selection = const Value.absent(),
                 Value<bool?> card = const Value.absent(),
+                Value<int?> gridColumn = const Value.absent(),
+                Value<int?> gridRow = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DashboardWidgetsTableCompanion.insert(
                 id: id,
@@ -5295,13 +7242,21 @@ class $$DashboardWidgetsTableTableTableManager
                 position: position,
                 selection: selection,
                 card: card,
+                gridColumn: gridColumn,
+                gridRow: gridRow,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$DashboardWidgetsTableTable, DashboardWidgetRow>(table),
-                  BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>(db, table, e),
+                  e.readTable<$DashboardWidgetsTableTable, DashboardWidgetRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DashboardWidgetsTableTable,
+                    DashboardWidgetRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -5320,20 +7275,30 @@ typedef $$DashboardWidgetsTableTableProcessedTableManager =
       $$DashboardWidgetsTableTableAnnotationComposer,
       $$DashboardWidgetsTableTableCreateCompanionBuilder,
       $$DashboardWidgetsTableTableUpdateCompanionBuilder,
-      (DashboardWidgetRow, BaseReferences<_$AppDatabase, $DashboardWidgetsTableTable, DashboardWidgetRow>),
+      (
+        DashboardWidgetRow,
+        BaseReferences<
+          _$AppDatabase,
+          $DashboardWidgetsTableTable,
+          DashboardWidgetRow
+        >,
+      ),
       DashboardWidgetRow,
       PrefetchHooks Function()
     >;
-typedef $$DashboardStateTableTableCreateCompanionBuilder = DashboardStateTableCompanion Function({
-  Value<int> id,
-  Value<bool> arranged,
-});
-typedef $$DashboardStateTableTableUpdateCompanionBuilder = DashboardStateTableCompanion Function({
-  Value<int> id,
-  Value<bool> arranged,
-});
+typedef $$DashboardStateTableTableCreateCompanionBuilder =
+    DashboardStateTableCompanion Function({
+      Value<int> id,
+      Value<bool> arranged,
+    });
+typedef $$DashboardStateTableTableUpdateCompanionBuilder =
+    DashboardStateTableCompanion Function({
+      Value<int> id,
+      Value<bool> arranged,
+    });
 
-class $$DashboardStateTableTableFilterComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+class $$DashboardStateTableTableFilterComposer
+    extends Composer<_$AppDatabase, $DashboardStateTableTable> {
   $$DashboardStateTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5341,13 +7306,19 @@ class $$DashboardStateTableTableFilterComposer extends Composer<_$AppDatabase, $
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<bool> get arranged =>
-      $composableBuilder(column: $table.arranged, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get arranged => $composableBuilder(
+    column: $table.arranged,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$DashboardStateTableTableOrderingComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+class $$DashboardStateTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $DashboardStateTableTable> {
   $$DashboardStateTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5355,13 +7326,19 @@ class $$DashboardStateTableTableOrderingComposer extends Composer<_$AppDatabase,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<bool> get arranged =>
-      $composableBuilder(column: $table.arranged, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get arranged => $composableBuilder(
+    column: $table.arranged,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$DashboardStateTableTableAnnotationComposer extends Composer<_$AppDatabase, $DashboardStateTableTable> {
+class $$DashboardStateTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DashboardStateTableTable> {
   $$DashboardStateTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5369,9 +7346,11 @@ class $$DashboardStateTableTableAnnotationComposer extends Composer<_$AppDatabas
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<bool> get arranged => $composableBuilder(column: $table.arranged, builder: (column) => column);
+  GeneratedColumn<bool> get arranged =>
+      $composableBuilder(column: $table.arranged, builder: (column) => column);
 }
 
 class $$DashboardStateTableTableTableManager
@@ -5385,18 +7364,36 @@ class $$DashboardStateTableTableTableManager
           $$DashboardStateTableTableAnnotationComposer,
           $$DashboardStateTableTableCreateCompanionBuilder,
           $$DashboardStateTableTableUpdateCompanionBuilder,
-          (DashboardStateRow, BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>),
+          (
+            DashboardStateRow,
+            BaseReferences<
+              _$AppDatabase,
+              $DashboardStateTableTable,
+              DashboardStateRow
+            >,
+          ),
           DashboardStateRow,
           PrefetchHooks Function()
         > {
-  $$DashboardStateTableTableTableManager(_$AppDatabase db, $DashboardStateTableTable table)
-    : super(
+  $$DashboardStateTableTableTableManager(
+    _$AppDatabase db,
+    $DashboardStateTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$DashboardStateTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$DashboardStateTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$DashboardStateTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$DashboardStateTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DashboardStateTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DashboardStateTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<bool> arranged = const Value.absent(),
@@ -5408,8 +7405,14 @@ class $$DashboardStateTableTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$DashboardStateTableTable, DashboardStateRow>(table),
-                  BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>(db, table, e),
+                  e.readTable<$DashboardStateTableTable, DashboardStateRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DashboardStateTableTable,
+                    DashboardStateRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -5428,34 +7431,44 @@ typedef $$DashboardStateTableTableProcessedTableManager =
       $$DashboardStateTableTableAnnotationComposer,
       $$DashboardStateTableTableCreateCompanionBuilder,
       $$DashboardStateTableTableUpdateCompanionBuilder,
-      (DashboardStateRow, BaseReferences<_$AppDatabase, $DashboardStateTableTable, DashboardStateRow>),
+      (
+        DashboardStateRow,
+        BaseReferences<
+          _$AppDatabase,
+          $DashboardStateTableTable,
+          DashboardStateRow
+        >,
+      ),
       DashboardStateRow,
       PrefetchHooks Function()
     >;
-typedef $$RoomScenesTableTableCreateCompanionBuilder = RoomScenesTableCompanion Function({
-  required String id,
-  required String roomId,
-  required String name,
-  required int position,
-  required int brightnessPercent,
-  required int color,
-  required int kelvin,
-  required String lights,
-  Value<int> rowid,
-});
-typedef $$RoomScenesTableTableUpdateCompanionBuilder = RoomScenesTableCompanion Function({
-  Value<String> id,
-  Value<String> roomId,
-  Value<String> name,
-  Value<int> position,
-  Value<int> brightnessPercent,
-  Value<int> color,
-  Value<int> kelvin,
-  Value<String> lights,
-  Value<int> rowid,
-});
+typedef $$RoomScenesTableTableCreateCompanionBuilder =
+    RoomScenesTableCompanion Function({
+      required String id,
+      required String roomId,
+      required String name,
+      required int position,
+      required int brightnessPercent,
+      required int color,
+      required int kelvin,
+      required String lights,
+      Value<int> rowid,
+    });
+typedef $$RoomScenesTableTableUpdateCompanionBuilder =
+    RoomScenesTableCompanion Function({
+      Value<String> id,
+      Value<String> roomId,
+      Value<String> name,
+      Value<int> position,
+      Value<int> brightnessPercent,
+      Value<int> color,
+      Value<int> kelvin,
+      Value<String> lights,
+      Value<int> rowid,
+    });
 
-class $$RoomScenesTableTableFilterComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+class $$RoomScenesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $RoomScenesTableTable> {
   $$RoomScenesTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5463,29 +7476,49 @@ class $$RoomScenesTableTableFilterComposer extends Composer<_$AppDatabase, $Room
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get roomId =>
-      $composableBuilder(column: $table.roomId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get roomId => $composableBuilder(
+    column: $table.roomId,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get name => $composableBuilder(column: $table.name, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get brightnessPercent =>
-      $composableBuilder(column: $table.brightnessPercent, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get brightnessPercent => $composableBuilder(
+    column: $table.brightnessPercent,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get color => $composableBuilder(column: $table.color, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<int> get kelvin =>
-      $composableBuilder(column: $table.kelvin, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get kelvin => $composableBuilder(
+    column: $table.kelvin,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get lights =>
-      $composableBuilder(column: $table.lights, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lights => $composableBuilder(
+    column: $table.lights,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
-class $$RoomScenesTableTableOrderingComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+class $$RoomScenesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $RoomScenesTableTable> {
   $$RoomScenesTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5493,31 +7526,49 @@ class $$RoomScenesTableTableOrderingComposer extends Composer<_$AppDatabase, $Ro
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get roomId =>
-      $composableBuilder(column: $table.roomId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get roomId => $composableBuilder(
+    column: $table.roomId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get position =>
-      $composableBuilder(column: $table.position, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get brightnessPercent =>
-      $composableBuilder(column: $table.brightnessPercent, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get brightnessPercent => $composableBuilder(
+    column: $table.brightnessPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get color =>
-      $composableBuilder(column: $table.color, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<int> get kelvin =>
-      $composableBuilder(column: $table.kelvin, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get kelvin => $composableBuilder(
+    column: $table.kelvin,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get lights =>
-      $composableBuilder(column: $table.lights, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lights => $composableBuilder(
+    column: $table.lights,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$RoomScenesTableTableAnnotationComposer extends Composer<_$AppDatabase, $RoomScenesTableTable> {
+class $$RoomScenesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RoomScenesTableTable> {
   $$RoomScenesTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5525,22 +7576,31 @@ class $$RoomScenesTableTableAnnotationComposer extends Composer<_$AppDatabase, $
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get roomId => $composableBuilder(column: $table.roomId, builder: (column) => column);
+  GeneratedColumn<String> get roomId =>
+      $composableBuilder(column: $table.roomId, builder: (column) => column);
 
-  GeneratedColumn<String> get name => $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumn<int> get position => $composableBuilder(column: $table.position, builder: (column) => column);
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
 
-  GeneratedColumn<int> get brightnessPercent =>
-      $composableBuilder(column: $table.brightnessPercent, builder: (column) => column);
+  GeneratedColumn<int> get brightnessPercent => $composableBuilder(
+    column: $table.brightnessPercent,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get color => $composableBuilder(column: $table.color, builder: (column) => column);
+  GeneratedColumn<int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
 
-  GeneratedColumn<int> get kelvin => $composableBuilder(column: $table.kelvin, builder: (column) => column);
+  GeneratedColumn<int> get kelvin =>
+      $composableBuilder(column: $table.kelvin, builder: (column) => column);
 
-  GeneratedColumn<String> get lights => $composableBuilder(column: $table.lights, builder: (column) => column);
+  GeneratedColumn<String> get lights =>
+      $composableBuilder(column: $table.lights, builder: (column) => column);
 }
 
 class $$RoomScenesTableTableTableManager
@@ -5554,18 +7614,26 @@ class $$RoomScenesTableTableTableManager
           $$RoomScenesTableTableAnnotationComposer,
           $$RoomScenesTableTableCreateCompanionBuilder,
           $$RoomScenesTableTableUpdateCompanionBuilder,
-          (RoomSceneRow, BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>),
+          (
+            RoomSceneRow,
+            BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>,
+          ),
           RoomSceneRow,
           PrefetchHooks Function()
         > {
-  $$RoomScenesTableTableTableManager(_$AppDatabase db, $RoomScenesTableTable table)
-    : super(
+  $$RoomScenesTableTableTableManager(
+    _$AppDatabase db,
+    $RoomScenesTableTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$RoomScenesTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$RoomScenesTableTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$RoomScenesTableTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$RoomScenesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RoomScenesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RoomScenesTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -5614,7 +7682,11 @@ class $$RoomScenesTableTableTableManager
               .map(
                 (e) => (
                   e.readTable<$RoomScenesTableTable, RoomSceneRow>(table),
-                  BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>(db, table, e),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $RoomScenesTableTable,
+                    RoomSceneRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -5633,8 +7705,247 @@ typedef $$RoomScenesTableTableProcessedTableManager =
       $$RoomScenesTableTableAnnotationComposer,
       $$RoomScenesTableTableCreateCompanionBuilder,
       $$RoomScenesTableTableUpdateCompanionBuilder,
-      (RoomSceneRow, BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>),
+      (
+        RoomSceneRow,
+        BaseReferences<_$AppDatabase, $RoomScenesTableTable, RoomSceneRow>,
+      ),
       RoomSceneRow,
+      PrefetchHooks Function()
+    >;
+typedef $$FocusPointsTableTableCreateCompanionBuilder =
+    FocusPointsTableCompanion Function({
+      required String id,
+      required String title,
+      required DateTime dueDate,
+      required int position,
+      required DateTime createdAt,
+      Value<DateTime?> achievedAt,
+      Value<int> rowid,
+    });
+typedef $$FocusPointsTableTableUpdateCompanionBuilder =
+    FocusPointsTableCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<DateTime> dueDate,
+      Value<int> position,
+      Value<DateTime> createdAt,
+      Value<DateTime?> achievedAt,
+      Value<int> rowid,
+    });
+
+class $$FocusPointsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $FocusPointsTableTable> {
+  $$FocusPointsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FocusPointsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $FocusPointsTableTable> {
+  $$FocusPointsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FocusPointsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FocusPointsTableTable> {
+  $$FocusPointsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dueDate =>
+      $composableBuilder(column: $table.dueDate, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get achievedAt => $composableBuilder(
+    column: $table.achievedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$FocusPointsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FocusPointsTableTable,
+          FocusPointRow,
+          $$FocusPointsTableTableFilterComposer,
+          $$FocusPointsTableTableOrderingComposer,
+          $$FocusPointsTableTableAnnotationComposer,
+          $$FocusPointsTableTableCreateCompanionBuilder,
+          $$FocusPointsTableTableUpdateCompanionBuilder,
+          (
+            FocusPointRow,
+            BaseReferences<
+              _$AppDatabase,
+              $FocusPointsTableTable,
+              FocusPointRow
+            >,
+          ),
+          FocusPointRow,
+          PrefetchHooks Function()
+        > {
+  $$FocusPointsTableTableTableManager(
+    _$AppDatabase db,
+    $FocusPointsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FocusPointsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FocusPointsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FocusPointsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<DateTime> dueDate = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> achievedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FocusPointsTableCompanion(
+                id: id,
+                title: title,
+                dueDate: dueDate,
+                position: position,
+                createdAt: createdAt,
+                achievedAt: achievedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required DateTime dueDate,
+                required int position,
+                required DateTime createdAt,
+                Value<DateTime?> achievedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FocusPointsTableCompanion.insert(
+                id: id,
+                title: title,
+                dueDate: dueDate,
+                position: position,
+                createdAt: createdAt,
+                achievedAt: achievedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FocusPointsTableTable, FocusPointRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $FocusPointsTableTable,
+                    FocusPointRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FocusPointsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FocusPointsTableTable,
+      FocusPointRow,
+      $$FocusPointsTableTableFilterComposer,
+      $$FocusPointsTableTableOrderingComposer,
+      $$FocusPointsTableTableAnnotationComposer,
+      $$FocusPointsTableTableCreateCompanionBuilder,
+      $$FocusPointsTableTableUpdateCompanionBuilder,
+      (
+        FocusPointRow,
+        BaseReferences<_$AppDatabase, $FocusPointsTableTable, FocusPointRow>,
+      ),
+      FocusPointRow,
       PrefetchHooks Function()
     >;
 
@@ -5645,7 +7956,8 @@ class $AppDatabaseManager {
       $$FloorPlansTableTableTableManager(_db, _db.floorPlansTable);
   $$PlacementsTableTableTableManager get placementsTable =>
       $$PlacementsTableTableTableManager(_db, _db.placementsTable);
-  $$PlantsTableTableTableManager get plantsTable => $$PlantsTableTableTableManager(_db, _db.plantsTable);
+  $$PlantsTableTableTableManager get plantsTable =>
+      $$PlantsTableTableTableManager(_db, _db.plantsTable);
   $$SpeakerSettingsTableTableTableManager get speakerSettingsTable =>
       $$SpeakerSettingsTableTableTableManager(_db, _db.speakerSettingsTable);
   $$ZenSettingsTableTableTableManager get zenSettingsTable =>
@@ -5660,6 +7972,8 @@ class $AppDatabaseManager {
       $$DashboardStateTableTableTableManager(_db, _db.dashboardStateTable);
   $$RoomScenesTableTableTableManager get roomScenesTable =>
       $$RoomScenesTableTableTableManager(_db, _db.roomScenesTable);
+  $$FocusPointsTableTableTableManager get focusPointsTable =>
+      $$FocusPointsTableTableTableManager(_db, _db.focusPointsTable);
 }
 
 // **************************************************************************
@@ -5675,7 +7989,8 @@ final appDatabaseProvider = AppDatabaseProvider._();
 
 /// Providers
 
-final class AppDatabaseProvider extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
+final class AppDatabaseProvider
+    extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
     with $Provider<AppDatabase> {
   /// Providers
   AppDatabaseProvider._()
@@ -5694,7 +8009,8 @@ final class AppDatabaseProvider extends $FunctionalProvider<AppDatabase, AppData
 
   @$internal
   @override
-  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   AppDatabase create(Ref ref) {
@@ -5703,7 +8019,10 @@ final class AppDatabaseProvider extends $FunctionalProvider<AppDatabase, AppData
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(AppDatabase value) {
-    return $ProviderOverride(origin: this, providerOverride: $SyncValueProvider<AppDatabase>(value));
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppDatabase>(value),
+    );
   }
 }
 
