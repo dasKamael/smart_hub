@@ -12,6 +12,7 @@ import 'package:smart_hub/presentation/design_system/layouts/hub_shell.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/screens/dashboard/dashboard.screen.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.screen.dart';
+import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.screen.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.controller.dart';
 import 'package:smart_hub/presentation/screens/lights/lights.screen.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
@@ -64,6 +65,7 @@ GoRouter createHubRouter({
       GoRoute(path: HubPage.settings.path, builder: (context, state) => const SettingsScreen()),
       GoRoute(path: HubPage.speakers.path, builder: (context, state) => const SpeakersScreen()),
       GoRoute(path: HubPage.weather.path, builder: (context, state) => const WeatherScreen()),
+      GoRoute(path: HubPage.floorplanEditor.path, builder: (context, state) => const FloorplanEditorScreen()),
       GoRoute(
         path: HubPage.plantProfile.path,
         builder: (context, state) => PlantProfileScreen(plantId: state.pathParameters['id'] ?? ''),

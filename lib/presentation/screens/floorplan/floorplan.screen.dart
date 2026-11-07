@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_hub/common/go_router/hub_page.enum.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
@@ -7,7 +9,9 @@ import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
 import 'package:smart_hub/presentation/design_system/atoms/device_marker.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_filter_chip.dart';
+import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.controller.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.state.dart';
@@ -180,17 +184,42 @@ class _LayerChips extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final layers = ref.watch(floorplanControllerProvider.select((s) => s.layers));
     final controller = ref.read(floorplanControllerProvider.notifier);
-    // Without lights and speakers there are only plants – nothing to switch between.
-    if (!ref.watch(hasLightsProvider)) return const SizedBox(height: 36);
     return SizedBox(
       height: 36,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
         spacing: 6,
         children: [
-          for (final MapEntry(key: layer, value: label) in _labels.entries)
-            HubFilterChip(label: label, selected: layers.contains(layer), onTap: () => controller.toggleLayer(layer)),
+          const _EditButton(),
+          const Spacer(),
+          // Without lights and speakers there are only plants – nothing to switch between.
+          if (ref.watch(hasLightsProvider))
+            for (final MapEntry(key: layer, value: label) in _labels.entries)
+              HubFilterChip(label: label, selected: layers.contains(layer), onTap: () => controller.toggleLayer(layer)),
         ],
+      ),
+    );
+  }
+}
+
+/// Opens the floor plan editor.
+class _EditButton extends StatelessWidget {
+  const _EditButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Edit floor plan',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.push(HubPage.floorplanEditor.path),
+        child: Container(
+          width: HubSizes.minTouchTarget,
+          height: 36,
+          decoration: BoxDecoration(color: HubColorPalette.elevated, borderRadius: BorderRadius.circular(18)),
+          alignment: Alignment.center,
+          child: const HubGlyphIcon(HubGlyph.pencil, color: HubColorPalette.text2),
+        ),
       ),
     );
   }

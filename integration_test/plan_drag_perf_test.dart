@@ -62,7 +62,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          floorPlanServiceProvider.overrideWith((ref) async => plan),
+          floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => plan),
           lightsServiceProvider.overrideWith(() => _Lights(lights)),
           speakersServiceProvider.overrideWith(_Speakers.new),
           placementServiceProvider.overrideWith(() => _Placements(placements)),

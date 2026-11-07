@@ -26,6 +26,14 @@ abstract final class HubColorPalette {
   static const wall = Color(0xFF636366);
   static const plantMarkerBg = Color(0xFF1E3524);
 
+  /// Window panes in the walls.
+  static const window = Color(0xFF8FD3FF);
+
+  /// Floor plan editor: 50 cm and 1 m grid lines, room names.
+  static const planGrid = Color(0x0BFFFFFF);
+  static const planGridStrong = Color(0x17FFFFFF);
+  static const planLabel = Color(0xCCEBEBF5);
+
   // Text
   static const text = Color(0xFFFFFFFF);
   static const text2 = Color(0x99EBEBF5);

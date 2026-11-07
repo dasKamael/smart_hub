@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/data/database/app_database.dart';
 import 'package:smart_hub/data/floorplan/floorplan.repository.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 
 /// Serves [content] for every key and counts the reads.
@@ -68,6 +70,36 @@ void main() {
       // Then
       expect(plan.rooms, hasLength(7));
       expect(assets.reads, 1);
+    });
+
+    test('Given an edited plan with a window, '
+        'when saving and loading again, '
+        'then the edited plan comes back instead of the bundled one', () async {
+      // Given
+      final edited = (await repository.load()).copyWith(
+        doors: const [Door(id: 'w1', type: DoorType.window, a: PlanPoint(10, 0), b: PlanPoint(110.5, 0))],
+      );
+
+      // When
+      await repository.save(edited);
+      final loaded = await repository.load();
+
+      // Then
+      expect(loaded, edited);
+    });
+
+    test('Given the bundled plan, '
+        'when encoding and parsing it again, '
+        'then nothing is lost and whole centimeters stay integers', () async {
+      // Given
+      final plan = await repository.load();
+
+      // When
+      final json = FloorplanRepository.encode(plan);
+
+      // Then
+      expect(FloorplanRepository.parse(jsonDecode(json) as Map<String, Object?>), plan);
+      expect(json, contains('"a": [\n        0,\n        160\n      ]'));
     });
 
     test('Given a plan in meters, when parsing, then it is rejected', () {

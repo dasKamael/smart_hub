@@ -7,6 +7,7 @@ import 'package:smart_hub/data/floorplan/placement.repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 
@@ -16,6 +17,8 @@ import '../../utils/riverpod.test_util.dart';
 class _MockFloorplanRepository extends Mock implements FloorplanRepository {}
 
 void main() {
+  setUpAll(() => registerFallbackValue(const FloorPlan(rooms: [])));
+
   group('floorPlanService', () {
     test('Given the repository has a plan, when reading the service, then the plan is returned', () async {
       // Given
@@ -29,6 +32,24 @@ void main() {
       // Then
       expect(plan.rooms, hasLength(7));
     });
+
+    test('Given the plan was loaded, '
+        'when saving an edited plan, '
+        'then it is stored and the service shows it at once', () async {
+      // Given
+      final repository = _MockFloorplanRepository();
+      when(repository.load).thenAnswer((_) async => loadApartmentPlan());
+      when(() => repository.save(any())).thenAnswer((_) async {});
+      final container = createTestContainer(overrides: [floorplanRepositoryProvider.overrideWithValue(repository)]);
+      final edited = (await container.read(floorPlanServiceProvider.future)).copyWith(rooms: const []);
+
+      // When
+      await container.read(floorPlanServiceProvider.notifier).save(edited);
+
+      // Then
+      expect(container.read(floorPlanServiceProvider).value, edited);
+      verify(() => repository.save(edited)).called(1);
+    });
   });
 
   group('PlacementService', () {
@@ -39,7 +60,7 @@ void main() {
       addTearDown(database.close);
       container = createTestContainer(
         overrides: [
-          floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
+          floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
           placementRepositoryProvider.overrideWithValue(PlacementRepository(database: database)),
         ],
       );

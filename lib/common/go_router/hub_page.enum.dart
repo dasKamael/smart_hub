@@ -4,6 +4,9 @@ enum HubPage {
   settings(path: '/settings'),
   speakers(path: '/settings/speakers'),
 
+  /// Drawing rooms, doors and windows of the plan.
+  floorplanEditor(path: '/plan/edit'),
+
   /// Profile of one plant: `/plants/<id>`.
   plantProfile(path: '/plants/:id'),
   weather(path: '/weather');

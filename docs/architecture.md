@@ -26,7 +26,8 @@ smart_hub/
 │  │  └─ zen/                     zen_settings.repository.dart, *.table.dart
 │  ├─ domain/
 │  │  ├─ connection/              connection.service.dart, connection.state.dart, model/
-│  │  ├─ floorplan/               placement.service.dart, room_lookup.util.dart, grouping.util.dart, model/
+│  │  ├─ floorplan/               placement.service.dart, room_lookup.util.dart, grouping.util.dart, model/,
+│  │  │                           editing/ (geometry of the floor plan editor)
 │  │  ├─ lights/                  light.service.dart, light_capabilities.util.dart, model/
 │  │  ├─ plants/                  watering.service.dart, watering_due.util.dart, model/
 │  │  ├─ music/                   speaker.service.dart, spotify*.service.dart, model/
@@ -42,6 +43,7 @@ smart_hub/
 │     ├─ shared_widgets/
 │     └─ screens/
 │        ├─ floorplan/            floorplan.screen.dart, floorplan.controller.dart, floorplan.state.dart, widgets/
+│        ├─ floorplan_editor/     drawing rooms, doors, openings and windows (replaceable module, see below)
 │        ├─ lights/  plants/  music/  dashboard/  setup/
 ├─ test/                          mirrors lib/ + architecture/, mocks/, utils/, fixtures/
 ├─ integration_test/              performance tests (profile mode)
@@ -53,7 +55,7 @@ smart_hub/
 | Context | Owns | Source of state |
 |---|---|---|
 | `connection` | HA session: auth, reconnect with backoff, online/offline, entity registry (for the placement picker) | HA |
-| `floorplan` | Rooms, walls, doors, device placements, room derivation, grouping, tray | drift |
+| `floorplan` | Rooms, walls, doors / openings / windows, device placements, room derivation, grouping, tray, editing the plan | drift |
 | `lights` | Light state, capabilities, light commands, scenes per room (templates until changed, adapted to what each lamp can do) | HA + drift |
 | `plants` | Plants, watering and fertilizing plan, photos, plant profiles (species care data from Perenual, loaded once per species and kept locally) | drift + local files + Perenual API |
 | `music` | Speaker state, playback, volume, speaker groups, Spotify content and Connect devices, local speaker settings | HA + Spotify Web API + drift |
@@ -82,6 +84,11 @@ Enforced by `test/architecture/`. Do not add exceptions without asking.
    Exception: every `data/<ctx>` may use `data/connection` (the shared HA session).
 5. `package:ha_client` is only imported in `lib/data/`.
 6. `domain/floorplan` does not import `domain/lights`, `domain/plants` or `domain/music`.
+   The floor plan editor is a replaceable module: `presentation/screens/floorplan_editor/` plus
+   `domain/floorplan/editing/`. Only the router opens it (`floorplan_editor.screen.dart`), only it uses
+   `domain/floorplan/editing/`, and it uses nothing but `domain/floorplan`, the design system and `common`. Its whole
+   contract is `FloorPlanService` (read the plan, `save`, `encode`). Swapping it for another builder means replacing
+   those two folders.
 7. `data` may import domain models (`domain/<ctx>/model/`) to map into them – nothing else from `domain`.
 8. `packages/ha_client` imports nothing from the app and nothing from Flutter.
 

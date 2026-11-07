@@ -8,18 +8,15 @@ part of 'floorplan.service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The apartment's floor plan.
 
-@ProviderFor(floorPlanService)
+@ProviderFor(FloorPlanService)
 final floorPlanServiceProvider = FloorPlanServiceProvider._();
 
+/// The apartment's floor plan.
 final class FloorPlanServiceProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<FloorPlan>,
-          FloorPlan,
-          FutureOr<FloorPlan>
-        >
-    with $FutureModifier<FloorPlan>, $FutureProvider<FloorPlan> {
+    extends $AsyncNotifierProvider<FloorPlanService, FloorPlan> {
+  /// The apartment's floor plan.
   FloorPlanServiceProvider._()
     : super(
         from: null,
@@ -36,16 +33,30 @@ final class FloorPlanServiceProvider
 
   @$internal
   @override
-  $FutureProviderElement<FloorPlan> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<FloorPlan> create(Ref ref) {
-    return floorPlanService(ref);
-  }
+  FloorPlanService create() => FloorPlanService();
 }
 
-String _$floorPlanServiceHash() => r'44fb965431fbdbf766675b1334d8247c12752128';
+String _$floorPlanServiceHash() => r'756b63ed3b562f0ab836bf1e0b7634bd215fa03e';
+
+/// The apartment's floor plan.
+
+abstract class _$FloorPlanService extends $AsyncNotifier<FloorPlan> {
+  FutureOr<FloorPlan> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<FloorPlan>, FloorPlan>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<FloorPlan>, FloorPlan>,
+              AsyncValue<FloorPlan>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
 
 /// Placed devices, live from the database.
 

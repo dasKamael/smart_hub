@@ -11,6 +11,7 @@ import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
@@ -28,11 +29,28 @@ List<Override> floorplanTestOverrides({PlacementRepository? placements}) {
   final database = AppDatabase(NativeDatabase.memory());
   addTearDown(database.close);
   return [
-    floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
+    floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
     placementRepositoryProvider.overrideWithValue(placements ?? PlacementRepository(database: database)),
     plantRepositoryProvider.overrideWithValue(PlantRepository(database: database)),
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),
   ];
+}
+
+/// [FloorPlanService] holding [plan] in memory that records every save.
+class FakeFloorPlanService extends FloorPlanService {
+  FakeFloorPlanService(this.plan);
+
+  final FloorPlan plan;
+  final saved = <FloorPlan>[];
+
+  @override
+  Future<FloorPlan> build() async => plan;
+
+  @override
+  Future<void> save(FloorPlan plan) async {
+    saved.add(plan);
+    state = AsyncData(plan);
+  }
 }
 
 /// [PlacementService] holding [placements] in memory, without a database.
@@ -69,7 +87,7 @@ List<Override> floorplanWidgetTestOverrides(
   bool hasHomeAssistant = true,
 }) {
   return [
-    floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
+    floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
     placementServiceProvider.overrideWith(() => placements),
     plantsServiceProvider.overrideWith(() => plants ?? FakePlantsService()),
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),

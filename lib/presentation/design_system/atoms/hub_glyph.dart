@@ -54,6 +54,23 @@ enum HubGlyph {
   /// Three rings around a center: a focus point.
   target(Size(18, 18), Size(16, 16)),
 
+  /// Arrow pointer: pick and move things.
+  pointer(Size(18, 18), Size(16, 16)),
+
+  /// Outline of a room with an angled wall.
+  room(Size(18, 18), Size(16, 16)),
+  rectangle(Size(18, 18), Size(16, 16)),
+
+  /// Door leaf with its swing.
+  door(Size(18, 18), Size(16, 16)),
+
+  /// Window with a cross bar.
+  window(Size(18, 18), Size(16, 16)),
+  redo(Size(18, 18), Size(16, 16)),
+
+  /// Arrow out of a tray.
+  export(Size(18, 18), Size(16, 16)),
+
   /// Potted plant, the illustration for plants without a photo.
   pottedPlant(Size(24, 24), Size(22, 22));
 
@@ -273,6 +290,54 @@ class _GlyphPainter extends CustomPainter {
         canvas
           ..drawCircle(const Offset(7.8, 7.8), 5, _stroke(2))
           ..drawLine(const Offset(11.6, 11.6), const Offset(15.4, 15.4), _stroke(2.4));
+      case HubGlyph.pointer:
+        canvas.drawPath(_pointer, fill);
+      case HubGlyph.room:
+        canvas.drawPath(_room, _stroke(1.9));
+      case HubGlyph.rectangle:
+        canvas.drawRRect(RRect.fromLTRBR(2.5, 4, 15.5, 14, const Radius.circular(1)), _stroke(1.9));
+      case HubGlyph.door:
+        canvas
+          ..drawLine(const Offset(2, 15.5), const Offset(16, 15.5), _stroke(1.9))
+          ..drawLine(const Offset(4, 15.5), const Offset(4, 3), _stroke(1.9))
+          ..drawArc(
+            Rect.fromCircle(center: const Offset(4, 15.5), radius: 12.5),
+            -math.pi / 2,
+            math.pi / 2,
+            false,
+            _stroke(1.3),
+          );
+      case HubGlyph.window:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(2.5, 2.5, 15.5, 15.5, const Radius.circular(1.5)), _stroke(1.9))
+          ..drawLine(const Offset(9, 2.5), const Offset(9, 15.5), _stroke(1.6))
+          ..drawLine(const Offset(2.5, 9), const Offset(15.5, 9), _stroke(1.6));
+      case HubGlyph.redo:
+        canvas
+          ..save()
+          ..translate(18, 0)
+          ..scale(-1, 1)
+          ..drawPath(_undoArc, _stroke(2.2))
+          ..drawPath(_undoHead, fill)
+          ..restore();
+      case HubGlyph.export:
+        canvas
+          ..drawLine(const Offset(9, 11), const Offset(9, 2.5), _stroke(2))
+          ..drawPath(
+            Path()
+              ..moveTo(5.2, 6.2)
+              ..lineTo(9, 2.4)
+              ..lineTo(12.8, 6.2),
+            _stroke(2),
+          )
+          ..drawPath(
+            Path()
+              ..moveTo(3, 11.5)
+              ..lineTo(3, 15)
+              ..lineTo(15, 15)
+              ..lineTo(15, 11.5),
+            _stroke(2),
+          );
       case HubGlyph.target:
         canvas
           ..drawCircle(const Offset(9, 9), 7.2, _stroke(1.7))
@@ -420,6 +485,24 @@ class _GlyphPainter extends CustomPainter {
     ..cubicTo(4.4, 16.6, 3.6, 16, 3.6, 15)
     ..lineTo(3.6, 12)
     ..cubicTo(3.6, 9.6, 5, 7.8, 7.4, 7)
+    ..close();
+
+  static final _pointer = Path()
+    ..moveTo(4, 2)
+    ..lineTo(14.5, 10.6)
+    ..lineTo(9.6, 11.2)
+    ..lineTo(12.2, 16)
+    ..lineTo(10.2, 17)
+    ..lineTo(7.6, 12.2)
+    ..lineTo(4, 15.4)
+    ..close();
+
+  static final _room = Path()
+    ..moveTo(2.5, 2.5)
+    ..lineTo(15.5, 2.5)
+    ..lineTo(15.5, 15.5)
+    ..lineTo(8, 15.5)
+    ..lineTo(2.5, 10)
     ..close();
 
   static final _undoArc = Path()

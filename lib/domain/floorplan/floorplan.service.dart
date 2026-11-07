@@ -9,8 +9,21 @@ import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
 
 part 'floorplan.service.g.dart';
 
+/// The apartment's floor plan.
 @Riverpod(keepAlive: true)
-Future<FloorPlan> floorPlanService(Ref ref) => ref.watch(floorplanRepositoryProvider).load();
+class FloorPlanService extends _$FloorPlanService {
+  @override
+  Future<FloorPlan> build() => ref.watch(floorplanRepositoryProvider).load();
+
+  /// Stores an edited plan; everything showing the plan follows at once.
+  Future<void> save(FloorPlan plan) async {
+    state = AsyncData(plan);
+    await ref.read(floorplanRepositoryProvider).save(plan);
+  }
+
+  /// [plan] as editor JSON (units: cm), e.g. for a backup.
+  String encode(FloorPlan plan) => FloorplanRepository.encode(plan);
+}
 
 /// Placed devices, live from the database.
 @Riverpod(keepAlive: true)

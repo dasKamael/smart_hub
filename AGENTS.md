@@ -142,6 +142,13 @@ Spotify device to a speaker goes on at the same track and position.
 The app runs without Home Assistant: the setup screen offers a demo mode backed by `FakeHomeAssistant`
 (`lib/data/connection/demo/`) with demo lights and speakers that react to service calls. Use it for UI work.
 
+## Floor plan editor
+
+Plan → pencil (`HubPage.floorplanEditor`): rooms (tap corners or drag a rectangle; corners snap to corners, guides and
+the 10 cm grid), doors, openings and windows on walls, undo / redo, saved on every change, copy as JSON for a backup.
+Windows are `DoorType.window`; the stored JSON stays the editor export format. A replaceable module with
+`FloorPlanService` as its only contract (`docs/architecture.md`, rule 6; enforced in `context_rules_test.dart`).
+
 ## Kiosk
 
 Launcher approach, no device owner: the app runs fullscreen (immersive sticky) with the screen always on.

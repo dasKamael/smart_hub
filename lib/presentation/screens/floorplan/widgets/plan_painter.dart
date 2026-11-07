@@ -1,11 +1,12 @@
 import 'package:flutter/rendering.dart';
+import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/plan_transform.dart';
 
-/// Static floor plan: rooms, walls, doors and the selected room overlay.
+/// Static floor plan: rooms, walls, doors, windows and the selected room overlay.
 ///
 /// Rooms are stroked thick first and filled afterwards, so only the outer outline stays thick (12 px) while
 /// inner walls end up 4 px.
@@ -16,6 +17,7 @@ class PlanPainter extends CustomPainter {
   static const _innerWallWidth = 4.0;
   static const _innerDoorWidth = 7.0;
   static const _outerDoorWidth = 14.0;
+  static const _paneWidth = 4.0;
 
   final FloorPlan plan;
   final PlanTransform transform;
@@ -58,11 +60,20 @@ class PlanPainter extends CustomPainter {
   }
 
   void _paintDoor(Canvas canvas, Door door) {
+    // A window keeps its wall; only the pane shows in it.
+    if (door.type == DoorType.window) return _paintWindow(canvas, door);
     final isOuter = _isOnOuterWall(door);
     final gap = Paint()
       ..color = isOuter ? HubColorPalette.surface : HubColorPalette.floor
       ..strokeWidth = isOuter ? _outerDoorWidth : _innerDoorWidth;
     canvas.drawLine(transform.toPx(door.a), transform.toPx(door.b), gap);
+  }
+
+  void _paintWindow(Canvas canvas, Door window) {
+    final pane = Paint()
+      ..color = HubColorPalette.window
+      ..strokeWidth = _paneWidth;
+    canvas.drawLine(transform.toPx(window.a), transform.toPx(window.b), pane);
   }
 
   /// A door is on the outer wall when one side of it is outside of every room.

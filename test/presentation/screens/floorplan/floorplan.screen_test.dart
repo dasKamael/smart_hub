@@ -88,6 +88,14 @@ void main() {
       expect(find.text('Tap a room or device'), findsOneWidget);
     });
 
+    testWidgets('Given the plan, when rendering, then a button to edit the plan is there', (tester) async {
+      // When
+      await pumpScreen(tester);
+
+      // Then
+      expect(find.bySemanticsLabel('Edit floor plan'), findsOneWidget);
+    });
+
     testWidgets('Given the plan, '
         'when tapping inside the kitchen, '
         'then the room inspector shows the kitchen', (tester) async {
