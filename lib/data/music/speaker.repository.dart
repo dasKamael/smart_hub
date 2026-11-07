@@ -27,6 +27,9 @@ abstract interface class SpeakerRepository {
 
   Future<void> play(String id, MediaItem item);
 
+  /// Plays the Spotify [tracks] (`spotify:track:…`) on [id] in this order, e.g. the liked songs.
+  Future<void> playTracks(String id, List<String> tracks);
+
   Future<List<MediaItem>> favorites(String id);
 
   /// Plays the track at [position] of the queue of [id].

@@ -56,6 +56,11 @@ class MusicController extends _$MusicController {
 
   void showLibrary(LibraryView view) => state = state.copyWith(libraryView: view);
 
+  /// Looks into [item] instead of playing it; opening it again closes it.
+  void open(MediaItem item) => state = state.copyWith(opened: state.opened?.contentId == item.contentId ? null : item);
+
+  void close() => state = state.copyWith(opened: null);
+
   void playPause(PlaybackTarget target) {
     switch (target) {
       case SpeakerGroupTarget(:final group):
@@ -71,7 +76,7 @@ class MusicController extends _$MusicController {
     final title = target.nowPlaying.title;
     switch (target) {
       case SpeakerGroupTarget(:final group):
-        final upcoming = PlayQueueUtil.nextAfter(ref.read(playQueueProvider(group.leaderId)).value, title);
+        final upcoming = PlayQueueUtil.nextAfter(ref.read(speakerQueueProvider(group.leaderId)).value, title);
         _transport('skip', _speakers.next(group.leaderId, upcoming: upcoming));
       case ConnectTarget(:final device):
         final upcoming = PlayQueueUtil.nextAfter(ref.read(spotifyQueueProvider).value, title);
@@ -111,7 +116,9 @@ class MusicController extends _$MusicController {
     }
   }
 
+  /// Plays [item] on [target]; what was looked into closes, so "Up next" shows the music.
   void play(PlaybackTarget target, MediaItem item) {
+    close();
     switch (target) {
       case SpeakerGroupTarget(:final group):
         _transport('play ${item.title}', _speakers.play(group.leaderId, item));
@@ -364,7 +371,7 @@ QueueItem? upNext(Ref ref, {required bool visible}) {
     ),
   );
   final queue = switch (shown) {
-    (leaderId: final leaderId?, spotifyPlays: _, title: _) => ref.watch(playQueueProvider(leaderId)).value,
+    (leaderId: final leaderId?, spotifyPlays: _, title: _) => ref.watch(speakerQueueProvider(leaderId)).value,
     (leaderId: null, spotifyPlays: true, title: _) => ref.watch(spotifyQueueProvider).value,
     _ => null,
   };

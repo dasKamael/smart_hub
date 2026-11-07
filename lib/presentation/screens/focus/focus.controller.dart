@@ -29,9 +29,8 @@ final class RemoveFocus extends FocusEdit {
   const RemoveFocus();
 }
 
-/// A focus point with its countdown today: days left, how much of its time has passed, how pressing it is and the
-/// countdown in words.
-typedef FocusEntry = ({FocusPoint point, int daysLeft, double progress, FocusUrgency urgency, String countdown});
+/// A focus point with its countdown today: days left, how pressing it is and the countdown in words.
+typedef FocusEntry = ({FocusPoint point, int daysLeft, FocusUrgency urgency, String countdown});
 
 /// The focus widget: saying a point is done, dropping it and saving the editor.
 @riverpod
@@ -93,7 +92,6 @@ List<FocusEntry> focusPlan(Ref ref) {
       (
         point: point,
         daysLeft: FocusDueUtil.daysLeft(point, today),
-        progress: FocusDueUtil.progress(point, today),
         urgency: FocusDueUtil.urgencyOf(point, today),
         countdown: FocusDueUtil.countdown(point, today),
       ),

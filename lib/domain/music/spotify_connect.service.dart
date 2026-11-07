@@ -271,3 +271,19 @@ Future<List<QueueItem>> spotifyQueue(Ref ref) async {
   ref.watch(spotifyConnectServiceProvider.select((state) => state.value?.playback?.title));
   return ref.watch(spotifyRepositoryProvider).queue();
 }
+
+/// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+/// its own then) and Spotify plays the same track. Reloads when the track changes.
+@riverpod
+Future<List<QueueItem>?> speakerQueue(Ref ref, String speakerId) async {
+  final title = ref.watch(
+    speakersServiceProvider.select(
+      (speakers) => speakers.value?.where((speaker) => speaker.id == speakerId).firstOrNull?.title,
+    ),
+  );
+  final own = await ref.watch(playQueueProvider(speakerId).future);
+  if (own != null) return own;
+  if (title == null || await ref.watch(spotifyAccountServiceProvider.future) is! SpotifySignedIn) return null;
+  final spotify = await ref.read(spotifyRepositoryProvider).queue();
+  return spotify.firstOrNull?.title == title ? spotify : null;
+}

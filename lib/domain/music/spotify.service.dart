@@ -4,6 +4,7 @@ import 'package:smart_hub/common/config/spotify_config.dart';
 import 'package:smart_hub/data/music/spotify/spotify.repository.dart';
 import 'package:smart_hub/data/music/spotify/spotify_auth.repository.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
+import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
 
 part 'spotify.service.g.dart';
@@ -57,4 +58,10 @@ Future<List<MediaItem>> spotifyPlaylists(Ref ref) async {
   final account = await ref.watch(spotifyAccountServiceProvider.future);
   if (account is! SpotifySignedIn) return const [];
   return ref.watch(spotifyRepositoryProvider).playlists();
+}
+
+/// The tracks of a playlist, album or the liked songs, to look into it before playing.
+@riverpod
+Future<List<QueueItem>> spotifyTracks(Ref ref, MediaItem item) {
+  return ref.watch(spotifyRepositoryProvider).tracksOf(item);
 }

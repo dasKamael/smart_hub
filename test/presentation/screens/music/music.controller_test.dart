@@ -360,7 +360,7 @@ void main() {
       container.listen(upNextProvider(visible: true), (_, _) {});
       await container.read(speakersServiceProvider.future);
       await container.read(speakerSettingsServiceProvider.future);
-      await container.read(playQueueProvider('media_player.office').future);
+      await container.read(speakerQueueProvider('media_player.office').future);
 
       // When
       final next = container.read(upNextProvider(visible: true));

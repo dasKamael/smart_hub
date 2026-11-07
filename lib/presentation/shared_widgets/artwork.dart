@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 
 /// Cover art. Without an image a warm gradient picked from [seed] (e.g. the title) and a note stand in, so
 /// different tracks and playlists still look different.
@@ -75,8 +76,19 @@ class Artwork extends StatelessWidget {
                 height: double.infinity,
                 // The old cover stays until the next one is decoded, so no placeholder shows in between.
                 gaplessPlayback: true,
-                frameBuilder: (context, image, frame, synchronous) =>
-                    Stack(fit: StackFit.expand, children: [generated, image]),
+                // A cover that is not in memory yet fades in over a calm tone once it is decoded; a cached one shows
+                // at once.
+                frameBuilder: (context, image, frame, synchronous) => synchronous
+                    ? image
+                    : ColoredBox(
+                        color: const Color(0x14FFFFFF),
+                        child: AnimatedOpacity(
+                          opacity: frame == null ? 0 : 1,
+                          duration: HubMotion.coverFadeDuration,
+                          curve: Curves.easeOut,
+                          child: image,
+                        ),
+                      ),
                 errorBuilder: (_, _, _) => generated,
               );
             },

@@ -6,15 +6,29 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/shared_widgets/artwork.dart';
 
-/// Favorites and playlists as a two-column list with small covers; a tap plays one on the active target.
+/// Favorites and playlists as a two-column list with small covers; a tap plays one on the active target, or opens
+/// it with [opens].
 class PlaylistGrid extends StatelessWidget {
-  const PlaylistGrid({super.key, required this.items, required this.enabled, required this.onPlay});
+  const PlaylistGrid({
+    super.key,
+    required this.items,
+    required this.enabled,
+    required this.onTap,
+    this.opens = false,
+    this.openedId,
+  });
 
   static const rowHeight = 60.0;
 
   final List<MediaItem> items;
   final bool enabled;
-  final ValueChanged<MediaItem> onPlay;
+  final ValueChanged<MediaItem> onTap;
+
+  /// Whether a tap looks into an item instead of playing it.
+  final bool opens;
+
+  /// The item looked into, highlighted.
+  final String? openedId;
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +43,23 @@ class PlaylistGrid extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        return _PlaylistRow(item: item, onTap: enabled ? () => onPlay(item) : null);
+        return _PlaylistRow(
+          item: item,
+          label: '${opens ? 'Open' : 'Play'} ${item.title}',
+          opened: item.contentId == openedId,
+          onTap: enabled ? () => onTap(item) : null,
+        );
       },
     );
   }
 }
 
 class _PlaylistRow extends StatefulWidget {
-  const _PlaylistRow({required this.item, this.onTap});
+  const _PlaylistRow({required this.item, required this.label, required this.opened, this.onTap});
 
   final MediaItem item;
+  final String label;
+  final bool opened;
   final VoidCallback? onTap;
 
   @override
@@ -53,7 +74,8 @@ class _PlaylistRowState extends State<_PlaylistRow> {
     final item = widget.item;
     return Semantics(
       button: true,
-      label: 'Play ${item.title}',
+      selected: widget.opened,
+      label: widget.label,
       excludeSemantics: true,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _pressed = true),
@@ -64,7 +86,7 @@ class _PlaylistRowState extends State<_PlaylistRow> {
           duration: HubMotion.fadeDuration,
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: _pressed ? HubColorPalette.control : HubColorPalette.elevated,
+            color: _pressed || widget.opened ? HubColorPalette.control : HubColorPalette.elevated,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(

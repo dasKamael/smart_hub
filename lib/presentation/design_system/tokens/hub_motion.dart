@@ -14,6 +14,9 @@ abstract final class HubMotion {
   static const fade = Curves.ease;
   static const fadeDuration = Duration(milliseconds: 220);
 
+  /// A loaded cover fading in.
+  static const coverFadeDuration = Duration(milliseconds: 400);
+
   /// Light glow on/off.
   static const glow = Curves.ease;
   static const glowDuration = Duration(milliseconds: 500);

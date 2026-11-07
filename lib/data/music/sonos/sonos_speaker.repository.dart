@@ -40,6 +40,9 @@ class SonosSpeakerRepository implements SpeakerRepository {
   var _started = false;
   var _disposed = false;
   var _reading = false;
+
+  /// Plays started per group coordinator, so queueing the rest of an earlier one stops when another starts.
+  final _plays = <String, int>{};
   Timer? _timer;
 
   @override
@@ -143,6 +146,7 @@ class SonosSpeakerRepository implements SpeakerRepository {
     if (entry == null) return Future.error(UnsupportedError('The speakers cannot play ${item.contentId}'));
     final coordinator = _coordinator(id);
     final soap = _soap(coordinator);
+    _startPlay(coordinator);
     return _command(() async {
       await soap.avTransport('RemoveAllTracksFromQueue');
       await soap.avTransport('AddURIToQueue', {
@@ -192,6 +196,55 @@ class SonosSpeakerRepository implements SpeakerRepository {
           '<desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON2311_X_#Svc2311-0-Token</desc>'
           '</item></DIDL-Lite>',
     );
+  }
+
+  /// The first track plays at once, the others are queued after it one by one in the background: queueing several
+  /// in one request splits their metadata at spaces, which the metadata itself contains.
+  @override
+  Future<void> playTracks(String id, List<String> tracks) {
+    final entries = [for (final track in tracks) ?_spotifyEntry(track)];
+    if (entries.isEmpty) return Future.error(UnsupportedError('The speakers cannot play these tracks'));
+    final coordinator = _coordinator(id);
+    final soap = _soap(coordinator);
+    final play = _startPlay(coordinator);
+    return _command(() async {
+      await soap.avTransport('RemoveAllTracksFromQueue');
+      await _enqueue(soap, entries.first);
+      await soap.avTransport('SetAVTransportURI', {
+        'CurrentURI': 'x-rincon-queue:$coordinator#0',
+        'CurrentURIMetaData': '',
+      });
+      await soap.avTransport('Play', {'Speed': '1'});
+      unawaited(_enqueueRest(soap, coordinator, play, entries.skip(1)));
+    });
+  }
+
+  int _startPlay(String coordinator) => _plays.update(coordinator, (count) => count + 1, ifAbsent: () => 1);
+
+  Future<void> _enqueueRest(
+    SonosSoap soap,
+    String coordinator,
+    int play,
+    Iterable<({String uri, String metadata})> entries,
+  ) async {
+    for (final entry in entries) {
+      if (_disposed || _plays[coordinator] != play) return;
+      try {
+        await _enqueue(soap, entry);
+      } on Object catch (e) {
+        _log.warning('Could not queue the rest of the tracks: $e');
+        return;
+      }
+    }
+  }
+
+  static Future<void> _enqueue(SonosSoap soap, ({String uri, String metadata}) entry) {
+    return soap.avTransport('AddURIToQueue', {
+      'EnqueuedURI': entry.uri,
+      'EnqueuedURIMetaData': entry.metadata,
+      'DesiredFirstTrackNumberEnqueued': '0',
+      'EnqueueAsNext': '0',
+    });
   }
 
   /// Where [spotifyTrack] is in the queue, looked up a page at a time.

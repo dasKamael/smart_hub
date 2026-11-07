@@ -115,7 +115,7 @@ final class FocusPlanProvider
   }
 }
 
-String _$focusPlanHash() => r'05a71dccd9946154f7e822ba17928ee62bc34e90';
+String _$focusPlanHash() => r'e139e1bac328ad50410ee3e627c599a06aa3b946';
 
 /// The color of the focus area: it warms as the days run out.
 

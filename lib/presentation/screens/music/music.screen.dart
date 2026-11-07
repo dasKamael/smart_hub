@@ -26,6 +26,7 @@ import 'package:smart_hub/presentation/screens/music/library_view.enum.dart';
 import 'package:smart_hub/presentation/screens/music/music.controller.dart';
 import 'package:smart_hub/presentation/screens/music/playback_target.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/now_playing_card.dart';
+import 'package:smart_hub/presentation/screens/music/widgets/opened_playlist.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/playlist_grid.dart';
 import 'package:smart_hub/presentation/screens/music/widgets/queue_list.dart';
 
@@ -250,6 +251,7 @@ class _JumpBackIn extends ConsumerWidget {
     );
     final enabled = ref.watch(shown.select((target) => target is ConnectTarget)) || _transportEnabled(ref, null);
     final view = ref.watch(musicControllerProvider.select((state) => state.libraryView));
+    final openedId = ref.watch(musicControllerProvider.select((state) => state.opened?.contentId));
     final favorites = switch ((leaderId, view)) {
       (final leaderId?, _) => ref.watch(mediaFavoritesProvider(leaderId)),
       (null, LibraryView.recent) => ref.watch(spotifyRecentProvider),
@@ -276,12 +278,20 @@ class _JumpBackIn extends ConsumerWidget {
           ),
           Expanded(
             child: switch (favorites) {
+              // Spotify's playlists and albums open first; a speaker's favorites play at once.
               AsyncData(value: final items) when items.isNotEmpty => PlaylistGrid(
                 key: ValueKey(view),
                 items: items,
-                enabled: enabled,
-                onPlay: (item) {
-                  if (ref.read(shown) case final target?) ref.read(musicControllerProvider.notifier).play(target, item);
+                enabled: leaderId == null || enabled,
+                opens: leaderId == null,
+                openedId: openedId,
+                onTap: (item) {
+                  final controller = ref.read(musicControllerProvider.notifier);
+                  if (leaderId == null) {
+                    controller.open(item);
+                  } else if (ref.read(shown) case final target?) {
+                    controller.play(target, item);
+                  }
                 },
               ),
               AsyncLoading() => const SizedBox.shrink(),
@@ -359,40 +369,60 @@ class _UpNext extends ConsumerWidget {
       ),
     );
     final queue = switch (shown) {
-      (leaderId: final leaderId?, spotifyPlays: _, title: _) => ref.watch(playQueueProvider(leaderId)),
+      (leaderId: final leaderId?, spotifyPlays: _, title: _) => ref.watch(speakerQueueProvider(leaderId)),
       (leaderId: null, spotifyPlays: true, title: _) => ref.watch(spotifyQueueProvider),
       _ => const AsyncData<List<QueueItem>?>(null),
     };
     final enabled =
         ref.watch(currentTargetProvider(visible: visible).select((target) => target is ConnectTarget)) ||
         _transportEnabled(ref, null);
+    final opened = ref.watch(musicControllerProvider.select((state) => state.opened));
+    final controller = ref.read(musicControllerProvider.notifier);
     return PageCard(
       color: _cardColor(ref, visible),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: HubSpacing.s8,
-        children: [
-          const Text('Up next', style: HubTextStyles.widgetTitle),
-          Expanded(
-            // The last queue stays while a new one loads, so the list does not blink.
-            child: switch ((queue.value, queue.isLoading)) {
-              (final items?, _) when items.isNotEmpty => QueueList(
-                items: items,
-                currentTitle: shown.title,
+      child: AnimatedSwitcher(
+        duration: HubMotion.fadeDuration,
+        child: opened != null
+            ? OpenedPlaylist(
+                key: ValueKey(opened.contentId),
+                item: opened,
+                tracks: ref.watch(spotifyTracksProvider(opened)),
+                onClose: controller.close,
                 onPlay: enabled
-                    ? (item) {
+                    ? (from) {
                         if (ref.read(currentTargetProvider(visible: visible)) case final target?) {
-                          ref.read(musicControllerProvider.notifier).playFromQueue(target, item);
+                          controller.play(target, from?.uri == null ? opened : opened.copyWith(startTrack: from!.uri));
                         }
                       }
                     : null,
+              )
+            : Column(
+                key: const ValueKey('up next'),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: HubSpacing.s8,
+                children: [
+                  const Text('Up next', style: HubTextStyles.widgetTitle),
+                  Expanded(
+                    // The last queue stays while a new one loads, so the list does not blink.
+                    child: switch ((queue.value, queue.isLoading)) {
+                      (final items?, _) when items.isNotEmpty => QueueList(
+                        items: items,
+                        currentTitle: shown.title,
+                        onPlay: enabled
+                            ? (item) {
+                                if (ref.read(currentTargetProvider(visible: visible)) case final target?) {
+                                  ref.read(musicControllerProvider.notifier).playFromQueue(target, item);
+                                }
+                              }
+                            : null,
+                      ),
+                      (_, true) => const SizedBox.shrink(),
+                      _ => const EmptyMark(glyph: HubGlyph.note, label: 'Nothing queued here'),
+                    },
+                  ),
+                ],
               ),
-              (_, true) => const SizedBox.shrink(),
-              _ => const EmptyMark(glyph: HubGlyph.note, label: 'Nothing queued here'),
-            },
-          ),
-        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/common/utils/optimistic_overlay.dart';
 import 'package:smart_hub/data/music/speaker.repository.dart';
+import 'package:smart_hub/data/music/spotify/spotify.repository.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/playback.enum.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
@@ -128,7 +129,8 @@ class SpeakersService extends _$SpeakersService {
     return _run(group, _repository.playFromQueue(id, position));
   }
 
-  /// Plays [item] on [id] and its group; its name and cover show at once until the first track is reported.
+  /// Plays [item] on [id] and its group; its name and cover show at once until the first track is reported. The
+  /// speakers cannot play Spotify's liked songs as a whole: they get its tracks.
   Future<void> play(String id, MediaItem item) {
     final group = _groupOf(id);
     final now = clock.now();
@@ -150,7 +152,13 @@ class SpeakersService extends _$SpeakersService {
         timeout: const Duration(seconds: 10),
       );
     }
-    return _run(group, _repository.play(id, item));
+    final command = item.isLikedSongs
+        ? ref.read(spotifyRepositoryProvider).likedTracks().then((tracks) {
+            final start = tracks.indexOf(item.startTrack ?? '');
+            return _repository.playTracks(id, start < 0 ? tracks : tracks.sublist(start));
+          })
+        : _repository.play(id, item);
+    return _run(group, command);
   }
 
   Future<void> setVolume(String id, int percent) {

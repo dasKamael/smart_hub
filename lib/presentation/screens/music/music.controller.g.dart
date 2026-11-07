@@ -44,7 +44,7 @@ final class MusicControllerProvider
   }
 }
 
-String _$musicControllerHash() => r'615820a6deeab070a65e2884354a267a784f4a57';
+String _$musicControllerHash() => r'1c4b0e4e0fa17eeba5218eddcfe4023bd85399e4';
 
 /// Music page: which target is shown, which tile shows its options, and the playback commands.
 
@@ -514,7 +514,7 @@ final class UpNextProvider
   }
 }
 
-String _$upNextHash() => r'd021feb0134ea9a8fb6ebe745b1ce29801600c48';
+String _$upNextHash() => r'759b39988db58b5a85e1119e93965142a9ea21ea';
 
 /// The track after the current one in the active target's queue, e.g. to load its cover ahead of time.
 

@@ -120,3 +120,92 @@ final class SpotifyQueueProvider
 }
 
 String _$spotifyQueueHash() => r'083be06913ab09fbc8e7b4b97a0b0e5236ceaa2a';
+
+/// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+/// its own then) and Spotify plays the same track. Reloads when the track changes.
+
+@ProviderFor(speakerQueue)
+final speakerQueueProvider = SpeakerQueueFamily._();
+
+/// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+/// its own then) and Spotify plays the same track. Reloads when the track changes.
+
+final class SpeakerQueueProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<QueueItem>?>,
+          List<QueueItem>?,
+          FutureOr<List<QueueItem>?>
+        >
+    with $FutureModifier<List<QueueItem>?>, $FutureProvider<List<QueueItem>?> {
+  /// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+  /// its own then) and Spotify plays the same track. Reloads when the track changes.
+  SpeakerQueueProvider._({
+    required SpeakerQueueFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'speakerQueueProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$speakerQueueHash();
+
+  @override
+  String toString() {
+    return r'speakerQueueProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<QueueItem>?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<QueueItem>?> create(Ref ref) {
+    final argument = this.argument as String;
+    return speakerQueue(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SpeakerQueueProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$speakerQueueHash() => r'7446430b0e9aa425fc9bf86d5c92bb113b5d184b';
+
+/// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+/// its own then) and Spotify plays the same track. Reloads when the track changes.
+
+final class SpeakerQueueFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<QueueItem>?>, String> {
+  SpeakerQueueFamily._()
+    : super(
+        retry: null,
+        name: r'speakerQueueProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The play queue of [speakerId]: its own, or Spotify's while it plays music sent to it with Spotify (it has none of
+  /// its own then) and Spotify plays the same track. Reloads when the track changes.
+
+  SpeakerQueueProvider call(String speakerId) =>
+      SpeakerQueueProvider._(argument: speakerId, from: this);
+
+  @override
+  String toString() => r'speakerQueueProvider';
+}

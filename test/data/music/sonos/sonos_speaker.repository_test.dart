@@ -168,6 +168,49 @@ void main() {
       ]);
     });
 
+    test('Given three liked songs, when playing them in the office, '
+        'then the first plays at once and the others are queued after it', () async {
+      // Given
+      await firstRead();
+      sonos.calls.clear();
+
+      // When
+      await repository.playTracks('RINCON_B', ['spotify:track:One', 'spotify:track:Two', 'spotify:track:Three']);
+      await pumpEventQueue();
+
+      // Then
+      expect(sonos.calls.where((call) => call.startsWith('10.0.0.25') && !call.contains(' Get')), [
+        '10.0.0.25 RemoveAllTracksFromQueue',
+        '10.0.0.25 AddURIToQueue x-sonos-spotify:spotify%3atrack%3aOne?sid=9&flags=8224&sn=0',
+        '10.0.0.25 SetAVTransportURI x-rincon-queue:RINCON_B#0',
+        '10.0.0.25 Play',
+        '10.0.0.25 AddURIToQueue x-sonos-spotify:spotify%3atrack%3aTwo?sid=9&flags=8224&sn=0',
+        '10.0.0.25 AddURIToQueue x-sonos-spotify:spotify%3atrack%3aThree?sid=9&flags=8224&sn=0',
+      ]);
+    });
+
+    test(
+      'Given liked songs still being queued, when a playlist starts, then none of them is queued after it',
+      () async {
+        // Given
+        await firstRead();
+        await repository.playTracks('RINCON_B', ['spotify:track:One', 'spotify:track:Two', 'spotify:track:Three']);
+        sonos.calls.clear();
+
+        // When
+        await repository.play(
+          'RINCON_B',
+          const MediaItem(title: 'Mix', contentId: 'spotify:playlist:Mix', contentType: 'playlist'),
+        );
+        await pumpEventQueue();
+
+        // Then
+        final cleared = sonos.calls.indexOf('10.0.0.25 RemoveAllTracksFromQueue');
+        expect(sonos.calls.skip(cleared).where((call) => call.contains('spotify%3atrack')), isEmpty);
+        expect(sonos.calls.where((call) => call.contains('spotify%3atrack%3aThree')), isEmpty);
+      },
+    );
+
     test('Given a podcast show, when playing it, then the speakers cannot', () async {
       // Given
       await firstRead();

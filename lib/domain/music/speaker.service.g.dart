@@ -45,7 +45,7 @@ final class SpeakersServiceProvider
   SpeakersService create() => SpeakersService();
 }
 
-String _$speakersServiceHash() => r'0eed0b93000e0d5a3e5aa1ad07cb3a7c4c3d566a';
+String _$speakersServiceHash() => r'a2d5544ceadab1512b2f60ff39f615c0b56304c6';
 
 /// All speakers, sorted by name, and the commands to control them.
 ///

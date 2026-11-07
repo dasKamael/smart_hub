@@ -180,7 +180,20 @@ void main() {
 
       // Then
       expect(find.text('What are you on?'), findsOneWidget);
-      expect(find.text('A name and a day. Up to three.'), findsOneWidget);
+    });
+
+    testWidgets('Given a single focus point, '
+        'when showing every size, '
+        'then it takes the whole card without overflowing', (tester) async {
+      for (final size in WidgetSize.values) {
+        // Given / When
+        await pumpWidgetWith(tester, [buildPoint('f1', 'Hub on the wall', dueDate: DateTime(2026, 11, 6))], size: size);
+
+        // Then
+        expect(tester.takeException(), isNull, reason: 'size ${size.name}');
+        expect(find.text('Hub on the wall'), findsOneWidget, reason: 'size ${size.name}');
+        await repository.delete('f1');
+      }
     });
 
     testWidgets('Given three focus points, '

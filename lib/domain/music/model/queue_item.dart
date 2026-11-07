@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'queue_item.freezed.dart';
 
-/// A track in the play queue of a speaker.
+/// A track in the play queue of a speaker, or of a playlist or album.
 @freezed
 abstract class QueueItem with _$QueueItem {
   const factory QueueItem({
@@ -17,5 +17,8 @@ abstract class QueueItem with _$QueueItem {
 
     /// Place in the speaker's queue, to jump there; `null` where that is not possible (Spotify).
     int? position,
+
+    /// The track on Spotify (`spotify:track:…`), to start a playlist or album from it.
+    String? uri,
   }) = _QueueItem;
 }

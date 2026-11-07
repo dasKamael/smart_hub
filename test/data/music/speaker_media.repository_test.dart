@@ -156,5 +156,19 @@ void main() {
       expect(server.serviceCalls.map((c) => c.service), ['play_media', 'media_next_track', 'media_previous_track']);
       expect(server.serviceCalls.first.data, {'media_content_id': 'fav:1', 'media_content_type': 'x'});
     });
+
+    test('Given two tracks, when playing them, then the first replaces the queue and the second is added', () async {
+      // Given
+      await connect([_player({})]);
+
+      // When
+      await repository.playTracks('media_player.kitchen', ['spotify:track:One', 'spotify:track:Two']);
+
+      // Then
+      expect(server.serviceCalls.map((c) => c.data), [
+        {'media_content_id': 'spotify:track:One', 'media_content_type': 'music', 'enqueue': 'replace'},
+        {'media_content_id': 'spotify:track:Two', 'media_content_type': 'music', 'enqueue': 'add'},
+      ]);
+    });
   });
 }

@@ -8,12 +8,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/data/music/spotify/spotify.repository.dart';
 import 'package:smart_hub/domain/music/model/connect_device.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
+import 'package:smart_hub/domain/music/model/playback.enum.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/model/spotify_account.dart';
+import 'package:smart_hub/domain/music/model/speaker_state.dart';
 import 'package:smart_hub/domain/music/model/spotify_playback.dart';
+import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/spotify.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
 
+import '../../mocks/devices.mock.dart';
 import '../../utils/riverpod.test_util.dart';
 
 class _MockSpotify extends Mock implements SpotifyRepository {}
@@ -346,6 +350,79 @@ void main() {
         expect(stateOf(container)?.playback?.title, 'Late Tram');
         verify(() => spotify.next('d-phone')).called(3);
       });
+    });
+  });
+
+  group('speakerQueue', () {
+    const kitchen = SpeakerState(
+      id: 'kitchen',
+      name: 'Kitchen',
+      playback: Playback.playing,
+      title: 'SWIM',
+      groupMembers: ['kitchen'],
+    );
+    const spotifyQueue = [QueueItem(title: 'SWIM'), QueueItem(title: 'Bloom')];
+    late _MockSpotify spotify;
+
+    setUp(() {
+      spotify = _MockSpotify();
+      when(() => spotify.queue()).thenAnswer((_) async => spotifyQueue);
+    });
+
+    Future<ProviderContainer> createContainer({required List<QueueItem>? ownQueue}) async {
+      final container = createTestContainer(
+        overrides: [
+          spotifyAccountServiceProvider.overrideWith(() => _FakeAccount(const SpotifySignedIn(displayName: 'Richard'))),
+          spotifyRepositoryProvider.overrideWithValue(spotify),
+          speakersServiceProvider.overrideWith(() => FakeSpeakersService([kitchen])),
+          playQueueProvider('kitchen').overrideWith((_) async => ownQueue),
+        ],
+      );
+      container.listen(speakerQueueProvider('kitchen'), (_, _) {});
+      await container.read(speakersServiceProvider.future);
+      return container;
+    }
+
+    test('Given a speaker playing music sent to it with Spotify, '
+        'when reading its queue, '
+        "then it is Spotify's queue", () async {
+      // Given
+      final container = await createContainer(ownQueue: null);
+
+      // When
+      final queue = await container.read(speakerQueueProvider('kitchen').future);
+
+      // Then
+      expect(queue, spotifyQueue);
+    });
+
+    test('Given a speaker with a queue of its own, '
+        'when reading its queue, '
+        'then it is its own and Spotify is not asked', () async {
+      // Given
+      const own = [QueueItem(title: 'SWIM', position: 0)];
+      final container = await createContainer(ownQueue: own);
+
+      // When
+      final queue = await container.read(speakerQueueProvider('kitchen').future);
+
+      // Then
+      expect(queue, own);
+      verifyNever(() => spotify.queue());
+    });
+
+    test('Given a speaker without a queue playing something Spotify does not, '
+        'when reading its queue, '
+        'then there is none', () async {
+      // Given
+      when(() => spotify.queue()).thenAnswer((_) async => const [QueueItem(title: 'Other song')]);
+      final container = await createContainer(ownQueue: null);
+
+      // When
+      final queue = await container.read(speakerQueueProvider('kitchen').future);
+
+      // Then
+      expect(queue, isNull);
     });
   });
 }

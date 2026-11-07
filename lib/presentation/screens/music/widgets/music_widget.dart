@@ -7,7 +7,6 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart
 import 'package:smart_hub/common/go_router/hub_route.enum.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
 import 'package:smart_hub/domain/music/play_queue.util.dart';
-import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/music/spotify_connect.service.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
@@ -331,7 +330,7 @@ class _ExtraLarge extends ConsumerWidget {
 /// The target's play queue; the last one stays while a new one loads.
 List<QueueItem>? _queue(WidgetRef ref, PlaybackTarget target) {
   return switch (target) {
-    SpeakerGroupTarget(:final group) => ref.watch(playQueueProvider(group.leaderId)).value,
+    SpeakerGroupTarget(:final group) => ref.watch(speakerQueueProvider(group.leaderId)).value,
     ConnectTarget(playback: _?) => ref.watch(spotifyQueueProvider).value,
     ConnectTarget() => null,
   };

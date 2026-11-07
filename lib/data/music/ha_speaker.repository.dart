@@ -44,6 +44,18 @@ class HaSpeakerRepository implements SpeakerRepository {
     );
   }
 
+  @override
+  Future<void> playTracks(String id, List<String> tracks) async {
+    for (final (index, track) in tracks.indexed) {
+      await session.callService(
+        'media_player',
+        'play_media',
+        entityIds: [id],
+        data: {'media_content_id': track, 'media_content_type': 'music', 'enqueue': index == 0 ? 'replace' : 'add'},
+      );
+    }
+  }
+
   /// Playable favorites of [id]: the top level of HA's media browser, or its favorites / playlists folder when the
   /// top level only holds folders (as for Sonos).
   @override

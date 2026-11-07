@@ -113,7 +113,40 @@ void main() {
               {'name': 'Night Drive', 'uri': 'spotify:playlist:nd', 'images': <Object?>[]},
             ],
           },
-          '/v1/me/tracks' => {'total': likedSongs},
+          '/v1/playlists/nd/items' => {
+            'items': [
+              {
+                'item': {
+                  'name': 'Neon',
+                  'uri': 'spotify:track:neon',
+                  'artists': [
+                    {'name': 'Kowloon'},
+                  ],
+                  'album': album('Night'),
+                },
+              },
+              {
+                'item': {'name': 'An episode', 'uri': 'spotify:episode:e1'},
+              },
+            ],
+          },
+          '/v1/albums/daybreak/tracks' => {
+            'items': [
+              {'name': 'First Light', 'uri': 'spotify:track:fl', 'artists': <Object?>[]},
+            ],
+          },
+          '/v1/me/tracks' => {
+            'total': likedSongs,
+            'items': [
+              for (final name in request.url.queryParameters['offset'] == '50' ? ['Third'] : ['First', 'Second'])
+                {
+                  'track': {'uri': 'spotify:track:$name'},
+                },
+            ],
+            'next': request.url.queryParameters['offset'] == '50'
+                ? null
+                : 'https://api.spotify.com/v1/me/tracks?offset=50',
+          },
           _ => <String, Object?>{},
         };
         return http.Response(jsonEncode(body), 200);
@@ -140,6 +173,67 @@ void main() {
       expect(recent.map((item) => '${item.contentType} ${item.title}'), ['album Daybreak', 'album Currents']);
       expect(recent.first.contentId, 'spotify:album:daybreak');
       expect(recent.first.artworkUrl, 'https://i.scdn.co/Daybreak.jpg');
+    });
+
+    test('Given a playlist with a track and an episode, '
+        'when loading its tracks, '
+        'then the track comes with artist, cover and uri', () async {
+      // Given
+      when(() => auth.loadTokens()).thenAnswer((_) async => tokens('valid'));
+      final repository = SpotifyRepository(auth: auth, client: api());
+
+      // When
+      final tracks = await withClock(
+        Clock.fixed(now),
+        () => repository.tracksOf(
+          const MediaItem(title: 'Night Drive', contentId: 'spotify:playlist:nd', contentType: 'playlist'),
+        ),
+      );
+
+      // Then
+      expect(tracks.map((track) => '${track.title} ${track.artist} ${track.uri} ${track.artworkUrl}'), [
+        'Neon Kowloon spotify:track:neon https://i.scdn.co/Night.jpg',
+      ]);
+    });
+
+    test('Given an album, '
+        'when loading its tracks, '
+        'then they carry the album cover', () async {
+      // Given
+      when(() => auth.loadTokens()).thenAnswer((_) async => tokens('valid'));
+      final repository = SpotifyRepository(auth: auth, client: api());
+
+      // When
+      final tracks = await withClock(
+        Clock.fixed(now),
+        () => repository.tracksOf(
+          const MediaItem(
+            title: 'Daybreak',
+            contentId: 'spotify:album:daybreak',
+            contentType: 'album',
+            artworkUrl: 'https://i.scdn.co/Daybreak.jpg',
+          ),
+        ),
+      );
+
+      // Then
+      expect(tracks.map((track) => '${track.title} ${track.artworkUrl}'), [
+        'First Light https://i.scdn.co/Daybreak.jpg',
+      ]);
+    });
+
+    test('Given liked songs on two pages, '
+        'when loading them as tracks, '
+        'then all come in order', () async {
+      // Given
+      when(() => auth.loadTokens()).thenAnswer((_) async => tokens('valid'));
+      final repository = SpotifyRepository(auth: auth, client: api());
+
+      // When
+      final tracks = await withClock(Clock.fixed(now), repository.likedTracks);
+
+      // Then
+      expect(tracks, ['spotify:track:First', 'spotify:track:Second', 'spotify:track:Third']);
     });
 
     test('Given liked songs and two pages of playlists, '
@@ -306,6 +400,15 @@ void main() {
           'd1',
           item: const MediaItem(title: 'D', contentId: 'spotify:album:d', contentType: 'album'),
         );
+        await repository.play(
+          'd1',
+          item: const MediaItem(
+            title: 'D',
+            contentId: 'spotify:album:d',
+            contentType: 'album',
+            startTrack: 'spotify:track:t2',
+          ),
+        );
         await repository.play('d1');
         await repository.pause('d1');
         await repository.next('d1');
@@ -318,6 +421,7 @@ void main() {
       // Then
       expect(requests.map((r) => '${r.method} ${r.url.path}?${r.url.query} ${r.body}'), [
         'PUT /v1/me/player/play?device_id=d1 {"context_uri":"spotify:album:d"}',
+        'PUT /v1/me/player/play?device_id=d1 {"context_uri":"spotify:album:d","offset":{"uri":"spotify:track:t2"}}',
         'PUT /v1/me/player/play?device_id=d1 {}',
         'PUT /v1/me/player/pause?device_id=d1 ',
         'POST /v1/me/player/next?device_id=d1 ',

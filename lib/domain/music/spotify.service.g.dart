@@ -146,3 +146,87 @@ final class SpotifyPlaylistsProvider
 }
 
 String _$spotifyPlaylistsHash() => r'3bd870fa738e5fd5981fcdb6de0d0affdd12ddd1';
+
+/// The tracks of a playlist, album or the liked songs, to look into it before playing.
+
+@ProviderFor(spotifyTracks)
+final spotifyTracksProvider = SpotifyTracksFamily._();
+
+/// The tracks of a playlist, album or the liked songs, to look into it before playing.
+
+final class SpotifyTracksProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<QueueItem>>,
+          List<QueueItem>,
+          FutureOr<List<QueueItem>>
+        >
+    with $FutureModifier<List<QueueItem>>, $FutureProvider<List<QueueItem>> {
+  /// The tracks of a playlist, album or the liked songs, to look into it before playing.
+  SpotifyTracksProvider._({
+    required SpotifyTracksFamily super.from,
+    required MediaItem super.argument,
+  }) : super(
+         retry: null,
+         name: r'spotifyTracksProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$spotifyTracksHash();
+
+  @override
+  String toString() {
+    return r'spotifyTracksProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<QueueItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<QueueItem>> create(Ref ref) {
+    final argument = this.argument as MediaItem;
+    return spotifyTracks(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SpotifyTracksProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$spotifyTracksHash() => r'1aaca1393f482ee9b9a89372a9f56cdff71b2947';
+
+/// The tracks of a playlist, album or the liked songs, to look into it before playing.
+
+final class SpotifyTracksFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<QueueItem>>, MediaItem> {
+  SpotifyTracksFamily._()
+    : super(
+        retry: null,
+        name: r'spotifyTracksProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The tracks of a playlist, album or the liked songs, to look into it before playing.
+
+  SpotifyTracksProvider call(MediaItem item) =>
+      SpotifyTracksProvider._(argument: item, from: this);
+
+  @override
+  String toString() => r'spotifyTracksProvider';
+}

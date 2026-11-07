@@ -86,6 +86,12 @@ void main() {
               spotifyRecentProvider.overrideWith(
                 (ref) async => const [MediaItem(title: 'Daybreak', contentId: 'spotify:album:d', contentType: 'album')],
               ),
+              spotifyTracksProvider.overrideWith(
+                (ref, item) async => const [
+                  QueueItem(title: 'First Light', uri: 'spotify:track:fl'),
+                  QueueItem(title: 'Noon', uri: 'spotify:track:noon'),
+                ],
+              ),
               spotifyPlaylistsProvider.overrideWith(
                 (ref) async => [
                   const MediaItem(
@@ -306,6 +312,41 @@ void main() {
       // Then
       expect(find.text('Daybreak'), findsNothing);
       expect(find.text('List 8'), findsOneWidget);
+    });
+
+    testWidgets('Given Spotify, '
+        'when opening an album and tapping its second track, '
+        'then its tracks show instead of Up next and it plays from that track', (tester) async {
+      // Given
+      await pumpScreen(tester, spotifySignedIn: true);
+
+      // When
+      await tester.tap(find.bySemanticsLabel('Open Daybreak'));
+      await tester.pumpAndSettle();
+      final shownWhileOpen = (find.text('Up next').evaluate().length, find.text('Noon').evaluate().length);
+      await tester.tap(find.text('Noon'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(shownWhileOpen, (0, 1));
+      expect(speakers.commands, ['play Daybreak on media_player.office']);
+      expect(speakers.played.single.startTrack, 'spotify:track:noon');
+      expect(find.text('Up next'), findsOneWidget);
+    });
+
+    testWidgets('Given an opened album, when going back, then Up next shows again and nothing plays', (tester) async {
+      // Given
+      await pumpScreen(tester, spotifySignedIn: true);
+      await tester.tap(find.bySemanticsLabel('Open Daybreak'));
+      await tester.pumpAndSettle();
+
+      // When
+      await tester.tap(find.bySemanticsLabel('Back to Up next'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.text('Up next'), findsOneWidget);
+      expect(speakers.commands, isEmpty);
     });
 
     testWidgets('Given no speakers and Spotify not connected, '

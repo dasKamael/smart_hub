@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/data/music/speaker.repository.dart';
+import 'package:smart_hub/data/music/spotify/spotify.repository.dart';
 import 'package:smart_hub/domain/music/model/media_item.dart';
 import 'package:smart_hub/domain/music/model/playback.enum.dart';
 import 'package:smart_hub/domain/music/model/queue_item.dart';
@@ -20,9 +21,12 @@ import '../../utils/riverpod.test_util.dart';
 
 class _MockSpeakerRepository extends Mock implements SpeakerRepository {}
 
+class _MockSpotify extends Mock implements SpotifyRepository {}
+
 void main() {
   group('SpeakersService', () {
     late _MockSpeakerRepository repository;
+    late _MockSpotify spotify;
 
     void givenSpeakers(List<SpeakerState> speakers) {
       when(() => repository.watchSpeakers()).thenAnswer((_) => Stream.value(speakers));
@@ -32,6 +36,7 @@ void main() {
 
     setUp(() {
       repository = _MockSpeakerRepository();
+      spotify = _MockSpotify();
       givenSpeakers(const []);
       when(() => repository.playPause(any())).thenAnswer((_) async {});
       when(() => repository.setVolume(any(), any())).thenAnswer((_) async {});
@@ -147,6 +152,7 @@ void main() {
           overrides: [
             speakerRepositoryProvider.overrideWithValue(repository),
             speakerSettingsServiceProvider.overrideWith(FakeSpeakerSettingsService.new),
+            spotifyRepositoryProvider.overrideWithValue(spotify),
           ],
         );
         container.listen(speakersServiceProvider, (_, _) {});
@@ -303,6 +309,48 @@ void main() {
         // Then
         final office = container.read(speakersServiceProvider).value!.last;
         expect((office.title, office.artworkUrl, office.playback), ('Focus Flow', 'a', Playback.playing));
+      });
+
+      test('Given the liked songs, when playing them, then their tracks are read from Spotify and played', () async {
+        // Given
+        when(() => spotify.likedTracks()).thenAnswer((_) async => ['spotify:track:One', 'spotify:track:Two']);
+        when(() => repository.playTracks(any(), any())).thenAnswer((_) async {});
+        final (service, _) = await createWithContainer();
+
+        // When
+        await service.play(
+          'media_player.office',
+          const MediaItem(title: 'Liked Songs', contentId: 'spotify:user:rm:collection', contentType: 'playlist'),
+        );
+
+        // Then
+        verify(() => repository.playTracks('media_player.office', ['spotify:track:One', 'spotify:track:Two']))
+            .called(1);
+        verifyNever(() => repository.play(any(), any()));
+      });
+
+      test('Given the liked songs started from their second track, '
+          'when playing them, then the speakers get the tracks from there on', () async {
+        // Given
+        when(() => spotify.likedTracks())
+            .thenAnswer((_) async => ['spotify:track:One', 'spotify:track:Two', 'spotify:track:Three']);
+        when(() => repository.playTracks(any(), any())).thenAnswer((_) async {});
+        final (service, _) = await createWithContainer();
+
+        // When
+        await service.play(
+          'media_player.office',
+          const MediaItem(
+            title: 'Liked Songs',
+            contentId: 'spotify:user:rm:collection',
+            contentType: 'playlist',
+            startTrack: 'spotify:track:Two',
+          ),
+        );
+
+        // Then
+        verify(() => repository.playTracks('media_player.office', ['spotify:track:Two', 'spotify:track:Three']))
+            .called(1);
       });
 
       test('Given a failing command, when pausing, then playing shows again at once', () async {

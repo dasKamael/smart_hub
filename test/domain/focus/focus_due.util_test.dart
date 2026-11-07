@@ -6,12 +6,12 @@ import 'package:smart_hub/domain/focus/model/focus_urgency.enum.dart';
 void main() {
   final today = DateTime(2026, 10, 28, 21, 40);
 
-  FocusPoint buildPoint({DateTime? dueDate, DateTime? createdAt, DateTime? achievedAt}) {
+  FocusPoint buildPoint({DateTime? dueDate, DateTime? achievedAt}) {
     return FocusPoint(
       id: 'focus-1',
       title: 'Hub on the wall',
       dueDate: dueDate ?? DateTime(2026, 11, 6),
-      createdAt: createdAt ?? DateTime(2026, 10, 18),
+      createdAt: DateTime(2026, 10, 18),
       achievedAt: achievedAt,
     );
   }
@@ -83,47 +83,6 @@ void main() {
 
       // Then
       expect(urgency, FocusUrgency.done);
-    });
-  });
-
-  group('FocusDueUtil.progress', () {
-    test('Given ten days taken on of which five have passed, '
-        'when asking how far it has run, '
-        'then it is half', () {
-      // Given
-      final point = buildPoint(createdAt: DateTime(2026, 10, 23, 18), dueDate: DateTime(2026, 11, 2));
-
-      // When
-      final progress = FocusDueUtil.progress(point, today);
-
-      // Then
-      expect(progress, 0.5);
-    });
-
-    test('Given a point whose day has passed, '
-        'when asking how far it has run, '
-        'then it stays full instead of running over', () {
-      // Given
-      final point = buildPoint(createdAt: DateTime(2026, 10, 18), dueDate: DateTime(2026, 10, 20));
-
-      // When
-      final progress = FocusDueUtil.progress(point, today);
-
-      // Then
-      expect(progress, 1);
-    });
-
-    test('Given a point taken on for today, '
-        'when asking how far it has run, '
-        'then it is full – there is no time left to show', () {
-      // Given
-      final point = buildPoint(createdAt: today, dueDate: DateTime(2026, 10, 28));
-
-      // When
-      final progress = FocusDueUtil.progress(point, today);
-
-      // Then
-      expect(progress, 1);
     });
   });
 

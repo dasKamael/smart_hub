@@ -9,7 +9,6 @@ import 'package:smart_hub/presentation/design_system/layouts/widget_tile.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_area_colors.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_dimensions.dart';
-import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
 import 'package:smart_hub/presentation/screens/focus/focus.controller.dart';
 import 'package:smart_hub/presentation/screens/focus/widgets/focus_day_label.dart';
@@ -111,19 +110,17 @@ class _Small extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             entry.point.title,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: HubTextStyles.body.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 8),
-          _Bar(entry),
         ],
       ),
     );
   }
 }
 
-/// "Focus" and the points under each other, the one due first on top.
+/// The points under each other, the one due first on top.
 class _Rows extends StatelessWidget {
   const _Rows(this.plan, {required this.actions, required this.rows, required this.onAdd, this.compact = false});
 
@@ -138,23 +135,23 @@ class _Rows extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shown = plan.take(rows).toList();
+    // Nothing to show: the whole tile is the invitation, so it needs no head above it.
+    if (shown.isEmpty) return const _Empty();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _Head(canAdd: plan.length < FocusService.maxActive, onAdd: onAdd, more: plan.length - shown.length),
-        if (shown.isEmpty)
-          const Expanded(child: _Empty())
-        else
-          Expanded(
-            child: Column(
-              children: [
-                for (final entry in shown)
-                  Expanded(
-                    child: _PointRow(entry, actions: actions, compact: compact),
-                  ),
-              ],
-            ),
+        Expanded(
+          child: Column(
+            children: [
+              for (final entry in shown)
+                Expanded(
+                  // A lone point gets the whole card, and takes the room it is given.
+                  child: _PointRow(entry, actions: actions, compact: compact, prominent: shown.length == 1),
+                ),
+            ],
           ),
+        ),
       ],
     );
   }
@@ -170,6 +167,7 @@ class _Columns extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (plan.isEmpty) return const _Empty();
     final canAdd = plan.length < FocusService.maxActive;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -233,26 +231,34 @@ class _Head extends StatelessWidget {
 
 /// One point as a row: what it is, how many days are left, and how far its time has run.
 class _PointRow extends StatelessWidget {
-  const _PointRow(this.entry, {required this.actions, required this.compact});
+  const _PointRow(this.entry, {required this.actions, required this.compact, this.prominent = false});
 
   final FocusEntry entry;
   final FocusActions actions;
   final bool compact;
 
+  /// The only point in the widget: it has the room, so it uses it.
+  final bool prominent;
+
   @override
   Widget build(BuildContext context) {
     final open = actions.openId == entry.point.id;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: EdgeInsets.only(bottom: prominent ? 0 : 6),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => actions.onTap(entry.point.id),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: compact ? 8 : 12),
-          decoration: BoxDecoration(
-            color: HubAreaColors.veil(HubAreaColors.focus),
-            borderRadius: BorderRadius.circular(HubRadius.row),
-          ),
+          padding: prominent
+              ? const EdgeInsets.symmetric(horizontal: 2)
+              : EdgeInsets.symmetric(horizontal: 12, vertical: compact ? 8 : 12),
+          // A lone point stands on the card itself; a veil around it would be a card on a card.
+          decoration: prominent
+              ? null
+              : BoxDecoration(
+                  color: HubAreaColors.veil(HubAreaColors.focus),
+                  borderRadius: BorderRadius.circular(HubRadius.row),
+                ),
           child: open
               ? _Options(entry, actions: actions)
               : compact
@@ -262,15 +268,15 @@ class _PointRow extends StatelessWidget {
                     Row(
                       spacing: HubSpacing.s8,
                       children: [
-                        Expanded(child: _Title(entry, fontSize: 15)),
+                        Expanded(child: _Title(entry, fontSize: prominent ? 18 : 15)),
                         Text(
                           entry.countdown,
-                          style: HubTextStyles.micro.copyWith(color: _colorOf(entry.urgency)).tabular,
+                          style: (prominent ? HubTextStyles.label : HubTextStyles.micro)
+                              .copyWith(color: _colorOf(entry.urgency))
+                              .tabular,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    _Bar(entry, height: 5),
                   ],
                 )
               : Row(
@@ -281,21 +287,19 @@ class _PointRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _Title(entry, fontSize: 16),
-                          const SizedBox(height: 4),
+                          _Title(entry, fontSize: prominent ? 24 : 16, maxLines: prominent ? 2 : 1),
+                          SizedBox(height: prominent ? 6 : 4),
                           Text(
                             focusDayLabel(entry.point.dueDate),
                             maxLines: 1,
-                            style: HubTextStyles.micro
+                            style: (prominent ? HubTextStyles.label : HubTextStyles.micro)
                                 .copyWith(fontWeight: FontWeight.w500, color: HubColorPalette.text3)
                                 .tabular,
                           ),
-                          const SizedBox(height: 8),
-                          _Bar(entry),
                         ],
                       ),
                     ),
-                    _Countdown(entry, size: 30),
+                    _Countdown(entry, size: prominent ? 56 : 30),
                   ],
                 ),
         ),
@@ -336,8 +340,6 @@ class _PointCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   _Countdown(entry, size: 52),
-                  const SizedBox(height: 12),
-                  _Bar(entry, height: 7),
                 ],
               ),
       ),
@@ -396,30 +398,6 @@ class _Countdown extends StatelessWidget {
           (false, _) => 'days over',
         }, style: HubTextStyles.micro.copyWith(color: HubColorPalette.text2)),
       ],
-    );
-  }
-}
-
-/// How much of the time from taking it on to its day has run.
-class _Bar extends StatelessWidget {
-  const _Bar(this.entry, {this.height = 6});
-
-  final FocusEntry entry;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(height),
-      child: Stack(
-        children: [
-          Container(height: height, color: HubColorPalette.elevated),
-          FractionallySizedBox(
-            widthFactor: entry.progress,
-            child: AnimatedContainer(duration: HubMotion.fadeDuration, height: height, color: _colorOf(entry.urgency)),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -527,34 +505,35 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// Nothing taken on yet.
+/// Nothing taken on yet: the tile itself is the invitation, a tap anywhere on it opens the editor.
 class _Empty extends StatelessWidget {
   const _Empty({this.compact = false});
 
+  /// The small size, where only the glyph and one short line fit.
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (compact) ...[
-          const HubGlyphIcon(HubGlyph.target, color: HubColorPalette.text2, size: Size.square(16)),
-          const Spacer(),
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: compact ? 10 : HubSpacing.s12,
+        children: [
+          Container(
+            width: compact ? 40 : 52,
+            height: compact ? 40 : 52,
+            decoration: const BoxDecoration(color: HubColorPalette.elevated, shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: HubGlyphIcon(HubGlyph.plus, color: HubColorPalette.text2, size: Size.square(compact ? 16 : 20)),
+          ),
+          Text(
+            'What are you on?',
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            style: HubTextStyles.body.copyWith(fontSize: compact ? 14 : 17, fontWeight: FontWeight.w700, height: 1.2),
+          ),
         ],
-        Text(
-          'What are you on?',
-          maxLines: 2,
-          style: HubTextStyles.body.copyWith(fontWeight: FontWeight.w700, height: 1.2),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'A name and a day. Up to three.',
-          maxLines: 2,
-          style: HubTextStyles.label.copyWith(fontWeight: FontWeight.w400, color: HubColorPalette.text2),
-        ),
-      ],
+      ),
     );
   }
 }

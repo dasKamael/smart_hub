@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/common/http/http_client.provider.dart';
 import 'package:smart_hub/data/music/spotify/spotify_auth.repository.dart';
@@ -23,9 +24,13 @@ final class SpotifySignedOutException implements Exception {
 class SpotifyRepository {
   SpotifyRepository({required this.auth, required this.client});
 
+  static final _log = Logger('SpotifyRepository');
+
   static final apiBase = Uri.parse('https://api.spotify.com/v1/');
   static const maxRecent = 12;
   static const maxPlaylists = 200;
+  static const maxLikedTracks = 100;
+  static const maxTracks = 200;
 
   final SpotifyAuthRepository auth;
   final http.Client client;
@@ -64,13 +69,28 @@ class SpotifyRepository {
     return [?await _likedSongs(), ...items.values];
   }
 
+  /// The liked songs as track URIs, newest first; at most [maxLikedTracks]. For speakers that cannot play the
+  /// collection itself.
+  Future<List<String>> likedTracks() async {
+    final uris = <String>[];
+    for (var offset = 0; offset < maxLikedTracks; offset += 50) {
+      final page = await _get('me/tracks', {'limit': '50', 'offset': '$offset'});
+      for (final saved in _list(page['items'])) {
+        if ((saved['track'] as Map<String, Object?>?)?['uri'] case final String uri) uris.add(uri);
+      }
+      if (page['next'] == null) break;
+    }
+    return uris;
+  }
+
   Future<MediaItem?> _likedSongs() async {
     try {
       final (tracks, me) = await (_get('me/tracks', {'limit': '1'}), _get('me')).wait;
       final id = me['id'] as String?;
       if (id == null || ((tracks['total'] as num?) ?? 0) == 0) return null;
       return MediaItem(title: 'Liked Songs', contentId: 'spotify:user:$id:collection', contentType: 'playlist');
-    } on ParallelWaitError<Object?, Object?> {
+    } on ParallelWaitError<Object?, Object?> catch (e) {
+      _log.warning('Could not read the liked songs: $e');
       return null;
     }
   }
@@ -115,28 +135,51 @@ class SpotifyRepository {
     );
   }
 
+  /// The tracks of [item] (a playlist, album or the liked songs) in order; at most [maxTracks].
+  Future<List<QueueItem>> tracksOf(MediaItem item) async {
+    final id = item.contentId.split(':').last;
+    final path = item.isLikedSongs
+        ? 'me/tracks'
+        : switch (item.contentType) {
+            'album' => 'albums/$id/tracks',
+            _ => 'playlists/$id/items',
+          };
+    final tracks = <QueueItem>[];
+    for (var offset = 0; offset < maxTracks; offset += 50) {
+      final page = await _get(path, {'limit': '50', 'offset': '$offset'});
+      for (final entry in _list(page['items'])) {
+        // Album tracks come bare, playlist entries as `item` (`track` before 2026), liked songs as `track`.
+        final track = (entry['item'] ?? entry['track'] ?? entry) as Map<String, Object?>;
+        if (track['uri'] case final String uri when uri.startsWith('spotify:track:')) {
+          tracks.add(_trackItem(track, uri: uri, artworkUrl: item.artworkUrl));
+        }
+      }
+      if (page['next'] == null) break;
+    }
+    return tracks;
+  }
+
   /// Up next on Spotify, the playing track first.
   Future<List<QueueItem>> queue() async {
     final json = await _get('me/player/queue');
-    QueueItem toItem(Map<String, Object?> track) {
-      final images = _list((track['album'] as Map<String, Object?>?)?['images']);
-      return QueueItem(
-        title: (track['name'] as String?) ?? 'Unknown',
-        artist: _list(track['artists']).map((artist) => artist['name']).whereType<String>().join(', '),
-        artworkUrl: images.isEmpty ? null : images.last['url'] as String?,
-        coverUrl: images.isEmpty ? null : images.first['url'] as String?,
-      );
-    }
-
     return [
-      if (json['currently_playing'] case final Map<String, Object?> current) toItem(current),
-      for (final track in _list(json['queue']).take(10)) toItem(track),
+      if (json['currently_playing'] case final Map<String, Object?> current) _trackItem(current),
+      for (final track in _list(json['queue']).take(10)) _trackItem(track),
     ];
   }
 
-  /// Starts [item] (an album or playlist URI) on [deviceId]; without [item] it resumes there.
+  /// Starts [item] (an album or playlist URI) on [deviceId], from its [MediaItem.startTrack] when given; without
+  /// [item] it resumes there.
   Future<void> play(String deviceId, {MediaItem? item}) {
-    return _send('PUT', 'me/player/play', query: {'device_id': deviceId}, body: {'context_uri': ?item?.contentId});
+    return _send(
+      'PUT',
+      'me/player/play',
+      query: {'device_id': deviceId},
+      body: {
+        'context_uri': ?item?.contentId,
+        if (item?.startTrack case final track?) 'offset': {'uri': track},
+      },
+    );
   }
 
   Future<void> pause(String deviceId) => _send('PUT', 'me/player/pause', query: {'device_id': deviceId});
@@ -162,6 +205,18 @@ class SpotifyRepository {
         'device_ids': [deviceId],
         'play': true,
       },
+    );
+  }
+
+  /// A track; [artworkUrl] for tracks without their own cover (those of an album).
+  static QueueItem _trackItem(Map<String, Object?> track, {String? uri, String? artworkUrl}) {
+    final images = _list((track['album'] as Map<String, Object?>?)?['images']);
+    return QueueItem(
+      title: (track['name'] as String?) ?? 'Unknown',
+      artist: _list(track['artists']).map((artist) => artist['name']).whereType<String>().join(', '),
+      artworkUrl: images.isEmpty ? artworkUrl : images.last['url'] as String?,
+      coverUrl: images.isEmpty ? artworkUrl : images.first['url'] as String?,
+      uri: uri,
     );
   }
 

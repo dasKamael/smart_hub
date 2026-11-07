@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$MusicPageState {
 
 /// Target shown in "Now playing" (`PlaybackTarget.id`); `null` picks what plays.
- String? get targetId; LibraryView get libraryView;
+ String? get targetId; LibraryView get libraryView;/// The playlist or album looked into, shown instead of "Up next" until something plays.
+ MediaItem? get opened;
 /// Create a copy of MusicPageState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +29,20 @@ $MusicPageStateCopyWith<MusicPageState> get copyWith => _$MusicPageStateCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as MusicPageState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicPageState&&(identical(other.targetId, _this.targetId) || other.targetId == _this.targetId)&&(identical(other.libraryView, _this.libraryView) || other.libraryView == _this.libraryView));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicPageState&&(identical(other.targetId, _this.targetId) || other.targetId == _this.targetId)&&(identical(other.libraryView, _this.libraryView) || other.libraryView == _this.libraryView)&&(identical(other.opened, _this.opened) || other.opened == _this.opened));
 }
 
 
 @override
 int get hashCode {
   final _this = this as MusicPageState;
-  return Object.hash(runtimeType,_this.targetId,_this.libraryView);
+  return Object.hash(runtimeType,_this.targetId,_this.libraryView,_this.opened);
 }
 
 @override
 String toString() {
   final _this = this as MusicPageState;
-  return 'MusicPageState(targetId: ${_this.targetId}, libraryView: ${_this.libraryView})';
+  return 'MusicPageState(targetId: ${_this.targetId}, libraryView: ${_this.libraryView}, opened: ${_this.opened})';
 }
 
 
@@ -52,11 +53,11 @@ abstract mixin class $MusicPageStateCopyWith<$Res>  {
   factory $MusicPageStateCopyWith(MusicPageState value, $Res Function(MusicPageState) _then) = _$MusicPageStateCopyWithImpl;
 @useResult
 $Res call({
- String? targetId, LibraryView libraryView
+ String? targetId, LibraryView libraryView, MediaItem? opened
 });
 
 
-
+$MediaItemCopyWith<$Res>? get opened;
 
 }
 /// @nodoc
@@ -69,14 +70,27 @@ class _$MusicPageStateCopyWithImpl<$Res>
 
 /// Create a copy of MusicPageState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? targetId = freezed,Object? libraryView = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? targetId = freezed,Object? libraryView = null,Object? opened = freezed,}) {
   return _then(MusicPageState(
 targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
 as String?,libraryView: null == libraryView ? _self.libraryView : libraryView // ignore: cast_nullable_to_non_nullable
-as LibraryView,
+as LibraryView,opened: freezed == opened ? _self.opened : opened // ignore: cast_nullable_to_non_nullable
+as MediaItem?,
   ));
 }
+/// Create a copy of MusicPageState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MediaItemCopyWith<$Res>? get opened {
+    if (_self.opened == null) {
+    return null;
+  }
 
+  return $MediaItemCopyWith<$Res>(_self.opened!, (value) {
+    return _then(_self.copyWith(opened: value));
+  });
+}
 }
 
 
@@ -158,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? targetId,  LibraryView libraryView)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? targetId,  LibraryView libraryView,  MediaItem? opened)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MusicPageState() when $default != null:
-return $default(_that.targetId,_that.libraryView);case _:
+return $default(_that.targetId,_that.libraryView,_that.opened);case _:
   return orElse();
 
 }
@@ -179,10 +193,10 @@ return $default(_that.targetId,_that.libraryView);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? targetId,  LibraryView libraryView)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? targetId,  LibraryView libraryView,  MediaItem? opened)  $default,) {final _that = this;
 switch (_that) {
 case _MusicPageState():
-return $default(_that.targetId,_that.libraryView);case _:
+return $default(_that.targetId,_that.libraryView,_that.opened);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +213,10 @@ return $default(_that.targetId,_that.libraryView);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? targetId,  LibraryView libraryView)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? targetId,  LibraryView libraryView,  MediaItem? opened)?  $default,) {final _that = this;
 switch (_that) {
 case _MusicPageState() when $default != null:
-return $default(_that.targetId,_that.libraryView);case _:
+return $default(_that.targetId,_that.libraryView,_that.opened);case _:
   return null;
 
 }
@@ -214,12 +228,14 @@ return $default(_that.targetId,_that.libraryView);case _:
 
 
 class _MusicPageState implements MusicPageState {
-  const _MusicPageState({this.targetId, this.libraryView = LibraryView.recent});
+  const _MusicPageState({this.targetId, this.libraryView = LibraryView.recent, this.opened});
   
 
 /// Target shown in "Now playing" (`PlaybackTarget.id`); `null` picks what plays.
 @override final  String? targetId;
 @override@JsonKey() final  LibraryView libraryView;
+/// The playlist or album looked into, shown instead of "Up next" until something plays.
+@override final  MediaItem? opened;
 
 /// Create a copy of MusicPageState
 /// with the given fields replaced by the non-null parameter values.
@@ -231,18 +247,18 @@ _$MusicPageStateCopyWith<_MusicPageState> get copyWith => __$MusicPageStateCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MusicPageState&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.libraryView, libraryView) || other.libraryView == libraryView));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MusicPageState&&(identical(other.targetId, targetId) || other.targetId == targetId)&&(identical(other.libraryView, libraryView) || other.libraryView == libraryView)&&(identical(other.opened, opened) || other.opened == opened));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,targetId,libraryView);
+    return Object.hash(runtimeType,targetId,libraryView,opened);
 }
 
 @override
 String toString() {
-    return 'MusicPageState(targetId: $targetId, libraryView: $libraryView)';
+    return 'MusicPageState(targetId: $targetId, libraryView: $libraryView, opened: $opened)';
 }
 
 
@@ -253,11 +269,11 @@ abstract mixin class _$MusicPageStateCopyWith<$Res> implements $MusicPageStateCo
   factory _$MusicPageStateCopyWith(_MusicPageState value, $Res Function(_MusicPageState) _then) = __$MusicPageStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? targetId, LibraryView libraryView
+ String? targetId, LibraryView libraryView, MediaItem? opened
 });
 
 
-
+@override $MediaItemCopyWith<$Res>? get opened;
 
 }
 /// @nodoc
@@ -270,15 +286,28 @@ class __$MusicPageStateCopyWithImpl<$Res>
 
 /// Create a copy of MusicPageState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? targetId = freezed,Object? libraryView = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? targetId = freezed,Object? libraryView = null,Object? opened = freezed,}) {
   return _then(_MusicPageState(
 targetId: freezed == targetId ? _self.targetId : targetId // ignore: cast_nullable_to_non_nullable
 as String?,libraryView: null == libraryView ? _self.libraryView : libraryView // ignore: cast_nullable_to_non_nullable
-as LibraryView,
+as LibraryView,opened: freezed == opened ? _self.opened : opened // ignore: cast_nullable_to_non_nullable
+as MediaItem?,
   ));
 }
 
+/// Create a copy of MusicPageState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MediaItemCopyWith<$Res>? get opened {
+    if (_self.opened == null) {
+    return null;
+  }
 
+  return $MediaItemCopyWith<$Res>(_self.opened!, (value) {
+    return _then(_self.copyWith(opened: value));
+  });
+}
 }
 
 // dart format on
