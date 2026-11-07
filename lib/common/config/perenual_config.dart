@@ -1,12 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/common/config/env.dart';
 
 part 'perenual_config.g.dart';
 
-/// Perenual plant database key (perenual.com, free tier), passed in with `--dart-define-from-file=env/dev.json`.
+/// Perenual plant database key (perenual.com, free tier), from `.env` ([Env]).
 class PerenualConfig {
   const PerenualConfig({required this.apiKey});
 
-  static const fromEnvironment = PerenualConfig(apiKey: String.fromEnvironment('PERENUAL_API_KEY'));
+  static final fromEnvironment = PerenualConfig(apiKey: Env.perenualApiKey);
 
   final String apiKey;
 

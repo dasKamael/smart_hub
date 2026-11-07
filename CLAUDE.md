@@ -55,13 +55,16 @@ Build in the order of the handoff ("Suggested build order") / roadmap phases.
 - Comments only where the *why* is not obvious from the code.
 - Keep diffs minimal; no drive-by refactorings.
 - Secrets (HA URL, long-lived token) never go into the repo. Runtime: `flutter_secure_storage` via the
-  setup screen. Development: `--dart-define-from-file=env/dev.json` (gitignored).
+  setup screen. App keys (Spotify client id, Perenual key): `.env` (gitignored, see `.env.example`), baked in by
+  envied (`common/config/env.dart`, generated `env.g.dart` is gitignored too). Without `.env` the build fails, so no
+  build silently runs without Spotify. After changing `.env`, run `dart run build_runner clean` before building:
+  build_runner does not notice the change on its own.
 
 ## Commands
 
 ```sh
 flutter pub get
-flutter run --dart-define-from-file=env/dev.json   # Spotify client id, Perenual key (env/dev.json is gitignored, see env/example.json)
+flutter run                              # keys come from .env (see .env.example) via envied
 dart run build_runner build -d          # after changing freezed / riverpod / drift / json sources
 dart format --line-length 120 lib test packages integration_test test_driver
 flutter analyze

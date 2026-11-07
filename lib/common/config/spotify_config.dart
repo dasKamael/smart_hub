@@ -1,15 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/common/config/env.dart';
 
 part 'spotify_config.g.dart';
 
-/// Spotify app registration (developer.spotify.com), passed in with `--dart-define-from-file=env/dev.json`.
+/// Spotify app registration (developer.spotify.com), from `.env` ([Env]).
 class SpotifyConfig {
   const SpotifyConfig({required this.clientId, required this.redirectUri});
 
-  static const fromEnvironment = SpotifyConfig(
-    clientId: String.fromEnvironment('SPOTIFY_CLIENT_ID'),
-    redirectUri: String.fromEnvironment('SPOTIFY_REDIRECT_URI', defaultValue: 'http://127.0.0.1:43821/callback'),
-  );
+  static final fromEnvironment = SpotifyConfig(clientId: Env.spotifyClientId, redirectUri: Env.spotifyRedirectUri);
 
   final String clientId;
 

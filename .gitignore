@@ -48,8 +48,9 @@ app.*.map.json
 .widget_preview/
 
 # Local secrets for development (--dart-define-from-file)
-/env/*.json
-!/env/example.json
+# Keys: .env holds them, envied bakes them into env.g.dart.
+/.env
+/lib/common/config/env.g.dart
 
 # fvm
 .fvm/flutter_sdk
