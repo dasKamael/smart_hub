@@ -88,6 +88,28 @@ void main() {
       expect((stored as StoredLayout).layout, _layout);
     });
 
+    test('Given a plan of room outlines in the database, when saving the converted layout and keeping the previous '
+        'plan, then the old plan is kept as a backup', () async {
+      // Given
+      final outlines = File('assets/floorplan/floorplan.json').readAsStringSync();
+      await database.into(database.floorPlansTable).insert(FloorPlanRow(id: 1, json: outlines));
+
+      // When
+      await repository.save(_layout, keepPrevious: true);
+
+      // Then
+      expect(await repository.loadBackup(), outlines);
+      expect((await repository.load() as StoredLayout).layout, _layout);
+    });
+
+    test('Given a fresh database, when saving without keeping the previous plan, then there is no backup', () async {
+      // When
+      await repository.save(_layout);
+
+      // Then
+      expect(await repository.loadBackup(), isNull);
+    });
+
     test('Given a layout with everything in it, when encoding and parsing it, then nothing is lost', () {
       // When
       final json = FloorplanRepository.encode(_layout);

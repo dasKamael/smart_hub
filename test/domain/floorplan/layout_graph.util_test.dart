@@ -118,6 +118,25 @@ void main() {
     );
   });
 
+  group('LayoutGraphUtil.removeWalls', () {
+    test('Given a line with a wall branching off, when removing the branch and the first part of the line together, '
+        'then only the second part is left (the parts are not merged before the first one is gone)', () {
+      // Given
+      var layout = LayoutGraphUtil.addWall(const HomeLayout(), PlanPoint.zero, const PlanPoint(200, 0));
+      layout = LayoutGraphUtil.addWall(layout, const PlanPoint(100, 0), const PlanPoint(100, 100));
+      final first = LayoutGraphUtil.wallAt(layout, const PlanPoint(50, 0), radius: 2)!;
+      final branch = LayoutGraphUtil.wallAt(layout, const PlanPoint(100, 50), radius: 2)!;
+
+      // When
+      final result = LayoutGraphUtil.removeWalls(layout, {branch.id, first.id});
+
+      // Then
+      final [wall] = result.walls;
+      final (a, b) = LayoutGraphUtil.endsOf(result, wall);
+      expect({a, b}, {const PlanPoint(100, 0), const PlanPoint(200, 0)});
+    });
+  });
+
   group('LayoutGraphUtil.removeWall', () {
     test('Given a room split by a wall, '
         'when removing that wall, '

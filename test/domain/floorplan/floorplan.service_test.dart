@@ -25,7 +25,7 @@ void main() {
 
     setUp(() {
       repository = _MockFloorplanRepository();
-      when(() => repository.save(any())).thenAnswer((_) async {});
+      when(() => repository.save(any(), keepPrevious: any(named: 'keepPrevious'))).thenAnswer((_) async {});
       container = createTestContainer(overrides: [floorplanRepositoryProvider.overrideWithValue(repository)]);
     });
 
@@ -41,7 +41,7 @@ void main() {
       // Then
       expect(layout.rooms, hasLength(7));
       expect(layout.furniture, isNotEmpty);
-      verify(() => repository.save(layout)).called(1);
+      verify(() => repository.save(layout, keepPrevious: true)).called(1);
       expect((await container.read(floorPlanServiceProvider.future)).rooms, hasLength(7));
     });
 
@@ -55,7 +55,7 @@ void main() {
 
       // Then
       expect(layout, stored);
-      verifyNever(() => repository.save(any()));
+      verifyNever(() => repository.save(any(), keepPrevious: any(named: 'keepPrevious')));
     });
 
     test('Given a loaded layout, when saving an edited one, then it is stored and shown at once', () async {

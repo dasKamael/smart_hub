@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
@@ -440,7 +441,7 @@ class HomeScenePainter extends CustomPainter {
   bool shouldRepaint(HomeScenePainter oldDelegate) =>
       oldDelegate.scene != scene ||
       oldDelegate.camera != camera ||
-      oldDelegate.lights != lights ||
+      !listEquals(oldDelegate.lights, lights) ||
       oldDelegate.lowered != lowered ||
       oldDelegate.selectedRoomId != selectedRoomId;
 }

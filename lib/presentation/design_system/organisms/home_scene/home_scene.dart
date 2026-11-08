@@ -35,6 +35,18 @@ final class SceneLight {
   final double g;
   final double b;
   final double brightness;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SceneLight &&
+      other.position == position &&
+      other.r == r &&
+      other.g == g &&
+      other.b == b &&
+      other.brightness == brightness;
+
+  @override
+  int get hashCode => Object.hash(position, r, g, b, brightness);
 }
 
 /// The apartment as 3D blocks: floors per room, walls cut open for doors and windows, and the furniture. Walls are

@@ -39,6 +39,9 @@ class FloorplanRepository {
   static const version = 2;
   static const _planId = 1;
 
+  /// Row keeping the plan as it was before it was turned into walls, in case the conversion lost something.
+  static const _backupId = 2;
+
   final AppDatabase database;
   final AssetBundle assets;
 
@@ -49,9 +52,25 @@ class FloorplanRepository {
     return json['format'] == format ? StoredLayout(parseLayout(json)) : StoredOutlines(parse(json));
   }
 
-  /// Stores [layout]; it replaces whatever was stored before.
-  Future<void> save(HomeLayout layout) async {
-    await database.into(database.floorPlansTable).insertOnConflictUpdate(FloorPlanRow(id: _planId, json: encode(layout)));
+  /// Stores [layout]; it replaces whatever was stored before. With [keepPrevious], the stored plan it replaces is
+  /// kept as a backup first (see [loadBackup]).
+  Future<void> save(HomeLayout layout, {bool keepPrevious = false}) async {
+    final table = database.floorPlansTable;
+    await database.transaction(() async {
+      if (keepPrevious) {
+        final previous = await (database.select(table)..where((t) => t.id.equals(_planId))).getSingleOrNull();
+        if (previous != null) {
+          await database.into(table).insertOnConflictUpdate(FloorPlanRow(id: _backupId, json: previous.json));
+        }
+      }
+      await database.into(table).insertOnConflictUpdate(FloorPlanRow(id: _planId, json: encode(layout)));
+    });
+  }
+
+  /// The JSON of the plan kept by `save(…, keepPrevious: true)`, or `null` when none was kept.
+  Future<String?> loadBackup() async {
+    final table = database.floorPlansTable;
+    return (await (database.select(table)..where((t) => t.id.equals(_backupId))).getSingleOrNull())?.json;
   }
 
   /// [layout] as readable JSON, e.g. for a backup.
@@ -65,7 +84,8 @@ class FloorplanRepository {
       for (final node in layout.nodes) {'id': node.id, 'at': _pointJson(node.position)},
     ],
     'walls': [
-      for (final wall in layout.walls) {'id': wall.id, 'from': wall.from, 'to': wall.to, 'thickness': _number(wall.thickness)},
+      for (final wall in layout.walls)
+        {'id': wall.id, 'from': wall.from, 'to': wall.to, 'thickness': _number(wall.thickness)},
     ],
     'openings': [
       for (final opening in layout.openings)

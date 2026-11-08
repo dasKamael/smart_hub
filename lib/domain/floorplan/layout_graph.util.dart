@@ -53,6 +53,25 @@ abstract final class LayoutGraphUtil {
     return graph.build();
   }
 
+  /// Removes the walls [wallIds] at once; walls left running straight on through a junction are merged afterwards.
+  static HomeLayout removeWalls(HomeLayout layout, Set<String> wallIds) {
+    final removed = [
+      for (final wall in layout.walls)
+        if (wallIds.contains(wall.id)) wall,
+    ];
+    if (removed.isEmpty) return layout;
+    final graph = _Graph(layout);
+    for (final wall in removed) {
+      graph.removeWall(wall.id);
+    }
+    for (final wall in removed) {
+      graph
+        ..tidy(wall.from)
+        ..tidy(wall.to);
+    }
+    return graph.build();
+  }
+
   /// Moves junction [nodeId] to [to]; its walls follow. Openings keep their relative place on those walls.
   static HomeLayout moveNode(HomeLayout layout, String nodeId, PlanPoint to) {
     final graph = _Graph(layout);

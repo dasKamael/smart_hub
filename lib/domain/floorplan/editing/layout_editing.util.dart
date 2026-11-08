@@ -245,7 +245,7 @@ abstract final class LayoutEditingUtil {
       for (final MapEntry(key: id, value: area) in LayoutRoomsUtil.outlines(layout).entries)
         if (id != roomId) area,
     ];
-    var result = layout.copyWith(
+    final result = layout.copyWith(
       furniture: [
         for (final item in layout.furniture)
           if (!PlanGeometryUtil.containsPoint(outline, item.position)) item,
@@ -255,6 +255,7 @@ abstract final class LayoutEditingUtil {
           if (room.id != roomId) room,
       ],
     );
+    final unneeded = <String>{};
     for (final wall in layout.walls) {
       final (a, b) = LayoutGraphUtil.endsOf(layout, wall);
       final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
@@ -265,9 +266,9 @@ abstract final class LayoutEditingUtil {
         middle + normal,
         middle - normal,
       ].any((side) => others.any((area) => PlanGeometryUtil.containsPoint(area, side)));
-      if (!bordersOther) result = LayoutGraphUtil.removeWall(result, wall.id);
+      if (!bordersOther) unneeded.add(wall.id);
     }
-    return result;
+    return LayoutGraphUtil.removeWalls(result, unneeded);
   }
 
   static double _mm(double cm) => (cm * 10).round() / 10;

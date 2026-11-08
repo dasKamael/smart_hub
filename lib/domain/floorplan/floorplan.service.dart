@@ -1,3 +1,4 @@
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/data/floorplan/floorplan.repository.dart';
 import 'package:smart_hub/data/floorplan/placement.repository.dart';
@@ -17,6 +18,8 @@ part 'floorplan.service.g.dart';
 /// turned into walls once and stored that way.
 @Riverpod(keepAlive: true)
 class HomeLayoutService extends _$HomeLayoutService {
+  static final _log = Logger('HomeLayoutService');
+
   @override
   Future<HomeLayout> build() async {
     final repository = ref.watch(floorplanRepositoryProvider);
@@ -26,7 +29,13 @@ class HomeLayoutService extends _$HomeLayoutService {
       case StoredOutlines(:final plan):
         // Furnished once, so the apartment looks lived in from the start.
         final layout = FurnishingUtil.furnishAll(LayoutConversionUtil.fromFloorPlan(plan));
-        await repository.save(layout);
+        if (layout.rooms.length < plan.rooms.length || layout.openings.length < plan.doors.length) {
+          _log.warning(
+            'Converting the floor plan lost parts: ${plan.rooms.length} rooms → ${layout.rooms.length}, '
+            '${plan.doors.length} doors → ${layout.openings.length}. The old plan is kept as a backup.',
+          );
+        }
+        await repository.save(layout, keepPrevious: true);
         return layout;
     }
   }
