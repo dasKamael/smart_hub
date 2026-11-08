@@ -45,7 +45,7 @@ final class FloorplanControllerProvider
 }
 
 String _$floorplanControllerHash() =>
-    r'08daeeb66bad411f84431623881fbb3ff9288ea9';
+    r'5d983e35acd73d390ada241d60babb50f174341e';
 
 /// UI state of the floor plan (selection, visible layers) and the device commands of the inspector.
 
@@ -67,17 +67,17 @@ abstract class _$FloorplanController extends $Notifier<FloorplanState> {
   }
 }
 
-/// The apartment in 3D: walls, floors and furniture of the drawn layout.
+/// The apartment in 3D: walls, floors and furniture of the drawn layout (as blocks until the models are loaded).
 
 @ProviderFor(homeScene)
 final homeSceneProvider = HomeSceneProvider._();
 
-/// The apartment in 3D: walls, floors and furniture of the drawn layout.
+/// The apartment in 3D: walls, floors and furniture of the drawn layout (as blocks until the models are loaded).
 
 final class HomeSceneProvider
     extends $FunctionalProvider<HomeScene?, HomeScene?, HomeScene?>
     with $Provider<HomeScene?> {
-  /// The apartment in 3D: walls, floors and furniture of the drawn layout.
+  /// The apartment in 3D: walls, floors and furniture of the drawn layout (as blocks until the models are loaded).
   HomeSceneProvider._()
     : super(
         from: null,
@@ -111,7 +111,7 @@ final class HomeSceneProvider
   }
 }
 
-String _$homeSceneHash() => r'31ee583b47d9344286269209b71ed13b8b29a156';
+String _$homeSceneHash() => r'0c6e79a6f1ca5a9d91fc7abfeed212a9c0a5b1cf';
 
 /// Placed lamps that are on, shining into the 3D apartment.
 

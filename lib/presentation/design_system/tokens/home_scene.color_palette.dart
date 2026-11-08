@@ -13,6 +13,16 @@ abstract final class HomeSceneColorPalette {
   /// Inside the rooms it is darker than on the outer walls.
   static const indoors = 0.6;
 
+  /// How much of their own color furniture models keep; the rest turns grey, for the muted look at night.
+  static const furnitureSaturation = 0.72;
+
+  /// [color] of a furniture model, muted.
+  static Color furniture(Color color) {
+    final grey = 0.3 * color.r + 0.59 * color.g + 0.11 * color.b;
+    double mix(double channel) => (grey + (channel - grey) * furnitureSaturation) * 0.92;
+    return Color.from(alpha: color.a, red: mix(color.r), green: mix(color.g), blue: mix(color.b));
+  }
+
   /// Light marker, off and on (`appartment.mp4`).
   static const markerOff = Color(0xCC2B2D33);
   static const markerOffBorder = Color(0x40FFFFFF);

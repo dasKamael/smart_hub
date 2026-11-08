@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_hub/presentation/design_system/atoms/scene_marker.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene_view.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/connection/model/connection_status.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
@@ -86,6 +88,60 @@ void main() {
       expect(marker('Office speaker'), findsOneWidget);
       expect(find.text('Hall light'), findsOneWidget, reason: 'tray item name');
       expect(find.text('Tap a room or device'), findsOneWidget);
+    });
+
+    testWidgets('Given the plan from above, '
+        'when tapping the 3D button, '
+        'then the apartment tilts into 3D with a marker per lamp, and back again', (tester) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.tap(find.bySemanticsLabel('3D view'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byType(HomeSceneView), findsOneWidget);
+      expect(find.byType(SceneMarker), findsNWidgets(3));
+      expect(find.bySemanticsLabel('Desk lamp'), findsOneWidget);
+
+      // When
+      await tester.tap(find.bySemanticsLabel('3D view'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byType(HomeSceneView), findsNothing);
+      expect(find.byType(SceneMarker), findsNothing);
+    });
+
+    testWidgets('Given the apartment in 3D, when lowering the front walls, then the 3D view lowers them', (
+      tester,
+    ) async {
+      // Given
+      await pumpScreen(tester);
+      await tester.tap(find.bySemanticsLabel('3D view'));
+      await tester.pumpAndSettle();
+
+      // When
+      await tester.tap(find.bySemanticsLabel('Lower front walls'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(tester.widget<HomeSceneView>(find.byType(HomeSceneView)).lowerFrontWalls, isTrue);
+    });
+
+    testWidgets('Given the apartment in 3D, when tapping a lamp that is off, then it is switched on', (tester) async {
+      // Given
+      await pumpScreen(tester);
+      await tester.tap(find.bySemanticsLabel('3D view'));
+      await tester.pumpAndSettle();
+
+      // When
+      await tester.tap(find.bySemanticsLabel('WC light'));
+      await tester.pump();
+
+      // Then
+      expect(lights.commands, ['on light.wc']);
     });
 
     testWidgets('Given the plan, when rendering, then a button to edit the plan is there', (tester) async {

@@ -200,6 +200,7 @@ class _LayerChips extends ConsumerWidget {
         children: [
           const _EditButton(),
           const _TiltButton(),
+          const _LowWallsButton(),
           const Spacer(),
           // Without lights and speakers there are only plants – nothing to switch between.
           if (ref.watch(hasLightsProvider))
@@ -259,6 +260,43 @@ class _TiltButton extends ConsumerWidget {
           ),
           alignment: Alignment.center,
           child: HubGlyphIcon(HubGlyph.cube, color: tilted ? HubColorPalette.text : HubColorPalette.text2),
+        ),
+      ),
+    );
+  }
+}
+
+/// In 3D: lowers the outer walls facing the viewer, to see into the rooms behind them.
+class _LowWallsButton extends ConsumerWidget {
+  const _LowWallsButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final (tilted, low) = ref.watch(floorplanControllerProvider.select((s) => (s.tilted, s.lowWalls)));
+    return AnimatedOpacity(
+      opacity: tilted ? 1 : 0,
+      duration: HubMotion.fadeDuration,
+      child: IgnorePointer(
+        ignoring: !tilted,
+        child: Semantics(
+          button: true,
+          toggled: low,
+          label: 'Lower front walls',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: ref.read(floorplanControllerProvider.notifier).toggleLowWalls,
+            child: AnimatedContainer(
+              duration: HubMotion.fadeDuration,
+              width: HubSizes.minTouchTarget,
+              height: 36,
+              decoration: BoxDecoration(
+                color: low ? HubColorPalette.accent : HubColorPalette.elevated,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              alignment: Alignment.center,
+              child: HubGlyphIcon(HubGlyph.wall, color: low ? HubColorPalette.text : HubColorPalette.text2),
+            ),
+          ),
         ),
       ),
     );
@@ -334,6 +372,7 @@ class _TiltedPlan extends ConsumerWidget {
       lights: ref.watch(sceneLightsProvider),
       tilted: tilted,
       tiltIn: true,
+      lowerFrontWalls: state.lowWalls,
       padding: 8,
       onSettled: onSettled,
       topCamera: (size) =>

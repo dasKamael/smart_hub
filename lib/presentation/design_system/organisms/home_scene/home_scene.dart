@@ -1,10 +1,13 @@
 import 'dart:math' as math;
 
+import 'package:smart_hub/domain/floorplan/furnishing.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
+import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_meshes.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_models.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/scene_solid.dart';
 
@@ -37,12 +40,21 @@ final class SceneLight {
 /// The apartment as 3D blocks: floors per room, walls cut open for doors and windows, and the furniture. Walls are
 /// cut into short pieces so that drawing back to front stays right.
 final class HomeScene {
-  const HomeScene({required this.floors, required this.solids, required this.walls});
+  const HomeScene({
+    required this.floors,
+    required this.solids,
+    required this.walls,
+    this.meshes = const [],
+    this.footprints = const [],
+  });
 
   /// Wall height in cm.
   static const wallHeight = 250.0;
   static const sillHeight = 95.0;
   static const windowTop = 212.0;
+
+  /// Outer walls facing the viewer are lowered to this height, to see into the rooms behind them.
+  static const loweredHeight = 45.0;
 
   /// The model stands on a slab this thick, seen below the outer walls.
   static const slabDepth = 14.0;
@@ -58,6 +70,12 @@ final class HomeScene {
   /// The wall pieces among [solids], for lighting walls by the room they face.
   final Set<SceneSolid> walls;
 
+  /// Furniture with a model, as triangles.
+  final List<SceneMesh> meshes;
+
+  /// Where furniture stands, for the shadow it casts onto the floor right under it.
+  final List<List<PlanPoint>> footprints;
+
   /// Every corner of the model, for fitting it into view.
   Iterable<(double, double, double)> get corners sync* {
     for (final solid in solids) {
@@ -71,9 +89,17 @@ final class HomeScene {
         yield (point.x, point.y, 0);
       }
     }
+    // Furniture by its outline and height; its many corners would only slow fitting down.
+    for (final mesh in meshes) {
+      for (final corner in FurnishingUtil.cornersOf(mesh.item)) {
+        yield (corner.x, corner.y, 0);
+        yield (corner.x, corner.y, mesh.item.kind.height);
+      }
+    }
   }
 
-  static HomeScene of(HomeLayout layout) {
+  /// The scene of [layout]; furniture with a model in [library] is drawn with it, the rest as blocks.
+  static HomeScene of(HomeLayout layout, {FurnitureMeshLibrary? library}) {
     final outlines = LayoutRoomsUtil.outlines(layout);
     final floors = [
       for (final room in layout.rooms)
@@ -82,16 +108,37 @@ final class HomeScene {
     ];
     final walls = <SceneSolid>[];
     final positions = {for (final node in layout.nodes) node.id: node.position};
+    final outsides = {
+      for (final wall in layout.walls)
+        wall.id: _outsideOf(positions[wall.from]!, positions[wall.to]!, wall.thickness, outlines.values),
+    };
     for (final wall in layout.walls) {
-      walls.addAll(_wallPieces(layout, wall, positions[wall.from]!, positions[wall.to]!));
+      walls.addAll(_wallPieces(layout, wall, positions[wall.from]!, positions[wall.to]!, outsides[wall.id]));
     }
     for (final node in layout.nodes) {
       final attached = layout.walls.where((wall) => wall.from == node.id || wall.to == node.id).toList();
       if (attached.isEmpty) continue;
-      walls.add(_pillar(node.position, attached, positions));
+      walls.add(_pillar(node, attached, positions, [for (final wall in attached) outsides[wall.id]]));
     }
-    final furniture = [for (final item in layout.furniture) ...FurnitureModels.solidsOf(item)];
-    return HomeScene(floors: floors, solids: [...walls, ...furniture], walls: walls.toSet());
+    final meshes = <SceneMesh>[];
+    final blocks = <SceneSolid>[];
+    for (final item in layout.furniture) {
+      if (library?.meshOf(item) case final mesh?) {
+        meshes.add(mesh);
+      } else {
+        blocks.addAll(FurnitureModels.solidsOf(item));
+      }
+    }
+    return HomeScene(
+      floors: floors,
+      solids: [...walls, ...blocks],
+      walls: walls.toSet(),
+      meshes: meshes,
+      footprints: [
+        for (final item in layout.furniture)
+          if (!item.kind.isFlat) FurnishingUtil.cornersOf(item),
+      ],
+    );
   }
 
   static SceneMaterial _floorOf(RoomType type) => switch (type) {
@@ -100,7 +147,28 @@ final class HomeScene {
     _ => SceneMaterial.floorWood,
   };
 
-  static List<SceneSolid> _wallPieces(HomeLayout layout, LayoutWall wall, PlanPoint a, PlanPoint b) {
+  /// The direction out of the apartment from the wall from [a] to [b], or `null` when there are rooms on both sides
+  /// (or on none).
+  static PlanPoint? _outsideOf(PlanPoint a, PlanPoint b, double thickness, Iterable<List<PlanPoint>> rooms) {
+    final length = a.distanceTo(b);
+    if (length < 1) return null;
+    final normal = PlanPoint(-(b.y - a.y) / length, (b.x - a.x) / length);
+    final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+    final reach = thickness / 2 + 15;
+    bool inRoom(PlanPoint point) => rooms.any((outline) => PlanGeometryUtil.containsPoint(outline, point));
+    final left = inRoom(PlanPoint(middle.x + normal.x * reach, middle.y + normal.y * reach));
+    final right = inRoom(PlanPoint(middle.x - normal.x * reach, middle.y - normal.y * reach));
+    if (left == right) return null;
+    return left ? PlanPoint(-normal.x, -normal.y) : normal;
+  }
+
+  static List<SceneSolid> _wallPieces(
+    HomeLayout layout,
+    LayoutWall wall,
+    PlanPoint a,
+    PlanPoint b,
+    PlanPoint? outside,
+  ) {
     final length = a.distanceTo(b);
     if (length < 1) return const [];
     final u = PlanPoint((b.x - a.x) / length, (b.y - a.y) / length);
@@ -137,6 +205,8 @@ final class HomeScene {
             // Ends inside the wall – against the next piece or the corner block at a junction – are not drawn; the
             // ends at a door or window are.
             hiddenSides: {if (i < count - 1 || to > length - 0.5 || !jambs) 1, if (i > 0 || from < 0.5 || !jambs) 3},
+            outside: outside,
+            nodeEnds: {if (i == count - 1 && to > length - 0.5) 1: wall.to, if (i == 0 && from < 0.5) 3: wall.from},
           ),
         );
       }
@@ -165,7 +235,13 @@ final class HomeScene {
   }
 
   /// Fills the corner where walls meet with a block as thick as the thickest of them.
-  static SceneSolid _pillar(PlanPoint at, List<LayoutWall> attached, Map<String, PlanPoint> positions) {
+  static SceneSolid _pillar(
+    LayoutNode node,
+    List<LayoutWall> attached,
+    Map<String, PlanPoint> positions,
+    List<PlanPoint?> joins,
+  ) {
+    final at = node.position;
     final thickest = attached.reduce((x, y) => x.thickness >= y.thickness ? x : y);
     final from = positions[thickest.from]!;
     final to = positions[thickest.to]!;
@@ -179,6 +255,8 @@ final class HomeScene {
       bottom: 0,
       top: wallHeight,
       material: SceneMaterial.wall,
+      node: node.id,
+      joins: joins,
     );
   }
 }

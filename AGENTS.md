@@ -142,14 +142,33 @@ Spotify device to a speaker goes on at the same track and position.
 The app runs without Home Assistant: the setup screen offers a demo mode backed by `FakeHomeAssistant`
 (`lib/data/connection/demo/`) with demo lights and speakers that react to service calls. Use it for UI work.
 
-## Floor plan editor
+## Floor plan, walls and 3D
 
-Plan → pencil (`HubPage.floorplanEditor`): rooms (tap corners or drag a rectangle; corners snap to corners, guides and
-the 10 cm grid), doors, openings and windows on walls, undo / redo, saved on every change, copy as JSON for a backup.
-A selected room: drag a corner, drag the middle of a wall to move the whole wall (the neighbor's wall along it follows,
-with a jog where it is longer; openings go along), tap the middle to add a corner, long press a corner to remove it.
-Windows are `DoorType.window`; the stored JSON stays the editor export format. A replaceable module with
-`FloorPlanService` as its only contract (`docs/architecture.md`, rule 6; enforced in `context_rules_test.dart`).
+The apartment is stored as walls (`HomeLayout`, `domain/floorplan/model/home_layout.dart`): junctions, walls between
+them (one wall between two rooms, outer walls thicker), openings hanging on a wall (door / opening / window, offset +
+width), rooms named by a point inside the area the walls enclose (with a `RoomType`), and furniture. The rest of the
+app keeps working with the derived `FloorPlan` (`floorPlanServiceProvider`: room outlines, door segments). A plan of
+room outlines (the first format, e.g. the bundled `assets/floorplan/floorplan.json`) is converted on first start and
+furnished once (`LayoutConversionUtil`, `FurnishingUtil`). Wall logic: `LayoutGraphUtil` (add, split, move, remove),
+`LayoutRoomsUtil` (areas, which room owns which area after a change).
+
+Editor (Plan → pencil, `HubPage.floorplanEditor`), built for few steps and measured
+(`test/.../floorplan_editor/editor_steps.benchmark_test.dart`, table in `build/editor_steps.md`): drag outside the rooms
+draws a room, a stroke inside a room splits it, the room's type is one chip (names it), "Furnish" fills a room by its
+type. Tools stay picked: wall (tap corners; a wall ending on the drawing ends the line), door / window / opening (tap a
+wall, or drag along it for its width; ends snap to the wall's ends), furniture (tap in a room; pieces snap against the
+nearest wall, long press turns them). Select: drag a junction, a wall (the neighbor's wall follows, with a jog where it
+is longer; openings stay with their wall), an opening along its wall, furniture. Two fingers zoom and move the view.
+5 cm grid. A replaceable module with `HomeLayoutService` as its only contract (`docs/architecture.md`, rule 6; enforced
+in `context_rules_test.dart`).
+
+3D (`presentation/design_system/organisms/home_scene/`): own orthographic renderer, no 3D package. Walls are cut into
+short pieces and drawn back to front with the furniture, lit by the night sky and the lamps of their room; colors in
+`HomeSceneColorPalette` follow `appartment.mp4` (the reference). The plan tab draws the scene from above with the plan's
+own projection (markers stay exact); the cube button tilts it into the reference angle, lamps become `SceneMarker`s
+(tap switches, long press selects), the wall button lowers the outer walls facing the viewer. Furniture models: Kenney
+Furniture Kit (CC0, `assets/furniture/`, license file next to it), converted once into `furniture_models.json`
+(normalized triangles + colors); without them the block models in `furniture_models.dart` are used.
 
 ## Kiosk
 

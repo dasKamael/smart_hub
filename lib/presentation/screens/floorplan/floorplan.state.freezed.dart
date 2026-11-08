@@ -629,7 +629,8 @@ mixin _$FloorplanState {
  PlanSelection get selection; Set<PlanLayer> get layers; PlanDrag? get drag;/// Key of the group that is fanned out (`GroupingUtil.groupKey`).
  String? get openGroupKey;/// Positions of dropped devices until the stored placement arrives, so markers do not jump back.
  Map<String, PlanPoint> get pendingPositions;/// The apartment seen at an angle in 3D instead of from above.
- bool get tilted;
+ bool get tilted;/// In 3D, the outer walls facing the viewer are lowered to see into the rooms.
+ bool get lowWalls;
 /// Create a copy of FloorplanState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -641,20 +642,20 @@ $FloorplanStateCopyWith<FloorplanState> get copyWith => _$FloorplanStateCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as FloorplanState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FloorplanState&&(identical(other.selection, _this.selection) || other.selection == _this.selection)&&const DeepCollectionEquality().equals(other.layers, _this.layers)&&(identical(other.drag, _this.drag) || other.drag == _this.drag)&&(identical(other.openGroupKey, _this.openGroupKey) || other.openGroupKey == _this.openGroupKey)&&const DeepCollectionEquality().equals(other.pendingPositions, _this.pendingPositions)&&(identical(other.tilted, _this.tilted) || other.tilted == _this.tilted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FloorplanState&&(identical(other.selection, _this.selection) || other.selection == _this.selection)&&const DeepCollectionEquality().equals(other.layers, _this.layers)&&(identical(other.drag, _this.drag) || other.drag == _this.drag)&&(identical(other.openGroupKey, _this.openGroupKey) || other.openGroupKey == _this.openGroupKey)&&const DeepCollectionEquality().equals(other.pendingPositions, _this.pendingPositions)&&(identical(other.tilted, _this.tilted) || other.tilted == _this.tilted)&&(identical(other.lowWalls, _this.lowWalls) || other.lowWalls == _this.lowWalls));
 }
 
 
 @override
 int get hashCode {
   final _this = this as FloorplanState;
-  return Object.hash(runtimeType,_this.selection,const DeepCollectionEquality().hash(_this.layers),_this.drag,_this.openGroupKey,const DeepCollectionEquality().hash(_this.pendingPositions),_this.tilted);
+  return Object.hash(runtimeType,_this.selection,const DeepCollectionEquality().hash(_this.layers),_this.drag,_this.openGroupKey,const DeepCollectionEquality().hash(_this.pendingPositions),_this.tilted,_this.lowWalls);
 }
 
 @override
 String toString() {
   final _this = this as FloorplanState;
-  return 'FloorplanState(selection: ${_this.selection}, layers: ${_this.layers}, drag: ${_this.drag}, openGroupKey: ${_this.openGroupKey}, pendingPositions: ${_this.pendingPositions}, tilted: ${_this.tilted})';
+  return 'FloorplanState(selection: ${_this.selection}, layers: ${_this.layers}, drag: ${_this.drag}, openGroupKey: ${_this.openGroupKey}, pendingPositions: ${_this.pendingPositions}, tilted: ${_this.tilted}, lowWalls: ${_this.lowWalls})';
 }
 
 
@@ -665,7 +666,7 @@ abstract mixin class $FloorplanStateCopyWith<$Res>  {
   factory $FloorplanStateCopyWith(FloorplanState value, $Res Function(FloorplanState) _then) = _$FloorplanStateCopyWithImpl;
 @useResult
 $Res call({
- PlanSelection selection, Set<PlanLayer> layers, PlanDrag? drag, String? openGroupKey, Map<String, PlanPoint> pendingPositions, bool tilted
+ PlanSelection selection, Set<PlanLayer> layers, PlanDrag? drag, String? openGroupKey, Map<String, PlanPoint> pendingPositions, bool tilted, bool lowWalls
 });
 
 
@@ -682,7 +683,7 @@ class _$FloorplanStateCopyWithImpl<$Res>
 
 /// Create a copy of FloorplanState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selection = null,Object? layers = null,Object? drag = freezed,Object? openGroupKey = freezed,Object? pendingPositions = null,Object? tilted = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selection = null,Object? layers = null,Object? drag = freezed,Object? openGroupKey = freezed,Object? pendingPositions = null,Object? tilted = null,Object? lowWalls = null,}) {
   return _then(FloorplanState(
 selection: null == selection ? _self.selection : selection // ignore: cast_nullable_to_non_nullable
 as PlanSelection,layers: null == layers ? _self.layers : layers // ignore: cast_nullable_to_non_nullable
@@ -690,6 +691,7 @@ as Set<PlanLayer>,drag: freezed == drag ? _self.drag : drag // ignore: cast_null
 as PlanDrag?,openGroupKey: freezed == openGroupKey ? _self.openGroupKey : openGroupKey // ignore: cast_nullable_to_non_nullable
 as String?,pendingPositions: null == pendingPositions ? _self.pendingPositions : pendingPositions // ignore: cast_nullable_to_non_nullable
 as Map<String, PlanPoint>,tilted: null == tilted ? _self.tilted : tilted // ignore: cast_nullable_to_non_nullable
+as bool,lowWalls: null == lowWalls ? _self.lowWalls : lowWalls // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -796,10 +798,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted,  bool lowWalls)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FloorplanState() when $default != null:
-return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted);case _:
+return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted,_that.lowWalls);case _:
   return orElse();
 
 }
@@ -817,10 +819,10 @@ return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted,  bool lowWalls)  $default,) {final _that = this;
 switch (_that) {
 case _FloorplanState():
-return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted);case _:
+return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted,_that.lowWalls);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -837,10 +839,10 @@ return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PlanSelection selection,  Set<PlanLayer> layers,  PlanDrag? drag,  String? openGroupKey,  Map<String, PlanPoint> pendingPositions,  bool tilted,  bool lowWalls)?  $default,) {final _that = this;
 switch (_that) {
 case _FloorplanState() when $default != null:
-return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted);case _:
+return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that.pendingPositions,_that.tilted,_that.lowWalls);case _:
   return null;
 
 }
@@ -852,7 +854,7 @@ return $default(_that.selection,_that.layers,_that.drag,_that.openGroupKey,_that
 
 
 class _FloorplanState implements FloorplanState {
-  const _FloorplanState({this.selection = const PlanSelection.none(),  Set<PlanLayer> layers = const {PlanLayer.plants, PlanLayer.lights, PlanLayer.speakers, PlanLayer.glow}, this.drag, this.openGroupKey,  Map<String, PlanPoint> pendingPositions = const {}, this.tilted = false}): _layers = layers,_pendingPositions = pendingPositions;
+  const _FloorplanState({this.selection = const PlanSelection.none(),  Set<PlanLayer> layers = const {PlanLayer.plants, PlanLayer.lights, PlanLayer.speakers, PlanLayer.glow}, this.drag, this.openGroupKey,  Map<String, PlanPoint> pendingPositions = const {}, this.tilted = false, this.lowWalls = false}): _layers = layers,_pendingPositions = pendingPositions;
   
 
 @override@JsonKey() final  PlanSelection selection;
@@ -877,6 +879,8 @@ class _FloorplanState implements FloorplanState {
 
 /// The apartment seen at an angle in 3D instead of from above.
 @override@JsonKey() final  bool tilted;
+/// In 3D, the outer walls facing the viewer are lowered to see into the rooms.
+@override@JsonKey() final  bool lowWalls;
 
 /// Create a copy of FloorplanState
 /// with the given fields replaced by the non-null parameter values.
@@ -888,18 +892,18 @@ _$FloorplanStateCopyWith<_FloorplanState> get copyWith => __$FloorplanStateCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FloorplanState&&(identical(other.selection, selection) || other.selection == selection)&&const DeepCollectionEquality().equals(other.layers, _layers)&&(identical(other.drag, drag) || other.drag == drag)&&(identical(other.openGroupKey, openGroupKey) || other.openGroupKey == openGroupKey)&&const DeepCollectionEquality().equals(other.pendingPositions, _pendingPositions)&&(identical(other.tilted, tilted) || other.tilted == tilted));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FloorplanState&&(identical(other.selection, selection) || other.selection == selection)&&const DeepCollectionEquality().equals(other.layers, _layers)&&(identical(other.drag, drag) || other.drag == drag)&&(identical(other.openGroupKey, openGroupKey) || other.openGroupKey == openGroupKey)&&const DeepCollectionEquality().equals(other.pendingPositions, _pendingPositions)&&(identical(other.tilted, tilted) || other.tilted == tilted)&&(identical(other.lowWalls, lowWalls) || other.lowWalls == lowWalls));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,selection,const DeepCollectionEquality().hash(_layers),drag,openGroupKey,const DeepCollectionEquality().hash(_pendingPositions),tilted);
+    return Object.hash(runtimeType,selection,const DeepCollectionEquality().hash(_layers),drag,openGroupKey,const DeepCollectionEquality().hash(_pendingPositions),tilted,lowWalls);
 }
 
 @override
 String toString() {
-    return 'FloorplanState(selection: $selection, layers: $layers, drag: $drag, openGroupKey: $openGroupKey, pendingPositions: $pendingPositions, tilted: $tilted)';
+    return 'FloorplanState(selection: $selection, layers: $layers, drag: $drag, openGroupKey: $openGroupKey, pendingPositions: $pendingPositions, tilted: $tilted, lowWalls: $lowWalls)';
 }
 
 
@@ -910,7 +914,7 @@ abstract mixin class _$FloorplanStateCopyWith<$Res> implements $FloorplanStateCo
   factory _$FloorplanStateCopyWith(_FloorplanState value, $Res Function(_FloorplanState) _then) = __$FloorplanStateCopyWithImpl;
 @override @useResult
 $Res call({
- PlanSelection selection, Set<PlanLayer> layers, PlanDrag? drag, String? openGroupKey, Map<String, PlanPoint> pendingPositions, bool tilted
+ PlanSelection selection, Set<PlanLayer> layers, PlanDrag? drag, String? openGroupKey, Map<String, PlanPoint> pendingPositions, bool tilted, bool lowWalls
 });
 
 
@@ -927,7 +931,7 @@ class __$FloorplanStateCopyWithImpl<$Res>
 
 /// Create a copy of FloorplanState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selection = null,Object? layers = null,Object? drag = freezed,Object? openGroupKey = freezed,Object? pendingPositions = null,Object? tilted = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selection = null,Object? layers = null,Object? drag = freezed,Object? openGroupKey = freezed,Object? pendingPositions = null,Object? tilted = null,Object? lowWalls = null,}) {
   return _then(_FloorplanState(
 selection: null == selection ? _self.selection : selection // ignore: cast_nullable_to_non_nullable
 as PlanSelection,layers: null == layers ? _self._layers : layers // ignore: cast_nullable_to_non_nullable
@@ -935,6 +939,7 @@ as Set<PlanLayer>,drag: freezed == drag ? _self.drag : drag // ignore: cast_null
 as PlanDrag?,openGroupKey: freezed == openGroupKey ? _self.openGroupKey : openGroupKey // ignore: cast_nullable_to_non_nullable
 as String?,pendingPositions: null == pendingPositions ? _self._pendingPositions : pendingPositions // ignore: cast_nullable_to_non_nullable
 as Map<String, PlanPoint>,tilted: null == tilted ? _self.tilted : tilted // ignore: cast_nullable_to_non_nullable
+as bool,lowWalls: null == lowWalls ? _self.lowWalls : lowWalls // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

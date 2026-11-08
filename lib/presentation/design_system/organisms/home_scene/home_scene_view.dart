@@ -23,7 +23,10 @@ class HomeSceneView extends StatefulWidget {
     this.padding = 16,
     this.selectedRoomId,
     this.selectionColor,
+    this.lowerFrontWalls = false,
   });
+
+  static const lowerDuration = Duration(milliseconds: 450);
 
   static const tiltDuration = Duration(milliseconds: 900);
 
@@ -45,11 +48,20 @@ class HomeSceneView extends StatefulWidget {
   final String? selectedRoomId;
   final Color? selectionColor;
 
+  /// Lowers the outer walls facing the viewer, to see into the rooms behind them.
+  final bool lowerFrontWalls;
+
   @override
   State<HomeSceneView> createState() => _HomeSceneViewState();
 }
 
-class _HomeSceneViewState extends State<HomeSceneView> with SingleTickerProviderStateMixin {
+class _HomeSceneViewState extends State<HomeSceneView> with TickerProviderStateMixin {
+  late final _lower = AnimationController(
+    vsync: this,
+    duration: HomeSceneView.lowerDuration,
+    value: widget.lowerFrontWalls ? 1 : 0,
+  );
+
   late final _tilt = AnimationController(
     vsync: this,
     duration: HomeSceneView.tiltDuration,
@@ -73,11 +85,15 @@ class _HomeSceneViewState extends State<HomeSceneView> with SingleTickerProvider
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scene != widget.scene) _corners = widget.scene.corners.toList();
     if (oldWidget.tilted != widget.tilted) widget.tilted ? _tilt.forward() : _tilt.reverse();
+    if (oldWidget.lowerFrontWalls != widget.lowerFrontWalls) {
+      widget.lowerFrontWalls ? _lower.forward() : _lower.reverse();
+    }
   }
 
   @override
   void dispose() {
     _tilt.dispose();
+    _lower.dispose();
     super.dispose();
   }
 
@@ -105,7 +121,7 @@ class _HomeSceneViewState extends State<HomeSceneView> with SingleTickerProvider
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => AnimatedBuilder(
-        animation: _tilt,
+        animation: Listenable.merge([_tilt, _lower]),
         builder: (context, _) {
           final camera = _camera(constraints.biggest, Curves.easeInOutCubic.transform(_tilt.value));
           return Stack(
@@ -119,6 +135,7 @@ class _HomeSceneViewState extends State<HomeSceneView> with SingleTickerProvider
                       lights: widget.lights,
                       selectedRoomId: widget.selectedRoomId,
                       selectionColor: widget.selectionColor,
+                      lowered: Curves.easeInOut.transform(_lower.value),
                     ),
                   ),
                 ),

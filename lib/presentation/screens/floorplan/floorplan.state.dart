@@ -45,5 +45,8 @@ abstract class FloorplanState with _$FloorplanState {
 
     /// The apartment seen at an angle in 3D instead of from above.
     @Default(false) bool tilted,
+
+    /// In 3D, the outer walls facing the viewer are lowered to see into the rooms.
+    @Default(false) bool lowWalls,
   }) = _FloorplanState;
 }

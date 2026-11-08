@@ -119,7 +119,7 @@ final class SceneCamera {
   static const topPitch = math.pi / 2;
 
   /// The angle of `appartment.mp4`: turned a little to the left, looking down from the front.
-  static const tiltedYaw = -38 * math.pi / 180;
+  static const tiltedYaw = -28 * math.pi / 180;
   static const tiltedPitch = 61 * math.pi / 180;
 
   @override

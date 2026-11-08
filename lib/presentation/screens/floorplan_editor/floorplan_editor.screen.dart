@@ -7,6 +7,7 @@ import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_icon_button.dart';
 import 'package:smart_hub/presentation/design_system/layouts/hub_background.dart';
 import 'package:smart_hub/presentation/design_system/layouts/page_card.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_meshes.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene_view.dart';
 import 'package:smart_hub/presentation/design_system/tokens/home_scene.color_palette.dart';
@@ -80,7 +81,12 @@ class _Surface extends ConsumerWidget {
       borderRadius: BorderRadius.circular(HubRadius.pageCard),
       child: ColoredBox(
         color: HomeSceneColorPalette.background,
-        child: HomeSceneView(scene: HomeScene.of(layout), tilted: true, padding: 48),
+        child: HomeSceneView(
+          scene: HomeScene.of(layout, library: ref.watch(furnitureMeshesProvider).value),
+          tilted: true,
+          lowerFrontWalls: true,
+          padding: 48,
+        ),
       ),
     );
   }
