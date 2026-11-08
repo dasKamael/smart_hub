@@ -11,7 +11,10 @@ abstract final class HomeSceneColorPalette {
   static const ambient = 0.78;
 
   /// Inside the rooms it is darker than on the outer walls.
-  static const indoors = 0.78;
+  static const indoors = 0.52;
+
+  /// Furniture gets only this share of the sky's light, so that a lamp's room stands out from the dark ones.
+  static const furnitureSky = 0.5;
 
   /// Joints between floorboards.
   static const floorJoint = Color(0x24000000);

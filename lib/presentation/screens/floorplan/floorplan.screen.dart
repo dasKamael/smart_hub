@@ -107,7 +107,6 @@ class _FloorplanScreenState extends ConsumerState<FloorplanScreen> {
     final plan = ref.watch(floorPlanServiceProvider).value;
     final devices = ref.watch(planDevicesProvider);
     final draggedId = ref.watch(floorplanControllerProvider.select((s) => s.drag?.deviceId));
-    final tilted = ref.watch(floorplanControllerProvider.select((s) => s.tilted));
 
     return Stack(
       key: _screenKey,
@@ -119,7 +118,7 @@ class _FloorplanScreenState extends ConsumerState<FloorplanScreen> {
           children: [
             Expanded(
               child: PageCard(
-                color: tilted ? HomeSceneColorPalette.background : null,
+                color: HomeSceneColorPalette.background,
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,

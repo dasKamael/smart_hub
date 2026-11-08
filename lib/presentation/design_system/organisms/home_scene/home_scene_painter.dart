@@ -88,8 +88,8 @@ class HomeScenePainter extends CustomPainter {
             ..blendMode = BlendMode.plus
             ..shader = RadialGradient(
               colors: [
-                color.withValues(alpha: 0.36 * light.brightness),
-                color.withValues(alpha: 0.14 * light.brightness),
+                color.withValues(alpha: 0.17 * light.brightness),
+                color.withValues(alpha: 0.06 * light.brightness),
                 color.withValues(alpha: 0),
               ],
               stops: const [0, 0.38, 1],
@@ -237,44 +237,56 @@ class HomeScenePainter extends CustomPainter {
         canvas.drawPath(path, paint);
         continue;
       }
-      // A side: light changes along it (lamps), blended from one upright edge to the other at mid height, so the
-      // pieces of a long wall meet in the same color.
-      final (px, py, bottom) = face.corners[0];
-      final (qx, qy, _) = face.corners[1];
-      final top = face.corners[2].$3;
-      final middle = (bottom + top) / 2;
-      final left = _lit(face, px, py, middle, lightRooms);
-      final right = _lit(face, qx, qy, middle, lightRooms);
-      if (left == right) {
-        paint.color = left;
-      } else {
-        // Upright edges are upright on screen: blending straight across keeps the colors equal along each of them,
-        // so neighboring pieces meet without a step.
-        paint.shader = ui.Gradient.linear(points[0], Offset(points[1].dx, points[0].dy), [left, right]);
-      }
-      canvas.drawPath(path, paint);
-      if (!face.isOutdoors) {
-        // Indoors, low parts get less light. Not enlarged: overlapping, the darkening would add up at the seams.
-        canvas.drawPath(
-          Path()..addPolygon(points, true),
-          Paint()
-            ..isAntiAlias = false
-            ..shader = ui.Gradient.linear(
-              points[3],
-              _acrossEdge(points[3], points[2], points[0]),
-              [_darkening(top), _darkening(math.max(bottom, math.min(top, 140))), _darkening(bottom)],
-              [
-                0,
-                top - bottom <= 0 ? 0 : ((top - math.min(top, math.max(bottom, 140))) / (top - bottom)).clamp(0, 1),
-                1,
-              ],
-            ),
-        );
-      }
+      _paintSide(canvas, face, points, lightRooms);
     }
     while (next < meshes.length) {
       _paintMesh(canvas, meshes[next++].$2, lightRooms);
     }
+  }
+
+  /// A side as triangles with a color at every corner: lamps light it along and up, low parts indoors get less light.
+  /// Neighboring pieces share their edges' colors, so a wall reads as one surface, without seams.
+  void _paintSide(Canvas canvas, _Face face, List<Offset> points, List<String?> lightRooms) {
+    final (px, py, bottom) = face.corners[0];
+    final (qx, qy, _) = face.corners[1];
+    final top = face.corners[2].$3;
+    final heights = [bottom, if (!face.isOutdoors && bottom < _shadeTop && top > _shadeTop) _shadeTop, top];
+    final positions = <Offset>[];
+    final colors = <Color>[];
+    for (final z in heights) {
+      final t = top - bottom <= 0 ? 0.0 : (z - bottom) / (top - bottom);
+      positions
+        ..add(Offset.lerp(points[0], points[3], t)!)
+        ..add(Offset.lerp(points[1], points[2], t)!);
+      colors
+        ..add(_sideColor(face, px, py, z, lightRooms))
+        ..add(_sideColor(face, qx, qy, z, lightRooms));
+    }
+    final indices = <int>[
+      for (var row = 0; row < heights.length - 1; row++) ...[
+        row * 2,
+        row * 2 + 1,
+        row * 2 + 3,
+        row * 2,
+        row * 2 + 3,
+        row * 2 + 2,
+      ],
+    ];
+    canvas.drawVertices(
+      ui.Vertices(ui.VertexMode.triangles, positions, colors: colors, indices: indices),
+      BlendMode.dst,
+      Paint(),
+    );
+  }
+
+  /// Height up to which walls and furniture indoors darken towards the floor, in cm.
+  static const _shadeTop = 140.0;
+
+  Color _sideColor(_Face face, double x, double y, double z, List<String?> lightRooms) {
+    final color = _lit(face, x, y, z, lightRooms);
+    if (face.isOutdoors) return color;
+    final keep = 1 - HomeSceneColorPalette.floorShade * (1 - math.min(1.0, math.max(0.0, z) / _shadeTop));
+    return Color.from(alpha: color.a, red: color.r * keep, green: color.g * keep, blue: color.b * keep);
   }
 
   /// A furniture model: its triangles facing the viewer, back to front, each lit on its own.
@@ -331,6 +343,7 @@ class HomeScenePainter extends CustomPainter {
         room,
         lightRooms,
         outdoors: false,
+        sky: HomeSceneColorPalette.furnitureSky,
       );
       for (final corner in corners) {
         positions.add(camera.project(p[corner], p[corner + 1], p[corner + 2]));
@@ -338,25 +351,6 @@ class HomeScenePainter extends CustomPainter {
       }
     }
     canvas.drawVertices(ui.Vertices(ui.VertexMode.triangles, positions, colors: colors), BlendMode.dst, Paint());
-  }
-
-  static Color _darkening(double z) => Color.from(
-    alpha: HomeSceneColorPalette.floorShade * (1 - math.min(1.0, math.max(0.0, z) / 140)),
-    red: 0,
-    green: 0,
-    blue: 0,
-  );
-
-  /// The point reached from [start] going at right angles to the edge from [start] to [along] until level with
-  /// [target]: a gradient from [start] to it keeps one value along every line parallel to that edge (the top of a
-  /// wall), so all pieces of a wall darken alike.
-  static Offset _acrossEdge(Offset start, Offset along, Offset target) {
-    final edge = along - start;
-    final length = edge.distance;
-    if (length == 0) return target;
-    final normal = Offset(-edge.dy / length, edge.dx / length);
-    final distance = (target - start).dx * normal.dx + (target - start).dy * normal.dy;
-    return start + normal * distance;
   }
 
   /// [points] pushed out by half a pixel, so neighboring faces meet without a hairline gap.
@@ -410,12 +404,13 @@ class HomeScenePainter extends CustomPainter {
     String? room,
     List<String?> lightRooms, {
     required bool outdoors,
+    double sky = 1,
   }) {
     final (nx, ny, nz) = normal;
-    final sky = _skyLight(nx, ny, nz) * (outdoors ? 1 : HomeSceneColorPalette.indoors);
-    var r = base.r * sky * HomeSceneColorPalette.moonlight.r;
-    var g = base.g * sky * HomeSceneColorPalette.moonlight.g;
-    var b = base.b * sky * HomeSceneColorPalette.moonlight.b;
+    final skyLight = _skyLight(nx, ny, nz) * (outdoors ? 1 : HomeSceneColorPalette.indoors) * sky;
+    var r = base.r * skyLight * HomeSceneColorPalette.moonlight.r;
+    var g = base.g * skyLight * HomeSceneColorPalette.moonlight.g;
+    var b = base.b * skyLight * HomeSceneColorPalette.moonlight.b;
     for (final (i, light) in lights.indexed) {
       if (light.brightness <= 0 || lightRooms[i] == null || lightRooms[i] != room) continue;
       final dx = light.position.x - x;
