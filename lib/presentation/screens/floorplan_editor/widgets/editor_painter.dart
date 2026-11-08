@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
+import 'package:smart_hub/domain/floorplan/editing/furniture_editing.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
@@ -12,6 +13,7 @@ import 'package:smart_hub/presentation/design_system/organisms/home_scene/furnit
 import 'package:smart_hub/presentation/design_system/tokens/home_scene.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart';
+import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.controller.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/widgets/editor_viewport.dart';
 
@@ -36,6 +38,7 @@ class EditorPainter extends CustomPainter {
     _paintOpenings(canvas, shapes);
     _paintLabels(canvas, outlines);
     _paintHandles(canvas, outlines);
+    _paintFurnitureHandles(canvas);
     _paintGuides(canvas, size);
     _paintDrafts(canvas);
   }
@@ -93,6 +96,28 @@ class EditorPainter extends CustomPainter {
           ..strokeWidth = item.id == selected ? 2.5 : 1
           ..color = item.id == selected ? HubColorPalette.accent : HubColorPalette.planFurnitureEdge,
       );
+    }
+  }
+
+  /// Size handles on the right side and the front of the selected piece, the turn handle on a stalk in front of it.
+  void _paintFurnitureHandles(Canvas canvas) {
+    final item = state.selectedFurniture;
+    if (item == null || (state.tool != EditorTool.select && state.tool != EditorTool.furniture)) return;
+    final handles = FurnitureEditingUtil.handlesOf(item, turnReach: FloorplanEditorController.turnPx / viewport.scale);
+    final front = _px(handles[FurnitureHandle.depth]!);
+    final turn = _px(handles[FurnitureHandle.turn]!);
+    canvas
+      ..drawLine(front, turn, _stroke(HubColorPalette.accent, 1.5))
+      ..drawCircle(turn, 9, Paint()..color = HubColorPalette.accent)
+      ..drawCircle(turn, 9, _stroke(HubColorPalette.text, 1.5));
+    // A small arrow around the turn handle's middle.
+    canvas.drawArc(Rect.fromCircle(center: turn, radius: 4.5), -0.6, 4.4, false, _stroke(HubColorPalette.text, 1.5));
+    for (final handle in [FurnitureHandle.width, FurnitureHandle.depth]) {
+      final rect = Rect.fromCenter(center: _px(handles[handle]!), width: 12, height: 12);
+      final shape = RRect.fromRectAndRadius(rect, const Radius.circular(3));
+      canvas
+        ..drawRRect(shape, Paint()..color = HubColorPalette.text)
+        ..drawRRect(shape, _stroke(HubColorPalette.accent, 2));
     }
   }
 

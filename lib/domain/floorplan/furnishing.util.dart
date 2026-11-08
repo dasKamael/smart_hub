@@ -8,6 +8,7 @@ import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/domain/floorplan/wall_shape.util.dart';
 
 /// Placing furniture: a piece put down near a wall turns its back to it, and "furnish" fills a room with the
 /// furniture its type usually has – against the walls, clear of doors, nothing tall in front of windows.
@@ -43,7 +44,7 @@ abstract final class FurnishingUtil {
     _Edge? nearest;
     var nearestDistance = wallSnap + item.depth / 2;
     for (final edge in room) {
-      final distance = PlanGeometryUtil.distanceToSegment(item.position, edge.a, edge.b) - edge.thickness / 2;
+      final distance = PlanGeometryUtil.distanceToSegment(item.position, edge.a, edge.b) - edge.face;
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearest = edge;
@@ -56,6 +57,35 @@ abstract final class FurnishingUtil {
       nearest,
       along.clamp(item.width / 2, math.max(item.width / 2, nearest.length - item.width / 2)),
     );
+  }
+
+  /// [item] moved the least needed so that no corner reaches into a wall of its room. Its turn and size stay.
+  static Furniture keepInside(HomeLayout layout, Furniture item) {
+    final room = _roomEdgesAt(layout, item.position);
+    if (room == null) return item;
+    var position = item.position;
+    // A few rounds, as pushing out of one wall can push into the one around a corner.
+    for (var round = 0; round < 4; round++) {
+      var pushed = false;
+      for (final edge in room) {
+        final along = PlanPoint((edge.b.x - edge.a.x) / edge.length, (edge.b.y - edge.a.y) / edge.length);
+        var deepest = 0.0;
+        for (final corner in cornersOf(item.copyWith(position: position))) {
+          final t = (corner.x - edge.a.x) * along.x + (corner.y - edge.a.y) * along.y;
+          // Only corners alongside this wall; past its ends another wall is in charge.
+          if (t < -edge.face || t > edge.length + edge.face) continue;
+          final into = edge.face - ((corner.x - edge.a.x) * edge.inward.x + (corner.y - edge.a.y) * edge.inward.y);
+          deepest = math.max(deepest, into);
+        }
+        if (deepest > 0.05) {
+          position = PlanPoint(position.x + edge.inward.x * deepest, position.y + edge.inward.y * deepest);
+          pushed = true;
+        }
+      }
+      if (!pushed) break;
+    }
+    if (position == item.position) return item;
+    return item.copyWith(position: PlanPoint(_round(position.x), _round(position.y)));
   }
 
   /// [layout] with the usual furniture for every room that has none yet.
@@ -104,6 +134,7 @@ abstract final class FurnishingUtil {
             0.5)
           raw[i],
     ];
+    final shapes = WallShapeUtil.shapesOf(layout);
     final edges = <_Edge>[];
     for (var i = 0; i < outline.length; i++) {
       final a = outline[i];
@@ -114,7 +145,7 @@ abstract final class FurnishingUtil {
       final wall = LayoutGraphUtil.wallAt(layout, middle, radius: 2);
       // Clockwise on screen, the room lies to the right of the walking direction.
       final inward = PlanPoint(-(b.y - a.y) / length, (b.x - a.x) / length);
-      edges.add(_Edge(a, b, inward, wall?.thickness ?? LayoutWall.innerThickness, wall?.id));
+      edges.add(_Edge(a, b, inward, _faceOf(shapes[wall?.id], inward, wall), wall?.id));
     }
     return edges;
   }
@@ -123,7 +154,7 @@ abstract final class FurnishingUtil {
   static Furniture _against(Furniture item, _Edge edge, double along) {
     final t = along / edge.length;
     final onWall = PlanPoint(edge.a.x + (edge.b.x - edge.a.x) * t, edge.a.y + (edge.b.y - edge.a.y) * t);
-    final away = edge.thickness / 2 + item.depth / 2 + 1;
+    final away = edge.face + item.depth / 2 + 1;
     final rotation = math.atan2(-edge.inward.x, edge.inward.y) * 180 / math.pi;
     return item.copyWith(
       position: PlanPoint(_round(onWall.x + edge.inward.x * away), _round(onWall.y + edge.inward.y * away)),
@@ -131,16 +162,24 @@ abstract final class FurnishingUtil {
     );
   }
 
+  /// The distance of the room-side face of [wall] from its line, from its [shape] when it has one.
+  static double _faceOf(WallShape? shape, PlanPoint inward, LayoutWall? wall) {
+    if (shape == null) return (wall?.thickness ?? LayoutWall.innerThickness) / 2;
+    return inward.x * shape.across.x + inward.y * shape.across.y > 0 ? shape.left : shape.right;
+  }
+
   static double _round(double value) => (value * 10).round() / 10;
 }
 
 class _Edge {
-  _Edge(this.a, this.b, this.inward, this.thickness, this.wallId);
+  _Edge(this.a, this.b, this.inward, this.face, this.wallId);
 
   final PlanPoint a;
   final PlanPoint b;
   final PlanPoint inward;
-  final double thickness;
+
+  /// How far the wall's face on the room's side is from its line.
+  final double face;
   final String? wallId;
 
   double get length => a.distanceTo(b);

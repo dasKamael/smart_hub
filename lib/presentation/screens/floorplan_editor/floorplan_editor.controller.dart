@@ -1,5 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:smart_hub/domain/floorplan/editing/furniture_editing.util.dart';
 import 'package:smart_hub/domain/floorplan/editing/layout_editing.util.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/furnishing.util.dart';
@@ -32,6 +33,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   /// Junctions are grabbed only close to them; a bit further along, the wall itself is grabbed.
   static const nodePx = 12.0;
+
+  /// How far the turn handle sits in front of a selected piece of furniture.
+  static const turnPx = 30.0;
 
   _Drag? _drag;
 
@@ -70,6 +74,8 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   void tap(PlanPoint point, {required double cmPerPx}) {
     final radius = handlePx * cmPerPx;
+    // A tap on a handle of the selected piece keeps it selected.
+    if (_furnitureHandleAt(point, cmPerPx) != null) return;
     switch (state.tool) {
       case EditorTool.select:
         select(_hit(point, radius));
@@ -89,7 +95,10 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         }
         if (LayoutEditingUtil.roomAt(_layout, point) == null) return;
         final id = LayoutGraphUtil.nextId('f', _layout.furniture.map((item) => item.id));
-        final item = FurnishingUtil.place(_layout, state.furnitureKind, point, id: id);
+        final item = FurnishingUtil.keepInside(
+          _layout,
+          FurnishingUtil.place(_layout, state.furnitureKind, point, id: id),
+        );
         _commit(_layout.copyWith(furniture: [..._layout.furniture, item]), select: EditorSelection.furniture(id));
     }
   }
@@ -106,6 +115,10 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   bool startDrag(PlanPoint point, {required double cmPerPx}) {
     _renamingRoomId = null;
     final radius = handlePx * cmPerPx;
+    if (_furnitureHandleAt(point, cmPerPx) case (final item, final handle)) {
+      _drag = _FurnitureHandleDrag(_layout, item.id, handle);
+      return true;
+    }
     switch (state.tool) {
       case EditorTool.room:
         _drag = _RectangleDrag(_snap(point, cmPerPx).point);
@@ -115,7 +128,13 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         if (wall == null) return false;
         _drag = _OpeningDraft(wall.id, point, snap: handlePx * cmPerPx);
         return true;
-      case EditorTool.wall || EditorTool.furniture:
+      case EditorTool.furniture:
+        final item = LayoutEditingUtil.furnitureAt(_layout, point);
+        if (item == null) return false;
+        select(EditorSelection.furniture(item.id));
+        _drag = _FurnitureDrag(_layout, item.id, point);
+        return true;
+      case EditorTool.wall:
         return false;
       case EditorTool.select:
         break;
@@ -190,7 +209,12 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         final moved = item.copyWith(
           position: PlanPoint((item.position.x + delta.x).roundToDouble(), (item.position.y + delta.y).roundToDouble()),
         );
-        _change(drag, _withFurniture(drag.before, FurnishingUtil.snapToWall(drag.before, moved)));
+        final placed = FurnishingUtil.keepInside(drag.before, FurnishingUtil.snapToWall(drag.before, moved));
+        _change(drag, _withFurniture(drag.before, placed));
+      case final _FurnitureHandleDrag drag:
+        final item = drag.before.furniture.firstWhere((item) => item.id == drag.furnitureId);
+        final resized = FurnitureEditingUtil.resized(item, drag.handle, point);
+        _change(drag, _withFurniture(drag.before, FurnishingUtil.keepInside(drag.before, resized)));
     }
   }
 
@@ -363,8 +387,29 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   void rotateFurniture() {
     final item = state.selectedFurniture;
-    if (item != null) _commit(_withFurniture(_layout, item.copyWith(rotation: (item.rotation + 90) % 360)));
+    if (item != null) _commitFurniture(item.copyWith(rotation: (item.rotation + 90) % 360));
   }
+
+  /// Sets the selected piece's size; its back stays against its wall.
+  void setFurnitureSize({double? width, double? depth}) {
+    final item = state.selectedFurniture;
+    if (item != null) _commitFurniture(FurnitureEditingUtil.withSize(item, width: width, depth: depth));
+  }
+
+  /// Puts a copy of the selected piece beside it and selects the copy, so a row of chairs is a few taps.
+  void duplicateFurniture() {
+    final item = state.selectedFurniture;
+    if (item == null) return;
+    final id = LayoutGraphUtil.nextId('f', _layout.furniture.map((item) => item.id));
+    final copy = FurnishingUtil.keepInside(
+      _layout,
+      FurnishingUtil.snapToWall(_layout, FurnitureEditingUtil.copyBeside(item, id: id)),
+    );
+    _commit(_layout.copyWith(furniture: [..._layout.furniture, copy]), select: EditorSelection.furniture(id));
+  }
+
+  /// [item] changed, moved back into its room where it reaches into a wall.
+  void _commitFurniture(Furniture item) => _commit(_withFurniture(_layout, FurnishingUtil.keepInside(_layout, item)));
 
   void deleteFurniture() {
     final item = state.selectedFurniture;
@@ -384,6 +429,7 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   void undo() {
     if (state.past.isEmpty) return;
+    _dropDrag();
     _renamingRoomId = null;
     final previous = state.past.last;
     state = state.copyWith(
@@ -398,6 +444,7 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   void redo() {
     if (state.future.isEmpty) return;
+    _dropDrag();
     _renamingRoomId = null;
     final next = state.future.first;
     state = state.copyWith(
@@ -420,6 +467,20 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     EditorTool.opening => DoorType.open,
     _ => DoorType.door,
   };
+
+  /// A drag still going on when the history moves would write over it; it ends without its changes.
+  void _dropDrag() {
+    _drag = null;
+    state = state.copyWith(rectangle: null, openingDraft: null, splitDraft: null, guideX: null, guideY: null);
+  }
+
+  /// The selected piece of furniture and its handle under [point], when the tool shows handles.
+  (Furniture, FurnitureHandle)? _furnitureHandleAt(PlanPoint point, double cmPerPx) {
+    final item = state.selectedFurniture;
+    if (item == null || (state.tool != EditorTool.select && state.tool != EditorTool.furniture)) return null;
+    final handle = FurnitureEditingUtil.handleAt(item, point, radius: handlePx * cmPerPx, turnReach: turnPx * cmPerPx);
+    return handle == null ? null : (item, handle);
+  }
 
   SnapResult _snap(PlanPoint point, double cmPerPx) => LayoutEditingUtil.snap(_layout, point, radius: snapPx * cmPerPx);
 
@@ -486,6 +547,11 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   void _commit(HomeLayout layout, {EditorSelection? select, bool deselect = false}) {
     _renamingRoomId = null;
     final normalized = LayoutRoomsUtil.normalize(layout, previousOutlines: LayoutRoomsUtil.outlines(_layout));
+    // Nothing changed: no undo step that would undo nothing.
+    if (normalized == _layout) {
+      state = state.copyWith(selection: deselect ? null : select ?? state.selection);
+      return;
+    }
     state = state.copyWith(
       layout: normalized,
       past: _pastWith(_layout),
@@ -587,4 +653,11 @@ final class _FurnitureDrag extends _EditDrag {
 
   final String furnitureId;
   final PlanPoint start;
+}
+
+final class _FurnitureHandleDrag extends _EditDrag {
+  _FurnitureHandleDrag(super.before, this.furnitureId, this.handle);
+
+  final String furnitureId;
+  final FurnitureHandle handle;
 }

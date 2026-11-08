@@ -84,6 +84,9 @@ enum HubGlyph {
   /// A circular arrow: turn by a quarter.
   rotate(Size(18, 18), Size(16, 16)),
 
+  /// Two overlapping sheets: a copy.
+  copy(Size(18, 18), Size(16, 16)),
+
   /// Potted plant, the illustration for plants without a photo.
   pottedPlant(Size(24, 24), Size(22, 22));
 
@@ -390,6 +393,21 @@ class _GlyphPainter extends CustomPainter {
               ..lineTo(10.6, 6.4)
               ..close(),
             fill,
+          );
+      case HubGlyph.copy:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(6, 6, 16, 16, const Radius.circular(2)), _stroke(1.9))
+          ..drawPath(
+            Path()
+              ..moveTo(12, 3.5)
+              ..lineTo(12, 3)
+              ..arcToPoint(const Offset(11, 2), radius: const Radius.circular(1), clockwise: false)
+              ..lineTo(3, 2)
+              ..arcToPoint(const Offset(2, 3), radius: const Radius.circular(1), clockwise: false)
+              ..lineTo(2, 11)
+              ..arcToPoint(const Offset(3, 12), radius: const Radius.circular(1), clockwise: false)
+              ..lineTo(3.5, 12),
+            _stroke(1.9),
           );
       case HubGlyph.target:
         canvas

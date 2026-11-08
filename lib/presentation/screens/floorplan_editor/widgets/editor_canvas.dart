@@ -172,7 +172,7 @@ class _ToolBar extends ConsumerWidget {
     EditorTool.door: 'Tap or drag along a wall',
     EditorTool.window: 'Tap or drag along a wall',
     EditorTool.opening: 'Tap or drag along a wall',
-    EditorTool.furniture: 'Tap in a room',
+    EditorTool.furniture: 'Tap in a room: place · drag a piece: move · handles: size and turn',
   };
 
   @override

@@ -287,6 +287,130 @@ void main() {
       // Then
       expect(state().layout.furniture.single.rotation, 90);
     });
+
+    /// A coffee table (110 × 60 cm) in the middle of the office, selected, with the furniture tool still picked.
+    Furniture placeTable() {
+      controller()
+        ..selectFurnitureKind(FurnitureKind.coffeeTable)
+        ..tap(const PlanPoint(200, 150), cmPerPx: 1);
+      return state().selectedFurniture!;
+    }
+
+    test(
+      'Given a selected table and the furniture tool, when dragging the table, then it moves instead of the view',
+      () {
+        // Given
+        placeTable();
+
+        // When
+        final dragging = controller().startDrag(const PlanPoint(200, 150), cmPerPx: 1);
+        controller()
+          ..updateDrag(const PlanPoint(220, 170), cmPerPx: 1)
+          ..endDrag();
+
+        // Then
+        expect(dragging, isTrue);
+        expect(state().layout.furniture.single.position, const PlanPoint(220, 170));
+        expect(state().past, hasLength(2), reason: 'placing and moving are one step each');
+      },
+    );
+
+    test('Given a selected table, when dragging its width handle 20 cm out, then it is 20 cm wider and its left side '
+        'stays', () {
+      // Given
+      placeTable();
+
+      // When
+      controller().startDrag(const PlanPoint(255, 150), cmPerPx: 1);
+      controller()
+        ..updateDrag(const PlanPoint(275, 150), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      final table = state().layout.furniture.single;
+      expect((table.width, table.depth), (130, 60));
+      expect(table.position, const PlanPoint(210, 150));
+    });
+
+    test('Given a selected table, when dragging its turn handle to the left, then its front faces left', () {
+      // Given
+      placeTable();
+
+      // When
+      controller().startDrag(const PlanPoint(200, 150 + 30 + FloorplanEditorController.turnPx), cmPerPx: 1);
+      controller()
+        ..updateDrag(const PlanPoint(100, 150), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(state().layout.furniture.single.rotation, 90);
+    });
+
+    test('Given a selected table, when tapping its turn handle, then it stays selected and nothing is placed', () {
+      // Given
+      final table = placeTable();
+
+      // When
+      controller().tap(const PlanPoint(200, 150 + 30 + FloorplanEditorController.turnPx), cmPerPx: 1);
+
+      // Then
+      expect(state().layout.furniture, hasLength(1));
+      expect(state().selection, EditorSelection.furniture(table.id));
+    });
+
+    test('Given a selected table, when copying it, then a second one is placed and selected', () {
+      // Given
+      final table = placeTable();
+
+      // When
+      controller().duplicateFurniture();
+
+      // Then
+      expect(state().layout.furniture, hasLength(2));
+      expect(state().selectedFurniture?.id, isNot(table.id));
+      expect(state().selectedFurniture?.kind, FurnitureKind.coffeeTable);
+    });
+
+    test('Given a selected table, when making it deeper, then it grows to the front and its back stays', () {
+      // Given
+      placeTable();
+
+      // When
+      controller().setFurnitureSize(depth: 80);
+
+      // Then
+      final table = state().layout.furniture.single;
+      expect(table.depth, 80);
+      expect(table.position, const PlanPoint(200, 160));
+    });
+
+    test('Given a selected table, when setting the size it already has, then no undo step is added', () {
+      // Given
+      final table = placeTable();
+
+      // When
+      controller().setFurnitureSize(width: table.width);
+
+      // Then
+      expect(state().past, hasLength(1));
+    });
+
+    test('Given a table being dragged, when undoing, then the drag ends and the next drag step changes nothing', () {
+      // Given
+      placeTable();
+      controller()
+        ..startDrag(const PlanPoint(200, 150), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(220, 170), cmPerPx: 1);
+
+      // When
+      controller()
+        ..undo()
+        ..updateDrag(const PlanPoint(240, 190), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(state().layout.furniture.single.position, const PlanPoint(200, 150));
+    });
   });
 
   group('history', () {

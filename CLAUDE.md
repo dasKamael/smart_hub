@@ -157,7 +157,8 @@ Editor (Plan → pencil, `HubPage.floorplanEditor`), built for few steps and mea
 draws a room, a stroke inside a room splits it, the room's type is one chip (names it), "Furnish" fills a room by its
 type. Tools stay picked: wall (tap corners; a wall ending on the drawing ends the line), door / window / opening (tap a
 wall, or drag along it for its width; ends snap to the wall's ends), furniture (tap in a room; pieces snap against the
-nearest wall, long press turns them). Select: drag a junction, a wall (the neighbor's wall follows, with a jog where it
+nearest wall and are kept out of walls; drag to move; a selected piece has size handles on its side and front and a
+turn handle in front, 15° steps; the panel has size steps, turn, copy and keeps the palette). Select: drag a junction, a wall (the neighbor's wall follows, with a jog where it
 is longer; openings stay with their wall), an opening along its wall, furniture. Two fingers zoom and move the view.
 5 cm grid. A replaceable module with `HomeLayoutService` as its only contract (`docs/architecture.md`, rule 6; enforced
 in `context_rules_test.dart`).

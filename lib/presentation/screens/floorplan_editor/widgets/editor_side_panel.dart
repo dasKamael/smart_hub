@@ -48,7 +48,10 @@ class EditorSidePanel extends ConsumerWidget {
               child: switch (state) {
                 FloorplanEditorState(selectedRoom: final room?) => _RoomPanel(key: ValueKey(room.id), room: room),
                 FloorplanEditorState(selectedOpening: final opening?) => _OpeningPanel(opening: opening),
-                FloorplanEditorState(selectedFurniture: final item?) => _FurniturePanel(item: item),
+                FloorplanEditorState(selectedFurniture: final item?) => _FurniturePanel(
+                  item: item,
+                  palette: state.tool == EditorTool.furniture ? state.furnitureKind : null,
+                ),
                 FloorplanEditorState(selectedWall: final wall?) => _WallPanel(wall: wall),
                 FloorplanEditorState(tool: EditorTool.furniture) => _FurniturePalette(selected: state.furnitureKind),
                 _ => _RoomList(layout: state.layout),
@@ -337,21 +340,39 @@ class _OpeningPanel extends ConsumerWidget {
   }
 }
 
+/// The selected piece: its size in steps, turn, copy and delete. With the furniture tool the palette stays below,
+/// so the next piece is one tap away.
 class _FurniturePanel extends ConsumerWidget {
-  const _FurniturePanel({required this.item});
+  const _FurniturePanel({required this.item, this.palette});
 
   final Furniture item;
+
+  /// What the furniture tool puts down next; `null` hides the palette.
+  final FurnitureKind? palette;
+
+  static const _sizeStep = 10.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
+    final palette = this.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: HubSpacing.s12,
       children: [
         Text(item.kind.label, style: HubTextStyles.widgetTitle),
-        Text('${item.width.round()} × ${item.depth.round()} cm', style: HubTextStyles.secondary.tabular),
-        const Spacer(),
+        _SizeStepper(
+          label: 'Width',
+          value: item.width,
+          onChanged: (width) => controller.setFurnitureSize(width: width),
+          step: _sizeStep,
+        ),
+        _SizeStepper(
+          label: 'Depth',
+          value: item.depth,
+          onChanged: (depth) => controller.setFurnitureSize(depth: depth),
+          step: _sizeStep,
+        ),
         Row(
           spacing: HubSpacing.s8,
           children: [
@@ -363,8 +384,55 @@ class _FurniturePanel extends ConsumerWidget {
                 onPressed: controller.rotateFurniture,
               ),
             ),
+            _IconAction(glyph: HubGlyph.copy, label: 'Copy', onTap: controller.duplicateFurniture),
             _IconAction(glyph: HubGlyph.trash, label: 'Delete', danger: true, onTap: controller.deleteFurniture),
           ],
+        ),
+        if (palette != null) ...[
+          const SizedBox(height: HubSpacing.s4),
+          Expanded(child: _FurniturePalette(selected: palette)),
+        ],
+      ],
+    );
+  }
+}
+
+/// A size in cm with buttons to make it smaller or larger by [step].
+class _SizeStepper extends StatelessWidget {
+  const _SizeStepper({required this.label, required this.value, required this.onChanged, required this.step});
+
+  final String label;
+  final double value;
+  final ValueChanged<double> onChanged;
+  final double step;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: HubSpacing.s8,
+      children: [
+        Expanded(child: Text(label, style: HubTextStyles.secondary)),
+        Semantics(
+          label: '$label smaller',
+          child: _Choice(
+            selected: false,
+            width: 40,
+            onTap: () => onChanged(value - step),
+            child: const HubGlyphIcon(HubGlyph.minus, color: HubColorPalette.text),
+          ),
+        ),
+        SizedBox(
+          width: 64,
+          child: Text('${value.round()} cm', textAlign: TextAlign.center, style: HubTextStyles.label.tabular),
+        ),
+        Semantics(
+          label: '$label larger',
+          child: _Choice(
+            selected: false,
+            width: 40,
+            onTap: () => onChanged(value + step),
+            child: const HubGlyphIcon(HubGlyph.plus, color: HubColorPalette.text),
+          ),
         ),
       ],
     );

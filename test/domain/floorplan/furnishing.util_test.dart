@@ -124,6 +124,79 @@ void main() {
       // Then
       expect(chair.position, const PlanPoint(200, 150));
     });
+
+    test('Given a room with outer walls, when putting a bed down near the left one, then its back touches the wall\'s '
+        'inner face (outer walls grow outwards)', () {
+      // Given
+      final layout = _room(RoomType.bedroom).copyWith(
+        walls: [for (final wall in _room(RoomType.bedroom).walls) wall.copyWith(thickness: LayoutWall.outerThickness)],
+      );
+
+      // When
+      final bed = FurnishingUtil.place(layout, FurnitureKind.bed, const PlanPoint(140, 150), id: 'b');
+
+      // Then
+      expect(bed.position.x, closeTo(LayoutWall.innerThickness / 2 + FurnitureKind.bed.depth / 2 + 1, 0.1));
+    });
+  });
+
+  group('FurnishingUtil.keepInside', () {
+    test('Given a desk turned so that a corner reaches into the left wall, when keeping it inside, then it is pushed '
+        'back into the room', () {
+      // Given
+      const desk = Furniture(
+        id: 'd',
+        kind: FurnitureKind.desk,
+        position: PlanPoint(20, 150),
+        rotation: 90,
+        width: 120,
+        depth: 60,
+      );
+
+      // When
+      final kept = FurnishingUtil.keepInside(_room(RoomType.office), desk);
+
+      // Then
+      expect(kept.position.x, closeTo(5 + 30, 0.1));
+      expect(kept.position.y, 150);
+      expect(kept.rotation, 90);
+    });
+
+    test('Given a piece wedged into a corner, when keeping it inside, then it moves out of both walls', () {
+      // Given
+      const table = Furniture(
+        id: 't',
+        kind: FurnitureKind.diningTable,
+        position: PlanPoint(30, 30),
+        width: 100,
+        depth: 100,
+      );
+
+      // When
+      final kept = FurnishingUtil.keepInside(_room(RoomType.office), table);
+
+      // Then
+      expect(kept.position.x, closeTo(55, 0.1));
+      expect(kept.position.y, closeTo(55, 0.1));
+    });
+
+    test('Given a piece well inside its room, when keeping it inside, then it stays as it is', () {
+      // Given
+      const chair = Furniture(
+        id: 'c',
+        kind: FurnitureKind.chair,
+        position: PlanPoint(200, 150),
+        rotation: 30,
+        width: 45,
+        depth: 50,
+      );
+
+      // When
+      final kept = FurnishingUtil.keepInside(_room(RoomType.office), chair);
+
+      // Then
+      expect(kept, chair);
+    });
   });
 
   group('FurnishingUtil.furnishAll', () {
