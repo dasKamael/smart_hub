@@ -8,15 +8,76 @@ part of 'floorplan.service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The apartment's floor plan.
+/// The apartment as drawn: walls, openings, rooms and furniture. A plan still in the first format (room outlines) is
+/// turned into walls once and stored that way.
 
-@ProviderFor(FloorPlanService)
+@ProviderFor(HomeLayoutService)
+final homeLayoutServiceProvider = HomeLayoutServiceProvider._();
+
+/// The apartment as drawn: walls, openings, rooms and furniture. A plan still in the first format (room outlines) is
+/// turned into walls once and stored that way.
+final class HomeLayoutServiceProvider
+    extends $AsyncNotifierProvider<HomeLayoutService, HomeLayout> {
+  /// The apartment as drawn: walls, openings, rooms and furniture. A plan still in the first format (room outlines) is
+  /// turned into walls once and stored that way.
+  HomeLayoutServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'homeLayoutServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$homeLayoutServiceHash();
+
+  @$internal
+  @override
+  HomeLayoutService create() => HomeLayoutService();
+}
+
+String _$homeLayoutServiceHash() => r'abd7963700b2a034095f2ff5c343d4b57a6b05cd';
+
+/// The apartment as drawn: walls, openings, rooms and furniture. A plan still in the first format (room outlines) is
+/// turned into walls once and stored that way.
+
+abstract class _$HomeLayoutService extends $AsyncNotifier<HomeLayout> {
+  FutureOr<HomeLayout> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<HomeLayout>, HomeLayout>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<HomeLayout>, HomeLayout>,
+              AsyncValue<HomeLayout>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// The floor plan the app shows: room outlines and door segments, derived from the drawn layout.
+
+@ProviderFor(floorPlanService)
 final floorPlanServiceProvider = FloorPlanServiceProvider._();
 
-/// The apartment's floor plan.
+/// The floor plan the app shows: room outlines and door segments, derived from the drawn layout.
+
 final class FloorPlanServiceProvider
-    extends $AsyncNotifierProvider<FloorPlanService, FloorPlan> {
-  /// The apartment's floor plan.
+    extends
+        $FunctionalProvider<
+          AsyncValue<FloorPlan>,
+          FloorPlan,
+          FutureOr<FloorPlan>
+        >
+    with $FutureModifier<FloorPlan>, $FutureProvider<FloorPlan> {
+  /// The floor plan the app shows: room outlines and door segments, derived from the drawn layout.
   FloorPlanServiceProvider._()
     : super(
         from: null,
@@ -33,30 +94,16 @@ final class FloorPlanServiceProvider
 
   @$internal
   @override
-  FloorPlanService create() => FloorPlanService();
-}
+  $FutureProviderElement<FloorPlan> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
-String _$floorPlanServiceHash() => r'756b63ed3b562f0ab836bf1e0b7634bd215fa03e';
-
-/// The apartment's floor plan.
-
-abstract class _$FloorPlanService extends $AsyncNotifier<FloorPlan> {
-  FutureOr<FloorPlan> build();
-  @$mustCallSuper
   @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<FloorPlan>, FloorPlan>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<FloorPlan>, FloorPlan>,
-              AsyncValue<FloorPlan>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
+  FutureOr<FloorPlan> create(Ref ref) {
+    return floorPlanService(ref);
   }
 }
+
+String _$floorPlanServiceHash() => r'5e45aa712b542fce99e54cd752928a408aed1007';
 
 /// Placed devices, live from the database.
 

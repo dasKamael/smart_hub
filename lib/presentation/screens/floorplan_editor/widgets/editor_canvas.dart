@@ -44,8 +44,8 @@ class _EditorCanvasState extends ConsumerState<EditorCanvas> {
   EditorViewport get _view => _viewport ??= _fit();
 
   EditorViewport _fit() {
-    final plan = ref.read(floorplanEditorControllerProvider).plan;
-    return EditorViewport.fit([for (final room in plan.rooms) ...room.polygon], _size);
+    final layout = ref.read(floorplanEditorControllerProvider).layout;
+    return EditorViewport.fit([for (final node in layout.nodes) node.position], _size);
   }
 
   void _zoomBy(double factor) {
@@ -159,32 +159,29 @@ class _EditorCanvasState extends ConsumerState<EditorCanvas> {
   }
 }
 
-/// While drawing a room: remove the last corner, finish, cancel. Otherwise a short hint for the tool.
+/// While drawing walls: take back the last one, finish. Otherwise a short hint for the tool.
 class _ToolBar extends ConsumerWidget {
   const _ToolBar({required this.state});
 
   final FloorplanEditorState state;
 
   static const _hints = {
-    EditorTool.room: 'Tap the corners',
-    EditorTool.rectangle: 'Drag across',
-    EditorTool.door: 'Tap a wall',
-    EditorTool.window: 'Tap a wall',
+    EditorTool.room: 'Drag across',
+    EditorTool.wall: 'Tap from corner to corner',
+    EditorTool.door: 'Tap or drag along a wall',
+    EditorTool.window: 'Tap or drag along a wall',
+    EditorTool.opening: 'Tap or drag along a wall',
+    EditorTool.furniture: 'Tap in a room',
   };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
-    if (state.tool == EditorTool.room && state.draft.isNotEmpty) {
+    if (state.tool == EditorTool.wall && state.chain.isNotEmpty) {
       return _Pill(
         children: [
-          _PillButton(glyph: HubGlyph.undo, label: 'Remove last corner', onTap: controller.removeLastDraftCorner),
-          _PillButton(
-            glyph: HubGlyph.check,
-            label: 'Finish room',
-            onTap: state.draft.length >= 3 ? controller.finishDraft : null,
-          ),
-          _PillButton(glyph: HubGlyph.close, label: 'Cancel room', onTap: () => controller.selectTool(EditorTool.room)),
+          _PillButton(glyph: HubGlyph.undo, label: 'Take back the last wall', onTap: controller.removeLastChainPoint),
+          _PillButton(glyph: HubGlyph.check, label: 'Finish walls', onTap: controller.finishChain),
         ],
       );
     }

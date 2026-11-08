@@ -71,6 +71,19 @@ enum HubGlyph {
   /// Arrow out of a tray.
   export(Size(18, 18), Size(16, 16)),
 
+  /// A thick wall seen from above.
+  wall(Size(18, 18), Size(16, 16)),
+
+  /// Two wall ends with a gap between them.
+  gap(Size(18, 18), Size(16, 16)),
+  sofa(Size(18, 18), Size(16, 16)),
+
+  /// A cube: the 3D view.
+  cube(Size(18, 18), Size(16, 16)),
+
+  /// A circular arrow: turn by a quarter.
+  rotate(Size(18, 18), Size(16, 16)),
+
   /// Potted plant, the illustration for plants without a photo.
   pottedPlant(Size(24, 24), Size(22, 22));
 
@@ -337,6 +350,46 @@ class _GlyphPainter extends CustomPainter {
               ..lineTo(15, 15)
               ..lineTo(15, 11.5),
             _stroke(2),
+          );
+      case HubGlyph.wall:
+        canvas.drawRRect(RRect.fromLTRBR(2, 6.5, 16, 11.5, const Radius.circular(1)), fill);
+      case HubGlyph.gap:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(1.5, 6.5, 6.5, 11.5, const Radius.circular(1)), fill)
+          ..drawRRect(RRect.fromLTRBR(11.5, 6.5, 16.5, 11.5, const Radius.circular(1)), fill)
+          ..drawLine(const Offset(8, 9), const Offset(10, 9), _stroke(1.2));
+      case HubGlyph.sofa:
+        canvas
+          ..drawRRect(RRect.fromLTRBR(3.5, 4, 14.5, 9, const Radius.circular(1.5)), fill)
+          ..drawRRect(RRect.fromLTRBR(1.5, 7, 4.5, 14, const Radius.circular(1.2)), fill)
+          ..drawRRect(RRect.fromLTRBR(13.5, 7, 16.5, 14, const Radius.circular(1.2)), fill)
+          ..drawRRect(RRect.fromLTRBR(4, 9.8, 14, 13.2, const Radius.circular(1)), fill);
+      case HubGlyph.cube:
+        canvas
+          ..drawPath(
+            Path()
+              ..moveTo(9, 2)
+              ..lineTo(15.5, 5.5)
+              ..lineTo(15.5, 12.5)
+              ..lineTo(9, 16)
+              ..lineTo(2.5, 12.5)
+              ..lineTo(2.5, 5.5)
+              ..close(),
+            _stroke(1.7),
+          )
+          ..drawLine(const Offset(2.5, 5.5), const Offset(9, 9), _stroke(1.5))
+          ..drawLine(const Offset(15.5, 5.5), const Offset(9, 9), _stroke(1.5))
+          ..drawLine(const Offset(9, 9), const Offset(9, 16), _stroke(1.5));
+      case HubGlyph.rotate:
+        canvas
+          ..drawArc(Rect.fromCircle(center: const Offset(9, 9.5), radius: 6), -0.4, 4.6, false, _stroke(2))
+          ..drawPath(
+            Path()
+              ..moveTo(15.8, 2.6)
+              ..lineTo(15.6, 8)
+              ..lineTo(10.6, 6.4)
+              ..close(),
+            fill,
           );
       case HubGlyph.target:
         canvas

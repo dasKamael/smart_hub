@@ -5,58 +5,150 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:smart_hub/data/database/app_database.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
+import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 
 part 'floorplan.repository.g.dart';
 
-/// Loads the floor plan. On first start it is seeded from the bundled editor export.
+/// What is stored: the apartment drawn with walls, or a plan in the first format (room outlines) that still has to
+/// be turned into walls. On first start that is the bundled plan.
+sealed class StoredPlan {
+  const StoredPlan();
+}
+
+final class StoredLayout extends StoredPlan {
+  const StoredLayout(this.layout);
+
+  final HomeLayout layout;
+}
+
+final class StoredOutlines extends StoredPlan {
+  const StoredOutlines(this.plan);
+
+  final FloorPlan plan;
+}
+
+/// Loads and stores the apartment as JSON in one row (units: cm).
 class FloorplanRepository {
   FloorplanRepository({required this.database, required this.assets});
 
   static const initialPlanAsset = 'assets/floorplan/floorplan.json';
+  static const format = 'smart-hub-home';
+  static const version = 2;
   static const _planId = 1;
 
   final AppDatabase database;
   final AssetBundle assets;
 
-  Future<FloorPlan> load() async {
+  Future<StoredPlan> load() async {
     final table = database.floorPlansTable;
     final row = await (database.select(table)..where((t) => t.id.equals(_planId))).getSingleOrNull();
-    final json = row?.json ?? await assets.loadString(initialPlanAsset);
-    if (row == null) await database.into(table).insert(FloorPlanRow(id: _planId, json: json));
-    return parse(jsonDecode(json) as Map<String, Object?>);
+    final json = jsonDecode(row?.json ?? await assets.loadString(initialPlanAsset)) as Map<String, Object?>;
+    return json['format'] == format ? StoredLayout(parseLayout(json)) : StoredOutlines(parse(json));
   }
 
-  /// Stores [plan]; it replaces the bundled one from now on.
-  Future<void> save(FloorPlan plan) async {
-    await database.into(database.floorPlansTable).insertOnConflictUpdate(FloorPlanRow(id: _planId, json: encode(plan)));
+  /// Stores [layout]; it replaces whatever was stored before.
+  Future<void> save(HomeLayout layout) async {
+    await database.into(database.floorPlansTable).insertOnConflictUpdate(FloorPlanRow(id: _planId, json: encode(layout)));
   }
 
-  /// [plan] as editor JSON (units: cm), readable for a backup.
-  static String encode(FloorPlan plan) => const JsonEncoder.withIndent('  ').convert(toJson(plan));
+  /// [layout] as readable JSON, e.g. for a backup.
+  static String encode(HomeLayout layout) => const JsonEncoder.withIndent('  ').convert(toJson(layout));
 
-  static Map<String, Object?> toJson(FloorPlan plan) => {
+  static Map<String, Object?> toJson(HomeLayout layout) => {
+    'format': format,
+    'version': version,
     'unit': 'cm',
-    'rooms': [
-      for (final room in plan.rooms) {'id': room.id, 'name': room.name, 'polygon': _polygonJson(room.polygon)},
+    'nodes': [
+      for (final node in layout.nodes) {'id': node.id, 'at': _pointJson(node.position)},
     ],
     'walls': [
-      for (final wall in plan.walls) {'id': wall.id, 'polygon': _polygonJson(wall.polygon)},
+      for (final wall in layout.walls) {'id': wall.id, 'from': wall.from, 'to': wall.to, 'thickness': _number(wall.thickness)},
     ],
-    'doors': [
-      for (final door in plan.doors)
-        {'id': door.id, 'type': door.type.name, 'a': _pointJson(door.a), 'b': _pointJson(door.b)},
+    'openings': [
+      for (final opening in layout.openings)
+        {
+          'id': opening.id,
+          'wall': opening.wallId,
+          'type': opening.type.name,
+          'offset': _number(opening.offset),
+          'width': _number(opening.width),
+          if (opening.swing != 0) 'swing': opening.swing,
+        },
+    ],
+    'rooms': [
+      for (final room in layout.rooms)
+        {'id': room.id, 'name': room.name, 'type': room.type.name, 'anchor': _pointJson(room.anchor)},
+    ],
+    'furniture': [
+      for (final item in layout.furniture)
+        {
+          'id': item.id,
+          'kind': item.kind.name,
+          'at': _pointJson(item.position),
+          'rotation': _number(item.rotation),
+          'width': _number(item.width),
+          'depth': _number(item.depth),
+        },
     ],
   };
 
-  static List<Object?> _polygonJson(List<PlanPoint> polygon) => [for (final point in polygon) _pointJson(point)];
+  /// Parses the JSON written by [toJson]. Entries of unknown kinds are skipped.
+  static HomeLayout parseLayout(Map<String, Object?> json) {
+    List<Map<String, Object?>> list(String key) => (json[key] as List<Object?>? ?? const []).cast();
+    double number(Object? value) => (value as num).toDouble();
+    T? byName<T extends Enum>(List<T> values, Object? name) => values.where((value) => value.name == name).firstOrNull;
 
-  /// Whole centimeters stay integers, as in the editor export.
-  static List<num> _pointJson(PlanPoint point) => [_number(point.x), _number(point.y)];
+    return HomeLayout(
+      nodes: [for (final node in list('nodes')) LayoutNode(id: node['id'] as String, position: _point(node['at']))],
+      walls: [
+        for (final wall in list('walls'))
+          LayoutWall(
+            id: wall['id'] as String,
+            from: wall['from'] as String,
+            to: wall['to'] as String,
+            thickness: number(wall['thickness'] ?? LayoutWall.innerThickness),
+          ),
+      ],
+      openings: [
+        for (final opening in list('openings'))
+          if (byName(DoorType.values, opening['type']) case final type?)
+            LayoutOpening(
+              id: opening['id'] as String,
+              wallId: opening['wall'] as String,
+              type: type,
+              offset: number(opening['offset']),
+              width: number(opening['width']),
+              swing: (opening['swing'] as num?)?.toInt() ?? 0,
+            ),
+      ],
+      rooms: [
+        for (final room in list('rooms'))
+          LayoutRoom(
+            id: room['id'] as String,
+            name: room['name'] as String,
+            type: byName(RoomType.values, room['type']) ?? RoomType.other,
+            anchor: _point(room['anchor']),
+          ),
+      ],
+      furniture: [
+        for (final item in list('furniture'))
+          if (byName(FurnitureKind.values, item['kind']) case final kind?)
+            Furniture(
+              id: item['id'] as String,
+              kind: kind,
+              position: _point(item['at']),
+              rotation: number(item['rotation'] ?? 0),
+              width: number(item['width'] ?? kind.width),
+              depth: number(item['depth'] ?? kind.depth),
+            ),
+      ],
+    );
+  }
 
-  static num _number(double value) => value == value.roundToDouble() ? value.toInt() : value;
-
-  /// Parses the JSON export of the floor plan editor (units: cm).
+  /// Parses the first format: room outlines and door segments (units: cm).
   static FloorPlan parse(Map<String, Object?> json) {
     final unit = json['unit'] as String? ?? 'cm';
     if (unit != 'cm') throw FormatException('Unsupported floor plan unit "$unit"');
@@ -86,6 +178,14 @@ class FloorplanRepository {
   static PlanPoint _point(Object? json) {
     final [x, y] = (json as List<Object?>).cast<num>();
     return PlanPoint(x.toDouble(), y.toDouble());
+  }
+
+  /// Whole centimeters stay integers; the rest is kept to the millimeter.
+  static List<num> _pointJson(PlanPoint point) => [_number(point.x), _number(point.y)];
+
+  static num _number(double value) {
+    final rounded = (value * 10).round() / 10;
+    return rounded == rounded.roundToDouble() ? rounded.toInt() : rounded;
   }
 }
 

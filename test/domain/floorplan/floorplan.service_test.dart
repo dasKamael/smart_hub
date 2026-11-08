@@ -7,7 +7,7 @@ import 'package:smart_hub/data/floorplan/placement.repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 
@@ -17,37 +17,57 @@ import '../../utils/riverpod.test_util.dart';
 class _MockFloorplanRepository extends Mock implements FloorplanRepository {}
 
 void main() {
-  setUpAll(() => registerFallbackValue(const FloorPlan(rooms: [])));
+  setUpAll(() => registerFallbackValue(const HomeLayout()));
 
-  group('floorPlanService', () {
-    test('Given the repository has a plan, when reading the service, then the plan is returned', () async {
-      // Given
-      final repository = _MockFloorplanRepository();
-      when(repository.load).thenAnswer((_) async => loadApartmentPlan());
-      final container = createTestContainer(overrides: [floorplanRepositoryProvider.overrideWithValue(repository)]);
+  group('HomeLayoutService', () {
+    late _MockFloorplanRepository repository;
+    late ProviderContainer container;
 
-      // When
-      final plan = await container.read(floorPlanServiceProvider.future);
-
-      // Then
-      expect(plan.rooms, hasLength(7));
+    setUp(() {
+      repository = _MockFloorplanRepository();
+      when(() => repository.save(any())).thenAnswer((_) async {});
+      container = createTestContainer(overrides: [floorplanRepositoryProvider.overrideWithValue(repository)]);
     });
 
-    test('Given the plan was loaded, '
-        'when saving an edited plan, '
-        'then it is stored and the service shows it at once', () async {
+    test('Given a plan of room outlines, '
+        'when loading, '
+        'then it is turned into walls, furnished once and stored that way', () async {
       // Given
-      final repository = _MockFloorplanRepository();
-      when(repository.load).thenAnswer((_) async => loadApartmentPlan());
-      when(() => repository.save(any())).thenAnswer((_) async {});
-      final container = createTestContainer(overrides: [floorplanRepositoryProvider.overrideWithValue(repository)]);
-      final edited = (await container.read(floorPlanServiceProvider.future)).copyWith(rooms: const []);
+      when(repository.load).thenAnswer((_) async => StoredOutlines(loadApartmentPlan()));
 
       // When
-      await container.read(floorPlanServiceProvider.notifier).save(edited);
+      final layout = await container.read(homeLayoutServiceProvider.future);
 
       // Then
-      expect(container.read(floorPlanServiceProvider).value, edited);
+      expect(layout.rooms, hasLength(7));
+      expect(layout.furniture, isNotEmpty);
+      verify(() => repository.save(layout)).called(1);
+      expect((await container.read(floorPlanServiceProvider.future)).rooms, hasLength(7));
+    });
+
+    test('Given a stored layout, when loading, then it is used as it is', () async {
+      // Given
+      const stored = HomeLayout(rooms: []);
+      when(repository.load).thenAnswer((_) async => const StoredLayout(stored));
+
+      // When
+      final layout = await container.read(homeLayoutServiceProvider.future);
+
+      // Then
+      expect(layout, stored);
+      verifyNever(() => repository.save(any()));
+    });
+
+    test('Given a loaded layout, when saving an edited one, then it is stored and shown at once', () async {
+      // Given
+      when(repository.load).thenAnswer((_) async => StoredOutlines(loadApartmentPlan()));
+      final edited = (await container.read(homeLayoutServiceProvider.future)).copyWith(furniture: const []);
+
+      // When
+      await container.read(homeLayoutServiceProvider.notifier).save(edited);
+
+      // Then
+      expect(container.read(homeLayoutServiceProvider).value, edited);
       verify(() => repository.save(edited)).called(1);
     });
   });
@@ -60,7 +80,7 @@ void main() {
       addTearDown(database.close);
       container = createTestContainer(
         overrides: [
-          floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
+          floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
           placementRepositoryProvider.overrideWithValue(PlacementRepository(database: database)),
         ],
       );

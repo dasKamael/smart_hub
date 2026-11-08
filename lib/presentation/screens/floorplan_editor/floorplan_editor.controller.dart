@@ -1,20 +1,24 @@
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:smart_hub/domain/floorplan/editing/plan_editing.util.dart';
+import 'package:smart_hub/domain/floorplan/editing/layout_editing.util.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
+import 'package:smart_hub/domain/floorplan/furnishing.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
-import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
-import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
+import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
 
 part 'floorplan_editor.controller.g.dart';
 
-/// The floor plan editor: tools, selection, drawing and dragging, undo / redo. Every change is saved at once.
+/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
+/// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
 ///
-/// Positions come in plan centimeters. [cmPerPx] tells how many centimeters one pixel is at the current zoom, so
-/// touch radii stay the same on screen.
+/// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
+/// radii stay the same on screen.
 @riverpod
 class FloorplanEditorController extends _$FloorplanEditorController {
   static final _log = Logger('FloorplanEditorController');
@@ -24,7 +28,6 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   // Touch radii in pixels.
   static const snapPx = 14.0;
   static const handlePx = 22.0;
-  static const closePx = 22.0;
   static const wallPx = 24.0;
 
   _Drag? _drag;
@@ -33,97 +36,110 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   String? _renamingRoomId;
 
   @override
-  FloorplanEditorState build() => FloorplanEditorState(plan: ref.read(floorPlanServiceProvider).requireValue);
+  FloorplanEditorState build() => FloorplanEditorState(layout: ref.read(homeLayoutServiceProvider).requireValue);
+
+  HomeLayout get _layout => state.layout;
 
   void selectTool(EditorTool tool) {
     _renamingRoomId = null;
     state = state.copyWith(
       tool: tool,
-      draft: const [],
+      chain: const [],
       rectangle: null,
+      openingDraft: null,
       guideX: null,
       guideY: null,
-      selection: tool == EditorTool.select ? state.selection : null,
     );
   }
 
+  /// Picks what the furniture tool puts down, and the furniture tool.
+  void selectFurnitureKind(FurnitureKind kind) {
+    selectTool(EditorTool.furniture);
+    state = state.copyWith(furnitureKind: kind);
+  }
+
+  void togglePreview() => state = state.copyWith(preview: !state.preview);
+
   void select(EditorSelection? selection) {
     _renamingRoomId = null;
-    state = state.copyWith(selection: selection, tool: EditorTool.select, draft: const []);
+    state = state.copyWith(selection: selection);
   }
 
   void tap(PlanPoint point, {required double cmPerPx}) {
+    final radius = handlePx * cmPerPx;
     switch (state.tool) {
       case EditorTool.select:
         if (state.selectedRoom case final room?) {
-          if (PlanEditingUtil.edgeMiddleAt(room.polygon, point, radius: handlePx * cmPerPx) case final edge?) {
-            final middle = PlanEditingUtil.edgeMiddle(room.polygon, edge);
-            final polygon = PlanEditingUtil.insertCorner(room.polygon, edge, middle);
-            return _commit(PlanEditingUtil.withRoomPolygon(state.plan, room.id, polygon));
+          if (_wallMiddleAt(room.id, point, radius) case final middle?) {
+            return _commit(LayoutGraphUtil.splitAt(_layout, middle));
           }
         }
-        final opening = PlanEditingUtil.openingAt(state.plan.doors, point, radius: handlePx * cmPerPx);
-        final room = RoomLookupUtil.roomAt(state.plan, point);
-        select(switch ((opening, room)) {
-          (final opening?, _) => EditorSelection.opening(opening.id),
-          (_, final room?) => EditorSelection.room(room.id),
-          _ => null,
-        });
+        select(_hit(point, radius));
       case EditorTool.room:
-        if (PlanEditingUtil.closesDraft(state.draft, point, radius: closePx * cmPerPx)) return finishDraft();
-        final corners = [...PlanEditingUtil.cornersOf(state.plan), ...state.draft];
-        final snapped = PlanEditingUtil.snap(point, corners, radius: snapPx * cmPerPx).point;
-        // A corner twice in a row would give a wall of no length.
-        if (state.draft.lastOrNull == snapped) return;
-        state = state.copyWith(draft: [...state.draft, snapped]);
-      case EditorTool.rectangle:
-        break;
+        select(_roomSelection(point));
+      case EditorTool.wall:
+        _chainTap(point, cmPerPx);
       case EditorTool.door:
-        _placeOpening(point, DoorType.door, cmPerPx);
+        _openingTap(point, DoorType.door, cmPerPx);
       case EditorTool.window:
-        _placeOpening(point, DoorType.window, cmPerPx);
+        _openingTap(point, DoorType.window, cmPerPx);
+      case EditorTool.opening:
+        _openingTap(point, DoorType.open, cmPerPx);
+      case EditorTool.furniture:
+        if (LayoutEditingUtil.furnitureAt(_layout, point) case final item?) {
+          return select(EditorSelection.furniture(item.id));
+        }
+        if (LayoutEditingUtil.roomAt(_layout, point) == null) return;
+        final id = LayoutGraphUtil.nextId('f', _layout.furniture.map((item) => item.id));
+        final item = FurnishingUtil.place(_layout, state.furnitureKind, point, id: id);
+        _commit(_layout.copyWith(furniture: [..._layout.furniture, item]), select: EditorSelection.furniture(id));
     }
   }
 
-  /// Removes the corner of the selected room under [point].
+  /// Turns the piece of furniture under [point] by a quarter.
   void longPress(PlanPoint point, {required double cmPerPx}) {
-    final room = state.selectedRoom;
-    if (state.tool != EditorTool.select || room == null) return;
-    final index = PlanEditingUtil.cornerAt(room.polygon, point, radius: handlePx * cmPerPx);
-    final polygon = index == null ? null : PlanEditingUtil.removeCorner(room.polygon, index);
-    if (polygon != null) _commit(PlanEditingUtil.withRoomPolygon(state.plan, room.id, polygon));
+    if (LayoutEditingUtil.furnitureAt(_layout, point) case final item?) {
+      select(EditorSelection.furniture(item.id));
+      rotateFurniture();
+    }
   }
 
   /// Starts dragging whatever is under [point]. Returns `false` when there is nothing to drag, so the view pans.
   bool startDrag(PlanPoint point, {required double cmPerPx}) {
     _renamingRoomId = null;
     final radius = handlePx * cmPerPx;
-    if (state.tool == EditorTool.rectangle) {
-      final start = _snap(point, cmPerPx);
-      _drag = _RectangleDrag(start.point);
-      return true;
-    }
-    if (state.tool != EditorTool.select) return false;
-
-    if (state.selectedRoom case final room?) {
-      if (PlanEditingUtil.cornerAt(room.polygon, point, radius: radius) case final index?) {
-        _drag = _CornerDrag(state.plan, room.id, index);
+    switch (state.tool) {
+      case EditorTool.room:
+        _drag = _RectangleDrag(_snap(point, cmPerPx).point);
         return true;
-      }
-      if (PlanEditingUtil.edgeMiddleAt(room.polygon, point, radius: radius) case final edge?) {
-        _drag = _WallDrag(state.plan, room.id, edge, point);
+      case EditorTool.door || EditorTool.window || EditorTool.opening:
+        final wall = LayoutGraphUtil.wallAt(_layout, point, radius: wallPx * cmPerPx);
+        if (wall == null) return false;
+        _drag = _OpeningDraft(wall.id, point, snap: handlePx * cmPerPx);
         return true;
-      }
+      case EditorTool.wall || EditorTool.furniture:
+        return false;
+      case EditorTool.select:
+        break;
     }
     if (state.selectedOpening case final opening?) {
-      if (PlanEditingUtil.openingAt([opening], point, radius: radius) != null) {
-        _drag = _OpeningDrag(state.plan, opening.id);
+      if (LayoutEditingUtil.openingAt(_layout, point, radius: radius)?.id == opening.id) {
+        _drag = _OpeningDrag(_layout, opening.id);
         return true;
       }
     }
-    if (RoomLookupUtil.roomAt(state.plan, point) case final room?) {
-      select(EditorSelection.room(room.id));
-      _drag = _RoomDrag(state.plan, room.id, point);
+    if (LayoutGraphUtil.nodeAt(_layout, point, radius: radius) case final node?) {
+      _drag = _NodeDrag(_layout, node.id);
+      return true;
+    }
+    if (LayoutEditingUtil.furnitureAt(_layout, point) case final item?) {
+      select(EditorSelection.furniture(item.id));
+      _drag = _FurnitureDrag(_layout, item.id, point);
+      return true;
+    }
+    if (LayoutGraphUtil.wallAt(_layout, point, radius: radius) case final wall?) {
+      select(EditorSelection.wall(wall.id));
+      _drag = _WallDrag(_layout, wall.id, point);
       return true;
     }
     return false;
@@ -136,122 +152,228 @@ class FloorplanEditorController extends _$FloorplanEditorController {
       case final _RectangleDrag drag:
         final end = _snap(point, cmPerPx);
         state = state.copyWith(rectangle: [drag.start, end.point], guideX: end.guideX, guideY: end.guideY);
-      // Drags are computed from the plan before the drag, so openings put back onto a wall do not drift.
-      case final _CornerDrag drag:
-        final room = drag.before.rooms.where((room) => room.id == drag.roomId).firstOrNull;
-        if (room == null) return;
-        final corners = PlanEditingUtil.cornersOf(drag.before, exceptRoomId: drag.roomId, exceptIndex: drag.index);
-        final snapped = PlanEditingUtil.snap(point, corners, radius: snapPx * cmPerPx);
-        final polygon = PlanEditingUtil.moveCorner(room.polygon, drag.index, snapped.point);
-        _change(drag, PlanEditingUtil.withRoomPolygon(drag.before, drag.roomId, polygon));
+      case final _OpeningDraft drag:
+        state = state.copyWith(openingDraft: [drag.start, point]);
+      case final _NodeDrag drag:
+        final snapped = LayoutEditingUtil.snap(drag.before, point, radius: snapPx * cmPerPx, except: {drag.nodeId});
+        _change(drag, LayoutGraphUtil.moveNode(drag.before, drag.nodeId, snapped.point));
         state = state.copyWith(guideX: snapped.guideX, guideY: snapped.guideY);
       case final _WallDrag drag:
-        final room = drag.before.rooms.where((room) => room.id == drag.roomId).firstOrNull;
-        if (room == null) return;
-        final p = room.polygon[drag.index];
-        final q = room.polygon[(drag.index + 1) % room.polygon.length];
-        // The wall snaps with its first corner; corners moving along with it do not count.
-        final corners = PlanEditingUtil.cornersOf(drag.before).where((corner) => corner != p && corner != q);
-        final snapped = PlanEditingUtil.snap(p + (point - drag.start), corners, radius: snapPx * cmPerPx);
-        _change(drag, PlanEditingUtil.moveWall(drag.before, drag.roomId, drag.index, snapped.point - p));
+        final wall = drag.before.walls.firstWhere((wall) => wall.id == drag.wallId);
+        final (a, _) = LayoutGraphUtil.endsOf(drag.before, wall);
+        final snapped = LayoutEditingUtil.snap(
+          drag.before,
+          a + (point - drag.start),
+          radius: snapPx * cmPerPx,
+          except: {wall.from, wall.to},
+        );
+        _change(drag, LayoutGraphUtil.moveWall(drag.before, drag.wallId, snapped.point - a));
         state = state.copyWith(guideX: snapped.guideX, guideY: snapped.guideY);
-      case final _RoomDrag drag:
-        final delta = PlanEditingUtil.gridDelta(drag.start, point);
-        if (delta == PlanPoint.zero && !drag.moved) return;
-        _change(drag, PlanEditingUtil.moveRoom(drag.before, drag.roomId, delta));
       case final _OpeningDrag drag:
-        final opening = drag.before.doors.where((door) => door.id == drag.openingId).firstOrNull;
-        if (opening == null) return;
-        _change(drag, _withOpening(PlanEditingUtil.slideOpening(drag.before, opening, point)));
+        final opening = drag.before.openings.firstWhere((opening) => opening.id == drag.openingId);
+        final wall = drag.before.walls.firstWhere((wall) => wall.id == opening.wallId);
+        final (a, b) = LayoutGraphUtil.endsOf(drag.before, wall);
+        final length = a.distanceTo(b);
+        final moved = LayoutGraphUtil.placedAt(drag.before, opening, point);
+        final step = LayoutEditingUtil.openingStep;
+        final offset = ((moved.offset / step).round() * step).clamp(moved.width / 2, length - moved.width / 2);
+        _change(drag, _withOpening(drag.before, moved.copyWith(offset: offset.toDouble())));
+      case final _FurnitureDrag drag:
+        final item = drag.before.furniture.firstWhere((item) => item.id == drag.furnitureId);
+        final delta = point - drag.start;
+        final moved = item.copyWith(
+          position: PlanPoint((item.position.x + delta.x).roundToDouble(), (item.position.y + delta.y).roundToDouble()),
+        );
+        _change(drag, _withFurniture(drag.before, FurnishingUtil.snapToWall(drag.before, moved)));
     }
   }
 
   void endDrag() {
     final drag = _drag;
     _drag = null;
-    if (drag is _RectangleDrag) {
-      final [from, to] = state.rectangle ?? [drag.start, drag.start];
-      state = state.copyWith(rectangle: null, guideX: null, guideY: null);
-      if (PlanEditingUtil.rectangle(from, to) case final polygon?) _addRoom(polygon);
-      return;
+    switch (drag) {
+      case _RectangleDrag(:final start):
+        final [from, to] = state.rectangle ?? [start, start];
+        state = state.copyWith(rectangle: null, guideX: null, guideY: null);
+        if ((to.x - from.x).abs() < LayoutEditingUtil.minRoomSide ||
+            (to.y - from.y).abs() < LayoutEditingUtil.minRoomSide) {
+          return;
+        }
+        final center = PlanPoint((from.x + to.x) / 2, (from.y + to.y) / 2);
+        _commit(LayoutGraphUtil.addRectangle(_layout, from, to));
+        select(_roomSelection(center));
+      case _OpeningDraft(:final wallId, :final start, :final snap):
+        final end = state.openingDraft?.last ?? start;
+        state = state.copyWith(openingDraft: null);
+        final wall = _layout.walls.where((wall) => wall.id == wallId).firstOrNull;
+        if (wall == null) return;
+        final type = _openingTypeOf(state.tool);
+        final id = LayoutGraphUtil.nextId('${type.name}-', _layout.openings.map((opening) => opening.id));
+        final dragged = LayoutEditingUtil.openingBetween(
+          _layout,
+          wall,
+          id: id,
+          type: type,
+          from: start,
+          to: end,
+          snap: snap,
+        );
+        final opening = dragged.width >= LayoutEditingUtil.minOpening
+            ? dragged
+            : LayoutEditingUtil.openingOn(_layout, wall, id: id, type: type, center: start);
+        _commit(_layout.copyWith(openings: [..._layout.openings, opening]), select: EditorSelection.opening(id));
+      case final _EditDrag drag:
+        state = state.copyWith(guideX: null, guideY: null);
+        if (drag.moved) _save();
+      case null:
+        state = state.copyWith(guideX: null, guideY: null);
     }
-    state = state.copyWith(guideX: null, guideY: null);
-    if (drag is _EditDrag && drag.moved) _save();
   }
 
-  /// Ends a drag that was interrupted, e.g. by a second finger: a rectangle being dragged is dropped, other changes
-  /// are kept.
+  /// Ends a drag that was interrupted, e.g. by a second finger: drafts are dropped, other changes kept.
   void cancelDrag() {
-    if (_drag is _RectangleDrag) {
+    if (_drag is _RectangleDrag || _drag is _OpeningDraft) {
       _drag = null;
-      state = state.copyWith(rectangle: null, guideX: null, guideY: null);
+      state = state.copyWith(rectangle: null, openingDraft: null, guideX: null, guideY: null);
       return;
     }
     endDrag();
   }
 
-  /// Turns the drawn corners into a room.
-  void finishDraft() {
-    if (state.draft.length < 3 || PlanGeometryUtil.areaInSquareMeters(state.draft) == 0) return;
-    _addRoom(state.draft);
+  /// Stops drawing walls.
+  void finishChain() => state = state.copyWith(chain: const []);
+
+  /// Takes back the last wall drawn, or the starting point when no wall is drawn yet.
+  void removeLastChainPoint() {
+    if (state.chain.length > 1) return undo();
+    finishChain();
   }
 
-  void removeLastDraftCorner() {
-    if (state.draft.isEmpty) return;
-    state = state.copyWith(draft: state.draft.sublist(0, state.draft.length - 1));
+  // Rooms
+
+  /// Sets the selected room's type and names it after it.
+  void setRoomType(RoomType type) {
+    final room = state.selectedRoom;
+    if (room == null) return;
+    final name = LayoutEditingUtil.nameFor(_layout, type, exceptRoomId: room.id);
+    _commit(_withRoom(room.copyWith(type: type, name: name)));
   }
 
   void renameRoom(String name) {
     final room = state.selectedRoom;
     if (room == null) return;
-    final plan = state.plan.copyWith(
-      rooms: [for (final r in state.plan.rooms) r.id == room.id ? r.copyWith(name: name) : r],
-    );
+    final layout = _withRoom(room.copyWith(name: name));
     if (_renamingRoomId == room.id) {
-      state = state.copyWith(plan: plan);
+      state = state.copyWith(layout: layout);
       _save();
     } else {
-      _commit(plan);
+      _commit(layout);
       _renamingRoomId = room.id;
     }
   }
 
+  /// Fills the selected room with the furniture its type usually has, replacing what is in it.
+  void furnishRoom() {
+    final room = state.selectedRoom;
+    if (room != null) _commit(FurnishingUtil.furnish(_layout, room.id));
+  }
+
+  /// Furnishes every room that has no furniture yet.
+  void furnishAll() => _commit(FurnishingUtil.furnishAll(_layout));
+
+  void deleteRoom() {
+    final room = state.selectedRoom;
+    if (room != null) _commit(LayoutEditingUtil.deleteRoom(_layout, room.id), deselect: true);
+  }
+
+  // Walls
+
+  void setWallThickness(double thickness) {
+    final wall = state.selectedWall;
+    if (wall == null || wall.thickness == thickness) return;
+    _commit(
+      _layout.copyWith(walls: [for (final w in _layout.walls) w.id == wall.id ? w.copyWith(thickness: thickness) : w]),
+    );
+  }
+
+  void deleteWall() {
+    final wall = state.selectedWall;
+    if (wall != null) _commit(LayoutGraphUtil.removeWall(_layout, wall.id), deselect: true);
+  }
+
+  // Openings
+
   void setOpeningType(DoorType type) {
     final opening = state.selectedOpening;
     if (opening == null || opening.type == type) return;
-    _commit(_withOpening(opening.copyWith(type: type)));
+    _commit(_withOpening(_layout, opening.copyWith(type: type)));
   }
 
-  void setOpeningWidth(double width) {
+  /// Sets the selected opening's width around its middle; `null` opens the whole wall.
+  void setOpeningWidth(double? width) {
+    final opening = state.selectedOpening;
+    final wall = _layout.walls.where((wall) => wall.id == opening?.wallId).firstOrNull;
+    if (opening == null || wall == null) return;
+    final (a, b) = LayoutGraphUtil.endsOf(_layout, wall);
+    final length = a.distanceTo(b);
+    final w = (width ?? length).clamp(0.0, length);
+    final offset = width == null ? length / 2 : opening.offset.clamp(w / 2, length - w / 2);
+    _commit(_withOpening(_layout, opening.copyWith(width: w, offset: offset)));
+  }
+
+  /// Turns the selected door to the next of its four ways to swing.
+  void flipOpening() {
+    final opening = state.selectedOpening;
+    if (opening != null) _commit(_withOpening(_layout, opening.copyWith(swing: (opening.swing + 1) % 4)));
+  }
+
+  void deleteOpening() {
     final opening = state.selectedOpening;
     if (opening == null) return;
-    _commit(_withOpening(PlanEditingUtil.resizeOpening(state.plan, opening, width)));
-  }
-
-  void deleteSelection() {
-    final plan = switch (state.selection) {
-      EditorRoomSelection(:final roomId) => PlanEditingUtil.deleteRoom(state.plan, roomId),
-      EditorOpeningSelection(:final openingId) => state.plan.copyWith(
-        doors: [
-          for (final door in state.plan.doors)
-            if (door.id != openingId) door,
+    _commit(
+      _layout.copyWith(
+        openings: [
+          for (final other in _layout.openings)
+            if (other.id != opening.id) other,
         ],
       ),
-      null => null,
-    };
-    if (plan == null) return;
-    _commit(plan);
-    state = state.copyWith(selection: null);
+      deselect: true,
+    );
   }
+
+  // Furniture
+
+  void rotateFurniture() {
+    final item = state.selectedFurniture;
+    if (item != null) _commit(_withFurniture(_layout, item.copyWith(rotation: (item.rotation + 90) % 360)));
+  }
+
+  void deleteFurniture() {
+    final item = state.selectedFurniture;
+    if (item == null) return;
+    _commit(
+      _layout.copyWith(
+        furniture: [
+          for (final other in _layout.furniture)
+            if (other.id != item.id) other,
+        ],
+      ),
+      deselect: true,
+    );
+  }
+
+  // History
 
   void undo() {
     if (state.past.isEmpty) return;
     _renamingRoomId = null;
+    final previous = state.past.last;
     state = state.copyWith(
-      plan: state.past.last,
+      layout: previous,
       past: state.past.sublist(0, state.past.length - 1),
-      future: [state.plan, ...state.future],
-      selection: null,
+      future: [_layout, ...state.future],
+      chain: state.chain.length > 1 ? state.chain.sublist(0, state.chain.length - 1) : const [],
+      selection: _stillThere(state.selection, previous),
     );
     _save();
   }
@@ -259,102 +381,185 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   void redo() {
     if (state.future.isEmpty) return;
     _renamingRoomId = null;
+    final next = state.future.first;
     state = state.copyWith(
-      plan: state.future.first,
-      past: [...state.past, state.plan],
+      layout: next,
+      past: [...state.past, _layout],
       future: state.future.sublist(1),
-      selection: null,
+      chain: const [],
+      selection: _stillThere(state.selection, next),
     );
     _save();
   }
 
-  /// The plan as editor JSON, e.g. to keep a copy.
-  String exportJson() => ref.read(floorPlanServiceProvider.notifier).encode(state.plan);
+  /// The layout as JSON, e.g. to keep a copy.
+  String exportJson() => ref.read(homeLayoutServiceProvider.notifier).encode(_layout);
 
-  void _placeOpening(PlanPoint point, DoorType type, double cmPerPx) {
-    final wall = PlanEditingUtil.wallAt(state.plan, point, radius: wallPx * cmPerPx);
+  // Internals
+
+  static DoorType _openingTypeOf(EditorTool tool) => switch (tool) {
+    EditorTool.window => DoorType.window,
+    EditorTool.opening => DoorType.open,
+    _ => DoorType.door,
+  };
+
+  SnapResult _snap(PlanPoint point, double cmPerPx) => LayoutEditingUtil.snap(_layout, point, radius: snapPx * cmPerPx);
+
+  EditorSelection? _roomSelection(PlanPoint point) {
+    final room = LayoutEditingUtil.roomAt(_layout, point);
+    return room == null ? null : EditorSelection.room(room.id);
+  }
+
+  /// What a tap at [point] selects: an opening, a piece of furniture, a wall or a room – in that order.
+  EditorSelection? _hit(PlanPoint point, double radius) {
+    if (LayoutEditingUtil.openingAt(_layout, point, radius: radius) case final opening?) {
+      return EditorSelection.opening(opening.id);
+    }
+    if (LayoutEditingUtil.furnitureAt(_layout, point) case final item?) return EditorSelection.furniture(item.id);
+    if (LayoutGraphUtil.wallAt(_layout, point, radius: radius * 0.6) case final wall?) {
+      return EditorSelection.wall(wall.id);
+    }
+    return _roomSelection(point);
+  }
+
+  /// The middle of a wall of room [roomId] under [point] – the handle that adds a corner there.
+  PlanPoint? _wallMiddleAt(String roomId, PlanPoint point, double radius) {
+    final outline = LayoutRoomsUtil.outlineOf(_layout, roomId);
+    if (outline == null) return null;
+    for (var i = 0; i < outline.length; i++) {
+      final a = outline[i];
+      final b = outline[(i + 1) % outline.length];
+      final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+      if (middle.distanceTo(point) < radius && a.distanceTo(b) > 2 * radius) return middle;
+    }
+    return null;
+  }
+
+  void _chainTap(PlanPoint point, double cmPerPx) {
+    final snapped = _snap(point, cmPerPx);
+    final chain = state.chain;
+    if (chain.isEmpty) {
+      state = state.copyWith(chain: [snapped.point]);
+      return;
+    }
+    if (snapped.point.distanceTo(chain.last) < 1) return;
+    final roomsBefore = {for (final room in _layout.rooms) room.id};
+    _commit(LayoutGraphUtil.addWall(_layout, chain.last, snapped.point));
+    // A wall that ends on the drawing finishes the line, e.g. a wall across a room or the last wall of a room.
+    state = state.copyWith(chain: snapped.onDrawing ? const [] : [...chain, snapped.point]);
+    final created = _layout.rooms.where((room) => !roomsBefore.contains(room.id)).firstOrNull;
+    if (created != null) select(EditorSelection.room(created.id));
+  }
+
+  void _openingTap(PlanPoint point, DoorType type, double cmPerPx) {
+    if (LayoutEditingUtil.openingAt(_layout, point, radius: handlePx * cmPerPx) case final opening?) {
+      if (opening.type == DoorType.door && type == DoorType.door && state.selectedOpening?.id == opening.id) {
+        return flipOpening();
+      }
+      return select(EditorSelection.opening(opening.id));
+    }
+    final wall = LayoutGraphUtil.wallAt(_layout, point, radius: wallPx * cmPerPx);
     if (wall == null) return;
-    final id = PlanEditingUtil.nextId('${type.name}-', state.plan.doors.map((door) => door.id));
-    final opening = PlanEditingUtil.placeOpening(wall, id: id, type: type, width: PlanEditingUtil.defaultWidth(type));
-    _commit(state.plan.copyWith(doors: [...state.plan.doors, opening]));
-    state = state.copyWith(selection: EditorSelection.opening(id), tool: EditorTool.select);
+    final id = LayoutGraphUtil.nextId('${type.name}-', _layout.openings.map((opening) => opening.id));
+    final opening = LayoutEditingUtil.openingOn(_layout, wall, id: id, type: type, center: point);
+    _commit(_layout.copyWith(openings: [..._layout.openings, opening]), select: EditorSelection.opening(id));
   }
 
-  void _addRoom(List<PlanPoint> polygon) {
-    final id = PlanEditingUtil.nextId('room-', state.plan.rooms.map((room) => room.id));
-    final room = Room(id: id, name: 'Room ${state.plan.rooms.length + 1}', polygon: polygon);
-    _commit(state.plan.copyWith(rooms: [...state.plan.rooms, room]));
-    state = state.copyWith(selection: EditorSelection.room(id), tool: EditorTool.select, draft: const []);
-  }
-
-  SnapResult _snap(PlanPoint point, double cmPerPx) =>
-      PlanEditingUtil.snap(point, PlanEditingUtil.cornersOf(state.plan), radius: snapPx * cmPerPx);
-
-  /// A drag step: the plan before the drag becomes one undo step on the first change.
-  void _change(_EditDrag drag, FloorPlan plan) {
+  /// A drag step: the layout before the drag becomes one undo step on the first change.
+  void _change(_EditDrag drag, HomeLayout layout) {
     if (!drag.moved) {
       drag.moved = true;
       state = state.copyWith(past: _pastWith(drag.before), future: const []);
     }
-    state = state.copyWith(plan: plan);
+    final outlines = drag.outlines ??= LayoutRoomsUtil.outlines(drag.before);
+    state = state.copyWith(layout: LayoutRoomsUtil.normalize(layout, previousOutlines: outlines));
   }
 
-  /// [plan] becomes the current plan; the one before is one undo step.
-  void _commit(FloorPlan plan, {bool save = true}) {
+  /// [layout] becomes the current one, its rooms matched to the areas they had; the one before is one undo step.
+  /// The selection becomes [select], or is cleared with [deselect], or stays when it still exists.
+  void _commit(HomeLayout layout, {EditorSelection? select, bool deselect = false}) {
     _renamingRoomId = null;
-    state = state.copyWith(plan: plan, past: _pastWith(state.plan), future: const []);
-    if (save) _save();
+    final normalized = LayoutRoomsUtil.normalize(layout, previousOutlines: LayoutRoomsUtil.outlines(_layout));
+    state = state.copyWith(
+      layout: normalized,
+      past: _pastWith(_layout),
+      future: const [],
+      selection: deselect ? null : select ?? _stillThere(state.selection, normalized),
+    );
+    _save();
   }
 
-  List<FloorPlan> _pastWith(FloorPlan plan) {
-    final past = [...state.past, plan];
+  static EditorSelection? _stillThere(EditorSelection? selection, HomeLayout layout) => switch (selection) {
+    EditorRoomSelection(:final roomId) when layout.rooms.any((room) => room.id == roomId) => selection,
+    EditorWallSelection(:final wallId) when layout.walls.any((wall) => wall.id == wallId) => selection,
+    EditorOpeningSelection(:final openingId) when layout.openings.any((o) => o.id == openingId) => selection,
+    EditorFurnitureSelection(:final furnitureId) when layout.furniture.any((f) => f.id == furnitureId) => selection,
+    _ => null,
+  };
+
+  List<HomeLayout> _pastWith(HomeLayout layout) {
+    final past = [...state.past, layout];
     return past.length > historyLimit ? past.sublist(past.length - historyLimit) : past;
   }
 
   void _save() {
-    ref.read(floorPlanServiceProvider.notifier).save(state.plan).catchError((Object error, StackTrace stack) {
+    ref.read(homeLayoutServiceProvider.notifier).save(_layout).catchError((Object error, StackTrace stack) {
       _log.warning('Saving the floor plan failed', error, stack);
     });
   }
 
-  FloorPlan _withOpening(Door opening) =>
-      state.plan.copyWith(doors: [for (final door in state.plan.doors) door.id == opening.id ? opening : door]);
+  HomeLayout _withRoom(LayoutRoom room) =>
+      _layout.copyWith(rooms: [for (final r in _layout.rooms) r.id == room.id ? room : r]);
+
+  static HomeLayout _withOpening(HomeLayout layout, LayoutOpening opening) =>
+      layout.copyWith(openings: [for (final o in layout.openings) o.id == opening.id ? opening : o]);
+
+  static HomeLayout _withFurniture(HomeLayout layout, Furniture item) =>
+      layout.copyWith(furniture: [for (final f in layout.furniture) f.id == item.id ? item : f]);
 }
 
 sealed class _Drag {}
 
-/// A drag that changes the plan.
-sealed class _EditDrag extends _Drag {
-  _EditDrag(this.before);
+final class _RectangleDrag extends _Drag {
+  _RectangleDrag(this.start);
 
-  /// The plan when the drag started.
-  final FloorPlan before;
-
-  /// Whether the drag changed the plan yet.
-  var moved = false;
-}
-
-final class _CornerDrag extends _EditDrag {
-  _CornerDrag(super.before, this.roomId, this.index);
-
-  final String roomId;
-  final int index;
-}
-
-final class _RoomDrag extends _EditDrag {
-  _RoomDrag(super.before, this.roomId, this.start);
-
-  final String roomId;
   final PlanPoint start;
 }
 
+final class _OpeningDraft extends _Drag {
+  _OpeningDraft(this.wallId, this.start, {required this.snap});
+
+  final String wallId;
+  final PlanPoint start;
+
+  /// Ends of the opening this close to an end of the wall go all the way to it (cm).
+  final double snap;
+}
+
+/// A drag that changes the layout.
+sealed class _EditDrag extends _Drag {
+  _EditDrag(this.before);
+
+  /// The layout when the drag started.
+  final HomeLayout before;
+
+  /// Outlines of the rooms before the drag, so rooms keep their areas while walls move.
+  Map<String, List<PlanPoint>>? outlines;
+
+  /// Whether the drag changed the layout yet.
+  var moved = false;
+}
+
+final class _NodeDrag extends _EditDrag {
+  _NodeDrag(super.before, this.nodeId);
+
+  final String nodeId;
+}
+
 final class _WallDrag extends _EditDrag {
-  _WallDrag(super.before, this.roomId, this.index, this.start);
+  _WallDrag(super.before, this.wallId, this.start);
 
-  final String roomId;
-
-  /// The wall from this corner of the room to the next one.
-  final int index;
+  final String wallId;
   final PlanPoint start;
 }
 
@@ -364,8 +569,9 @@ final class _OpeningDrag extends _EditDrag {
   final String openingId;
 }
 
-final class _RectangleDrag extends _Drag {
-  _RectangleDrag(this.start);
+final class _FurnitureDrag extends _EditDrag {
+  _FurnitureDrag(super.before, this.furnitureId, this.start);
 
+  final String furnitureId;
   final PlanPoint start;
 }

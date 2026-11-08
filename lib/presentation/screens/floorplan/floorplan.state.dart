@@ -42,5 +42,8 @@ abstract class FloorplanState with _$FloorplanState {
 
     /// Positions of dropped devices until the stored placement arrives, so markers do not jump back.
     @Default({}) Map<String, PlanPoint> pendingPositions,
+
+    /// The apartment seen at an angle in 3D instead of from above.
+    @Default(false) bool tilted,
   }) = _FloorplanState;
 }

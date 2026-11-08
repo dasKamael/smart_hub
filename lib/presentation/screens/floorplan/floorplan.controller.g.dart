@@ -45,7 +45,7 @@ final class FloorplanControllerProvider
 }
 
 String _$floorplanControllerHash() =>
-    r'511bc00f58a17c70759017b0d7dab9d592241176';
+    r'08daeeb66bad411f84431623881fbb3ff9288ea9';
 
 /// UI state of the floor plan (selection, visible layers) and the device commands of the inspector.
 
@@ -66,6 +66,103 @@ abstract class _$FloorplanController extends $Notifier<FloorplanState> {
     return element.handleCreate(ref, build);
   }
 }
+
+/// The apartment in 3D: walls, floors and furniture of the drawn layout.
+
+@ProviderFor(homeScene)
+final homeSceneProvider = HomeSceneProvider._();
+
+/// The apartment in 3D: walls, floors and furniture of the drawn layout.
+
+final class HomeSceneProvider
+    extends $FunctionalProvider<HomeScene?, HomeScene?, HomeScene?>
+    with $Provider<HomeScene?> {
+  /// The apartment in 3D: walls, floors and furniture of the drawn layout.
+  HomeSceneProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'homeSceneProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$homeSceneHash();
+
+  @$internal
+  @override
+  $ProviderElement<HomeScene?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  HomeScene? create(Ref ref) {
+    return homeScene(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(HomeScene? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<HomeScene?>(value),
+    );
+  }
+}
+
+String _$homeSceneHash() => r'31ee583b47d9344286269209b71ed13b8b29a156';
+
+/// Placed lamps that are on, shining into the 3D apartment.
+
+@ProviderFor(sceneLights)
+final sceneLightsProvider = SceneLightsProvider._();
+
+/// Placed lamps that are on, shining into the 3D apartment.
+
+final class SceneLightsProvider
+    extends
+        $FunctionalProvider<
+          List<SceneLight>,
+          List<SceneLight>,
+          List<SceneLight>
+        >
+    with $Provider<List<SceneLight>> {
+  /// Placed lamps that are on, shining into the 3D apartment.
+  SceneLightsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'sceneLightsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$sceneLightsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<SceneLight>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<SceneLight> create(Ref ref) {
+    return sceneLights(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<SceneLight> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<SceneLight>>(value),
+    );
+  }
+}
+
+String _$sceneLightsHash() => r'c110f01ab79e44fa9d4491642644a21f5210912d';
 
 /// Every device the hub knows, joined with its placement (or the position it was just dropped at).
 

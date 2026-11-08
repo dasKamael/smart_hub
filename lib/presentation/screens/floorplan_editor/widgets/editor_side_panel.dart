@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_hub/domain/floorplan/editing/plan_editing.util.dart';
+import 'package:smart_hub/domain/floorplan/editing/layout_editing.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
+import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
@@ -18,11 +22,12 @@ import 'package:smart_hub/presentation/design_system/tokens/hub_text_styles.dart
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.controller.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
 
-/// Tools, the selected room or opening (or the list of rooms), undo / redo and the JSON export.
+/// Tools, then what belongs to the selection (a room's type and furniture, a wall's thickness, an opening's width,
+/// a piece of furniture) or – with nothing selected – the rooms; undo / redo, 3D and the JSON copy at the bottom.
 class EditorSidePanel extends ConsumerWidget {
   const EditorSidePanel({super.key});
 
-  static const width = 300.0;
+  static const width = 320.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,14 +45,17 @@ class EditorSidePanel extends ConsumerWidget {
           Expanded(
             child: PageCard(
               padding: const EdgeInsets.all(HubSpacing.s16),
-              child: switch ((state.selectedRoom, state.selectedOpening)) {
-                (final room?, _) => _RoomPanel(key: ValueKey(room.id), room: room),
-                (_, final opening?) => _OpeningPanel(opening: opening),
-                _ => _RoomList(rooms: state.plan.rooms),
+              child: switch (state) {
+                FloorplanEditorState(selectedRoom: final room?) => _RoomPanel(key: ValueKey(room.id), room: room),
+                FloorplanEditorState(selectedOpening: final opening?) => _OpeningPanel(opening: opening),
+                FloorplanEditorState(selectedFurniture: final item?) => _FurniturePanel(item: item),
+                FloorplanEditorState(selectedWall: final wall?) => _WallPanel(wall: wall),
+                FloorplanEditorState(tool: EditorTool.furniture) => _FurniturePalette(selected: state.furnitureKind),
+                _ => _RoomList(layout: state.layout),
               },
             ),
           ),
-          _HistoryBar(canUndo: state.past.isNotEmpty, canRedo: state.future.isNotEmpty),
+          _HistoryBar(canUndo: state.past.isNotEmpty, canRedo: state.future.isNotEmpty, preview: state.preview),
         ],
       ),
     );
@@ -61,44 +69,34 @@ class _Tools extends ConsumerWidget {
 
   static const _tools = [
     (EditorTool.select, HubGlyph.pointer, 'Select'),
-    (EditorTool.room, HubGlyph.room, 'Room'),
-    (EditorTool.rectangle, HubGlyph.rectangle, 'Rectangle'),
+    (EditorTool.room, HubGlyph.rectangle, 'Room'),
+    (EditorTool.wall, HubGlyph.wall, 'Wall'),
+    (EditorTool.furniture, HubGlyph.sofa, 'Furniture'),
     (EditorTool.door, HubGlyph.door, 'Door'),
     (EditorTool.window, HubGlyph.window, 'Window'),
+    (EditorTool.opening, HubGlyph.gap, 'Opening'),
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
-    return Row(
+    return Wrap(
       spacing: HubSpacing.s4,
+      runSpacing: HubSpacing.s4,
       children: [
         for (final (tool, glyph, label) in _tools)
-          Expanded(
-            child: Semantics(
-              button: true,
-              selected: tool == selected,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => controller.selectTool(tool),
-                child: AnimatedContainer(
-                  duration: HubMotion.fadeDuration,
-                  curve: HubMotion.fade,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: tool == selected ? HubColorPalette.accent : HubColorPalette.elevated,
-                    borderRadius: BorderRadius.circular(HubRadius.tile),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: HubSpacing.s4,
-                    children: [
-                      HubGlyphIcon(glyph, color: HubColorPalette.text, size: const Size.square(18)),
-                      Text(label, style: HubTextStyles.label.copyWith(fontSize: 10), maxLines: 1),
-                    ],
-                  ),
-                ),
-              ),
+          _Choice(
+            width: (EditorSidePanel.width - 2 * HubSpacing.s12 - 3 * HubSpacing.s4) / 4,
+            height: 56,
+            selected: tool == selected,
+            onTap: () => controller.selectTool(tool),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: HubSpacing.s4,
+              children: [
+                HubGlyphIcon(glyph, color: HubColorPalette.text, size: const Size.square(18)),
+                Text(label, style: HubTextStyles.label.copyWith(fontSize: 10), maxLines: 1),
+              ],
             ),
           ),
       ],
@@ -106,10 +104,45 @@ class _Tools extends ConsumerWidget {
   }
 }
 
+/// A tile that can be picked, as tools, room types and widths are.
+class _Choice extends StatelessWidget {
+  const _Choice({required this.selected, required this.onTap, required this.child, this.width, this.height = 40});
+
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget child;
+  final double? width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: HubMotion.fadeDuration,
+          curve: HubMotion.fade,
+          width: width,
+          height: height,
+          padding: width == null ? const EdgeInsets.symmetric(horizontal: 12) : EdgeInsets.zero,
+          decoration: BoxDecoration(
+            color: selected ? HubColorPalette.accent : HubColorPalette.elevated,
+            borderRadius: BorderRadius.circular(HubRadius.tile),
+          ),
+          child: Center(widthFactor: width == null ? 1 : null, child: child),
+        ),
+      ),
+    );
+  }
+}
+
 class _RoomPanel extends ConsumerStatefulWidget {
   const _RoomPanel({super.key, required this.room});
 
-  final Room room;
+  final LayoutRoom room;
 
   @override
   ConsumerState<_RoomPanel> createState() => _RoomPanelState();
@@ -117,6 +150,13 @@ class _RoomPanel extends ConsumerStatefulWidget {
 
 class _RoomPanelState extends ConsumerState<_RoomPanel> {
   late final _name = TextEditingController(text: widget.room.name);
+
+  @override
+  void didUpdateWidget(_RoomPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A type picked sets the name; typing keeps the cursor where it is.
+    if (widget.room.name != _name.text) _name.text = widget.room.name;
+  }
 
   @override
   void dispose() {
@@ -127,35 +167,102 @@ class _RoomPanelState extends ConsumerState<_RoomPanel> {
   @override
   Widget build(BuildContext context) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
+    final layout = ref.watch(floorplanEditorControllerProvider.select((state) => state.layout));
+    final outline = LayoutRoomsUtil.outlineOf(layout, widget.room.id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: HubSpacing.s12,
       children: [
-        TextField(
-          controller: _name,
-          onChanged: controller.renameRoom,
-          style: HubTextStyles.widgetTitle,
-          cursorColor: HubColorPalette.accent,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: HubColorPalette.elevated,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(HubRadius.tile),
-              borderSide: BorderSide.none,
+        Row(
+          spacing: HubSpacing.s8,
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _name,
+                onChanged: controller.renameRoom,
+                style: HubTextStyles.widgetTitle,
+                cursorColor: HubColorPalette.accent,
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: HubColorPalette.elevated,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(HubRadius.tile),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            if (outline != null)
+              Text(
+                '${PlanGeometryUtil.areaInSquareMeters(outline).toStringAsFixed(1)} m²',
+                style: HubTextStyles.secondary.tabular,
+              ),
+          ],
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: HubSpacing.s4,
+              runSpacing: HubSpacing.s4,
+              children: [
+                for (final type in RoomType.values)
+                  _Choice(
+                    selected: widget.room.type == type,
+                    onTap: () => controller.setRoomType(type),
+                    child: Text(type.label, style: HubTextStyles.label),
+                  ),
+              ],
             ),
           ),
         ),
-        Text(
-          '${PlanGeometryUtil.areaInSquareMeters(widget.room.polygon).toStringAsFixed(1)} m²',
-          style: HubTextStyles.secondary.tabular,
+        Row(
+          spacing: HubSpacing.s8,
+          children: [
+            Expanded(
+              child: HubButton(
+                label: 'Furnish',
+                glyph: HubGlyph.sofa,
+                variant: HubButtonVariant.secondary,
+                onPressed: widget.room.type == RoomType.other ? null : controller.furnishRoom,
+              ),
+            ),
+            _IconAction(glyph: HubGlyph.trash, label: 'Delete room', danger: true, onTap: controller.deleteRoom),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _WallPanel extends ConsumerWidget {
+  const _WallPanel({required this.wall});
+
+  final LayoutWall wall;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(floorplanEditorControllerProvider.notifier);
+    final layout = ref.watch(floorplanEditorControllerProvider.select((state) => state.layout));
+    final (a, b) = LayoutGraphUtil.endsOf(layout, wall);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: HubSpacing.s16,
+      children: [
+        Text('${(a.distanceTo(b) / 100).toStringAsFixed(2)} m', style: HubTextStyles.widgetTitle.tabular),
+        HubSegmentedControl<double>(
+          values: const [LayoutWall.innerThickness, LayoutWall.outerThickness],
+          selected: wall.thickness,
+          labelOf: (thickness) => thickness == LayoutWall.innerThickness ? 'Inner wall' : 'Outer wall',
+          onChanged: controller.setWallThickness,
         ),
         const Spacer(),
         HubButton(
           label: 'Delete',
           glyph: HubGlyph.trash,
           variant: HubButtonVariant.destructive,
-          onPressed: controller.deleteSelection,
+          onPressed: controller.deleteWall,
         ),
       ],
     );
@@ -165,14 +272,20 @@ class _RoomPanelState extends ConsumerState<_RoomPanel> {
 class _OpeningPanel extends ConsumerWidget {
   const _OpeningPanel({required this.opening});
 
-  final Door opening;
+  final LayoutOpening opening;
 
   static const _typeLabels = {DoorType.door: 'Door', DoorType.open: 'Opening', DoorType.window: 'Window'};
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
-    final width = opening.a.distanceTo(opening.b).round();
+    final layout = ref.watch(floorplanEditorControllerProvider.select((state) => state.layout));
+    final wall = layout.walls.where((wall) => wall.id == opening.wallId).firstOrNull;
+    final wallLength = wall == null
+        ? 0.0
+        : LayoutGraphUtil.endsOf(layout, wall).$1.distanceTo(LayoutGraphUtil.endsOf(layout, wall).$2);
+    final width = opening.width.round();
+    final wholeWall = (opening.width - wallLength).abs() < 1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: HubSpacing.s16,
@@ -187,77 +300,129 @@ class _OpeningPanel extends ConsumerWidget {
           spacing: HubSpacing.s8,
           runSpacing: HubSpacing.s8,
           children: [
-            for (final option in PlanEditingUtil.widthsFor(opening.type))
-              _WidthChip(
-                centimeters: option.round(),
-                selected: option.round() == width,
-                onTap: () => controller.setOpeningWidth(option),
-              ),
+            for (final option in LayoutEditingUtil.widthsFor(opening.type))
+              if (option < wallLength)
+                _Choice(
+                  selected: !wholeWall && option.round() == width,
+                  onTap: () => controller.setOpeningWidth(option),
+                  child: Text('${option.round()} cm', style: HubTextStyles.label.tabular),
+                ),
+            _Choice(
+              selected: wholeWall,
+              onTap: () => controller.setOpeningWidth(null),
+              child: Text('Whole wall', style: HubTextStyles.label),
+            ),
           ],
         ),
         const Spacer(),
-        HubButton(
-          label: 'Delete',
-          glyph: HubGlyph.trash,
-          variant: HubButtonVariant.destructive,
-          onPressed: controller.deleteSelection,
+        Row(
+          spacing: HubSpacing.s8,
+          children: [
+            if (opening.type == DoorType.door)
+              Expanded(
+                child: HubButton(
+                  label: 'Swing',
+                  glyph: HubGlyph.rotate,
+                  variant: HubButtonVariant.secondary,
+                  onPressed: controller.flipOpening,
+                ),
+              )
+            else
+              const Spacer(),
+            _IconAction(glyph: HubGlyph.trash, label: 'Delete', danger: true, onTap: controller.deleteOpening),
+          ],
         ),
       ],
     );
   }
 }
 
-class _WidthChip extends StatelessWidget {
-  const _WidthChip({required this.centimeters, required this.selected, required this.onTap});
+class _FurniturePanel extends ConsumerWidget {
+  const _FurniturePanel({required this.item});
 
-  final int centimeters;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: HubMotion.fadeDuration,
-          curve: HubMotion.fade,
-          height: HubSizes.minTouchTarget,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: selected ? HubColorPalette.accent : HubColorPalette.elevated,
-            borderRadius: BorderRadius.circular(HubRadius.pill),
-          ),
-          child: Center(widthFactor: 1, child: Text('$centimeters cm', style: HubTextStyles.label.tabular)),
-        ),
-      ),
-    );
-  }
-}
-
-class _RoomList extends ConsumerWidget {
-  const _RoomList({required this.rooms});
-
-  final List<Room> rooms;
-
-  static String _area(List<Room> rooms) =>
-      '${rooms.fold(0.0, (sum, room) => sum + PlanGeometryUtil.areaInSquareMeters(room.polygon)).toStringAsFixed(1)} m²';
+  final Furniture item;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(floorplanEditorControllerProvider.notifier);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: HubSpacing.s12,
+      children: [
+        Text(item.kind.label, style: HubTextStyles.widgetTitle),
+        Text('${item.width.round()} × ${item.depth.round()} cm', style: HubTextStyles.secondary.tabular),
+        const Spacer(),
+        Row(
+          spacing: HubSpacing.s8,
+          children: [
+            Expanded(
+              child: HubButton(
+                label: 'Turn',
+                glyph: HubGlyph.rotate,
+                variant: HubButtonVariant.secondary,
+                onPressed: controller.rotateFurniture,
+              ),
+            ),
+            _IconAction(glyph: HubGlyph.trash, label: 'Delete', danger: true, onTap: controller.deleteFurniture),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FurniturePalette extends ConsumerWidget {
+  const _FurniturePalette({required this.selected});
+
+  final FurnitureKind selected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(floorplanEditorControllerProvider.notifier);
+    return SingleChildScrollView(
+      child: Wrap(
+        spacing: HubSpacing.s4,
+        runSpacing: HubSpacing.s4,
+        children: [
+          for (final kind in FurnitureKind.values)
+            _Choice(
+              selected: kind == selected,
+              onTap: () => controller.selectFurnitureKind(kind),
+              child: Text(kind.label, style: HubTextStyles.label),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoomList extends ConsumerWidget {
+  const _RoomList({required this.layout});
+
+  final HomeLayout layout;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(floorplanEditorControllerProvider.notifier);
+    final outlines = LayoutRoomsUtil.outlines(layout);
+    double area(String id) => outlines[id] == null ? 0 : PlanGeometryUtil.areaInSquareMeters(outlines[id]!);
+    final total = layout.rooms.fold(0.0, (sum, room) => sum + area(room.id));
+    final bare = layout.rooms.any(
+      (room) =>
+          room.type != RoomType.other &&
+          outlines[room.id] != null &&
+          !layout.furniture.any((item) => PlanGeometryUtil.containsPoint(outlines[room.id]!, item.position)),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: HubSpacing.s8,
       children: [
-        Text(_area(rooms), style: HubTextStyles.widgetTitle.tabular),
+        Text('${total.toStringAsFixed(1)} m²', style: HubTextStyles.widgetTitle.tabular),
         Expanded(
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              for (final room in rooms)
+              for (final room in layout.rooms)
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => controller.select(EditorSelection.room(room.id)),
@@ -266,7 +431,7 @@ class _RoomList extends ConsumerWidget {
                     child: Row(
                       children: [
                         Expanded(child: Text(room.name, style: HubTextStyles.body.copyWith(fontSize: 15))),
-                        Text(_area([room]), style: HubTextStyles.secondary.tabular),
+                        Text('${area(room.id).toStringAsFixed(1)} m²', style: HubTextStyles.secondary.tabular),
                       ],
                     ),
                   ),
@@ -274,16 +439,24 @@ class _RoomList extends ConsumerWidget {
             ],
           ),
         ),
+        if (bare)
+          HubButton(
+            label: 'Furnish all',
+            glyph: HubGlyph.sofa,
+            variant: HubButtonVariant.secondary,
+            onPressed: controller.furnishAll,
+          ),
       ],
     );
   }
 }
 
 class _HistoryBar extends ConsumerStatefulWidget {
-  const _HistoryBar({required this.canUndo, required this.canRedo});
+  const _HistoryBar({required this.canUndo, required this.canRedo, required this.preview});
 
   final bool canUndo;
   final bool canRedo;
+  final bool preview;
 
   @override
   ConsumerState<_HistoryBar> createState() => _HistoryBarState();
@@ -313,10 +486,11 @@ class _HistoryBarState extends ConsumerState<_HistoryBar> {
     return Row(
       spacing: HubSpacing.s8,
       children: [
-        _BarButton(glyph: HubGlyph.undo, label: 'Undo', onTap: widget.canUndo ? controller.undo : null),
-        _BarButton(glyph: HubGlyph.redo, label: 'Redo', onTap: widget.canRedo ? controller.redo : null),
+        _IconAction(glyph: HubGlyph.undo, label: 'Undo', onTap: widget.canUndo ? controller.undo : null),
+        _IconAction(glyph: HubGlyph.redo, label: 'Redo', onTap: widget.canRedo ? controller.redo : null),
         const Spacer(),
-        _BarButton(
+        _IconAction(glyph: HubGlyph.cube, label: '3D', selected: widget.preview, onTap: controller.togglePreview),
+        _IconAction(
           glyph: _copied == null ? HubGlyph.export : HubGlyph.check,
           label: 'Copy plan as JSON',
           onTap: _export,
@@ -326,20 +500,29 @@ class _HistoryBarState extends ConsumerState<_HistoryBar> {
   }
 }
 
-class _BarButton extends StatelessWidget {
-  const _BarButton({required this.glyph, required this.label, required this.onTap});
+class _IconAction extends StatelessWidget {
+  const _IconAction({
+    required this.glyph,
+    required this.label,
+    required this.onTap,
+    this.danger = false,
+    this.selected = false,
+  });
 
   final HubGlyph glyph;
   final String label;
 
   /// `null` disables the button.
   final VoidCallback? onTap;
+  final bool danger;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
       enabled: onTap != null,
+      selected: selected,
       label: label,
       child: GestureDetector(
         onTap: onTap,
@@ -349,9 +532,11 @@ class _BarButton extends StatelessWidget {
           child: Container(
             width: 52,
             height: 52,
-            decoration: PageCard.decoration(radius: 26),
+            decoration: selected
+                ? BoxDecoration(color: HubColorPalette.accent, borderRadius: BorderRadius.circular(26))
+                : PageCard.decoration(radius: 26),
             alignment: Alignment.center,
-            child: HubGlyphIcon(glyph, color: HubColorPalette.text),
+            child: HubGlyphIcon(glyph, color: danger ? HubColorPalette.dangerText : HubColorPalette.text),
           ),
         ),
       ),

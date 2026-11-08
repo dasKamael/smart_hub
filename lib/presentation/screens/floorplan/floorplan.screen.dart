@@ -4,6 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
+import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/presentation/design_system/atoms/scene_marker.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene_view.dart';
+import 'package:smart_hub/presentation/design_system/tokens/home_scene.color_palette.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub_motion.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/room_lookup.util.dart';
@@ -100,6 +107,7 @@ class _FloorplanScreenState extends ConsumerState<FloorplanScreen> {
     final plan = ref.watch(floorPlanServiceProvider).value;
     final devices = ref.watch(planDevicesProvider);
     final draggedId = ref.watch(floorplanControllerProvider.select((s) => s.drag?.deviceId));
+    final tilted = ref.watch(floorplanControllerProvider.select((s) => s.tilted));
 
     return Stack(
       key: _screenKey,
@@ -111,6 +119,7 @@ class _FloorplanScreenState extends ConsumerState<FloorplanScreen> {
           children: [
             Expanded(
               child: PageCard(
+                color: tilted ? HomeSceneColorPalette.background : null,
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,7 +129,7 @@ class _FloorplanScreenState extends ConsumerState<FloorplanScreen> {
                     Expanded(
                       child: plan == null
                           ? const SizedBox.shrink()
-                          : _Plan(
+                          : _PlanArea(
                               plan: plan,
                               planKey: _planKey,
                               dragCallbacks: _dragCallbacks,
@@ -190,6 +199,7 @@ class _LayerChips extends ConsumerWidget {
         spacing: 6,
         children: [
           const _EditButton(),
+          const _TiltButton(),
           const Spacer(),
           // Without lights and speakers there are only plants – nothing to switch between.
           if (ref.watch(hasLightsProvider))
@@ -225,6 +235,149 @@ class _EditButton extends StatelessWidget {
   }
 }
 
+/// Tilts the apartment into 3D and back.
+class _TiltButton extends ConsumerWidget {
+  const _TiltButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tilted = ref.watch(floorplanControllerProvider.select((s) => s.tilted));
+    return Semantics(
+      button: true,
+      toggled: tilted,
+      label: '3D view',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: ref.read(floorplanControllerProvider.notifier).toggleTilt,
+        child: AnimatedContainer(
+          duration: HubMotion.fadeDuration,
+          width: HubSizes.minTouchTarget,
+          height: 36,
+          decoration: BoxDecoration(
+            color: tilted ? HubColorPalette.accent : HubColorPalette.elevated,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          alignment: Alignment.center,
+          child: HubGlyphIcon(HubGlyph.cube, color: tilted ? HubColorPalette.text : HubColorPalette.text2),
+        ),
+      ),
+    );
+  }
+}
+
+/// The plan from above, or – tilted – the apartment in 3D. The 3D view stays until it has turned back to the view
+/// from above, so the switch is seamless.
+class _PlanArea extends ConsumerStatefulWidget {
+  const _PlanArea({required this.plan, required this.planKey, required this.dragCallbacks, required this.onLayout});
+
+  final FloorPlan plan;
+  final GlobalKey planKey;
+  final MarkerDragCallbacks dragCallbacks;
+  final ValueChanged<PlanTransform> onLayout;
+
+  @override
+  ConsumerState<_PlanArea> createState() => _PlanAreaState();
+}
+
+class _PlanAreaState extends ConsumerState<_PlanArea> {
+  late var _inScene = ref.read(floorplanControllerProvider).tilted;
+
+  @override
+  Widget build(BuildContext context) {
+    final tilted = ref.watch(floorplanControllerProvider.select((s) => s.tilted));
+    final scene = ref.watch(homeSceneProvider);
+    if (tilted && !_inScene) _inScene = true;
+    if (!_inScene || scene == null) {
+      return _Plan(
+        plan: widget.plan,
+        planKey: widget.planKey,
+        dragCallbacks: widget.dragCallbacks,
+        onLayout: widget.onLayout,
+      );
+    }
+    return _TiltedPlan(
+      plan: widget.plan,
+      scene: scene,
+      tilted: tilted,
+      onSettled: (tilted) {
+        if (!tilted && mounted) setState(() => _inScene = false);
+      },
+    );
+  }
+}
+
+class _TiltedPlan extends ConsumerWidget {
+  const _TiltedPlan({required this.plan, required this.scene, required this.tilted, required this.onSettled});
+
+  final FloorPlan plan;
+  final HomeScene scene;
+  final bool tilted;
+  final ValueChanged<bool> onSettled;
+
+  /// Height of the markers above the floor, in cm.
+  static const _markerHeight = {DeviceKind.light: 170.0, DeviceKind.speaker: 90.0, DeviceKind.plant: 70.0};
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(floorplanControllerProvider);
+    final controller = ref.read(floorplanControllerProvider.notifier);
+    final devices = [
+      for (final device in ref.watch(planDevicesProvider))
+        if (device.position != null && isLayerVisible(device.kind, state.layers)) device,
+    ];
+    final selectedId = switch (state.selection) {
+      DeviceSelection(:final deviceId) => deviceId,
+      _ => null,
+    };
+    return HomeSceneView(
+      scene: scene,
+      lights: ref.watch(sceneLightsProvider),
+      tilted: tilted,
+      tiltIn: true,
+      padding: 8,
+      onSettled: onSettled,
+      topCamera: (size) =>
+          PlanView.topCameraOf(PlanTransform.fit(PlanGeometryUtil.bounds(plan), size, inset: PlanView.inset)),
+      overlayBuilder: (context, camera) => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (final device in devices)
+            if (camera.projectPoint(device.position!, _markerHeight[device.kind]!) case final at)
+              Positioned(
+                left: at.dx - 22,
+                top: at.dy - 22,
+                child: switch (device) {
+                  PlanLight(:final light) => SceneMarker(
+                    glyph: HubGlyph.bulb,
+                    on: light.isOn,
+                    glow: planLightColor(device),
+                    selected: device.id == selectedId,
+                    semanticLabel: light.name,
+                    onTap: () => controller.setLightsOn([light.id], on: !light.isOn),
+                    onLongPress: () => controller.tapDevice(light.id),
+                  ),
+                  PlanSpeaker(:final speaker) => SceneMarker(
+                    glyph: HubGlyph.speaker,
+                    on: speaker.playback.isPlaying,
+                    selected: device.id == selectedId,
+                    semanticLabel: speaker.name,
+                    onTap: () => controller.tapDevice(speaker.id),
+                  ),
+                  PlanPlant(:final plant) => SceneMarker(
+                    glyph: HubGlyph.leaf,
+                    on: false,
+                    selected: device.id == selectedId,
+                    semanticLabel: plant.name,
+                    onTap: () => controller.tapDevice(plant.id),
+                  ),
+                },
+              ),
+        ],
+      ),
+    );
+  }
+}
+
 class _Plan extends ConsumerWidget {
   const _Plan({required this.plan, required this.planKey, required this.dragCallbacks, required this.onLayout});
 
@@ -245,8 +398,11 @@ class _Plan extends ConsumerWidget {
     ];
     final selection = state.selection;
 
+    final scene = ref.watch(homeSceneProvider);
     return PlanView(
       plan: plan,
+      scene: scene,
+      sceneLights: ref.watch(sceneLightsProvider),
       stackKey: planKey,
       onLayout: onLayout,
       selectedRoomId: selection is RoomSelection ? selection.roomId : null,
@@ -254,12 +410,14 @@ class _Plan extends ConsumerWidget {
         final room = RoomLookupUtil.roomAt(plan, point);
         room == null ? controller.clearSelection() : controller.tapRoom(room.id);
       },
-      glowBuilder: (context, transform) => GlowLayer(
-        plan: plan,
-        transform: transform,
-        lights: devices.whereType<PlanLight>().toList(),
-        visible: state.layers.containsAll({PlanLayer.lights, PlanLayer.glow}),
-      ),
+      glowBuilder: scene != null
+          ? null
+          : (context, transform) => GlowLayer(
+              plan: plan,
+              transform: transform,
+              lights: devices.whereType<PlanLight>().toList(),
+              visible: state.layers.containsAll({PlanLayer.lights, PlanLayer.glow}),
+            ),
       markerBuilder: (context, transform) => MarkerLayer(
         devices: devices,
         transform: transform,

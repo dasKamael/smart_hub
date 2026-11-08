@@ -7,7 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/data/database/app_database.dart';
 import 'package:smart_hub/data/floorplan/floorplan.repository.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
+import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 
 /// Serves [content] for every key and counts the reads.
@@ -30,6 +32,24 @@ class _FakeAssetBundle extends CachingAssetBundle {
   }
 }
 
+const _layout = HomeLayout(
+  nodes: [
+    LayoutNode(id: 'n1', position: PlanPoint.zero),
+    LayoutNode(id: 'n2', position: PlanPoint(400, 0)),
+    LayoutNode(id: 'n3', position: PlanPoint(400, 300.5)),
+  ],
+  walls: [
+    LayoutWall(id: 'w1', from: 'n1', to: 'n2', thickness: 24),
+    LayoutWall(id: 'w2', from: 'n2', to: 'n3'),
+    LayoutWall(id: 'w3', from: 'n3', to: 'n1'),
+  ],
+  openings: [LayoutOpening(id: 'd', wallId: 'w1', type: DoorType.window, offset: 120.5, width: 100, swing: 2)],
+  rooms: [LayoutRoom(id: 'r', name: 'Bedroom', type: RoomType.bedroom, anchor: PlanPoint(260, 100))],
+  furniture: [
+    Furniture(id: 'f1', kind: FurnitureKind.bed, position: PlanPoint(200, 110), rotation: 90, width: 160, depth: 205),
+  ],
+);
+
 void main() {
   group('FloorplanRepository', () {
     late AppDatabase database;
@@ -45,61 +65,36 @@ void main() {
 
     test('Given a fresh database, '
         'when loading, '
-        'then the bundled apartment is parsed with 7 rooms and 7 doors', () async {
+        'then the bundled apartment comes as room outlines with 7 rooms and 7 doors', () async {
       // When
-      final plan = await repository.load();
+      final stored = await repository.load();
 
       // Then
+      final plan = (stored as StoredOutlines).plan;
       expect(plan.rooms.map((r) => r.name), ['Office', 'Storage', 'Storage 2', 'Hall', 'Kitchen', 'WC', 'Sleep']);
       expect(plan.doors, hasLength(7));
       expect(plan.doors.first.type, DoorType.door);
       expect(plan.doors.first.a, const PlanPoint(0, 160));
-      expect(plan.rooms.first.polygon.first, PlanPoint.zero);
     });
 
-    test('Given the plan was loaded once, '
-        'when loading again after the bundled file changed, '
-        'then the stored plan is used', () async {
+    test('Given a saved layout, when loading again, then that layout comes back instead of the bundled plan', () async {
       // Given
-      await repository.load();
-      assets.content = '{"unit": "cm", "rooms": []}';
+      await repository.save(_layout);
 
       // When
-      final plan = await repository.load();
+      final stored = await repository.load();
 
       // Then
-      expect(plan.rooms, hasLength(7));
-      expect(assets.reads, 1);
+      expect((stored as StoredLayout).layout, _layout);
     });
 
-    test('Given an edited plan with a window, '
-        'when saving and loading again, '
-        'then the edited plan comes back instead of the bundled one', () async {
-      // Given
-      final edited = (await repository.load()).copyWith(
-        doors: const [Door(id: 'w1', type: DoorType.window, a: PlanPoint(10, 0), b: PlanPoint(110.5, 0))],
-      );
-
+    test('Given a layout with everything in it, when encoding and parsing it, then nothing is lost', () {
       // When
-      await repository.save(edited);
-      final loaded = await repository.load();
+      final json = FloorplanRepository.encode(_layout);
 
       // Then
-      expect(loaded, edited);
-    });
-
-    test('Given the bundled plan, '
-        'when encoding and parsing it again, '
-        'then nothing is lost and whole centimeters stay integers', () async {
-      // Given
-      final plan = await repository.load();
-
-      // When
-      final json = FloorplanRepository.encode(plan);
-
-      // Then
-      expect(FloorplanRepository.parse(jsonDecode(json) as Map<String, Object?>), plan);
-      expect(json, contains('"a": [\n        0,\n        160\n      ]'));
+      expect(FloorplanRepository.parseLayout(jsonDecode(json) as Map<String, Object?>), _layout);
+      expect(json, contains('"format": "smart-hub-home"'));
     });
 
     test('Given a plan in meters, when parsing, then it is rejected', () {

@@ -11,7 +11,7 @@ import 'package:smart_hub/domain/lights/model/light_bridge.dart';
 import 'package:smart_hub/domain/connection/connection.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/placement.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
@@ -29,27 +29,28 @@ List<Override> floorplanTestOverrides({PlacementRepository? placements}) {
   final database = AppDatabase(NativeDatabase.memory());
   addTearDown(database.close);
   return [
-    floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
+    floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
+    homeLayoutServiceProvider.overrideWith(() => FakeHomeLayoutService(loadApartmentLayout())),
     placementRepositoryProvider.overrideWithValue(placements ?? PlacementRepository(database: database)),
     plantRepositoryProvider.overrideWithValue(PlantRepository(database: database)),
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),
   ];
 }
 
-/// [FloorPlanService] holding [plan] in memory that records every save.
-class FakeFloorPlanService extends FloorPlanService {
-  FakeFloorPlanService(this.plan);
+/// [HomeLayoutService] holding [layout] in memory that records every save.
+class FakeHomeLayoutService extends HomeLayoutService {
+  FakeHomeLayoutService(this.layout);
 
-  final FloorPlan plan;
-  final saved = <FloorPlan>[];
-
-  @override
-  Future<FloorPlan> build() async => plan;
+  final HomeLayout layout;
+  final saved = <HomeLayout>[];
 
   @override
-  Future<void> save(FloorPlan plan) async {
-    saved.add(plan);
-    state = AsyncData(plan);
+  Future<HomeLayout> build() async => layout;
+
+  @override
+  Future<void> save(HomeLayout layout) async {
+    saved.add(layout);
+    state = AsyncData(layout);
   }
 }
 
@@ -87,7 +88,8 @@ List<Override> floorplanWidgetTestOverrides(
   bool hasHomeAssistant = true,
 }) {
   return [
-    floorPlanServiceProvider.overrideWithBuild((ref, notifier) async => loadApartmentPlan()),
+    floorPlanServiceProvider.overrideWith((ref) async => loadApartmentPlan()),
+    homeLayoutServiceProvider.overrideWith(() => FakeHomeLayoutService(loadApartmentLayout())),
     placementServiceProvider.overrideWith(() => placements),
     plantsServiceProvider.overrideWith(() => plants ?? FakePlantsService()),
     currentDayProvider.overrideWith((ref) => Stream.value(testToday)),

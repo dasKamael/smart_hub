@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene_painter.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/scene_camera.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/plan_painter.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/plan_transform.dart';
 import 'package:smart_hub/presentation/screens/floorplan/widgets/room_labels.dart';
@@ -21,7 +25,22 @@ class PlanView extends StatelessWidget {
     this.markerBuilder,
     this.stackKey,
     this.onLayout,
+    this.scene,
+    this.sceneLights = const [],
   });
+
+  /// The camera that sees [scene] from above exactly as [transform] draws the plan.
+  static SceneCamera topCameraOf(PlanTransform transform) {
+    final bounds = transform.bounds;
+    final center = PlanPoint((bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2);
+    return SceneCamera(
+      yaw: SceneCamera.topYaw,
+      pitch: SceneCamera.topPitch,
+      scale: transform.scale,
+      origin: transform.toPx(center),
+      center: center,
+    );
+  }
 
   /// Keeps the 12 px outer wall and markers at the border visible.
   static const inset = 8.0;
@@ -39,6 +58,10 @@ class PlanView extends StatelessWidget {
 
   /// Reports the transform of every layout, e.g. to convert drag positions.
   final ValueChanged<PlanTransform>? onLayout;
+
+  /// The apartment in 3D, drawn from above instead of the flat plan: walls, floors, furniture and lamp light.
+  final HomeScene? scene;
+  final List<SceneLight> sceneLights;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +82,16 @@ class PlanView extends StatelessWidget {
                 },
                 child: RepaintBoundary(
                   child: CustomPaint(
-                    painter: PlanPainter(plan: plan, transform: transform, selectedRoomId: selectedRoomId),
+                    painter: switch (scene) {
+                      final scene? => HomeScenePainter(
+                        scene: scene,
+                        camera: topCameraOf(transform),
+                        lights: sceneLights,
+                        selectedRoomId: selectedRoomId,
+                        selectionColor: HubColorPalette.accent,
+                      ),
+                      null => PlanPainter(plan: plan, transform: transform, selectedRoomId: selectedRoomId),
+                    },
                   ),
                 ),
               ),

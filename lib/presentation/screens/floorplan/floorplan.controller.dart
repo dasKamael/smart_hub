@@ -20,8 +20,10 @@ import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
 import 'package:smart_hub/domain/plants/plants.service.dart';
 import 'package:smart_hub/domain/plants/watering_due.util.dart';
+import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.state.dart';
 import 'package:smart_hub/presentation/screens/floorplan/plan_device.dart';
+import 'package:smart_hub/presentation/screens/floorplan/widgets/plan_marker.dart';
 
 part 'floorplan.controller.g.dart';
 
@@ -52,6 +54,9 @@ class FloorplanController extends _$FloorplanController {
     });
     return const FloorplanState();
   }
+
+  /// Tilts the apartment into 3D, or back to the view from above.
+  void toggleTilt() => state = state.copyWith(tilted: !state.tilted, openGroupKey: null);
 
   void toggleLayer(PlanLayer layer) {
     final layers = {...state.layers};
@@ -198,6 +203,31 @@ bool isLayerVisible(DeviceKind kind, Set<PlanLayer> layers) {
     DeviceKind.speaker => PlanLayer.speakers,
     DeviceKind.plant => PlanLayer.plants,
   });
+}
+
+/// The apartment in 3D: walls, floors and furniture of the drawn layout.
+@riverpod
+HomeScene? homeScene(Ref ref) {
+  final layout = ref.watch(homeLayoutServiceProvider).value;
+  return layout == null ? null : HomeScene.of(layout);
+}
+
+/// Placed lamps that are on, shining into the 3D apartment.
+@riverpod
+List<SceneLight> sceneLights(Ref ref) {
+  final layers = ref.watch(floorplanControllerProvider.select((s) => s.layers));
+  if (!layers.containsAll({PlanLayer.lights, PlanLayer.glow})) return const [];
+  return [
+    for (final device in ref.watch(planDevicesProvider))
+      if (device case PlanLight(:final light, :final position?) when light.isOn)
+        SceneLight(
+          position: position,
+          r: planLightColor(device).r,
+          g: planLightColor(device).g,
+          b: planLightColor(device).b,
+          brightness: (light.brightnessPercent ?? 100) / 100,
+        ),
+  ];
 }
 
 /// Every device the hub knows, joined with its placement (or the position it was just dropped at).

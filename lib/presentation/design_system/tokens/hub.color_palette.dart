@@ -34,6 +34,10 @@ abstract final class HubColorPalette {
   static const planGridStrong = Color(0x17FFFFFF);
   static const planLabel = Color(0xCCEBEBF5);
 
+  /// Editor: outline of furniture seen from above, and the gap a door or window leaves in a wall.
+  static const planFurnitureEdge = Color(0x40000000);
+  static const planGap = Color(0xFF1A1F29);
+
   // Text
   static const text = Color(0xFFFFFFFF);
   static const text2 = Color(0x99EBEBF5);

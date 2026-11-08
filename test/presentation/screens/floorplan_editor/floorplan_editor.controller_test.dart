@@ -2,480 +2,333 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:smart_hub/domain/floorplan/editing/plan_editing.util.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
-import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
+import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
+import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
+import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.controller.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
 
 import '../../../mocks/floorplan.mock.dart';
 import '../../../utils/riverpod.test_util.dart';
 
-/// Two rooms side by side, sharing the wall at x = 400.
-final _plan = FloorPlan(
-  rooms: [
-    Room(id: 'office', name: 'Office', polygon: _box(0, 0, 400, 300)),
-    Room(id: 'kitchen', name: 'Kitchen', polygon: _box(400, 0, 700, 300)),
-  ],
-  doors: const [Door(id: 'door-1', type: DoorType.door, a: PlanPoint(400, 100), b: PlanPoint(400, 180))],
-);
-
-List<PlanPoint> _box(double left, double top, double right, double bottom) => [
-  PlanPoint(left, top),
-  PlanPoint(right, top),
-  PlanPoint(right, bottom),
-  PlanPoint(left, bottom),
-];
+/// An office (4 × 3 m) and a kitchen (3 × 3 m) side by side, sharing the wall at x = 400.
+final editorTestLayout = () {
+  var layout = LayoutGraphUtil.addRectangle(const HomeLayout(), PlanPoint.zero, const PlanPoint(400, 300));
+  layout = LayoutGraphUtil.addRectangle(layout, const PlanPoint(400, 0), const PlanPoint(700, 300));
+  return layout.copyWith(
+    rooms: const [
+      LayoutRoom(id: 'office', name: 'Office', type: RoomType.office, anchor: PlanPoint(200, 150)),
+      LayoutRoom(id: 'kitchen', name: 'Kitchen', type: RoomType.kitchen, anchor: PlanPoint(550, 150)),
+    ],
+  );
+}();
 
 void main() {
-  late FakeFloorPlanService service;
+  late FakeHomeLayoutService service;
   late ProviderContainer container;
 
   FloorplanEditorController controller() => container.read(floorplanEditorControllerProvider.notifier);
   FloorplanEditorState state() => container.read(floorplanEditorControllerProvider);
+  Map<String, double> areas() => {
+    for (final MapEntry(key: id, value: outline) in LayoutRoomsUtil.outlines(state().layout).entries)
+      id: PlanGeometryUtil.areaInSquareMeters(outline),
+  };
 
   setUp(() async {
-    service = FakeFloorPlanService(_plan);
-    container = createTestContainer(overrides: [floorPlanServiceProvider.overrideWith(() => service)]);
-    await container.read(floorPlanServiceProvider.future);
+    service = FakeHomeLayoutService(editorTestLayout);
+    container = createTestContainer(overrides: [homeLayoutServiceProvider.overrideWith(() => service)]);
+    await container.read(homeLayoutServiceProvider.future);
     container.listen(floorplanEditorControllerProvider, (_, _) {});
   });
 
-  group('drawing rooms', () {
+  group('rooms', () {
     test('Given the room tool, '
-        'when tapping three corners and then the first one again, '
-        'then a selected room is added and saved', () {
+        'when dragging a rectangle against the office, '
+        'then a new room sharing its wall is added, selected and saved, and the tool stays', () {
       // Given
       controller().selectTool(EditorTool.room);
 
       // When
-      for (final point in const [PlanPoint(0, 400), PlanPoint(203, 398), PlanPoint(200, 600), PlanPoint(4, 402)]) {
+      expect(controller().startDrag(const PlanPoint(0, 300), cmPerPx: 1), isTrue);
+      controller()
+        ..updateDrag(const PlanPoint(398, 553), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(areas().values.toList()..sort(), [closeTo(9, 0.01), closeTo(10, 0.01), closeTo(12, 0.01)]);
+      final created = state().layout.rooms.last;
+      expect(state().selection, EditorSelection.room(created.id));
+      expect(state().tool, EditorTool.room);
+      expect(service.saved.last, state().layout);
+    });
+
+    test('Given a new room selected, when picking its type, then it is named after it in one step', () {
+      // Given
+      controller()
+        ..selectTool(EditorTool.room)
+        ..startDrag(const PlanPoint(0, 300), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(400, 550), cmPerPx: 1)
+        ..endDrag();
+
+      // When
+      controller().setRoomType(RoomType.bedroom);
+
+      // Then
+      expect(state().selectedRoom?.name, 'Bedroom');
+      expect(state().selectedRoom?.type, RoomType.bedroom);
+    });
+
+    test('Given a second room of the same type, when picking the type, then its name gets a number', () {
+      // Given
+      controller().select(const EditorSelection.room('kitchen'));
+
+      // When
+      controller().setRoomType(RoomType.office);
+
+      // Then
+      expect(state().selectedRoom?.name, 'Office 2');
+    });
+
+    test('Given the wall tool, '
+        'when tapping from one wall of the office to the opposite one, '
+        'then two taps split it and the new room is selected', () {
+      // Given
+      controller().selectTool(EditorTool.wall);
+
+      // When
+      controller()
+        ..tap(const PlanPoint(152, 3), cmPerPx: 1)
+        ..tap(const PlanPoint(148, 298), cmPerPx: 1);
+
+      // Then
+      expect(areas()['office'], closeTo(7.5, 0.01));
+      expect(state().chain, isEmpty);
+      expect(state().selectedRoom?.name, 'Room');
+    });
+
+    test('Given the wall tool, when tapping corners in free space and back to the start, then a room is closed', () {
+      // Given
+      controller().selectTool(EditorTool.wall);
+
+      // When
+      for (final point in const [
+        PlanPoint(800, 0),
+        PlanPoint(1000, 0),
+        PlanPoint(1000, 200),
+        PlanPoint(800, 200),
+        PlanPoint(801, 2),
+      ]) {
         controller().tap(point, cmPerPx: 1);
       }
 
       // Then
-      final room = state().plan.rooms.last;
-      expect(room.polygon, const [PlanPoint(0, 400), PlanPoint(200, 400), PlanPoint(200, 600)]);
-      expect(room.name, 'Room 3');
-      expect(state().selection, EditorSelection.room(room.id));
-      expect(state().tool, EditorTool.select);
-      expect(state().draft, isEmpty);
-      expect(service.saved.last, state().plan);
+      expect(areas().values.where((area) => (area - 4).abs() < 0.01), hasLength(1));
+      expect(state().chain, isEmpty);
     });
 
-    test('Given two drawn corners, when removing the last one, then only the first is left', () {
-      // Given
-      controller()
-        ..selectTool(EditorTool.room)
-        ..tap(const PlanPoint(0, 400), cmPerPx: 1)
-        ..tap(const PlanPoint(200, 400), cmPerPx: 1);
-
-      // When
-      controller().removeLastDraftCorner();
-
-      // Then
-      expect(state().draft, const [PlanPoint(0, 400)]);
-    });
-
-    test('Given the rectangle tool, '
-        'when dragging from one corner to the opposite one, '
-        'then a rectangular room is added', () {
-      // Given
-      controller().selectTool(EditorTool.rectangle);
-
-      // When
-      expect(controller().startDrag(const PlanPoint(0, 400), cmPerPx: 1), isTrue);
-      controller()
-        ..updateDrag(const PlanPoint(302, 597), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      expect(state().plan.rooms.last.polygon, _box(0, 400, 300, 600));
-      expect(state().rectangle, isNull);
-    });
-
-    test('Given the rectangle tool, when dragging less than 50 cm, then no room is added', () {
-      // Given
-      controller().selectTool(EditorTool.rectangle);
-
-      // When
-      controller()
-        ..startDrag(const PlanPoint(0, 400), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(40, 600), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      expect(state().plan.rooms, hasLength(2));
-    });
-  });
-
-  group('interrupted and odd input', () {
-    test('Given a rectangle being dragged, when the drag is cancelled by a second finger, then no room is added', () {
-      // Given
-      controller()
-        ..selectTool(EditorTool.rectangle)
-        ..startDrag(const PlanPoint(0, 400), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(300, 600), cmPerPx: 1);
-
-      // When
-      controller().cancelDrag();
-
-      // Then
-      expect(state().plan.rooms, hasLength(2));
-      expect(state().rectangle, isNull);
-      expect(service.saved, isEmpty);
-    });
-
-    test('Given a corner being dragged, when the drag is cancelled, then the moved corner is kept and saved', () {
-      // Given
-      controller()
-        ..select(const EditorSelection.room('office'))
-        ..startDrag(PlanPoint.zero, cmPerPx: 1)
-        ..updateDrag(const PlanPoint(-50, -50), cmPerPx: 1);
-
-      // When
-      controller().cancelDrag();
-
-      // Then
-      expect(state().plan.rooms.first.polygon.first, const PlanPoint(-50, -50));
-      expect(service.saved.last, state().plan);
-    });
-
-    test('Given the room tool, when tapping the same spot twice, then the corner is added once', () {
-      // Given
-      controller().selectTool(EditorTool.room);
-
-      // When
-      controller()
-        ..tap(const PlanPoint(0, 400), cmPerPx: 1)
-        ..tap(const PlanPoint(2, 401), cmPerPx: 1);
-
-      // Then
-      expect(state().draft, const [PlanPoint(0, 400)]);
-    });
-
-    test('Given three corners on one line, when finishing, then no room without area is added', () {
-      // Given
-      controller()
-        ..selectTool(EditorTool.room)
-        ..tap(const PlanPoint(0, 400), cmPerPx: 1)
-        ..tap(const PlanPoint(100, 400), cmPerPx: 1)
-        ..tap(const PlanPoint(200, 400), cmPerPx: 1);
-
-      // When
-      controller().finishDraft();
-
-      // Then
-      expect(state().plan.rooms, hasLength(2));
-    });
-
-    test('Given a renamed room, '
-        'when one of its corners is dragged and the name is typed on, '
-        'then the typing after the drag is its own undo step', () {
-      // Given
-      controller()
-        ..select(const EditorSelection.room('office'))
-        ..renameRoom('Stu');
-
-      // When
-      controller()
-        ..startDrag(PlanPoint.zero, cmPerPx: 1)
-        ..updateDrag(const PlanPoint(-50, 0), cmPerPx: 1)
-        ..endDrag()
-        ..renameRoom('Study');
-
-      // Then
-      expect(state().past, hasLength(3));
-      controller().undo();
-      expect(state().plan.rooms.first.name, 'Stu');
-      expect(state().plan.rooms.first.polygon.first, const PlanPoint(-50, 0));
-    });
-  });
-
-  group('openings', () {
-    test('Given the door tool, '
-        'when tapping next to a wall, '
-        'then a selected 80 cm door is placed on it and the tool goes back to select', () {
-      // Given
-      controller().selectTool(EditorTool.door);
-
-      // When
-      controller().tap(const PlanPoint(150, 10), cmPerPx: 1);
-
-      // Then
-      final door = state().plan.doors.last;
-      expect(door, const Door(id: 'door-2', type: DoorType.door, a: PlanPoint(110, 0), b: PlanPoint(190, 0)));
-      expect(state().selection, const EditorSelection.opening('door-2'));
-      expect(state().tool, EditorTool.select);
-    });
-
-    test('Given the window tool, when tapping next to a wall, then a 100 cm window is placed', () {
-      // Given
-      controller().selectTool(EditorTool.window);
-
-      // When
-      controller().tap(const PlanPoint(550, 295), cmPerPx: 1);
-
-      // Then
-      expect(
-        state().plan.doors.last,
-        const Door(id: 'window-1', type: DoorType.window, a: PlanPoint(600, 300), b: PlanPoint(500, 300)),
-      );
-    });
-
-    test('Given the door tool, when tapping in the middle of a room, then nothing is placed', () {
-      // Given
-      controller().selectTool(EditorTool.door);
-
-      // When
-      controller().tap(const PlanPoint(200, 150), cmPerPx: 1);
-
-      // Then
-      expect(state().plan.doors, hasLength(1));
-      expect(state().tool, EditorTool.door);
-    });
-
-    test('Given a selected door, when making it a 100 cm window, then it keeps its middle', () {
-      // Given
-      controller().select(const EditorSelection.opening('door-1'));
-
-      // When
-      controller()
-        ..setOpeningType(DoorType.window)
-        ..setOpeningWidth(100);
-
-      // Then
-      expect(
-        state().plan.doors.single,
-        const Door(id: 'door-1', type: DoorType.window, a: PlanPoint(400, 90), b: PlanPoint(400, 190)),
-      );
-    });
-
-    test('Given a selected door, when dragging it along its wall, then it slides in 5 cm steps', () {
-      // Given
-      controller().select(const EditorSelection.opening('door-1'));
-
-      // When
-      expect(controller().startDrag(const PlanPoint(402, 140), cmPerPx: 1), isTrue);
-      controller()
-        ..updateDrag(const PlanPoint(420, 211), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      expect(state().plan.doors.single.a, const PlanPoint(400, 170));
-      expect(state().past, hasLength(1));
-    });
-  });
-
-  group('changing rooms', () {
-    test('Given the office selected, '
-        'when dragging a corner next to another corner, '
-        'then it snaps onto it and the drag is one undo step', () {
+    test('Given a room, when furnishing it, then it gets the furniture of its type in one step', () {
       // Given
       controller().select(const EditorSelection.room('office'));
 
       // When
-      expect(controller().startDrag(const PlanPoint(5, 295), cmPerPx: 1), isTrue);
-      controller()
-        ..updateDrag(const PlanPoint(30, 320), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(52, 351), cmPerPx: 1)
-        ..endDrag();
+      controller().furnishRoom();
 
       // Then
-      expect(state().plan.rooms.first.polygon.last, const PlanPoint(50, 350));
-      expect(state().past, [_plan]);
-      expect(service.saved, [state().plan]);
+      expect(state().layout.furniture.map((item) => item.kind), contains(FurnitureKind.desk));
     });
 
-    test('Given the office selected, '
-        'when tapping the middle of its top wall, '
-        'then a corner is added there as one undo step', () {
+    test('Given the kitchen selected, when deleting it, then its own walls go and the shared wall stays', () {
       // Given
-      controller().select(const EditorSelection.room('office'));
+      controller().select(const EditorSelection.room('kitchen'));
 
       // When
-      controller().tap(const PlanPoint(200, 2), cmPerPx: 1);
+      controller().deleteRoom();
 
       // Then
-      expect(state().plan.rooms.first.polygon, hasLength(5));
-      expect(state().plan.rooms.first.polygon[1], const PlanPoint(200, 0));
-      expect(state().selection, const EditorSelection.room('office'));
-      expect(state().past, hasLength(1));
-    });
-
-    test('Given the office selected, '
-        'when dragging the middle of the wall it shares with the kitchen to the right, '
-        'then the wall moves, the kitchen gets smaller and the door goes along', () {
-      // Given
-      controller().select(const EditorSelection.room('office'));
-
-      // When
-      controller()
-        ..startDrag(const PlanPoint(398, 150), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(430, 170), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(447, 160), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      expect(state().plan.rooms.first.polygon, _box(0, 0, 450, 300));
-      expect(state().plan.rooms.last.polygon, unorderedEquals(_box(450, 0, 700, 300)));
-      expect(state().plan.doors.single.a, const PlanPoint(450, 100));
-      expect(state().past, [_plan]);
-      expect(service.saved.last, state().plan);
-    });
-
-    test('Given a window in the middle of the top wall, '
-        'when a corner is added under it and dragged up, '
-        'then the window stays on a wall of the office with its width', () {
-      // Given
-      controller()
-        ..selectTool(EditorTool.window)
-        ..tap(const PlanPoint(200, 5), cmPerPx: 1)
-        ..select(const EditorSelection.room('office'))
-        ..tap(const PlanPoint(200, 0), cmPerPx: 1);
-
-      // When
-      controller()
-        ..startDrag(const PlanPoint(200, 0), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(200, -60), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      final window = state().plan.doors.last;
-      expect(state().plan.rooms.first.polygon, hasLength(5));
-      expect(state().plan.rooms.first.polygon[1], const PlanPoint(200, -60));
-      expect(PlanEditingUtil.wallOf(state().plan, window, roomId: 'office'), isNotNull);
-      expect(window.a.distanceTo(window.b), closeTo(100, 0.2));
-    });
-
-    test('Given the office selected, when long pressing a corner, then the corner is removed', () {
-      // Given
-      controller().select(const EditorSelection.room('office'));
-
-      // When
-      controller().longPress(const PlanPoint(398, 302), cmPerPx: 1);
-
-      // Then
-      expect(state().plan.rooms.first.polygon, const [PlanPoint.zero, PlanPoint(400, 0), PlanPoint(0, 300)]);
-    });
-
-    test('Given nothing selected, '
-        'when dragging the kitchen, '
-        'then it is selected and moves in 10 cm steps together with the door on its wall', () {
-      // When
-      controller()
-        ..startDrag(const PlanPoint(500, 150), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(534, 150), cmPerPx: 1)
-        ..endDrag();
-
-      // Then
-      expect(state().selection, const EditorSelection.room('kitchen'));
-      expect(state().plan.rooms.last.polygon.first, const PlanPoint(430, 0));
-      expect(state().plan.doors.single.a, const PlanPoint(430, 100));
-    });
-
-    test('Given nothing under the finger, when starting a drag, then the view may pan', () {
-      expect(controller().startDrag(const PlanPoint(900, 900), cmPerPx: 1), isFalse);
-    });
-
-    test('Given the office selected, when typing a new name letter by letter, then it is one undo step', () {
-      // Given
-      controller().select(const EditorSelection.room('office'));
-
-      // When
-      controller()
-        ..renameRoom('S')
-        ..renameRoom('St')
-        ..renameRoom('Study');
-
-      // Then
-      expect(state().plan.rooms.first.name, 'Study');
-      expect(state().past, [_plan]);
-      expect(service.saved.last.rooms.first.name, 'Study');
-    });
-
-    test(
-      'Given the kitchen selected, when deleting it, then the room is gone and the door on the shared wall stays',
-      () {
-        // Given
-        controller().select(const EditorSelection.room('kitchen'));
-
-        // When
-        controller().deleteSelection();
-
-        // Then
-        expect(state().plan.rooms.map((r) => r.id), ['office']);
-        expect(state().plan.doors, hasLength(1));
-        expect(state().selection, isNull);
-      },
-    );
-  });
-
-  group('selection', () {
-    test('Given the select tool, when tapping on the door, then the door is selected rather than the room', () {
-      // When
-      controller().tap(const PlanPoint(395, 140), cmPerPx: 1);
-
-      // Then
-      expect(state().selection, const EditorSelection.opening('door-1'));
-    });
-
-    test('Given a selected room, when tapping outside of all rooms, then nothing is selected', () {
-      // Given
-      controller().select(const EditorSelection.room('office'));
-
-      // When
-      controller().tap(const PlanPoint(900, 900), cmPerPx: 1);
-
-      // Then
+      expect(state().layout.rooms.map((room) => room.id), ['office']);
+      expect(state().layout.walls, hasLength(4));
       expect(state().selection, isNull);
     });
   });
 
-  group('undo and redo', () {
+  group('walls', () {
+    test('Given the select tool, '
+        'when dragging the shared wall 50 cm to the right, '
+        'then the office grows and the kitchen shrinks by the same, as one undo step', () {
+      // When
+      expect(controller().startDrag(const PlanPoint(401, 150), cmPerPx: 1), isTrue);
+      controller()
+        ..updateDrag(const PlanPoint(430, 160), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(452, 140), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(areas()['office'], closeTo(13.5, 0.01));
+      expect(areas()['kitchen'], closeTo(7.5, 0.01));
+      expect(state().past, [editorTestLayout]);
+    });
+
+    test('Given the select tool, when dragging a corner, then the walls meeting there follow', () {
+      // When
+      controller()
+        ..startDrag(const PlanPoint(2, 2), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(-48, -2), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(areas()['office'], closeTo(12.75, 0.01));
+    });
+
+    test('Given a selected wall, when making it an outer wall, then it gets thicker', () {
+      // Given
+      controller().tap(const PlanPoint(200, 2), cmPerPx: 1);
+
+      // When
+      controller().setWallThickness(LayoutWall.outerThickness);
+
+      // Then
+      expect(state().selectedWall?.thickness, LayoutWall.outerThickness);
+    });
+  });
+
+  group('openings', () {
+    test('Given the door tool, when tapping the shared wall, then an 80 cm door is put there in one tap', () {
+      // Given
+      controller().selectTool(EditorTool.door);
+
+      // When
+      controller().tap(const PlanPoint(398, 152), cmPerPx: 1);
+
+      // Then
+      final door = state().layout.openings.single;
+      expect(door.type, DoorType.door);
+      expect(door.width, 80);
+      expect(state().selection, EditorSelection.opening(door.id));
+      expect(state().tool, EditorTool.door);
+    });
+
+    test('Given the opening tool, '
+        'when dragging along the shared wall from end to end, '
+        'then the whole wall is open', () {
+      // Given
+      controller().selectTool(EditorTool.opening);
+
+      // When
+      controller()
+        ..startDrag(const PlanPoint(401, 5), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(402, 330), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      final opening = state().layout.openings.single;
+      expect(opening.type, DoorType.open);
+      expect(opening.width, 300);
+    });
+
+    test('Given a selected window, when choosing the whole wall, then it spans the wall', () {
+      // Given
+      controller()
+        ..selectTool(EditorTool.window)
+        ..tap(const PlanPoint(200, 2), cmPerPx: 1);
+
+      // When
+      controller().setOpeningWidth(null);
+
+      // Then
+      expect(state().selectedOpening?.width, 400);
+    });
+
+    test('Given a selected door, when tapping it again with the door tool, then it swings the other way', () {
+      // Given
+      controller()
+        ..selectTool(EditorTool.door)
+        ..tap(const PlanPoint(398, 152), cmPerPx: 1);
+
+      // When
+      controller().tap(const PlanPoint(398, 152), cmPerPx: 1);
+
+      // Then
+      expect(state().selectedOpening?.swing, 1);
+      expect(state().layout.openings, hasLength(1));
+    });
+  });
+
+  group('furniture', () {
+    test('Given the furniture tool with a bed, '
+        'when tapping near the left wall of the office, '
+        'then the bed stands with its back against that wall', () {
+      // Given
+      controller().selectFurnitureKind(FurnitureKind.bed);
+
+      // When
+      controller().tap(const PlanPoint(140, 150), cmPerPx: 1);
+
+      // Then
+      final bed = state().layout.furniture.single;
+      expect(bed.rotation, 270);
+      expect(state().selection, EditorSelection.furniture(bed.id));
+    });
+
+    test('Given a piece of furniture, when long pressing it, then it turns by a quarter', () {
+      // Given
+      controller()
+        ..selectFurnitureKind(FurnitureKind.chair)
+        ..tap(const PlanPoint(200, 150), cmPerPx: 1);
+
+      // When
+      controller().longPress(const PlanPoint(200, 150), cmPerPx: 1);
+
+      // Then
+      expect(state().layout.furniture.single.rotation, 90);
+    });
+  });
+
+  group('history', () {
     test('Given a deleted room, when undoing and redoing, then the room comes back and goes again', () {
       // Given
       controller()
         ..select(const EditorSelection.room('kitchen'))
-        ..deleteSelection();
+        ..deleteRoom();
 
       // When
       controller().undo();
 
       // Then
-      expect(state().plan, _plan);
-      expect(service.saved.last, _plan);
+      expect(state().layout.rooms, hasLength(2));
 
       // When
       controller().redo();
 
       // Then
-      expect(state().plan.rooms, hasLength(1));
-      expect(state().future, isEmpty);
+      expect(state().layout.rooms, hasLength(1));
     });
 
-    test('Given 60 changes, when looking at the history, then only the last 50 are kept', () {
+    test('Given a typed room name, when undoing, then all the typing is one step', () {
       // Given
-      controller().select(const EditorSelection.opening('door-1'));
-
-      // When
-      for (var i = 0; i < 60; i++) {
-        controller().setOpeningWidth(i.isEven ? 70 : 90);
+      controller().select(const EditorSelection.room('office'));
+      for (final name in ['S', 'St', 'Stu', 'Study']) {
+        controller().renameRoom(name);
       }
 
+      // When
+      controller().undo();
+
       // Then
-      expect(state().past, hasLength(FloorplanEditorController.historyLimit));
+      expect(state().layout.rooms.first.name, 'Office');
     });
-  });
 
-  test('Given the plan, when exporting, then it is editor JSON in centimeters', () {
-    // When
-    final json = jsonDecode(controller().exportJson()) as Map<String, Object?>;
+    test('Given the plan, when exporting, then it is the stored JSON', () {
+      // When
+      final json = jsonDecode(controller().exportJson()) as Map<String, Object?>;
 
-    // Then
-    expect(json['unit'], 'cm');
-    expect(json['rooms'], hasLength(2));
+      // Then
+      expect(json['format'], 'smart-hub-home');
+    });
   });
 }
