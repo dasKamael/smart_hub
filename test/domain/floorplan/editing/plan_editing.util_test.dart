@@ -4,6 +4,8 @@ import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 
+import '../../../fixtures/floorplan.fixture.dart';
+
 /// Two rooms side by side, sharing the wall at x = 400.
 FloorPlan _twoRooms({List<Door> doors = const []}) {
   return FloorPlan(
@@ -360,6 +362,113 @@ void main() {
 
       // Then
       expect(changed.doors.single, door);
+    });
+  });
+
+  group('PlanEditingUtil.moveWall', () {
+    late FloorPlan apartment;
+
+    setUp(() => apartment = loadApartmentPlan());
+
+    Room room(FloorPlan plan, String id) => plan.rooms.firstWhere((room) => room.id == id);
+
+    test('Given the WC wall with the door, shared with the kitchen, '
+        'when moving it 60 cm up, '
+        'then the kitchen follows and the door goes along', () {
+      // When
+      final plan = PlanEditingUtil.moveWall(apartment, 'wc', 2, const PlanPoint(0, -60));
+
+      // Then
+      expect(room(plan, 'wc').polygon, _box(715, 0, 825, 305));
+      expect(room(plan, 'kitchen').polygon, const [
+        PlanPoint(450, 0),
+        PlanPoint(715, 0),
+        PlanPoint(715, 305),
+        PlanPoint(825, 305),
+        PlanPoint(825, 450),
+        PlanPoint(450, 450),
+      ]);
+      final door = plan.doors.firstWhere((door) => door.id == 'd5');
+      expect(door.a, const PlanPoint(745, 305));
+      expect(door.b, const PlanPoint(795, 305));
+      expect(room(plan, 'sleep'), room(apartment, 'sleep'));
+    });
+
+    test('Given the storage below a part of the office wall, '
+        'when moving the storage top wall 30 cm down, '
+        'then the office takes the freed strip and storage 2 and the hall stay as they are', () {
+      // When
+      final plan = PlanEditingUtil.moveWall(apartment, 'storage', 0, const PlanPoint(0, 30));
+
+      // Then
+      expect(room(plan, 'storage').polygon, _box(280, 300, 370, 365));
+      expect(room(plan, 'office').polygon, const [
+        PlanPoint.zero,
+        PlanPoint(450, 0),
+        PlanPoint(450, 270),
+        PlanPoint(370, 270),
+        PlanPoint(370, 300),
+        PlanPoint(280, 300),
+        PlanPoint(280, 270),
+        PlanPoint(240, 150),
+        PlanPoint(0, 150),
+      ]);
+      expect(room(plan, 'storage2'), room(apartment, 'storage2'));
+      expect(room(plan, 'hall'), room(apartment, 'hall'));
+    });
+
+    test('Given storage 2 above a part of the hall wall, '
+        'when moving its bottom wall 65 cm up, '
+        'then the hall takes the freed space and the opening on that wall goes along', () {
+      // When
+      final plan = PlanEditingUtil.moveWall(apartment, 'storage2', 2, const PlanPoint(0, -65));
+
+      // Then
+      expect(room(plan, 'storage2').polygon, _box(370, 270, 450, 300));
+      expect(room(plan, 'hall').polygon, const [
+        PlanPoint(0, 150),
+        PlanPoint(240, 150),
+        PlanPoint(280, 270),
+        PlanPoint(280, 365),
+        PlanPoint(370, 365),
+        PlanPoint(370, 300),
+        PlanPoint(450, 300),
+        PlanPoint(450, 450),
+        PlanPoint(190, 450),
+        PlanPoint(190, 270),
+        PlanPoint(190, 245),
+        PlanPoint(0, 245),
+      ]);
+      final doors = {for (final door in plan.doors) door.id: door};
+      expect(doors['d3']?.a, const PlanPoint(375, 300));
+      expect(doors['d2']?.a, const PlanPoint(285, 365));
+    });
+
+    test('Given a finger moved along the wall as well, when moving the wall, then only the part across it counts', () {
+      // When
+      final plan = PlanEditingUtil.moveWall(apartment, 'storage', 0, const PlanPoint(50, 30));
+
+      // Then
+      expect(room(plan, 'storage').polygon, _box(280, 300, 370, 365));
+    });
+  });
+
+  group('PlanEditingUtil.withRoomPolygon when a corner moves', () {
+    test('Given a window on the top wall, '
+        'when the top right corner moves up, '
+        'then the window stays at the same place along that wall', () {
+      // Given
+      const window = Door(id: 'w', type: DoorType.window, a: PlanPoint(150, 0), b: PlanPoint(250, 0));
+      final plan = _twoRooms(doors: [window]);
+      final polygon = PlanEditingUtil.moveCorner(plan.rooms.first.polygon, 1, const PlanPoint(400, -100));
+
+      // When
+      final moved = PlanEditingUtil.withRoomPolygon(plan, 'office', polygon);
+
+      // Then
+      final opening = moved.doors.single;
+      expect(PlanEditingUtil.wallOf(moved, opening, roomId: 'office')?.index, 0);
+      expect((opening.a.x + opening.b.x) / 2, closeTo(200, 3));
     });
   });
 

@@ -249,33 +249,141 @@ abstract final class PlanEditingUtil {
     );
   }
 
-  /// Gives room [roomId] a new [polygon]. Its openings that fell off their wall are put back onto the nearest wall of
-  /// the room, with their width.
+  /// Gives room [roomId] a new [polygon]. Openings on a wall of the room that changed go along: with the same
+  /// corners (a corner moved) they keep their place along that wall, otherwise they are put back onto the nearest wall.
   static FloorPlan withRoomPolygon(FloorPlan plan, String roomId, List<PlanPoint> polygon) {
+    final before = plan.rooms.where((room) => room.id == roomId).firstOrNull?.polygon;
+    if (before == null) return plan;
     final changed = plan.copyWith(
       rooms: [for (final room in plan.rooms) room.id == roomId ? room.copyWith(polygon: polygon) : room],
     );
     final room = FloorPlan(
-      rooms: [
-        for (final room in changed.rooms)
-          if (room.id == roomId) room,
-      ],
+      rooms: [Room(id: roomId, name: '', polygon: polygon)],
     );
-    return changed.copyWith(
-      doors: [
-        for (final opening in plan.doors)
-          if (wallOf(plan, opening, roomId: roomId) == null || wallOf(changed, opening) != null)
-            opening
-          else
-            _reattach(room, opening),
-      ],
-    );
+    Door follow(Door opening) {
+      final wall = wallOf(plan, opening, roomId: roomId);
+      if (wall == null) return opening;
+      if (before.length != polygon.length) {
+        return wallOf(changed, opening) != null ? opening : _reattach(room, opening);
+      }
+      final a = polygon[wall.index];
+      final b = polygon[(wall.index + 1) % polygon.length];
+      if ((a == wall.a && b == wall.b) || a.distanceTo(b) == 0) return opening;
+      final along = wall.a.distanceTo(wall.point) / wall.length * a.distanceTo(b);
+      return placeOpening(
+        WallHit(roomId: roomId, index: wall.index, a: a, b: b, point: _along(a, b, along)),
+        id: opening.id,
+        type: opening.type,
+        width: opening.a.distanceTo(opening.b),
+      );
+    }
+
+    return changed.copyWith(doors: [for (final opening in plan.doors) follow(opening)]);
   }
 
   static Door _reattach(FloorPlan room, Door opening) {
     final wall = wallAt(room, _middle(opening.a, opening.b), radius: double.infinity);
     if (wall == null) return opening;
     return placeOpening(wall, id: opening.id, type: opening.type, width: opening.a.distanceTo(opening.b));
+  }
+
+  /// Moves wall [index] of room [roomId] (from that corner to the next) across itself, by the part of [delta]
+  /// perpendicular to it. Walls of other rooms along it move too, as one shared wall; where such a wall is longer, it
+  /// gets a jog at the end. Openings on the wall go along.
+  static FloorPlan moveWall(FloorPlan plan, String roomId, int index, PlanPoint delta) {
+    final room = plan.rooms.where((room) => room.id == roomId).firstOrNull;
+    if (room == null) return plan;
+    final next = (index + 1) % room.polygon.length;
+    final p = room.polygon[index];
+    final q = room.polygon[next];
+    final length = p.distanceTo(q);
+    if (length == 0) return plan;
+    final normal = PlanPoint(-(q.y - p.y) / length, (q.x - p.x) / length);
+    final across = delta.x * normal.x + delta.y * normal.y;
+    if (across.abs() < _tolerance) return plan;
+    final shift = PlanPoint(_toMillimeter(normal.x * across), _toMillimeter(normal.y * across));
+    return plan.copyWith(
+      rooms: [
+        for (final other in plan.rooms)
+          other.id == roomId
+              ? other.copyWith(
+                  polygon: [
+                    for (final (i, corner) in other.polygon.indexed) i == index || i == next ? corner + shift : corner,
+                  ],
+                )
+              : other.copyWith(polygon: _withWallMoved(other.polygon, p, q, shift)),
+      ],
+      doors: [
+        for (final opening in plan.doors)
+          _onSegment(opening.a, p, q) && _onSegment(opening.b, p, q)
+              ? opening.copyWith(a: opening.a + shift, b: opening.b + shift)
+              : opening,
+      ],
+    );
+  }
+
+  /// [polygon] with the parts of its walls that lie on the wall from [p] to [q] moved by [shift].
+  static List<PlanPoint> _withWallMoved(List<PlanPoint> polygon, PlanPoint p, PlanPoint q, PlanPoint shift) {
+    final moved = <PlanPoint>[];
+    final touched = <PlanPoint>[];
+    for (var i = 0; i < polygon.length; i++) {
+      final a = polygon[i];
+      final b = polygon[(i + 1) % polygon.length];
+      moved.add(a);
+      final overlap = _overlap(a, b, p, q);
+      if (overlap == null) continue;
+      final (from, to) = overlap;
+      if (from.distanceTo(a) >= _tolerance) moved.add(from);
+      moved
+        ..add(from + shift)
+        ..add(to + shift);
+      if (to.distanceTo(b) >= _tolerance) moved.add(to);
+      touched.addAll([a, b, from, to]);
+    }
+    return touched.isEmpty ? polygon : _withoutStraightCorners(moved, touched);
+  }
+
+  /// The part of the wall from [a] to [b] that lies on the wall from [p] to [q], in the direction from [a] to [b].
+  static (PlanPoint, PlanPoint)? _overlap(PlanPoint a, PlanPoint b, PlanPoint p, PlanPoint q) {
+    final dx = b.x - a.x;
+    final dy = b.y - a.y;
+    final lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared == 0 || _distanceToLine(p, a, b) >= _tolerance || _distanceToLine(q, a, b) >= _tolerance) {
+      return null;
+    }
+    double t(PlanPoint point) => ((point.x - a.x) * dx + (point.y - a.y) * dy) / lengthSquared;
+    final from = math.max(0.0, math.min(t(p), t(q)));
+    final to = math.min(1.0, math.max(t(p), t(q)));
+    if ((to - from) * math.sqrt(lengthSquared) < _tolerance) return null;
+    PlanPoint at(double t) => PlanPoint(_toMillimeter(a.x + dx * t), _toMillimeter(a.y + dy * t));
+    return (at(from), at(to));
+  }
+
+  /// [polygon] without the corners at [candidates] that no longer bend the wall (or repeat the previous corner).
+  static List<PlanPoint> _withoutStraightCorners(List<PlanPoint> polygon, List<PlanPoint> candidates) {
+    final result = [...polygon];
+    var removed = true;
+    while (removed && result.length > 3) {
+      removed = false;
+      for (var i = 0; i < result.length; i++) {
+        final corner = result[i];
+        if (!candidates.any((candidate) => candidate.distanceTo(corner) < _tolerance)) continue;
+        final previous = result[(i - 1 + result.length) % result.length];
+        final next = result[(i + 1) % result.length];
+        if (corner.distanceTo(previous) < _tolerance || _distanceToLine(corner, previous, next) < _tolerance) {
+          result.removeAt(i);
+          removed = true;
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  static double _distanceToLine(PlanPoint point, PlanPoint a, PlanPoint b) {
+    final length = a.distanceTo(b);
+    if (length == 0) return point.distanceTo(a);
+    return ((b.x - a.x) * (a.y - point.y) - (a.x - point.x) * (b.y - a.y)).abs() / length;
   }
 
   /// Whether a tap at [point] closes [draft]: it has at least three corners and the tap is on the first one.

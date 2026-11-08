@@ -146,6 +146,8 @@ The app runs without Home Assistant: the setup screen offers a demo mode backed 
 
 Plan → pencil (`HubPage.floorplanEditor`): rooms (tap corners or drag a rectangle; corners snap to corners, guides and
 the 10 cm grid), doors, openings and windows on walls, undo / redo, saved on every change, copy as JSON for a backup.
+A selected room: drag a corner, drag the middle of a wall to move the whole wall (the neighbor's wall along it follows,
+with a jog where it is longer; openings go along), tap the middle to add a corner, long press a corner to remove it.
 Windows are `DoorType.window`; the stored JSON stays the editor export format. A replaceable module with
 `FloorPlanService` as its only contract (`docs/architecture.md`, rule 6; enforced in `context_rules_test.dart`).
 

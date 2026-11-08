@@ -54,7 +54,7 @@ final class FloorplanEditorControllerProvider
 }
 
 String _$floorplanEditorControllerHash() =>
-    r'584aef11ca1b7320b12284895f8b6a8a31dfbf78';
+    r'49cefcda3805b1c074ab0b5138a28f563f5c8040';
 
 /// The floor plan editor: tools, selection, drawing and dragging, undo / redo. Every change is saved at once.
 ///

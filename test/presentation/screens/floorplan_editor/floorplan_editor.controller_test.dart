@@ -290,21 +290,40 @@ void main() {
     });
 
     test('Given the office selected, '
-        'when dragging the middle of its top wall up, '
-        'then a new corner is added there', () {
+        'when tapping the middle of its top wall, '
+        'then a corner is added there as one undo step', () {
+      // Given
+      controller().select(const EditorSelection.room('office'));
+
+      // When
+      controller().tap(const PlanPoint(200, 2), cmPerPx: 1);
+
+      // Then
+      expect(state().plan.rooms.first.polygon, hasLength(5));
+      expect(state().plan.rooms.first.polygon[1], const PlanPoint(200, 0));
+      expect(state().selection, const EditorSelection.room('office'));
+      expect(state().past, hasLength(1));
+    });
+
+    test('Given the office selected, '
+        'when dragging the middle of the wall it shares with the kitchen to the right, '
+        'then the wall moves, the kitchen gets smaller and the door goes along', () {
       // Given
       controller().select(const EditorSelection.room('office'));
 
       // When
       controller()
-        ..startDrag(const PlanPoint(200, 2), cmPerPx: 1)
-        ..updateDrag(const PlanPoint(200, -40), cmPerPx: 1)
+        ..startDrag(const PlanPoint(398, 150), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(430, 170), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(447, 160), cmPerPx: 1)
         ..endDrag();
 
       // Then
-      expect(state().plan.rooms.first.polygon, hasLength(5));
-      expect(state().plan.rooms.first.polygon[1], const PlanPoint(200, -40));
-      expect(state().past, hasLength(1));
+      expect(state().plan.rooms.first.polygon, _box(0, 0, 450, 300));
+      expect(state().plan.rooms.last.polygon, unorderedEquals(_box(450, 0, 700, 300)));
+      expect(state().plan.doors.single.a, const PlanPoint(450, 100));
+      expect(state().past, [_plan]);
+      expect(service.saved.last, state().plan);
     });
 
     test('Given a window in the middle of the top wall, '
@@ -314,7 +333,8 @@ void main() {
       controller()
         ..selectTool(EditorTool.window)
         ..tap(const PlanPoint(200, 5), cmPerPx: 1)
-        ..select(const EditorSelection.room('office'));
+        ..select(const EditorSelection.room('office'))
+        ..tap(const PlanPoint(200, 0), cmPerPx: 1);
 
       // When
       controller()
@@ -325,6 +345,7 @@ void main() {
       // Then
       final window = state().plan.doors.last;
       expect(state().plan.rooms.first.polygon, hasLength(5));
+      expect(state().plan.rooms.first.polygon[1], const PlanPoint(200, -60));
       expect(PlanEditingUtil.wallOf(state().plan, window, roomId: 'office'), isNotNull);
       expect(window.a.distanceTo(window.b), closeTo(100, 0.2));
     });

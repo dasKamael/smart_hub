@@ -55,6 +55,13 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   void tap(PlanPoint point, {required double cmPerPx}) {
     switch (state.tool) {
       case EditorTool.select:
+        if (state.selectedRoom case final room?) {
+          if (PlanEditingUtil.edgeMiddleAt(room.polygon, point, radius: handlePx * cmPerPx) case final edge?) {
+            final middle = PlanEditingUtil.edgeMiddle(room.polygon, edge);
+            final polygon = PlanEditingUtil.insertCorner(room.polygon, edge, middle);
+            return _commit(PlanEditingUtil.withRoomPolygon(state.plan, room.id, polygon));
+          }
+        }
         final opening = PlanEditingUtil.openingAt(state.plan.doors, point, radius: handlePx * cmPerPx);
         final room = RoomLookupUtil.roomAt(state.plan, point);
         select(switch ((opening, room)) {
@@ -104,14 +111,7 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         return true;
       }
       if (PlanEditingUtil.edgeMiddleAt(room.polygon, point, radius: radius) case final edge?) {
-        final polygon = PlanEditingUtil.insertCorner(
-          room.polygon,
-          edge,
-          PlanEditingUtil.edgeMiddle(room.polygon, edge),
-        );
-        _commit(PlanEditingUtil.withRoomPolygon(state.plan, room.id, polygon), save: false);
-        // The new corner is already one undo step; the drag goes on from the plan with it.
-        _drag = _CornerDrag(state.plan, room.id, edge + 1)..moved = true;
+        _drag = _WallDrag(state.plan, room.id, edge, point);
         return true;
       }
     }
@@ -144,6 +144,16 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         final snapped = PlanEditingUtil.snap(point, corners, radius: snapPx * cmPerPx);
         final polygon = PlanEditingUtil.moveCorner(room.polygon, drag.index, snapped.point);
         _change(drag, PlanEditingUtil.withRoomPolygon(drag.before, drag.roomId, polygon));
+        state = state.copyWith(guideX: snapped.guideX, guideY: snapped.guideY);
+      case final _WallDrag drag:
+        final room = drag.before.rooms.where((room) => room.id == drag.roomId).firstOrNull;
+        if (room == null) return;
+        final p = room.polygon[drag.index];
+        final q = room.polygon[(drag.index + 1) % room.polygon.length];
+        // The wall snaps with its first corner; corners moving along with it do not count.
+        final corners = PlanEditingUtil.cornersOf(drag.before).where((corner) => corner != p && corner != q);
+        final snapped = PlanEditingUtil.snap(p + (point - drag.start), corners, radius: snapPx * cmPerPx);
+        _change(drag, PlanEditingUtil.moveWall(drag.before, drag.roomId, drag.index, snapped.point - p));
         state = state.copyWith(guideX: snapped.guideX, guideY: snapped.guideY);
       case final _RoomDrag drag:
         final delta = PlanEditingUtil.gridDelta(drag.start, point);
@@ -335,6 +345,16 @@ final class _RoomDrag extends _EditDrag {
   _RoomDrag(super.before, this.roomId, this.start);
 
   final String roomId;
+  final PlanPoint start;
+}
+
+final class _WallDrag extends _EditDrag {
+  _WallDrag(super.before, this.roomId, this.index, this.start);
+
+  final String roomId;
+
+  /// The wall from this corner of the room to the next one.
+  final int index;
   final PlanPoint start;
 }
 
