@@ -41,8 +41,6 @@ final class SceneSolid {
     this.hiddenSides = const {},
     this.outside,
     this.nodeEnds = const {},
-    this.node,
-    this.joins = const [],
   });
 
   final List<PlanPoint> base;
@@ -51,7 +49,7 @@ final class SceneSolid {
   final SceneMaterial material;
 
   /// Sides (by the index of their first corner in [base]) inside something else, e.g. where two pieces of a wall
-  /// meet; they are not drawn – unless they end at a junction whose corner block is lowered ([nodeEnds]).
+  /// meet; they are not drawn – unless they end at a junction where a wall was lowered ([nodeEnds]).
   final Set<int> hiddenSides;
 
   /// For a piece of an outer wall: the direction out of the apartment. Outer walls facing the viewer can be lowered.
@@ -59,9 +57,4 @@ final class SceneSolid {
 
   /// Hidden sides that end at a junction, by side: the junction's id.
   final Map<int, String> nodeEnds;
-
-  /// For the corner block at a junction: the junction's id, and the [outside] of each wall meeting there (`null`
-  /// for inner walls).
-  final String? node;
-  final List<PlanPoint?> joins;
 }

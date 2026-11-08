@@ -11,7 +11,16 @@ abstract final class HomeSceneColorPalette {
   static const ambient = 0.78;
 
   /// Inside the rooms it is darker than on the outer walls.
-  static const indoors = 0.6;
+  static const indoors = 0.78;
+
+  /// Joints between floorboards.
+  static const floorJoint = Color(0x24000000);
+
+  /// Darkening of walls and furniture right above the floor, fading out by 1.4 m.
+  static const floorShade = 0.42;
+
+  /// The cut tops of the walls: lighter than their sides, a crisp edge.
+  static const wallTop = Color(0xFF6A7699);
 
   /// How much of their own color furniture models keep; the rest turns grey, for the muted look at night.
   static const furnitureSaturation = 0.72;
@@ -24,15 +33,15 @@ abstract final class HomeSceneColorPalette {
   }
 
   /// Light marker, off and on (`appartment.mp4`).
-  static const markerOff = Color(0xCC2B2D33);
-  static const markerOffBorder = Color(0x40FFFFFF);
+  static const markerOff = Color(0x8C26282E);
+  static const markerOffBorder = Color(0x66FFFFFF);
   static const markerOffGlyph = Color(0xFFE9E9EE);
   static const markerOn = Color(0xFFF7E1C0);
   static const markerOnGlyph = Color(0xFFE49D54);
   static const markerGlow = Color(0x99F2B36B);
 
   static const _materials = {
-    SceneMaterial.wall: Color(0xFF546283),
+    SceneMaterial.wall: Color(0xFF56617D),
     SceneMaterial.slab: Color(0xFF2E3648),
     SceneMaterial.glass: Color(0x5598B4D4),
     SceneMaterial.floorWood: Color(0xFF4A3628),

@@ -7,6 +7,7 @@ import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/domain/floorplan/wall_shape.util.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_models.dart';
 import 'package:smart_hub/presentation/design_system/tokens/home_scene.color_palette.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
@@ -30,8 +31,9 @@ class EditorPainter extends CustomPainter {
     _paintGrid(canvas, size);
     _paintFloors(canvas, outlines);
     _paintFurniture(canvas);
-    _paintWalls(canvas);
-    _paintOpenings(canvas);
+    final shapes = WallShapeUtil.shapesOf(_layout);
+    _paintWalls(canvas, shapes);
+    _paintOpenings(canvas, shapes);
     _paintLabels(canvas, outlines);
     _paintHandles(canvas, outlines);
     _paintGuides(canvas, size);
@@ -105,46 +107,36 @@ class EditorPainter extends CustomPainter {
     return [corner(-w, -d), corner(w, -d), corner(w, d), corner(-w, d)];
   }
 
-  void _paintWalls(Canvas canvas) {
-    final positions = {for (final node in _layout.nodes) node.id: node.position};
+  void _paintWalls(Canvas canvas, Map<String, WallShape> shapes) {
     final selected = state.selectedWall?.id;
     final fill = Paint()..color = HubColorPalette.wall;
-    for (final wall in _layout.walls) {
-      final a = positions[wall.from]!;
-      final b = positions[wall.to]!;
-      canvas.drawPath(
-        _path(_wallOutline(a, b, wall.thickness)),
-        wall.id == selected ? (Paint()..color = HubColorPalette.accent) : fill,
-      );
-    }
-    // Joints: fill the corners where walls meet.
-    for (final node in _layout.nodes) {
-      final thickness = _layout.walls
-          .where((wall) => wall.from == node.id || wall.to == node.id)
-          .fold(0.0, (max, wall) => math.max(max, wall.thickness));
-      final half = thickness / 2 * viewport.scale;
-      canvas.drawRect(Rect.fromCenter(center: _px(node.position), width: 2 * half, height: 2 * half), fill);
+    final highlight = Paint()..color = HubColorPalette.accent;
+    for (final MapEntry(key: id, value: shape) in shapes.entries) {
+      canvas.drawPath(_path(shape.corners), id == selected ? highlight : fill);
     }
   }
 
-  static List<PlanPoint> _wallOutline(PlanPoint a, PlanPoint b, double thickness) {
-    final length = a.distanceTo(b);
-    if (length == 0) return [a, a, a, a];
-    final n = PlanPoint(-(b.y - a.y) / length * thickness / 2, (b.x - a.x) / length * thickness / 2);
-    return [a + n, b + n, b - n, a - n];
-  }
-
-  void _paintOpenings(Canvas canvas) {
+  void _paintOpenings(Canvas canvas, Map<String, WallShape> shapes) {
     final selected = state.selectedOpening?.id;
     for (final opening in _layout.openings) {
       final segment = LayoutGraphUtil.openingSegment(_layout, opening);
-      final wall = _layout.walls.where((wall) => wall.id == opening.wallId).firstOrNull;
-      if (segment == null || wall == null) continue;
-      final (a, b) = segment;
+      final shape = shapes[opening.wallId];
+      if (segment == null || shape == null) continue;
+      var (a, b) = segment;
       final isSelected = opening.id == selected;
       final color = isSelected ? HubColorPalette.accent : HubColorPalette.text2;
-      // The gap through the wall.
-      canvas.drawPath(_path(_wallOutline(a, b, wall.thickness + 1)), Paint()..color = HubColorPalette.planGap);
+      // The gap through the wall, across its whole body.
+      final from = opening.offset - opening.width / 2;
+      final to = opening.offset + opening.width / 2;
+      canvas.drawPath(
+        _path([
+          shape.at(from, -shape.right - 0.5),
+          shape.at(to, -shape.right - 0.5),
+          shape.at(to, shape.left + 0.5),
+          shape.at(from, shape.left + 0.5),
+        ]),
+        Paint()..color = HubColorPalette.planGap,
+      );
       final length = a.distanceTo(b);
       if (length == 0) continue;
       final u = PlanPoint((b.x - a.x) / length, (b.y - a.y) / length);
@@ -188,7 +180,12 @@ class EditorPainter extends CustomPainter {
               ..strokeWidth = 1.5,
           );
         case DoorType.window:
-          final offset = PlanPoint(-u.y * wall.thickness / 4, u.x * wall.thickness / 4);
+          final middle = (shape.left - shape.right) / 2;
+          final spread = (shape.left + shape.right) / 4;
+          final across = shape.across;
+          a = PlanPoint(a.x + across.x * middle, a.y + across.y * middle);
+          b = PlanPoint(b.x + across.x * middle, b.y + across.y * middle);
+          final offset = PlanPoint(across.x * spread, across.y * spread);
           final pane = Paint()
             ..color = isSelected ? HubColorPalette.accent : HubColorPalette.window
             ..strokeWidth = 1.5;

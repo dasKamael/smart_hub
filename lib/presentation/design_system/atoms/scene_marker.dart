@@ -17,7 +17,7 @@ class SceneMarker extends StatelessWidget {
     this.onLongPress,
   });
 
-  static const size = 32.0;
+  static const size = 29.0;
 
   final HubGlyph glyph;
   final bool on;

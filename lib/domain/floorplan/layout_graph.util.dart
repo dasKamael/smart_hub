@@ -70,6 +70,7 @@ abstract final class LayoutGraphUtil {
           null => opening,
         },
     ];
+    graph.settle(nodeId);
     return graph.build();
   }
 
@@ -115,7 +116,10 @@ abstract final class LayoutGraphUtil {
         graph.replaceWall(moved);
       }
     }
-    graph.keepOpeningsAt(absolute, except: {wallId});
+    graph
+      ..keepOpeningsAt(absolute, except: {wallId})
+      ..settle(moved.from)
+      ..settle(moved.to);
     return graph.build();
   }
 
@@ -332,6 +336,75 @@ class _Graph {
     }
   }
 
+  /// Joins junction [node], after it moved, to what it landed on: another junction (the two become one; walls that
+  /// end up doubled or of no length go) or the middle of a wall (which is split there).
+  void settle(String node) {
+    final position = nodes[node];
+    if (position == null) return;
+    final other = nodes.entries
+        .where(
+          (entry) =>
+              entry.key != node && wallsAt(entry.key).isNotEmpty && entry.value.distanceTo(position) < _tolerance,
+        )
+        .firstOrNull;
+    if (other != null) {
+      final centers = openingCenters();
+      for (var i = 0; i < walls.length; i++) {
+        final wall = walls[i];
+        if (wall.from == node) walls[i] = wall.copyWith(from: other.key);
+        if (wall.to == node) walls[i] = walls[i].copyWith(to: other.key);
+      }
+      nodes.remove(node);
+      final seen = <String>{};
+      final removed = <String>{};
+      for (final wall in [...walls]) {
+        final key = ([wall.from, wall.to]..sort()).join('|');
+        if (wall.from == wall.to || !seen.add(key)) removed.add(wall.id);
+      }
+      final kept = {
+        for (final wall in walls)
+          if (!removed.contains(wall.id)) ([wall.from, wall.to]..sort()).join('|'): wall.id,
+      };
+      final doubled = {
+        for (final wall in walls)
+          if (removed.contains(wall.id) && wall.from != wall.to)
+            wall.id: kept[([wall.from, wall.to]..sort()).join('|')]!,
+      };
+      walls.removeWhere((wall) => removed.contains(wall.id));
+      openings = [
+        for (final opening in openings)
+          if (doubled[opening.wallId] case final keptId?)
+            opening.copyWith(wallId: keptId)
+          else if (!removed.contains(opening.wallId))
+            opening,
+      ];
+      keepOpeningsAt(centers);
+      return;
+    }
+    for (final wall in [...walls]) {
+      if (wall.from == node || wall.to == node) continue;
+      final a = nodes[wall.from]!;
+      final b = nodes[wall.to]!;
+      if (PlanGeometryUtil.distanceToSegment(position, a, b) >= _tolerance) continue;
+      final along = PlanGeometryUtil.segmentParameter(position, a, b);
+      if (along <= 0 || along >= 1) continue;
+      final firstLength = a.distanceTo(position);
+      final second = LayoutWall(id: newWallId(), from: node, to: wall.to, thickness: wall.thickness);
+      replaceWall(wall.copyWith(to: node));
+      walls.add(second);
+      openings = [
+        for (final opening in openings)
+          if (opening.wallId != wall.id)
+            opening
+          else if (opening.offset <= firstLength)
+            fitted(opening)
+          else
+            fitted(opening.copyWith(wallId: second.id, offset: opening.offset - firstLength)),
+      ];
+      return;
+    }
+  }
+
   /// Removes [node] when no wall is left on it, or joins its two walls when they run straight through it.
   void tidy(String node) {
     final attached = wallsAt(node).toList();
@@ -342,7 +415,8 @@ class _Graph {
     final secondFar = second.from == node ? second.to : second.from;
     final position = nodes[node]!;
     if (PlanGeometryUtil.distanceToLine(position, nodes[firstFar]!, nodes[secondFar]!) >= _tolerance) return;
-    if (PlanGeometryUtil.segmentParameter(position, nodes[firstFar]!, nodes[secondFar]!) <= 0) return;
+    final along = PlanGeometryUtil.segmentParameter(position, nodes[firstFar]!, nodes[secondFar]!);
+    if (along <= 0 || along >= 1) return;
     if (connected(firstFar, secondFar)) return;
     final centers = openingCenters();
     final joined = first.copyWith(from: firstFar, to: secondFar);

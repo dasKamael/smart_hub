@@ -7,6 +7,7 @@ import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
+import 'package:smart_hub/domain/floorplan/wall_shape.util.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_meshes.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/home_scene.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/scene_solid.dart';
@@ -59,7 +60,7 @@ void main() {
       final scene = HomeScene.of(_room());
 
       // Then
-      expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(100, 0))), isEmpty);
+      expect(scene.walls.where((solid) => solid.top > 0 && _covers(solid, const PlanPoint(100, 0))), isEmpty);
       expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(200, 0))), isNotEmpty);
     });
 
@@ -79,9 +80,9 @@ void main() {
 
       // Then
       final beforeDoor = scene.walls.where((solid) => _covers(solid, const PlanPoint(55, 0)) && solid.top > 200).single;
-      expect(beforeDoor.hiddenSides, isNot(contains(1)));
+      expect(beforeDoor.hiddenSides, isNot(containsAll(WallShape.endSides)));
       final middle = scene.walls.where((solid) => _covers(solid, const PlanPoint(250, 0)) && solid.top > 200).single;
-      expect(middle.hiddenSides, containsAll([1, 3]));
+      expect(middle.hiddenSides, containsAll({...WallShape.startSides, ...WallShape.endSides}));
     });
 
     test('Given furniture and no models, when building the scene, then it is made of blocks and casts shadows', () {

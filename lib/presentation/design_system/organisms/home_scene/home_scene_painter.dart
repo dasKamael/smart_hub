@@ -65,6 +65,7 @@ class HomeScenePainter extends CustomPainter {
       canvas.drawPath(path, Paint()..color = _shade(HomeSceneColorPalette.of(floor.material), topLight));
       canvas.save();
       canvas.clipPath(path);
+      if (floor.material == SceneMaterial.floorWood) _paintPlanks(canvas, floor.outline);
       // Darker along the walls, as light does not reach into the corners.
       canvas.drawPath(
         path,
@@ -87,8 +88,8 @@ class HomeScenePainter extends CustomPainter {
             ..blendMode = BlendMode.plus
             ..shader = RadialGradient(
               colors: [
-                color.withValues(alpha: 0.5 * light.brightness),
-                color.withValues(alpha: 0.2 * light.brightness),
+                color.withValues(alpha: 0.36 * light.brightness),
+                color.withValues(alpha: 0.14 * light.brightness),
                 color.withValues(alpha: 0),
               ],
               stops: const [0, 0.38, 1],
@@ -102,6 +103,33 @@ class HomeScenePainter extends CustomPainter {
       canvas.restore();
     }
   }
+
+  /// Joints of floorboards: along the boards every [_board] cm, across them staggered every [_boardLength] cm.
+  void _paintPlanks(Canvas canvas, List<PlanPoint> outline) {
+    final xs = outline.map((p) => p.x);
+    final ys = outline.map((p) => p.y);
+    final left = xs.reduce(math.min);
+    final right = xs.reduce(math.max);
+    final top = ys.reduce(math.min);
+    final bottom = ys.reduce(math.max);
+    final joint = Paint()
+      ..color = HomeSceneColorPalette.floorJoint
+      ..strokeWidth = 1 / camera.scale;
+    canvas.save();
+    canvas.transform(camera.planeAt(0));
+    var row = 0;
+    for (var y = (top / _board).floor() * _board; y < bottom; y += _board, row++) {
+      canvas.drawLine(Offset(left, y), Offset(right, y), joint);
+      final shift = (row % 3) * _boardLength / 3;
+      for (var x = (left / _boardLength).floor() * _boardLength + shift; x < right; x += _boardLength) {
+        canvas.drawLine(Offset(x, y), Offset(x, y + _board), joint);
+      }
+    }
+    canvas.restore();
+  }
+
+  static const _board = 18.0;
+  static const _boardLength = 120.0;
 
   void _paintContactShadows(Canvas canvas) {
     final shadow = Paint()
@@ -118,19 +146,16 @@ class HomeScenePainter extends CustomPainter {
   void _paintFaces(Canvas canvas, List<String?> lightRooms) {
     final faces = <_Face>[];
     final tilted = camera.pitch < math.pi / 2 - 0.001;
-    // Corner blocks come down with the walls when every outer wall meeting there faces the viewer.
+    // Junctions where a lowered outer wall ends: walls ending there show their end instead of a hole.
     final loweredNodes = {
       if (lowered > 0)
         for (final solid in scene.solids)
-          if (solid.node case final node?
-              when solid.joins.any(_facesViewer) && solid.joins.every((join) => join == null || _facesViewer(join)))
-            node,
+          if (_facesViewer(solid.outside)) ...solid.nodeEnds.values,
     };
     for (final solid in scene.solids) {
       final isLowered = switch (solid) {
-        SceneSolid(:final node?) => loweredNodes.contains(node),
         SceneSolid(:final outside?) => lowered > 0 && _facesViewer(outside),
-        // A short stub of an inner wall at a lowered corner would stand up as a thin post.
+        // A short stub of an inner wall at a lowered junction would stand up as a thin post.
         _ => solid.nodeEnds.values.any(loweredNodes.contains) && solid.base[0].distanceTo(solid.base[1]) < _stub,
       };
       final top = isLowered
@@ -173,6 +198,8 @@ class HomeScenePainter extends CustomPainter {
           );
         }
       }
+      // The slab lies under walls and floors: its top is never seen, but would cover door gaps from above.
+      if (solid.material == SceneMaterial.slab) continue;
       faces.add(
         _Face(
           solid: solid,
@@ -221,7 +248,9 @@ class HomeScenePainter extends CustomPainter {
       if (left == right) {
         paint.color = left;
       } else {
-        paint.shader = ui.Gradient.linear((points[0] + points[3]) / 2, (points[1] + points[2]) / 2, [left, right]);
+        // Upright edges are upright on screen: blending straight across keeps the colors equal along each of them,
+        // so neighboring pieces meet without a step.
+        paint.shader = ui.Gradient.linear(points[0], Offset(points[1].dx, points[0].dy), [left, right]);
       }
       canvas.drawPath(path, paint);
       if (!face.isOutdoors) {
@@ -231,8 +260,8 @@ class HomeScenePainter extends CustomPainter {
           Paint()
             ..isAntiAlias = false
             ..shader = ui.Gradient.linear(
-              (points[2] + points[3]) / 2,
-              (points[0] + points[1]) / 2,
+              points[3],
+              _acrossEdge(points[3], points[2], points[0]),
               [_darkening(top), _darkening(math.max(bottom, math.min(top, 140))), _darkening(bottom)],
               [
                 0,
@@ -311,8 +340,24 @@ class HomeScenePainter extends CustomPainter {
     canvas.drawVertices(ui.Vertices(ui.VertexMode.triangles, positions, colors: colors), BlendMode.dst, Paint());
   }
 
-  static Color _darkening(double z) =>
-      Color.from(alpha: 0.28 * (1 - math.min(1.0, math.max(0.0, z) / 140)), red: 0, green: 0, blue: 0);
+  static Color _darkening(double z) => Color.from(
+    alpha: HomeSceneColorPalette.floorShade * (1 - math.min(1.0, math.max(0.0, z) / 140)),
+    red: 0,
+    green: 0,
+    blue: 0,
+  );
+
+  /// The point reached from [start] going at right angles to the edge from [start] to [along] until level with
+  /// [target]: a gradient from [start] to it keeps one value along every line parallel to that edge (the top of a
+  /// wall), so all pieces of a wall darken alike.
+  static Offset _acrossEdge(Offset start, Offset along, Offset target) {
+    final edge = along - start;
+    final length = edge.distance;
+    if (length == 0) return target;
+    final normal = Offset(-edge.dy / length, edge.dx / length);
+    final distance = (target - start).dx * normal.dx + (target - start).dy * normal.dy;
+    return start + normal * distance;
+  }
 
   /// [points] pushed out by half a pixel, so neighboring faces meet without a hairline gap.
   static List<Offset> _grown(List<Offset> points) {
@@ -345,7 +390,7 @@ class HomeScenePainter extends CustomPainter {
   }
 
   Color _lit(_Face face, double x, double y, double z, List<String?> lightRooms) => _shadeAt(
-    HomeSceneColorPalette.of(face.solid.material),
+    face.top && face.isWall ? HomeSceneColorPalette.wallTop : HomeSceneColorPalette.of(face.solid.material),
     face.normal,
     x,
     y,
@@ -378,19 +423,20 @@ class HomeScenePainter extends CustomPainter {
       final dz = lampHeight - z;
       final distance = math.sqrt(dx * dx + dy * dy + dz * dz);
       if (distance < 1) continue;
-      final facing = math.max(0.0, (dx * nx + dy * ny + dz * nz) / distance);
-      final strength = light.brightness * 1.1 / (1 + math.pow(distance / _falloff, 2));
+      // Light falls mostly on the walls; tops of furniture and floors get a share of it (floors have their pool).
+      final facing = math.max(0.0, (dx * nx + dy * ny + dz * nz) / distance) * (1 - 0.55 * math.max(0.0, nz));
+      final strength = light.brightness * 0.75 / (1 + math.pow(distance / _falloff, 2));
       final amount = strength * (0.35 + 0.65 * facing);
-      r += (base.r * 1.1 + 0.25) * light.r * amount;
-      g += (base.g * 1.1 + 0.25) * light.g * amount;
-      b += (base.b * 1.1 + 0.25) * light.b * amount;
+      r += (base.r * 1.1 + 0.12) * light.r * amount;
+      g += (base.g * 1.1 + 0.12) * light.g * amount;
+      b += (base.b * 1.1 + 0.12) * light.b * amount;
     }
     return Color.from(alpha: base.a, red: _knee(r), green: _knee(g), blue: _knee(b));
   }
 
   /// Bright light rolls off softly instead of clipping to white.
   static double _knee(double value) {
-    const start = 0.55;
+    const start = 0.5;
     if (value <= start) return math.max(0, value);
     return start + (1 - start) * (1 - math.exp(-(value - start) / (1 - start)));
   }

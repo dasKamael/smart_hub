@@ -201,6 +201,55 @@ void main() {
     });
   });
 
+  group('LayoutGraphUtil joining after a move', () {
+    test('Given two rooms apart, '
+        'when a corner of one is moved onto a corner of the other, '
+        'then they share that junction and both rooms keep their areas', () {
+      // Given
+      var layout = LayoutGraphUtil.addRectangle(const HomeLayout(), PlanPoint.zero, const PlanPoint(400, 300));
+      layout = LayoutGraphUtil.addRectangle(layout, const PlanPoint(420, 0), const PlanPoint(700, 300));
+      final corner = LayoutGraphUtil.nodeAt(layout, const PlanPoint(420, 0), radius: 2)!;
+
+      // When
+      final moved = LayoutGraphUtil.moveNode(layout, corner.id, const PlanPoint(400, 0));
+
+      // Then
+      expect(moved.nodes, hasLength(layout.nodes.length - 1));
+      expect(LayoutRoomsUtil.areas(moved), hasLength(2));
+    });
+
+    test('Given a free wall end, when it is moved onto the middle of another wall, then that wall is split there', () {
+      // Given
+      var layout = LayoutGraphUtil.addRectangle(const HomeLayout(), PlanPoint.zero, const PlanPoint(400, 300));
+      layout = LayoutGraphUtil.addWall(layout, const PlanPoint(200, 100), const PlanPoint(200, 200));
+      final end = LayoutGraphUtil.nodeAt(layout, const PlanPoint(200, 200), radius: 2)!;
+
+      // When
+      final moved = LayoutGraphUtil.moveNode(layout, end.id, const PlanPoint(200, 300));
+
+      // Then
+      expect(moved.walls, hasLength(layout.walls.length + 1));
+      expect(LayoutGraphUtil.nodeAt(moved, const PlanPoint(200, 300), radius: 2)?.id, end.id);
+    });
+
+    test('Given a room, when one of its walls is dragged onto the opposite wall, then no doubled wall is left', () {
+      // Given
+      var layout = LayoutGraphUtil.addRectangle(const HomeLayout(), PlanPoint.zero, const PlanPoint(400, 300));
+      layout = LayoutGraphUtil.addWall(layout, const PlanPoint(200, 0), const PlanPoint(200, 300));
+      final middle = LayoutGraphUtil.wallAt(layout, const PlanPoint(200, 150), radius: 2)!;
+
+      // When
+      final moved = LayoutGraphUtil.moveWall(layout, middle.id, const PlanPoint(200, 0));
+
+      // Then
+      final pairs = {
+        for (final wall in moved.walls) ([wall.from, wall.to]..sort()).join('|'),
+      };
+      expect(pairs, hasLength(moved.walls.length));
+      expect(moved.walls.where((wall) => wall.from == wall.to), isEmpty);
+    });
+  });
+
   group('LayoutGraphUtil.moveNode', () {
     test('Given a window in the middle of a wall, when moving one end of the wall, then it stays in its middle', () {
       // Given

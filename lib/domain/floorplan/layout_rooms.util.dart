@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:clock/clock.dart';
+
 import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/model/floor_plan.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
@@ -62,10 +64,11 @@ abstract final class LayoutRoomsUtil {
 
   static double _angle(PlanPoint from, PlanPoint to) => math.atan2(to.y - from.y, to.x - from.x);
 
-  /// Gives every area exactly one room. An area belongs to the room whose outline before the change
-  /// ([previousOutlines]) holds its middle – larger areas choose first, so a split room keeps its name on the larger
-  /// part. Then rooms whose anchor lies in a free area take it, then rooms left take the nearest free area. Areas left
-  /// get a new room. Anchors move to the middle of their area, so they stay inside while walls move.
+  /// Gives every area exactly one room. An area goes to the room whose outline before the change ([previousOutlines])
+  /// lies most in it – by share of that old room, so a room that grew keeps its name (and what hangs on its id) and a
+  /// split room keeps it on the part that is most of it. Then rooms whose anchor lies in a free area
+  /// take it, then rooms left take the nearest free area. Areas left get a new room. Anchors move to the middle of
+  /// their area, so they stay inside while walls move.
   static HomeLayout normalize(HomeLayout layout, {Map<String, List<PlanPoint>> previousOutlines = const {}}) {
     final areas = LayoutRoomsUtil.areas(layout);
     final centers = [for (final area in areas) PlanGeometryUtil.interiorPoint(area)];
@@ -73,20 +76,22 @@ abstract final class LayoutRoomsUtil {
     final owner = <int, String>{};
     bool owns(String roomId) => owner.containsValue(roomId);
 
-    final bySize = [for (var i = 0; i < areas.length; i++) i]
-      ..sort((a, b) => PlanGeometryUtil.signedArea(areas[b]).compareTo(PlanGeometryUtil.signedArea(areas[a])));
-    for (final index in bySize) {
-      for (final MapEntry(key: roomId, value: outline) in previousOutlines.entries) {
-        if (rooms.containsKey(roomId) && !owns(roomId) && PlanGeometryUtil.containsPoint(outline, centers[index])) {
-          owner[index] = roomId;
-          break;
-        }
-      }
+    // By the share of the old room that is in the area, then by the size of that part.
+    final overlaps = [
+      for (var i = 0; i < areas.length; i++)
+        for (final MapEntry(key: roomId, value: outline) in previousOutlines.entries)
+          if (rooms.containsKey(roomId))
+            if (_overlap(areas[i], outline) case final overlap when overlap > 0)
+              (i, roomId, _share(overlap, outline), overlap),
+    ]..sort((a, b) => b.$3 != a.$3 ? b.$3.compareTo(a.$3) : b.$4.compareTo(a.$4));
+    for (final (index, roomId, _, _) in overlaps) {
+      if (owner.containsKey(index) || owns(roomId)) continue;
+      owner[index] = roomId;
     }
     for (final room in layout.rooms) {
       if (owns(room.id) || previousOutlines.containsKey(room.id)) continue;
-      final index = areas.indexWhere((area) => PlanGeometryUtil.containsPoint(area, room.anchor));
-      if (index >= 0 && !owner.containsKey(index)) owner[index] = room.id;
+      final index = _smallestAt(areas, room.anchor);
+      if (index != null && !owner.containsKey(index)) owner[index] = room.id;
     }
     for (final room in layout.rooms) {
       if (owns(room.id)) continue;
@@ -106,8 +111,13 @@ abstract final class LayoutRoomsUtil {
     final added = <LayoutRoom>[];
     for (var i = 0; i < areas.length; i++) {
       if (owner.containsKey(i)) continue;
-      final id = LayoutGraphUtil.nextId('room-', [...rooms.keys, ...added.map((room) => room.id)]);
-      added.add(LayoutRoom(id: id, name: RoomType.other.label, anchor: centers[i]));
+      added.add(
+        LayoutRoom(
+          id: newRoomId([...rooms.keys, ...added.map((room) => room.id)]),
+          name: RoomType.other.label,
+          anchor: centers[i],
+        ),
+      );
     }
     final anchors = {for (final MapEntry(key: index, value: roomId) in owner.entries) roomId: centers[index]};
     return layout.copyWith(
@@ -119,12 +129,59 @@ abstract final class LayoutRoomsUtil {
     );
   }
 
+  /// An id for a new room that no room has had before (as far as can be told): ids of deleted rooms are not taken
+  /// again, so nothing kept under a deleted room's id (e.g. its light scenes) passes to a new one.
+  static String newRoomId(Iterable<String> existing) {
+    final taken = existing.toSet();
+    var id = 'room-${clock.now().microsecondsSinceEpoch.toRadixString(36)}';
+    while (taken.contains(id)) {
+      id = '${id}x';
+    }
+    return id;
+  }
+
+  /// Which share of the room with [outline] [overlap] is, in steps of 5 % (sampling is not more exact), so that two
+  /// rooms lying wholly in one area count as a tie.
+  static double _share(double overlap, List<PlanPoint> outline) {
+    final share = overlap / math.max(1.0, PlanGeometryUtil.signedArea(outline).abs() / 2);
+    return (share.clamp(0.0, 1.0) * 20).round() / 20;
+  }
+
+  /// How much of [area] lies inside [outline], in square centimeters (sampled on a grid).
+  static double _overlap(List<PlanPoint> area, List<PlanPoint> outline) {
+    final xs = area.map((p) => p.x);
+    final ys = area.map((p) => p.y);
+    final left = xs.reduce(math.min);
+    final top = ys.reduce(math.min);
+    final width = xs.reduce(math.max) - left;
+    final height = ys.reduce(math.max) - top;
+    final step = math.max(4.0, math.sqrt(width * height) / 32);
+    var count = 0;
+    for (var y = top + step / 2; y < top + height; y += step) {
+      for (var x = left + step / 2; x < left + width; x += step) {
+        final point = PlanPoint(x, y);
+        if (PlanGeometryUtil.containsPoint(area, point) && PlanGeometryUtil.containsPoint(outline, point)) count++;
+      }
+    }
+    return count * step * step;
+  }
+
+  /// The smallest area holding [point] – a room drawn inside another room is the inner one.
+  static int? _smallestAt(List<List<PlanPoint>> areas, PlanPoint point) {
+    int? best;
+    for (var i = 0; i < areas.length; i++) {
+      if (!PlanGeometryUtil.containsPoint(areas[i], point)) continue;
+      if (best == null || PlanGeometryUtil.signedArea(areas[i]) < PlanGeometryUtil.signedArea(areas[best])) best = i;
+    }
+    return best;
+  }
+
   /// Outline of every room, by room id (rooms whose anchor lies in no area are left out).
   static Map<String, List<PlanPoint>> outlines(HomeLayout layout) {
     final areas = LayoutRoomsUtil.areas(layout);
     return {
       for (final room in layout.rooms)
-        room.id: ?areas.where((area) => PlanGeometryUtil.containsPoint(area, room.anchor)).firstOrNull,
+        if (_smallestAt(areas, room.anchor) case final index?) room.id: areas[index],
     };
   }
 
@@ -132,7 +189,9 @@ abstract final class LayoutRoomsUtil {
   static List<PlanPoint>? outlineOf(HomeLayout layout, String roomId) {
     final room = layout.rooms.where((room) => room.id == roomId).firstOrNull;
     if (room == null) return null;
-    return areas(layout).where((area) => PlanGeometryUtil.containsPoint(area, room.anchor)).firstOrNull;
+    final all = areas(layout);
+    final index = _smallestAt(all, room.anchor);
+    return index == null ? null : all[index];
   }
 
   /// The floor plan to show: every named room with its outline and every opening as a segment.
@@ -141,8 +200,8 @@ abstract final class LayoutRoomsUtil {
     return FloorPlan(
       rooms: [
         for (final room in layout.rooms)
-          if (areas.where((area) => PlanGeometryUtil.containsPoint(area, room.anchor)).firstOrNull case final outline?)
-            Room(id: room.id, name: room.name, polygon: _withoutStraightCorners(outline)),
+          if (_smallestAt(areas, room.anchor) case final index?)
+            Room(id: room.id, name: room.name, polygon: _withoutStraightCorners(areas[index])),
       ],
       doors: [
         for (final opening in layout.openings)

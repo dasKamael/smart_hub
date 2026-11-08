@@ -6,7 +6,7 @@ import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
-import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
+import 'package:smart_hub/domain/floorplan/wall_shape.util.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_meshes.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/furniture_models.dart';
 import 'package:smart_hub/presentation/design_system/organisms/home_scene/scene_solid.dart';
@@ -107,18 +107,9 @@ final class HomeScene {
           SceneFloor(roomId: room.id, outline: outline, material: _floorOf(room.type)),
     ];
     final walls = <SceneSolid>[];
-    final positions = {for (final node in layout.nodes) node.id: node.position};
-    final outsides = {
-      for (final wall in layout.walls)
-        wall.id: _outsideOf(positions[wall.from]!, positions[wall.to]!, wall.thickness, outlines.values),
-    };
+    final shapes = WallShapeUtil.shapesOf(layout);
     for (final wall in layout.walls) {
-      walls.addAll(_wallPieces(layout, wall, positions[wall.from]!, positions[wall.to]!, outsides[wall.id]));
-    }
-    for (final node in layout.nodes) {
-      final attached = layout.walls.where((wall) => wall.from == node.id || wall.to == node.id).toList();
-      if (attached.isEmpty) continue;
-      walls.add(_pillar(node, attached, positions, [for (final wall in attached) outsides[wall.id]]));
+      if (shapes[wall.id] case final shape?) walls.addAll(_wallPieces(layout, wall, shape));
     }
     final meshes = <SceneMesh>[];
     final blocks = <SceneSolid>[];
@@ -147,32 +138,8 @@ final class HomeScene {
     _ => SceneMaterial.floorWood,
   };
 
-  /// The direction out of the apartment from the wall from [a] to [b], or `null` when there are rooms on both sides
-  /// (or on none).
-  static PlanPoint? _outsideOf(PlanPoint a, PlanPoint b, double thickness, Iterable<List<PlanPoint>> rooms) {
-    final length = a.distanceTo(b);
-    if (length < 1) return null;
-    final normal = PlanPoint(-(b.y - a.y) / length, (b.x - a.x) / length);
-    final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
-    final reach = thickness / 2 + 15;
-    bool inRoom(PlanPoint point) => rooms.any((outline) => PlanGeometryUtil.containsPoint(outline, point));
-    final left = inRoom(PlanPoint(middle.x + normal.x * reach, middle.y + normal.y * reach));
-    final right = inRoom(PlanPoint(middle.x - normal.x * reach, middle.y - normal.y * reach));
-    if (left == right) return null;
-    return left ? PlanPoint(-normal.x, -normal.y) : normal;
-  }
-
-  static List<SceneSolid> _wallPieces(
-    HomeLayout layout,
-    LayoutWall wall,
-    PlanPoint a,
-    PlanPoint b,
-    PlanPoint? outside,
-  ) {
-    final length = a.distanceTo(b);
-    if (length < 1) return const [];
-    final u = PlanPoint((b.x - a.x) / length, (b.y - a.y) / length);
-    final n = PlanPoint(-u.y * wall.thickness / 2, u.x * wall.thickness / 2);
+  static List<SceneSolid> _wallPieces(HomeLayout layout, LayoutWall wall, WallShape shape) {
+    final length = shape.length;
     final openings = [
       for (final opening in layout.openings)
         if (opening.wallId == wall.id) opening,
@@ -185,28 +152,37 @@ final class HomeScene {
       double bottom,
       double top,
       SceneMaterial material, {
-      double thin = 1,
+      bool pane = false,
       bool jambs = true,
     }) {
       if (to - from < 0.5 || top - bottom < 0.5) return;
       final count = math.max(1, ((to - from) / _piece).ceil());
-      final half = PlanPoint(n.x * thin, n.y * thin);
+      // Glass is a thin pane in the middle of the wall.
+      final middle = (shape.left - shape.right) / 2;
       for (var i = 0; i < count; i++) {
         final s = from + (to - from) * i / count;
         final e = from + (to - from) * (i + 1) / count;
-        final p = PlanPoint(a.x + u.x * s, a.y + u.y * s);
-        final q = PlanPoint(a.x + u.x * e, a.y + u.y * e);
+        final atStart = i == 0 && s < 0.5;
+        final atEnd = i == count - 1 && e > length - 0.5;
         pieces.add(
           SceneSolid(
-            base: [p - half, q - half, q + half, p + half],
+            base: pane ? shape.section(s, e, right: 1 - middle, left: 1 + middle) : shape.section(s, e),
             bottom: bottom,
             top: top,
             material: material,
-            // Ends inside the wall – against the next piece or the corner block at a junction – are not drawn; the
-            // ends at a door or window are.
-            hiddenSides: {if (i < count - 1 || to > length - 0.5 || !jambs) 1, if (i > 0 || from < 0.5 || !jambs) 3},
-            outside: outside,
-            nodeEnds: {if (i == count - 1 && to > length - 0.5) 1: wall.to, if (i == 0 && from < 0.5) 3: wall.from},
+            // Ends inside the wall – against the next piece, or joined to other walls at a junction – are not
+            // drawn; free ends and the ends at a door or window (jambs) are.
+            hiddenSides: {
+              if (i < count - 1 || !jambs || atEnd && shape.end != null) ...WallShape.endSides,
+              if (i > 0 || !jambs || atStart && shape.start != null) ...WallShape.startSides,
+            },
+            outside: shape.outside,
+            nodeEnds: {
+              if (atEnd)
+                for (final side in WallShape.endSides) side: wall.to,
+              if (atStart)
+                for (final side in WallShape.startSides) side: wall.from,
+            },
           ),
         );
       }
@@ -214,49 +190,18 @@ final class HomeScene {
 
     var cursor = 0.0;
     for (final opening in openings) {
-      final start = (opening.offset - opening.width / 2).clamp(0.0, length);
-      final end = (opening.offset + opening.width / 2).clamp(0.0, length);
-      add(cursor, start, 0, wallHeight, SceneMaterial.wall);
-      switch (opening.type) {
-        case DoorType.door:
-        case DoorType.open:
-          // Cut open to the top, as a model house: the room behind stays visible.
-          break;
-        case DoorType.window:
-          add(start, end, 0, sillHeight, SceneMaterial.wall, jambs: false);
-          add(start, end, windowTop, wallHeight, SceneMaterial.wall, jambs: false);
-          add(start, end, sillHeight, windowTop, SceneMaterial.glass, thin: 0.25, jambs: false);
+      final from = (opening.offset - opening.width / 2).clamp(0.0, length);
+      final to = (opening.offset + opening.width / 2).clamp(0.0, length);
+      add(cursor, from, 0, wallHeight, SceneMaterial.wall);
+      if (opening.type == DoorType.window) {
+        add(from, to, 0, sillHeight, SceneMaterial.wall, jambs: false);
+        add(from, to, windowTop, wallHeight, SceneMaterial.wall, jambs: false);
+        add(from, to, sillHeight, windowTop, SceneMaterial.glass, pane: true, jambs: false);
       }
-      cursor = math.max(cursor, end);
+      cursor = math.max(cursor, to);
     }
     add(cursor, length, 0, wallHeight, SceneMaterial.wall);
-    if (wall.thickness >= LayoutWall.outerThickness) add(0, length, -slabDepth, 0, SceneMaterial.slab, jambs: false);
+    if (shape.outside != null) add(0, length, -slabDepth, 0, SceneMaterial.slab, jambs: false);
     return pieces;
-  }
-
-  /// Fills the corner where walls meet with a block as thick as the thickest of them.
-  static SceneSolid _pillar(
-    LayoutNode node,
-    List<LayoutWall> attached,
-    Map<String, PlanPoint> positions,
-    List<PlanPoint?> joins,
-  ) {
-    final at = node.position;
-    final thickest = attached.reduce((x, y) => x.thickness >= y.thickness ? x : y);
-    final from = positions[thickest.from]!;
-    final to = positions[thickest.to]!;
-    final length = from.distanceTo(to);
-    final u = length == 0 ? const PlanPoint(1, 0) : PlanPoint((to.x - from.x) / length, (to.y - from.y) / length);
-    final h = thickest.thickness / 2;
-    final x = PlanPoint(u.x * h, u.y * h);
-    final y = PlanPoint(-u.y * h, u.x * h);
-    return SceneSolid(
-      base: [at - x - y, at + x - y, at + x + y, at - x + y],
-      bottom: 0,
-      top: wallHeight,
-      material: SceneMaterial.wall,
-      node: node.id,
-      joins: joins,
-    );
   }
 }
