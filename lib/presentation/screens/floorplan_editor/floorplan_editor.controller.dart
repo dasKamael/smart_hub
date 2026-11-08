@@ -14,8 +14,8 @@ import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor
 
 part 'floorplan_editor.controller.g.dart';
 
-/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
-/// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
+/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag outside the rooms (no tool
+/// needed), a wall across a room two taps, a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
 ///
 /// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
 /// radii stay the same on screen.
@@ -29,6 +29,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   static const snapPx = 14.0;
   static const handlePx = 22.0;
   static const wallPx = 24.0;
+
+  /// Junctions are grabbed only close to them; a bit further along, the wall itself is grabbed.
+  static const nodePx = 12.0;
 
   _Drag? _drag;
 
@@ -69,11 +72,6 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     final radius = handlePx * cmPerPx;
     switch (state.tool) {
       case EditorTool.select:
-        if (state.selectedRoom case final room?) {
-          if (_wallMiddleAt(room.id, point, radius) case final middle?) {
-            return _commit(LayoutGraphUtil.splitAt(_layout, middle));
-          }
-        }
         select(_hit(point, radius));
       case EditorTool.room:
         select(_roomSelection(point));
@@ -128,7 +126,7 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         return true;
       }
     }
-    if (LayoutGraphUtil.nodeAt(_layout, point, radius: radius) case final node?) {
+    if (LayoutGraphUtil.nodeAt(_layout, point, radius: nodePx * cmPerPx) case final node?) {
       _drag = _NodeDrag(_layout, node.id);
       return true;
     }
@@ -142,7 +140,11 @@ class FloorplanEditorController extends _$FloorplanEditorController {
       _drag = _WallDrag(_layout, wall.id, point);
       return true;
     }
-    return false;
+    // Outside of all rooms, a drag draws a new room; inside one, a stroke splits it – no tool to pick first. Two
+    // fingers move the view.
+    final room = LayoutEditingUtil.roomAt(_layout, point);
+    _drag = room == null ? _RectangleDrag(_snap(point, cmPerPx).point) : _SplitDrag(room.id, point);
+    return true;
   }
 
   void updateDrag(PlanPoint point, {required double cmPerPx}) {
@@ -154,6 +156,10 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         state = state.copyWith(rectangle: [drag.start, end.point], guideX: end.guideX, guideY: end.guideY);
       case final _OpeningDraft drag:
         state = state.copyWith(openingDraft: [drag.start, point]);
+      case final _SplitDrag drag:
+        final outline = LayoutRoomsUtil.outlineOf(_layout, drag.roomId);
+        final line = outline == null ? null : LayoutEditingUtil.splitLine(outline, drag.start, point);
+        state = state.copyWith(splitDraft: line == null ? null : [line.$1, line.$2]);
       case final _NodeDrag drag:
         final snapped = LayoutEditingUtil.snap(drag.before, point, radius: snapPx * cmPerPx, except: {drag.nodeId});
         _change(drag, LayoutGraphUtil.moveNode(drag.before, drag.nodeId, snapped.point));
@@ -222,6 +228,14 @@ class FloorplanEditorController extends _$FloorplanEditorController {
             ? dragged
             : LayoutEditingUtil.openingOn(_layout, wall, id: id, type: type, center: start);
         _commit(_layout.copyWith(openings: [..._layout.openings, opening]), select: EditorSelection.opening(id));
+      case _SplitDrag():
+        final line = state.splitDraft;
+        state = state.copyWith(splitDraft: null);
+        if (line == null) return;
+        final roomsBefore = {for (final room in _layout.rooms) room.id};
+        _commit(LayoutGraphUtil.addWall(_layout, line.first, line.last));
+        final created = _layout.rooms.where((room) => !roomsBefore.contains(room.id)).firstOrNull;
+        if (created != null) select(EditorSelection.room(created.id));
       case final _EditDrag drag:
         state = state.copyWith(guideX: null, guideY: null);
         if (drag.moved) _save();
@@ -232,9 +246,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   /// Ends a drag that was interrupted, e.g. by a second finger: drafts are dropped, other changes kept.
   void cancelDrag() {
-    if (_drag is _RectangleDrag || _drag is _OpeningDraft) {
+    if (_drag is _RectangleDrag || _drag is _OpeningDraft || _drag is _SplitDrag) {
       _drag = null;
-      state = state.copyWith(rectangle: null, openingDraft: null, guideX: null, guideY: null);
+      state = state.copyWith(rectangle: null, openingDraft: null, splitDraft: null, guideX: null, guideY: null);
       return;
     }
     endDrag();
@@ -296,9 +310,13 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     );
   }
 
+  /// Removes the selected wall; the room it divided is one again and stays selected, ready for its type.
   void deleteWall() {
     final wall = state.selectedWall;
-    if (wall != null) _commit(LayoutGraphUtil.removeWall(_layout, wall.id), deselect: true);
+    if (wall == null) return;
+    final (a, b) = LayoutGraphUtil.endsOf(_layout, wall);
+    _commit(LayoutGraphUtil.removeWall(_layout, wall.id), deselect: true);
+    select(_roomSelection(PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2)));
   }
 
   // Openings
@@ -422,22 +440,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     return _roomSelection(point);
   }
 
-  /// The middle of a wall of room [roomId] under [point] – the handle that adds a corner there.
-  PlanPoint? _wallMiddleAt(String roomId, PlanPoint point, double radius) {
-    final outline = LayoutRoomsUtil.outlineOf(_layout, roomId);
-    if (outline == null) return null;
-    for (var i = 0; i < outline.length; i++) {
-      final a = outline[i];
-      final b = outline[(i + 1) % outline.length];
-      final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
-      if (middle.distanceTo(point) < radius && a.distanceTo(b) > 2 * radius) return middle;
-    }
-    return null;
-  }
-
   void _chainTap(PlanPoint point, double cmPerPx) {
-    final snapped = _snap(point, cmPerPx);
     final chain = state.chain;
+    final snapped = LayoutEditingUtil.snap(_layout, point, radius: snapPx * cmPerPx, drawn: chain);
     if (chain.isEmpty) {
       state = state.copyWith(chain: [snapped.point]);
       return;
@@ -446,7 +451,8 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     final roomsBefore = {for (final room in _layout.rooms) room.id};
     _commit(LayoutGraphUtil.addWall(_layout, chain.last, snapped.point));
     // A wall that ends on the drawing finishes the line, e.g. a wall across a room or the last wall of a room.
-    state = state.copyWith(chain: snapped.onDrawing ? const [] : [...chain, snapped.point]);
+    final ended = snapped.onDrawing || chain.contains(snapped.point);
+    state = state.copyWith(chain: ended ? const [] : [...chain, snapped.point]);
     final created = _layout.rooms.where((room) => !roomsBefore.contains(room.id)).firstOrNull;
     if (created != null) select(EditorSelection.room(created.id));
   }
@@ -523,6 +529,13 @@ sealed class _Drag {}
 final class _RectangleDrag extends _Drag {
   _RectangleDrag(this.start);
 
+  final PlanPoint start;
+}
+
+final class _SplitDrag extends _Drag {
+  _SplitDrag(this.roomId, this.start);
+
+  final String roomId;
   final PlanPoint start;
 }
 

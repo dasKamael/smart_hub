@@ -166,6 +166,7 @@ class _ToolBar extends ConsumerWidget {
   final FloorplanEditorState state;
 
   static const _hints = {
+    EditorTool.select: 'Drag outside: new room · across a room: split it',
     EditorTool.room: 'Drag across',
     EditorTool.wall: 'Tap from corner to corner',
     EditorTool.door: 'Tap or drag along a wall',

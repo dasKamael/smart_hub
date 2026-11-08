@@ -23,7 +23,7 @@ final class SnapResult {
 /// Editing helpers of the floor plan editor: snapping, what is under a finger, and edits made of several steps.
 /// Pure functions; search radii are passed in, so they follow the zoom level.
 abstract final class LayoutEditingUtil {
-  static const grid = 10.0;
+  static const grid = 5.0;
 
   /// Openings move along their wall in these steps.
   static const openingStep = 5.0;
@@ -49,8 +49,18 @@ abstract final class LayoutEditingUtil {
     DoorType.open => 100,
   };
 
-  /// Snaps onto a junction, else onto a wall, else onto the grid aligned with junctions on either axis.
-  static SnapResult snap(HomeLayout layout, PlanPoint point, {required double radius, Set<String> except = const {}}) {
+  /// Snaps onto a junction, else onto a wall, else onto the grid aligned with junctions on either axis. [drawn] are
+  /// points placed but not part of the layout yet (the walls being drawn); they count like junctions.
+  static SnapResult snap(
+    HomeLayout layout,
+    PlanPoint point, {
+    required double radius,
+    Set<String> except = const {},
+    List<PlanPoint> drawn = const [],
+  }) {
+    final close = drawn.where((p) => p.distanceTo(point) < radius).toList()
+      ..sort((a, b) => a.distanceTo(point).compareTo(b.distanceTo(point)));
+    if (close.isNotEmpty) return SnapResult(close.first);
     final node = layout.nodes
         .where((node) => !except.contains(node.id) && node.position.distanceTo(point) < radius)
         .fold<LayoutNode?>(
@@ -79,17 +89,21 @@ abstract final class LayoutEditingUtil {
     double? guideY;
     var bestX = radius;
     var bestY = radius;
-    for (final node in layout.nodes) {
-      if (except.contains(node.id)) continue;
-      final dx = (node.position.x - point.x).abs();
-      final dy = (node.position.y - point.y).abs();
+    final aligned = [
+      for (final node in layout.nodes)
+        if (!except.contains(node.id)) node.position,
+      ...drawn,
+    ];
+    for (final position in aligned) {
+      final dx = (position.x - point.x).abs();
+      final dy = (position.y - point.y).abs();
       if (dx < bestX) {
         bestX = dx;
-        x = guideX = node.position.x;
+        x = guideX = position.x;
       }
       if (dy < bestY) {
         bestY = dy;
-        y = guideY = node.position.y;
+        y = guideY = position.y;
       }
     }
     return SnapResult(PlanPoint(x, y), guideX: guideX, guideY: guideY);
@@ -173,6 +187,40 @@ abstract final class LayoutEditingUtil {
     final start = math.min(along(from), along(to));
     final end = math.max(along(from), along(to));
     return LayoutOpening(id: id, wallId: wall.id, type: type, offset: (start + end) / 2, width: end - start);
+  }
+
+  /// Turns within this many degrees of a straight or right angle are taken as one.
+  static const straightAngle = 8.0;
+
+  /// The wall that splits the room with [outline] along a stroke from [from] to [to]: the stroke made straight when
+  /// nearly so, then lengthened both ways to the room's walls. `null` when it does not cross the room.
+  static (PlanPoint, PlanPoint)? splitLine(List<PlanPoint> outline, PlanPoint from, PlanPoint to) {
+    final length = from.distanceTo(to);
+    if (length < minOpening) return null;
+    var angle = math.atan2(to.y - from.y, to.x - from.x);
+    final quarter = math.pi / 2;
+    final nearest = (angle / quarter).round() * quarter;
+    if ((angle - nearest).abs() < straightAngle * math.pi / 180) angle = nearest;
+    final dx = math.cos(angle);
+    final dy = math.sin(angle);
+    double? back;
+    double? ahead;
+    for (var i = 0; i < outline.length; i++) {
+      final a = outline[i];
+      final b = outline[(i + 1) % outline.length];
+      final ex = b.x - a.x;
+      final ey = b.y - a.y;
+      final denominator = dx * ey - dy * ex;
+      if (denominator.abs() < 1e-9) continue;
+      final t = ((a.x - from.x) * ey - (a.y - from.y) * ex) / denominator;
+      final u = ((a.x - from.x) * dy - (a.y - from.y) * dx) / denominator;
+      if (u < -1e-6 || u > 1 + 1e-6) continue;
+      if (t > 0 && (ahead == null || t < ahead)) ahead = t;
+      if (t < 0 && (back == null || t > back)) back = t;
+    }
+    if (back == null || ahead == null) return null;
+    PlanPoint at(double t) => PlanPoint(_mm(from.x + dx * t), _mm(from.y + dy * t));
+    return (at(back), at(ahead));
   }
 
   /// The name for a room of [type]: its type's name, numbered when another room has it already.

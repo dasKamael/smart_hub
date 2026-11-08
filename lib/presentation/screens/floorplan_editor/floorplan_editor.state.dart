@@ -39,6 +39,9 @@ abstract class FloorplanEditorState with _$FloorplanEditorState {
     /// Opening being dragged along a wall, from where the finger went down to where it is.
     List<PlanPoint>? openingDraft,
 
+    /// Wall being drawn across a room with one stroke, already lengthened to the room's walls.
+    List<PlanPoint>? splitDraft,
+
     /// Lines through junctions the dragged point is aligned with.
     double? guideX,
     double? guideY,

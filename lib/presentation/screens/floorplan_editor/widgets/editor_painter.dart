@@ -246,13 +246,6 @@ class EditorPainter extends CustomPainter {
       final b = outline[(i + 1) % outline.length];
       if (a.distanceTo(b) * viewport.scale < 50) continue;
       _lengthLabel(canvas, a, b, center);
-      // Adds a corner in the middle of the wall.
-      final middle = _px(PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2));
-      canvas
-        ..drawCircle(middle, 7, Paint()..color = HubColorPalette.card)
-        ..drawCircle(middle, 7, _stroke(HubColorPalette.accent, 1.5))
-        ..drawLine(middle - const Offset(3.5, 0), middle + const Offset(3.5, 0), _stroke(HubColorPalette.accent, 1.5))
-        ..drawLine(middle - const Offset(0, 3.5), middle + const Offset(0, 3.5), _stroke(HubColorPalette.accent, 1.5));
     }
   }
 
@@ -331,6 +324,21 @@ class EditorPainter extends CustomPainter {
         '${(width * height / 10000).toStringAsFixed(1)} m²',
         HubTextStyles.label.copyWith(fontSize: 14, fontWeight: FontWeight.w700),
         (size) => rect.center - Offset(size.width / 2, size.height / 2),
+      );
+    }
+    if (state.splitDraft case [final from, final to]) {
+      canvas.drawLine(
+        _px(from),
+        _px(to),
+        Paint()
+          ..color = HubColorPalette.accent
+          ..strokeWidth = math.max(4, LayoutWall.innerThickness * viewport.scale),
+      );
+      _drawText(
+        canvas,
+        '${(from.distanceTo(to) / 100).toStringAsFixed(2)} m',
+        HubTextStyles.label.copyWith(fontSize: 13, fontWeight: FontWeight.w700),
+        (size) => (_px(from) + _px(to)) / 2 - Offset(size.width / 2, size.height + 12),
       );
     }
     if (state.openingDraft case [final from, final to]) {

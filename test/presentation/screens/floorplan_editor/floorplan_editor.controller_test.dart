@@ -57,7 +57,7 @@ void main() {
       // When
       expect(controller().startDrag(const PlanPoint(0, 300), cmPerPx: 1), isTrue);
       controller()
-        ..updateDrag(const PlanPoint(398, 553), cmPerPx: 1)
+        ..updateDrag(const PlanPoint(398, 551), cmPerPx: 1)
         ..endDrag();
 
       // Then

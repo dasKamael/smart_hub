@@ -463,7 +463,8 @@ mixin _$FloorplanEditorState {
  FurnitureKind get furnitureKind; EditorSelection? get selection;/// Corners of the walls being drawn with [EditorTool.wall]; the last one is where the next wall starts.
  List<PlanPoint> get chain;/// Rectangle being dragged with [EditorTool.room], two opposite corners.
  List<PlanPoint>? get rectangle;/// Opening being dragged along a wall, from where the finger went down to where it is.
- List<PlanPoint>? get openingDraft;/// Lines through junctions the dragged point is aligned with.
+ List<PlanPoint>? get openingDraft;/// Wall being drawn across a room with one stroke, already lengthened to the room's walls.
+ List<PlanPoint>? get splitDraft;/// Lines through junctions the dragged point is aligned with.
  double? get guideX; double? get guideY;/// Shows the apartment in 3D instead of the plan to edit.
  bool get preview;/// Earlier layouts for undo (oldest first) and undone layouts for redo (next first).
  List<HomeLayout> get past; List<HomeLayout> get future;
@@ -478,20 +479,20 @@ $FloorplanEditorStateCopyWith<FloorplanEditorState> get copyWith => _$FloorplanE
 @override
 bool operator ==(Object other) {
   final _this = this as FloorplanEditorState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FloorplanEditorState&&(identical(other.layout, _this.layout) || other.layout == _this.layout)&&(identical(other.tool, _this.tool) || other.tool == _this.tool)&&(identical(other.furnitureKind, _this.furnitureKind) || other.furnitureKind == _this.furnitureKind)&&(identical(other.selection, _this.selection) || other.selection == _this.selection)&&const DeepCollectionEquality().equals(other.chain, _this.chain)&&const DeepCollectionEquality().equals(other.rectangle, _this.rectangle)&&const DeepCollectionEquality().equals(other.openingDraft, _this.openingDraft)&&(identical(other.guideX, _this.guideX) || other.guideX == _this.guideX)&&(identical(other.guideY, _this.guideY) || other.guideY == _this.guideY)&&(identical(other.preview, _this.preview) || other.preview == _this.preview)&&const DeepCollectionEquality().equals(other.past, _this.past)&&const DeepCollectionEquality().equals(other.future, _this.future));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FloorplanEditorState&&(identical(other.layout, _this.layout) || other.layout == _this.layout)&&(identical(other.tool, _this.tool) || other.tool == _this.tool)&&(identical(other.furnitureKind, _this.furnitureKind) || other.furnitureKind == _this.furnitureKind)&&(identical(other.selection, _this.selection) || other.selection == _this.selection)&&const DeepCollectionEquality().equals(other.chain, _this.chain)&&const DeepCollectionEquality().equals(other.rectangle, _this.rectangle)&&const DeepCollectionEquality().equals(other.openingDraft, _this.openingDraft)&&const DeepCollectionEquality().equals(other.splitDraft, _this.splitDraft)&&(identical(other.guideX, _this.guideX) || other.guideX == _this.guideX)&&(identical(other.guideY, _this.guideY) || other.guideY == _this.guideY)&&(identical(other.preview, _this.preview) || other.preview == _this.preview)&&const DeepCollectionEquality().equals(other.past, _this.past)&&const DeepCollectionEquality().equals(other.future, _this.future));
 }
 
 
 @override
 int get hashCode {
   final _this = this as FloorplanEditorState;
-  return Object.hash(runtimeType,_this.layout,_this.tool,_this.furnitureKind,_this.selection,const DeepCollectionEquality().hash(_this.chain),const DeepCollectionEquality().hash(_this.rectangle),const DeepCollectionEquality().hash(_this.openingDraft),_this.guideX,_this.guideY,_this.preview,const DeepCollectionEquality().hash(_this.past),const DeepCollectionEquality().hash(_this.future));
+  return Object.hash(runtimeType,_this.layout,_this.tool,_this.furnitureKind,_this.selection,const DeepCollectionEquality().hash(_this.chain),const DeepCollectionEquality().hash(_this.rectangle),const DeepCollectionEquality().hash(_this.openingDraft),const DeepCollectionEquality().hash(_this.splitDraft),_this.guideX,_this.guideY,_this.preview,const DeepCollectionEquality().hash(_this.past),const DeepCollectionEquality().hash(_this.future));
 }
 
 @override
 String toString() {
   final _this = this as FloorplanEditorState;
-  return 'FloorplanEditorState(layout: ${_this.layout}, tool: ${_this.tool}, furnitureKind: ${_this.furnitureKind}, selection: ${_this.selection}, chain: ${_this.chain}, rectangle: ${_this.rectangle}, openingDraft: ${_this.openingDraft}, guideX: ${_this.guideX}, guideY: ${_this.guideY}, preview: ${_this.preview}, past: ${_this.past}, future: ${_this.future})';
+  return 'FloorplanEditorState(layout: ${_this.layout}, tool: ${_this.tool}, furnitureKind: ${_this.furnitureKind}, selection: ${_this.selection}, chain: ${_this.chain}, rectangle: ${_this.rectangle}, openingDraft: ${_this.openingDraft}, splitDraft: ${_this.splitDraft}, guideX: ${_this.guideX}, guideY: ${_this.guideY}, preview: ${_this.preview}, past: ${_this.past}, future: ${_this.future})';
 }
 
 
@@ -502,7 +503,7 @@ abstract mixin class $FloorplanEditorStateCopyWith<$Res>  {
   factory $FloorplanEditorStateCopyWith(FloorplanEditorState value, $Res Function(FloorplanEditorState) _then) = _$FloorplanEditorStateCopyWithImpl;
 @useResult
 $Res call({
- HomeLayout layout, EditorTool tool, FurnitureKind furnitureKind, EditorSelection? selection, List<PlanPoint> chain, List<PlanPoint>? rectangle, List<PlanPoint>? openingDraft, double? guideX, double? guideY, bool preview, List<HomeLayout> past, List<HomeLayout> future
+ HomeLayout layout, EditorTool tool, FurnitureKind furnitureKind, EditorSelection? selection, List<PlanPoint> chain, List<PlanPoint>? rectangle, List<PlanPoint>? openingDraft, List<PlanPoint>? splitDraft, double? guideX, double? guideY, bool preview, List<HomeLayout> past, List<HomeLayout> future
 });
 
 
@@ -519,7 +520,7 @@ class _$FloorplanEditorStateCopyWithImpl<$Res>
 
 /// Create a copy of FloorplanEditorState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? layout = null,Object? tool = null,Object? furnitureKind = null,Object? selection = freezed,Object? chain = null,Object? rectangle = freezed,Object? openingDraft = freezed,Object? guideX = freezed,Object? guideY = freezed,Object? preview = null,Object? past = null,Object? future = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? layout = null,Object? tool = null,Object? furnitureKind = null,Object? selection = freezed,Object? chain = null,Object? rectangle = freezed,Object? openingDraft = freezed,Object? splitDraft = freezed,Object? guideX = freezed,Object? guideY = freezed,Object? preview = null,Object? past = null,Object? future = null,}) {
   return _then(FloorplanEditorState(
 layout: null == layout ? _self.layout : layout // ignore: cast_nullable_to_non_nullable
 as HomeLayout,tool: null == tool ? _self.tool : tool // ignore: cast_nullable_to_non_nullable
@@ -528,6 +529,7 @@ as FurnitureKind,selection: freezed == selection ? _self.selection : selection /
 as EditorSelection?,chain: null == chain ? _self.chain : chain // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>,rectangle: freezed == rectangle ? _self.rectangle : rectangle // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>?,openingDraft: freezed == openingDraft ? _self.openingDraft : openingDraft // ignore: cast_nullable_to_non_nullable
+as List<PlanPoint>?,splitDraft: freezed == splitDraft ? _self.splitDraft : splitDraft // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>?,guideX: freezed == guideX ? _self.guideX : guideX // ignore: cast_nullable_to_non_nullable
 as double?,guideY: freezed == guideY ? _self.guideY : guideY // ignore: cast_nullable_to_non_nullable
 as double?,preview: null == preview ? _self.preview : preview // ignore: cast_nullable_to_non_nullable
@@ -639,10 +641,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  List<PlanPoint>? splitDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FloorplanEditorState() when $default != null:
-return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
+return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.splitDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
   return orElse();
 
 }
@@ -660,10 +662,10 @@ return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  List<PlanPoint>? splitDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)  $default,) {final _that = this;
 switch (_that) {
 case _FloorplanEditorState():
-return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
+return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.splitDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -680,10 +682,10 @@ return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( HomeLayout layout,  EditorTool tool,  FurnitureKind furnitureKind,  EditorSelection? selection,  List<PlanPoint> chain,  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  List<PlanPoint>? splitDraft,  double? guideX,  double? guideY,  bool preview,  List<HomeLayout> past,  List<HomeLayout> future)?  $default,) {final _that = this;
 switch (_that) {
 case _FloorplanEditorState() when $default != null:
-return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
+return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_that.chain,_that.rectangle,_that.openingDraft,_that.splitDraft,_that.guideX,_that.guideY,_that.preview,_that.past,_that.future);case _:
   return null;
 
 }
@@ -695,7 +697,7 @@ return $default(_that.layout,_that.tool,_that.furnitureKind,_that.selection,_tha
 
 
 class _FloorplanEditorState extends FloorplanEditorState {
-  const _FloorplanEditorState({required this.layout, this.tool = EditorTool.select, this.furnitureKind = FurnitureKind.bed, this.selection,  List<PlanPoint> chain = const [],  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft, this.guideX, this.guideY, this.preview = false,  List<HomeLayout> past = const [],  List<HomeLayout> future = const []}): _chain = chain,_rectangle = rectangle,_openingDraft = openingDraft,_past = past,_future = future,super._();
+  const _FloorplanEditorState({required this.layout, this.tool = EditorTool.select, this.furnitureKind = FurnitureKind.bed, this.selection,  List<PlanPoint> chain = const [],  List<PlanPoint>? rectangle,  List<PlanPoint>? openingDraft,  List<PlanPoint>? splitDraft, this.guideX, this.guideY, this.preview = false,  List<HomeLayout> past = const [],  List<HomeLayout> future = const []}): _chain = chain,_rectangle = rectangle,_openingDraft = openingDraft,_splitDraft = splitDraft,_past = past,_future = future,super._();
   
 
 @override final  HomeLayout layout;
@@ -734,6 +736,17 @@ class _FloorplanEditorState extends FloorplanEditorState {
   return EqualUnmodifiableListView(value);
 }
 
+/// Wall being drawn across a room with one stroke, already lengthened to the room's walls.
+ final  List<PlanPoint>? _splitDraft;
+/// Wall being drawn across a room with one stroke, already lengthened to the room's walls.
+@override List<PlanPoint>? get splitDraft {
+  final value = _splitDraft;
+  if (value == null) return null;
+  if (_splitDraft is EqualUnmodifiableListView) return _splitDraft;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 /// Lines through junctions the dragged point is aligned with.
 @override final  double? guideX;
 @override final  double? guideY;
@@ -766,18 +779,18 @@ _$FloorplanEditorStateCopyWith<_FloorplanEditorState> get copyWith => __$Floorpl
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FloorplanEditorState&&(identical(other.layout, layout) || other.layout == layout)&&(identical(other.tool, tool) || other.tool == tool)&&(identical(other.furnitureKind, furnitureKind) || other.furnitureKind == furnitureKind)&&(identical(other.selection, selection) || other.selection == selection)&&const DeepCollectionEquality().equals(other.chain, _chain)&&const DeepCollectionEquality().equals(other.rectangle, _rectangle)&&const DeepCollectionEquality().equals(other.openingDraft, _openingDraft)&&(identical(other.guideX, guideX) || other.guideX == guideX)&&(identical(other.guideY, guideY) || other.guideY == guideY)&&(identical(other.preview, preview) || other.preview == preview)&&const DeepCollectionEquality().equals(other.past, _past)&&const DeepCollectionEquality().equals(other.future, _future));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _FloorplanEditorState&&(identical(other.layout, layout) || other.layout == layout)&&(identical(other.tool, tool) || other.tool == tool)&&(identical(other.furnitureKind, furnitureKind) || other.furnitureKind == furnitureKind)&&(identical(other.selection, selection) || other.selection == selection)&&const DeepCollectionEquality().equals(other.chain, _chain)&&const DeepCollectionEquality().equals(other.rectangle, _rectangle)&&const DeepCollectionEquality().equals(other.openingDraft, _openingDraft)&&const DeepCollectionEquality().equals(other.splitDraft, _splitDraft)&&(identical(other.guideX, guideX) || other.guideX == guideX)&&(identical(other.guideY, guideY) || other.guideY == guideY)&&(identical(other.preview, preview) || other.preview == preview)&&const DeepCollectionEquality().equals(other.past, _past)&&const DeepCollectionEquality().equals(other.future, _future));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,layout,tool,furnitureKind,selection,const DeepCollectionEquality().hash(_chain),const DeepCollectionEquality().hash(_rectangle),const DeepCollectionEquality().hash(_openingDraft),guideX,guideY,preview,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_future));
+    return Object.hash(runtimeType,layout,tool,furnitureKind,selection,const DeepCollectionEquality().hash(_chain),const DeepCollectionEquality().hash(_rectangle),const DeepCollectionEquality().hash(_openingDraft),const DeepCollectionEquality().hash(_splitDraft),guideX,guideY,preview,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_future));
 }
 
 @override
 String toString() {
-    return 'FloorplanEditorState(layout: $layout, tool: $tool, furnitureKind: $furnitureKind, selection: $selection, chain: $chain, rectangle: $rectangle, openingDraft: $openingDraft, guideX: $guideX, guideY: $guideY, preview: $preview, past: $past, future: $future)';
+    return 'FloorplanEditorState(layout: $layout, tool: $tool, furnitureKind: $furnitureKind, selection: $selection, chain: $chain, rectangle: $rectangle, openingDraft: $openingDraft, splitDraft: $splitDraft, guideX: $guideX, guideY: $guideY, preview: $preview, past: $past, future: $future)';
 }
 
 
@@ -788,7 +801,7 @@ abstract mixin class _$FloorplanEditorStateCopyWith<$Res> implements $FloorplanE
   factory _$FloorplanEditorStateCopyWith(_FloorplanEditorState value, $Res Function(_FloorplanEditorState) _then) = __$FloorplanEditorStateCopyWithImpl;
 @override @useResult
 $Res call({
- HomeLayout layout, EditorTool tool, FurnitureKind furnitureKind, EditorSelection? selection, List<PlanPoint> chain, List<PlanPoint>? rectangle, List<PlanPoint>? openingDraft, double? guideX, double? guideY, bool preview, List<HomeLayout> past, List<HomeLayout> future
+ HomeLayout layout, EditorTool tool, FurnitureKind furnitureKind, EditorSelection? selection, List<PlanPoint> chain, List<PlanPoint>? rectangle, List<PlanPoint>? openingDraft, List<PlanPoint>? splitDraft, double? guideX, double? guideY, bool preview, List<HomeLayout> past, List<HomeLayout> future
 });
 
 
@@ -805,7 +818,7 @@ class __$FloorplanEditorStateCopyWithImpl<$Res>
 
 /// Create a copy of FloorplanEditorState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? layout = null,Object? tool = null,Object? furnitureKind = null,Object? selection = freezed,Object? chain = null,Object? rectangle = freezed,Object? openingDraft = freezed,Object? guideX = freezed,Object? guideY = freezed,Object? preview = null,Object? past = null,Object? future = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? layout = null,Object? tool = null,Object? furnitureKind = null,Object? selection = freezed,Object? chain = null,Object? rectangle = freezed,Object? openingDraft = freezed,Object? splitDraft = freezed,Object? guideX = freezed,Object? guideY = freezed,Object? preview = null,Object? past = null,Object? future = null,}) {
   return _then(_FloorplanEditorState(
 layout: null == layout ? _self.layout : layout // ignore: cast_nullable_to_non_nullable
 as HomeLayout,tool: null == tool ? _self.tool : tool // ignore: cast_nullable_to_non_nullable
@@ -814,6 +827,7 @@ as FurnitureKind,selection: freezed == selection ? _self.selection : selection /
 as EditorSelection?,chain: null == chain ? _self._chain : chain // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>,rectangle: freezed == rectangle ? _self._rectangle : rectangle // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>?,openingDraft: freezed == openingDraft ? _self._openingDraft : openingDraft // ignore: cast_nullable_to_non_nullable
+as List<PlanPoint>?,splitDraft: freezed == splitDraft ? _self._splitDraft : splitDraft // ignore: cast_nullable_to_non_nullable
 as List<PlanPoint>?,guideX: freezed == guideX ? _self.guideX : guideX // ignore: cast_nullable_to_non_nullable
 as double?,guideY: freezed == guideY ? _self.guideY : guideY // ignore: cast_nullable_to_non_nullable
 as double?,preview: null == preview ? _self.preview : preview // ignore: cast_nullable_to_non_nullable

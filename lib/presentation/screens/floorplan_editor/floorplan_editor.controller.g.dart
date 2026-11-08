@@ -8,8 +8,8 @@ part of 'floorplan_editor.controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
-/// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
+/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag outside the rooms (no tool
+/// needed), a wall across a room two taps, a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
 ///
 /// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
 /// radii stay the same on screen.
@@ -17,15 +17,15 @@ part of 'floorplan_editor.controller.dart';
 @ProviderFor(FloorplanEditorController)
 final floorplanEditorControllerProvider = FloorplanEditorControllerProvider._();
 
-/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
-/// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
+/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag outside the rooms (no tool
+/// needed), a wall across a room two taps, a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
 ///
 /// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
 /// radii stay the same on screen.
 final class FloorplanEditorControllerProvider
     extends $NotifierProvider<FloorplanEditorController, FloorplanEditorState> {
-  /// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
-  /// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
+  /// The floor plan editor. Built for few steps: tools stay picked, a room is one drag outside the rooms (no tool
+  /// needed), a wall across a room two taps, a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
   ///
   /// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
   /// radii stay the same on screen.
@@ -57,10 +57,10 @@ final class FloorplanEditorControllerProvider
 }
 
 String _$floorplanEditorControllerHash() =>
-    r'f42266ec0f56c9df50c5af27b44816ba2d25d87b';
+    r'5c8516f859831b7bd963b6133379b3aa7b105791';
 
-/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag, a wall across a room two taps,
-/// a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
+/// The floor plan editor. Built for few steps: tools stay picked, a room is one drag outside the rooms (no tool
+/// needed), a wall across a room two taps, a door one tap, a room's type one tap, its furniture one tap. Every change is saved at once and can be undone.
 ///
 /// Positions come in plan centimeters; [cmPerPx] tells how many centimeters one pixel is at the current zoom, so touch
 /// radii stay the same on screen.

@@ -41,14 +41,6 @@ abstract final class LayoutGraphUtil {
     return result;
   }
 
-  /// Puts a junction on the wall at [point] (splitting it), e.g. to bend the wall there afterwards.
-  static HomeLayout splitAt(HomeLayout layout, PlanPoint point) {
-    final graph = _Graph(layout);
-    final before = graph.nodes.length;
-    graph.junctionAt(point);
-    return graph.nodes.length == before ? layout : graph.build();
-  }
-
   /// Removes wall [wallId] with its openings. Junctions left alone disappear, and two straight walls left meeting in
   /// a junction become one again.
   static HomeLayout removeWall(HomeLayout layout, String wallId) {
