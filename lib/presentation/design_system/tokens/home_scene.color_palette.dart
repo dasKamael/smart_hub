@@ -41,6 +41,9 @@ abstract final class HomeSceneColorPalette {
   static const markerOffGlyph = Color(0xFFE9E9EE);
   static const markerOn = Color(0xFFF7E1C0);
   static const markerOnGlyph = Color(0xFFE49D54);
+
+  /// Dot on a marker of something that needs attention.
+  static const markerAlert = Color(0xFFFF453A);
   static const markerGlow = Color(0x99F2B36B);
 
   static const _materials = {

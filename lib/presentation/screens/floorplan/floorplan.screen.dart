@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_hub/common/go_router/hub_page.enum.dart';
+import 'package:smart_hub/domain/plants/model/watering_state.enum.dart';
 import 'package:smart_hub/domain/lights/light_bridge.service.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
 import 'package:smart_hub/domain/floorplan/model/device_kind.enum.dart';
@@ -401,9 +402,16 @@ class _TiltedPlan extends ConsumerWidget {
                     semanticLabel: speaker.name,
                     onTap: () => controller.tapDevice(speaker.id),
                   ),
-                  PlanPlant(:final plant) => SceneMarker(
+                  PlanPlant(:final plant, :final state) => SceneMarker(
                     glyph: HubGlyph.leaf,
                     on: false,
+                    glyphColor: HubColorPalette.success,
+                    ringColor: switch (state) {
+                      WateringState.overdue => HubColorPalette.danger,
+                      WateringState.dueToday => HubColorPalette.accent,
+                      WateringState.wateredToday || WateringState.upcoming => null,
+                    },
+                    alert: state == WateringState.overdue,
                     selected: device.id == selectedId,
                     semanticLabel: plant.name,
                     onTap: () => controller.tapDevice(plant.id),

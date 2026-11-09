@@ -29,8 +29,11 @@ class HomeScenePainter extends CustomPainter {
   /// Inner wall pieces shorter than this come down with a lowered corner they end at, in cm.
   static const _stub = 30.0;
 
+  /// How much of a lamp's own color a lit surface takes on, whatever its color: walls glow in the lamp's color.
+  static const _tint = 0.36;
+
   /// Distance at which a lamp has lost half its light, in cm.
-  static const _falloff = 190.0;
+  static const _falloff = 130.0;
 
   final HomeScene scene;
   final SceneCamera camera;
@@ -88,12 +91,14 @@ class HomeScenePainter extends CustomPainter {
           Paint()
             ..blendMode = BlendMode.plus
             ..shader = RadialGradient(
+              // A bright core right under the lamp, then a wide soft pool.
               colors: [
-                color.withValues(alpha: 0.17 * light.brightness),
-                color.withValues(alpha: 0.06 * light.brightness),
+                Color.lerp(color, const Color(0xFFFFFFFF), 0.35)!.withValues(alpha: 0.32 * light.brightness),
+                color.withValues(alpha: 0.15 * light.brightness),
+                color.withValues(alpha: 0.05 * light.brightness),
                 color.withValues(alpha: 0),
               ],
-              stops: const [0, 0.38, 1],
+              stops: const [0, 0.14, 0.42, 1],
             ).createShader(Rect.fromCircle(center: Offset(light.position.x, light.position.y), radius: radius)),
         );
         canvas.restore();
@@ -421,11 +426,11 @@ class HomeScenePainter extends CustomPainter {
       if (distance < 1) continue;
       // Light falls mostly on the walls; tops of furniture and floors get a share of it (floors have their pool).
       final facing = math.max(0.0, (dx * nx + dy * ny + dz * nz) / distance) * (1 - 0.55 * math.max(0.0, nz));
-      final strength = light.brightness * 0.75 / (1 + math.pow(distance / _falloff, 2));
+      final strength = light.brightness * 1.5 / (1 + math.pow(distance / _falloff, 2));
       final amount = strength * (0.35 + 0.65 * facing);
-      r += (base.r * 1.1 + 0.12) * light.r * amount;
-      g += (base.g * 1.1 + 0.12) * light.g * amount;
-      b += (base.b * 1.1 + 0.12) * light.b * amount;
+      r += (base.r * 1.1 + _tint) * light.r * amount;
+      g += (base.g * 1.1 + _tint) * light.g * amount;
+      b += (base.b * 1.1 + _tint) * light.b * amount;
     }
     return Color.from(alpha: base.a, red: _knee(r), green: _knee(g), blue: _knee(b));
   }

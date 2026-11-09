@@ -9,6 +9,9 @@ import 'package:smart_hub/domain/lights/light.service.dart';
 import 'package:smart_hub/domain/music/speaker.service.dart';
 import 'package:smart_hub/domain/plants/model/plant.dart';
 import 'package:smart_hub/presentation/design_system/atoms/device_marker.dart';
+import 'package:smart_hub/presentation/design_system/atoms/scene_marker.dart';
+import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
+import 'package:smart_hub/presentation/design_system/tokens/home_scene.color_palette.dart';
 import 'package:smart_hub/presentation/screens/floorplan/floorplan.screen.dart';
 
 import '../../../mocks/devices.mock.dart';
@@ -67,11 +70,31 @@ void main() {
 
       // Then
       expect(markerOf(tester, 'Monstera').badge, MarkerBadge.alert);
-      expect(markerOf(tester, 'Monstera').haloColor, isNotNull);
-      expect(markerOf(tester, 'Basil').ringWidth, 3);
+      expect(markerOf(tester, 'Monstera').ringColor, HubColorPalette.danger);
+      expect(markerOf(tester, 'Basil').ringColor, HubColorPalette.accent);
       expect(markerOf(tester, 'Basil').badge, MarkerBadge.none);
-      expect(markerOf(tester, 'Fern').ringWidth, 2);
+      expect(markerOf(tester, 'Fern').ringColor, HomeSceneColorPalette.markerOffBorder);
+      expect(markerOf(tester, 'Fern').ringWidth, lessThan(markerOf(tester, 'Basil').ringWidth));
       expect(find.text('Fig'), findsOneWidget, reason: 'unplaced plant in the tray');
+    });
+
+    testWidgets('Given plants in every state, when tilting the plan into 3D, then overdue has a red ring and dot and due '
+        'today a blue ring', (tester) async {
+      // Given
+      await pumpScreen(tester);
+
+      // When
+      await tester.tap(find.bySemanticsLabel('3D view'));
+      await tester.pumpAndSettle();
+
+      // Then
+      SceneMarker sceneMarkerOf(String name) =>
+          tester.widget<SceneMarker>(find.byWidgetPredicate((w) => w is SceneMarker && w.semanticLabel == name));
+      expect(sceneMarkerOf('Monstera').ringColor, HubColorPalette.danger);
+      expect(sceneMarkerOf('Monstera').alert, isTrue);
+      expect(sceneMarkerOf('Basil').ringColor, HubColorPalette.accent);
+      expect(sceneMarkerOf('Basil').alert, isFalse);
+      expect(sceneMarkerOf('Fern').ringColor, isNull);
     });
 
     testWidgets('Given an overdue plant, '

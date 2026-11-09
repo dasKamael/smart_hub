@@ -15,6 +15,9 @@ class SceneMarker extends StatelessWidget {
     this.selected = false,
     this.onTap,
     this.onLongPress,
+    this.glyphColor,
+    this.ringColor,
+    this.alert = false,
   });
 
   static const size = 29.0;
@@ -26,6 +29,15 @@ class SceneMarker extends StatelessWidget {
   final bool selected;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+
+  /// Overrides the glyph's color when off, e.g. green for a plant.
+  final Color? glyphColor;
+
+  /// A colored ring instead of the thin white one when off, e.g. a plant that needs water.
+  final Color? ringColor;
+
+  /// A red dot at the top right: something needs attention (an overdue plant).
+  final bool alert;
 
   @override
   Widget build(BuildContext context) {
@@ -41,35 +53,52 @@ class SceneMarker extends StatelessWidget {
         // Larger than the circle, so it is easy to hit.
         child: SizedBox.square(
           dimension: 44,
-          child: Center(
-            child: AnimatedContainer(
-              duration: HubMotion.fadeDuration,
-              curve: HubMotion.fade,
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: on ? HomeSceneColorPalette.markerOn : HomeSceneColorPalette.markerOff,
-                border: Border.all(
-                  color: selected
-                      ? HomeSceneColorPalette.markerOn
-                      : (on ? const Color(0x00FFFFFF) : HomeSceneColorPalette.markerOffBorder),
-                  width: selected ? 2 : 1.2,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              AnimatedContainer(
+                duration: HubMotion.fadeDuration,
+                curve: HubMotion.fade,
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: on ? HomeSceneColorPalette.markerOn : HomeSceneColorPalette.markerOff,
+                  border: Border.all(
+                    color: selected
+                        ? HomeSceneColorPalette.markerOn
+                        : (on ? const Color(0x00FFFFFF) : ringColor ?? HomeSceneColorPalette.markerOffBorder),
+                    width: selected || ringColor != null ? 2 : 1.2,
+                  ),
+                  boxShadow: on
+                      ? [
+                          BoxShadow(color: glowColor.withValues(alpha: 0.75), blurRadius: 18, spreadRadius: 2),
+                          BoxShadow(color: glowColor.withValues(alpha: 0.35), blurRadius: 34, spreadRadius: 6),
+                        ]
+                      : null,
                 ),
-                boxShadow: on
-                    ? [
-                        BoxShadow(color: glowColor.withValues(alpha: 0.75), blurRadius: 18, spreadRadius: 2),
-                        BoxShadow(color: glowColor.withValues(alpha: 0.35), blurRadius: 34, spreadRadius: 6),
-                      ]
-                    : null,
+                alignment: Alignment.center,
+                child: HubGlyphIcon(
+                  glyph,
+                  color: on ? HomeSceneColorPalette.markerOnGlyph : glyphColor ?? HomeSceneColorPalette.markerOffGlyph,
+                  size: Size(glyph.markerSize.width * 0.85, glyph.markerSize.height * 0.85),
+                ),
               ),
-              alignment: Alignment.center,
-              child: HubGlyphIcon(
-                glyph,
-                color: on ? HomeSceneColorPalette.markerOnGlyph : HomeSceneColorPalette.markerOffGlyph,
-                size: Size(glyph.markerSize.width * 0.85, glyph.markerSize.height * 0.85),
-              ),
-            ),
+              if (alert)
+                Positioned(
+                  top: (44 - size) / 2 - 3,
+                  right: (44 - size) / 2 - 3,
+                  child: Container(
+                    width: 11,
+                    height: 11,
+                    decoration: BoxDecoration(
+                      color: HomeSceneColorPalette.markerAlert,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: HomeSceneColorPalette.background, width: 1.5),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
