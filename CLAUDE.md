@@ -158,8 +158,9 @@ draws a room, a stroke inside a room splits it, the room's type is one chip (nam
 type. A selected wall can be removed while its rooms stay apart ("Remove wall" = open along its whole length; such
 walls are not drawn and the walls next to them end square) or deleted, merging the rooms. Wall pieces under 20 cm
 beside a passage are not built (`LayoutGraphUtil.minPiece`), so no thin posts are left standing. Tools stay picked: wall (tap corners; a wall ending on the drawing ends the line), door / window / opening (tap a
-wall, or drag along it for its width; ends snap to the wall's ends), furniture (tap in a room; pieces snap against the
-nearest wall and are kept out of walls; drag to move; a selected piece has size handles on its side and front and a
+wall, or drag along it for its width; ends snap to the wall's ends), furniture (tap in a room, or drag a kind from the list to
+where it should stand; tapped pieces snap against the nearest wall; dragged pieces move freely, turned as they are,
+and only snap flush right at a wall; all are kept out of walls; a selected piece has size handles on its side and front and a
 turn handle in front, 15° steps; the panel has size steps, turn, copy and keeps the palette). Select: drag a junction, a wall (the neighbor's wall follows, with a jog where it
 is longer; openings stay with their wall), an opening along its wall, furniture. Two fingers zoom and move the view.
 5 cm grid. A replaceable module with `HomeLayoutService` as its only contract (`docs/architecture.md`, rule 6; enforced

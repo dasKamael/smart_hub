@@ -140,6 +140,50 @@ void main() {
     });
   });
 
+  group('FurnishingUtil.touchWall', () {
+    const desk = Furniture(
+      id: 'd',
+      kind: FurnitureKind.desk,
+      position: PlanPoint(200, 150),
+      rotation: 30,
+      width: 120,
+      depth: 60,
+    );
+
+    test('Given a piece in the middle of the room, when snapping it, then it stays where it is, turned as it was', () {
+      // When
+      final snapped = FurnishingUtil.touchWall(_room(RoomType.office), desk, reach: 10);
+
+      // Then
+      expect(snapped, desk);
+    });
+
+    test('Given an unturned piece 8 cm from the left wall\'s face, when snapping within 10 cm, then it touches the '
+        'wall and keeps its turn', () {
+      // Given
+      final near = desk.copyWith(rotation: 90, position: const PlanPoint(5 + 8 + 30, 150));
+
+      // When
+      final snapped = FurnishingUtil.touchWall(_room(RoomType.office), near, reach: 10);
+
+      // Then
+      expect(snapped.position.x, closeTo(5 + 30, 0.1));
+      expect(snapped.position.y, 150);
+      expect(snapped.rotation, 90);
+    });
+
+    test('Given a piece 30 cm from the wall, when snapping within 10 cm, then it is left where it is', () {
+      // Given
+      final away = desk.copyWith(rotation: 90, position: const PlanPoint(5 + 30 + 30, 150));
+
+      // When
+      final snapped = FurnishingUtil.touchWall(_room(RoomType.office), away, reach: 10);
+
+      // Then
+      expect(snapped, away);
+    });
+  });
+
   group('FurnishingUtil.keepInside', () {
     test('Given a desk turned so that a corner reaches into the left wall, when keeping it inside, then it is pushed '
         'back into the room', () {

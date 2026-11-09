@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_glyph.dart';
 import 'package:smart_hub/presentation/design_system/tokens/hub.color_palette.dart';
@@ -33,6 +34,9 @@ class _EditorCanvasState extends ConsumerState<EditorCanvas> {
   /// finger has moved a little, which can be off a corner handle already.
   var _downAt = Offset.zero;
 
+  /// A piece of furniture dragged out of the palette over the plan, and where (local pixels).
+  (FurnitureKind, Offset)? _incoming;
+
   // Zoom gesture: scale and the plan point under the fingers when it started.
   var _zoomStartScale = 1.0;
   var _zoomStartFactor = 1.0;
@@ -47,6 +51,10 @@ class _EditorCanvasState extends ConsumerState<EditorCanvas> {
     final layout = ref.read(floorplanEditorControllerProvider).layout;
     return EditorViewport.fit([for (final node in layout.nodes) node.position], _size);
   }
+
+  /// [global] in the canvas' own pixels.
+  static Offset _local(BuildContext context, Offset global) =>
+      (context.findRenderObject()! as RenderBox).globalToLocal(global);
 
   void _zoomBy(double factor) {
     final center = Offset(_size.width / 2, _size.height / 2);
@@ -114,27 +122,56 @@ class _EditorCanvasState extends ConsumerState<EditorCanvas> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: Listener(
-                  onPointerDown: (event) {
-                    _pointers++;
-                    _downAt = event.localPosition;
+                child: DragTarget<FurnitureKind>(
+                  onMove: (details) => setState(() => _incoming = (details.data, _local(context, details.offset))),
+                  onLeave: (_) => setState(() => _incoming = null),
+                  onAcceptWithDetails: (details) {
+                    setState(() => _incoming = null);
+                    _controller.dropFurniture(
+                      details.data,
+                      view.toPlan(_local(context, details.offset)),
+                      cmPerPx: view.cmPerPx,
+                    );
                   },
-                  onPointerUp: (_) => _pointerGone(),
-                  onPointerCancel: (_) => _pointerGone(),
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapUp: (details) => _controller.tap(view.toPlan(details.localPosition), cmPerPx: view.cmPerPx),
-                    onLongPressStart: (details) =>
-                        _controller.longPress(view.toPlan(details.localPosition), cmPerPx: view.cmPerPx),
-                    onScaleStart: _onScaleStart,
-                    onScaleUpdate: _onScaleUpdate,
-                    onScaleEnd: _onScaleEnd,
-                    child: CustomPaint(
-                      painter: EditorPainter(state: state, viewport: view),
+                  builder: (context, _, _) => Listener(
+                    onPointerDown: (event) {
+                      _pointers++;
+                      _downAt = event.localPosition;
+                    },
+                    onPointerUp: (_) => _pointerGone(),
+                    onPointerCancel: (_) => _pointerGone(),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTapUp: (details) => _controller.tap(view.toPlan(details.localPosition), cmPerPx: view.cmPerPx),
+                      onLongPressStart: (details) =>
+                          _controller.longPress(view.toPlan(details.localPosition), cmPerPx: view.cmPerPx),
+                      onScaleStart: _onScaleStart,
+                      onScaleUpdate: _onScaleUpdate,
+                      onScaleEnd: _onScaleEnd,
+                      child: CustomPaint(
+                        painter: EditorPainter(state: state, viewport: view),
+                      ),
                     ),
                   ),
                 ),
               ),
+              // Where the dragged piece will stand, at its real size.
+              if (_incoming case (final kind, final at))
+                Positioned(
+                  left: at.dx - kind.width * view.scale / 2,
+                  top: at.dy - kind.depth * view.scale / 2,
+                  width: kind.width * view.scale,
+                  height: kind.depth * view.scale,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: HubColorPalette.accent.withValues(alpha: 0.25),
+                        border: Border.all(color: HubColorPalette.accent, width: 2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 left: 14,
                 bottom: 14,
@@ -172,7 +209,7 @@ class _ToolBar extends ConsumerWidget {
     EditorTool.door: 'Tap or drag along a wall',
     EditorTool.window: 'Tap or drag along a wall',
     EditorTool.opening: 'Tap or drag along a wall',
-    EditorTool.furniture: 'Tap in a room: place · drag a piece: move · handles: size and turn',
+    EditorTool.furniture: 'Tap or drag in from the list · drag to move',
   };
 
   @override
@@ -191,9 +228,16 @@ class _ToolBar extends ConsumerWidget {
     return IgnorePointer(
       child: _Pill(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Text(hint, style: HubTextStyles.label.copyWith(color: HubColorPalette.text2)),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Text(
+                hint,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: HubTextStyles.label.copyWith(color: HubColorPalette.text2),
+              ),
+            ),
           ),
         ],
       ),

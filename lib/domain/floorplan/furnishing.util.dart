@@ -59,6 +59,34 @@ abstract final class FurnishingUtil {
     );
   }
 
+  /// [item] moved against the nearest wall of its room when the gap between them is less than [reach] cm, as it is
+  /// turned: for moving a piece freely, with a magnet only right at the walls.
+  static Furniture touchWall(HomeLayout layout, Furniture item, {required double reach}) {
+    final room = _roomEdgesAt(layout, item.position);
+    if (room == null) return item;
+    final corners = cornersOf(item);
+    _Edge? nearest;
+    var nearestGap = reach;
+    for (final edge in room) {
+      final along = PlanPoint((edge.b.x - edge.a.x) / edge.length, (edge.b.y - edge.a.y) / edge.length);
+      double? gap;
+      for (final corner in corners) {
+        final t = (corner.x - edge.a.x) * along.x + (corner.y - edge.a.y) * along.y;
+        if (t < 0 || t > edge.length) continue;
+        final distance = (corner.x - edge.a.x) * edge.inward.x + (corner.y - edge.a.y) * edge.inward.y - edge.face;
+        gap = gap == null ? distance : math.min(gap, distance);
+      }
+      if (gap != null && gap >= 0 && gap < nearestGap) {
+        nearestGap = gap;
+        nearest = edge;
+      }
+    }
+    if (nearest == null || nearestGap < 0.05) return item;
+    final x = item.position.x - nearest.inward.x * nearestGap;
+    final y = item.position.y - nearest.inward.y * nearestGap;
+    return item.copyWith(position: PlanPoint(_round(x), _round(y)));
+  }
+
   /// [item] moved the least needed so that no corner reaches into a wall of its room. Its turn and size stay.
   static Furniture keepInside(HomeLayout layout, Furniture item) {
     final room = _roomEdgesAt(layout, item.position);

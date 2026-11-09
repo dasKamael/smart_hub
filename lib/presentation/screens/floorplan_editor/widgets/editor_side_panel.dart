@@ -470,12 +470,38 @@ class _FurniturePalette extends ConsumerWidget {
         runSpacing: HubSpacing.s4,
         children: [
           for (final kind in FurnitureKind.values)
-            _Choice(
-              selected: kind == selected,
-              onTap: () => controller.selectFurnitureKind(kind),
-              child: Text(kind.label, style: HubTextStyles.label),
+            // Tap picks what a tap on the plan puts down; dragging sideways onto the plan puts it right there.
+            Draggable<FurnitureKind>(
+              data: kind,
+              affinity: Axis.horizontal,
+              dragAnchorStrategy: pointerDragAnchorStrategy,
+              feedback: _DragChip(label: kind.label),
+              child: _Choice(
+                selected: kind == selected,
+                onTap: () => controller.selectFurnitureKind(kind),
+                child: Text(kind.label, style: HubTextStyles.label),
+              ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// What follows the finger while a piece of furniture is dragged out of the palette.
+class _DragChip extends StatelessWidget {
+  const _DragChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionalTranslation(
+      translation: const Offset(-0.5, -1.4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(color: HubColorPalette.accent, borderRadius: BorderRadius.circular(HubRadius.tile)),
+        child: Text(label, style: HubTextStyles.label.copyWith(decoration: TextDecoration.none)),
       ),
     );
   }

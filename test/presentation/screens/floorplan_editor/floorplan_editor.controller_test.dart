@@ -346,6 +346,92 @@ void main() {
       },
     );
 
+    test(
+      'Given a table, when dragging it to 40 cm from the office\'s left wall, then it stays under the finger, turned '
+      'as it was, instead of jumping to the wall',
+      () {
+        // Given
+        final table = placeTable();
+
+        // When
+        controller().startDrag(const PlanPoint(200, 150), cmPerPx: 1);
+        controller()
+          ..updateDrag(const PlanPoint(100, 150), cmPerPx: 1)
+          ..endDrag();
+
+        // Then
+        final moved = state().layout.furniture.single;
+        expect(moved.position, const PlanPoint(100, 150));
+        expect(moved.rotation, table.rotation);
+      },
+    );
+
+    test('Given a table, when dragging it to a few cm from the left wall, then it snaps flush against it', () {
+      // Given
+      placeTable();
+
+      // When
+      controller().startDrag(const PlanPoint(200, 150), cmPerPx: 1);
+      controller()
+        ..updateDrag(PlanPoint(LayoutWall.innerThickness / 2 + 55 + 6, 150), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(state().layout.furniture.single.position.x, closeTo(LayoutWall.innerThickness / 2 + 55, 0.1));
+    });
+
+    test('Given a selected chair (45 × 50 cm) at a zoom where its handles are close to its middle, when dragging it '
+        'from its middle, then it moves instead of being resized', () {
+      // Given
+      controller().dropFurniture(FurnitureKind.chair, const PlanPoint(180, 120), cmPerPx: 1.2);
+
+      // When
+      expect(controller().startDrag(const PlanPoint(180, 120), cmPerPx: 1.2), isTrue);
+      controller()
+        ..updateDrag(const PlanPoint(240, 160), cmPerPx: 1.2)
+        ..endDrag();
+
+      // Then
+      final chair = state().layout.furniture.single;
+      expect((chair.width, chair.depth), (FurnitureKind.chair.width, FurnitureKind.chair.depth));
+      expect(chair.position, const PlanPoint(240, 160));
+    });
+
+    test('Given a selected chair, when dragging its width handle from just outside the chair, then it gets wider', () {
+      // Given
+      controller().dropFurniture(FurnitureKind.chair, const PlanPoint(180, 120), cmPerPx: 1);
+
+      // When
+      controller().startDrag(PlanPoint(180 + FurnitureKind.chair.width / 2 + 8, 120), cmPerPx: 1);
+      controller()
+        ..updateDrag(PlanPoint(180 + FurnitureKind.chair.width / 2 + 28, 120), cmPerPx: 1)
+        ..endDrag();
+
+      // Then
+      expect(state().layout.furniture.single.width, greaterThan(FurnitureKind.chair.width));
+    });
+
+    test('Given a chair dragged out of the palette, when dropping it in the office, then it stands where it was '
+        'dropped and is selected', () {
+      // When
+      controller().dropFurniture(FurnitureKind.chair, const PlanPoint(180, 120), cmPerPx: 1);
+
+      // Then
+      final chair = state().layout.furniture.single;
+      expect(chair.kind, FurnitureKind.chair);
+      expect(chair.position, const PlanPoint(180, 120));
+      expect(state().selection, EditorSelection.furniture(chair.id));
+      expect(state().tool, EditorTool.furniture);
+    });
+
+    test('Given a chair dropped outside every room, when dropping it, then nothing is placed', () {
+      // When
+      controller().dropFurniture(FurnitureKind.chair, const PlanPoint(-200, -200), cmPerPx: 1);
+
+      // Then
+      expect(state().layout.furniture, isEmpty);
+    });
+
     test('Given a selected table, when dragging its width handle 20 cm out, then it is 20 cm wider and its left side '
         'stays', () {
       // Given

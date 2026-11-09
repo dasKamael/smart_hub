@@ -11,6 +11,7 @@ import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
+import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
 
 part 'floorplan_editor.controller.g.dart';
@@ -33,6 +34,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
 
   /// Junctions are grabbed only close to them; a bit further along, the wall itself is grabbed.
   static const nodePx = 12.0;
+
+  /// Touch radius of a furniture handle from inside the piece.
+  static const insideHandlePx = 10.0;
 
   /// How far the turn handle sits in front of a selected piece of furniture.
   static const turnPx = 30.0;
@@ -101,6 +105,23 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         );
         _commit(_layout.copyWith(furniture: [..._layout.furniture, item]), select: EditorSelection.furniture(id));
     }
+  }
+
+  /// Puts a piece of [kind] dragged out of the palette where it was dropped, as it comes (not turned), against a
+  /// wall only when dropped right at it. Outside the rooms nothing is placed.
+  void dropFurniture(FurnitureKind kind, PlanPoint point, {required double cmPerPx}) {
+    if (LayoutEditingUtil.roomAt(_layout, point) == null) return;
+    selectFurnitureKind(kind);
+    final id = LayoutGraphUtil.nextId('f', _layout.furniture.map((item) => item.id));
+    final item = Furniture(
+      id: id,
+      kind: kind,
+      position: PlanPoint(point.x.roundToDouble(), point.y.roundToDouble()),
+      width: kind.width,
+      depth: kind.depth,
+    );
+    final placed = FurnishingUtil.keepInside(_layout, FurnishingUtil.touchWall(_layout, item, reach: snapPx * cmPerPx));
+    _commit(_layout.copyWith(furniture: [..._layout.furniture, placed]), select: EditorSelection.furniture(id));
   }
 
   /// Turns the piece of furniture under [point] by a quarter.
@@ -209,7 +230,9 @@ class FloorplanEditorController extends _$FloorplanEditorController {
         final moved = item.copyWith(
           position: PlanPoint((item.position.x + delta.x).roundToDouble(), (item.position.y + delta.y).roundToDouble()),
         );
-        final placed = FurnishingUtil.keepInside(drag.before, FurnishingUtil.snapToWall(drag.before, moved));
+        // Free: the piece stays under the finger as it is turned, with a magnet only right at the walls.
+        final touching = FurnishingUtil.touchWall(drag.before, moved, reach: snapPx * cmPerPx);
+        final placed = FurnishingUtil.keepInside(drag.before, touching);
         _change(drag, _withFurniture(drag.before, placed));
       case final _FurnitureHandleDrag drag:
         final item = drag.before.furniture.firstWhere((item) => item.id == drag.furnitureId);
@@ -498,7 +521,15 @@ class FloorplanEditorController extends _$FloorplanEditorController {
   (Furniture, FurnitureHandle)? _furnitureHandleAt(PlanPoint point, double cmPerPx) {
     final item = state.selectedFurniture;
     if (item == null || (state.tool != EditorTool.select && state.tool != EditorTool.furniture)) return null;
-    final handle = FurnitureEditingUtil.handleAt(item, point, radius: handlePx * cmPerPx, turnReach: turnPx * cmPerPx);
+    // On a small piece the handles' touch areas would cover all of it: inside the piece a handle has to be hit
+    // nearly exactly, so a drag there moves the piece.
+    final inside = PlanGeometryUtil.containsPoint(FurnishingUtil.cornersOf(item), point);
+    final handle = FurnitureEditingUtil.handleAt(
+      item,
+      point,
+      radius: (inside ? insideHandlePx : handlePx) * cmPerPx,
+      turnReach: turnPx * cmPerPx,
+    );
     return handle == null ? null : (item, handle);
   }
 

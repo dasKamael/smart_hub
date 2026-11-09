@@ -7,6 +7,8 @@ import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.controller.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.state.dart';
+import 'package:smart_hub/presentation/screens/floorplan_editor/widgets/editor_canvas.dart';
+import 'package:smart_hub/domain/floorplan/editing/layout_editing.util.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/widgets/editor_side_panel.dart';
 
 import '../../../../mocks/floorplan.mock.dart';
@@ -109,6 +111,47 @@ void main() {
 
       // Then
       expect(LayoutGraphUtil.isOpen(state().layout, wall), isTrue);
+    });
+  });
+
+  group('EditorSidePanel palette with the canvas', () {
+    testWidgets('Given the furniture tool, when dragging a chair from the list onto the office, then a chair stands '
+        'where it was dropped', (tester) async {
+      // Given
+      container = createTestContainer(
+        overrides: [homeLayoutServiceProvider.overrideWith(() => FakeHomeLayoutService(editorTestLayout))],
+      );
+      await container.read(homeLayoutServiceProvider.future);
+      container.read(floorplanEditorControllerProvider.notifier).selectTool(EditorTool.furniture);
+      await loadWidgetTestApp(
+        tester: tester,
+        container: container,
+        underTestWidget: const Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: EditorCanvas()),
+            EditorSidePanel(),
+          ],
+        ),
+      );
+      final canvas = tester.getRect(find.byType(EditorCanvas));
+      await tester.ensureVisible(find.text('Chair'));
+      await tester.pumpAndSettle();
+
+      // When
+      final gesture = await tester.startGesture(tester.getCenter(find.text('Chair')));
+      await gesture.moveBy(const Offset(-30, 0));
+      await tester.pump();
+      final target = Offset(canvas.left + canvas.width * 0.3, canvas.center.dy);
+      await gesture.moveTo(target);
+      await tester.pump();
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      // Then
+      final chair = state().layout.furniture.single;
+      expect(chair.kind, FurnitureKind.chair);
+      expect(LayoutEditingUtil.roomAt(state().layout, chair.position)?.id, 'office');
     });
   });
 }
