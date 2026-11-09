@@ -137,6 +137,8 @@ class EditorPainter extends CustomPainter {
     final fill = Paint()..color = HubColorPalette.wall;
     final highlight = Paint()..color = HubColorPalette.accent;
     for (final MapEntry(key: id, value: shape) in shapes.entries) {
+      // An open wall is gone; its opening draws the line between the rooms.
+      if (shape.open) continue;
       canvas.drawPath(_path(shape.corners), id == selected ? highlight : fill);
     }
   }
@@ -153,15 +155,17 @@ class EditorPainter extends CustomPainter {
       // The gap through the wall, across its whole body.
       final from = opening.offset - opening.width / 2;
       final to = opening.offset + opening.width / 2;
-      canvas.drawPath(
-        _path([
-          shape.at(from, -shape.right - 0.5),
-          shape.at(to, -shape.right - 0.5),
-          shape.at(to, shape.left + 0.5),
-          shape.at(from, shape.left + 0.5),
-        ]),
-        Paint()..color = HubColorPalette.planGap,
-      );
+      if (!shape.open) {
+        canvas.drawPath(
+          _path([
+            shape.at(from, -shape.right - 0.5),
+            shape.at(to, -shape.right - 0.5),
+            shape.at(to, shape.left + 0.5),
+            shape.at(from, shape.left + 0.5),
+          ]),
+          Paint()..color = HubColorPalette.planGap,
+        );
+      }
       final length = a.distanceTo(b);
       if (length == 0) continue;
       final u = PlanPoint((b.x - a.x) / length, (b.y - a.y) / length);

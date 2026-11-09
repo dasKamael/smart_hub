@@ -121,7 +121,7 @@ final class HomeScene {
     final walls = <SceneSolid>[];
     final shapes = WallShapeUtil.shapesOf(layout);
     for (final wall in layout.walls) {
-      if (shapes[wall.id] case final shape?) walls.addAll(_wallPieces(layout, wall, shape));
+      if (shapes[wall.id] case final shape? when !shape.open) walls.addAll(_wallPieces(layout, wall, shape));
     }
     final meshes = <SceneMesh>[];
     final blocks = <SceneSolid>[];

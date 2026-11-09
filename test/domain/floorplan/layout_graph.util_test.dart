@@ -118,6 +118,39 @@ void main() {
     );
   });
 
+  group('LayoutGraphUtil.isOpen', () {
+    HomeLayout wallWith(List<(DoorType, double, double)> openings) {
+      final layout = LayoutGraphUtil.addWall(const HomeLayout(), PlanPoint.zero, const PlanPoint(300, 0));
+      final wall = layout.walls.single;
+      return layout.copyWith(
+        openings: [
+          for (final (i, (type, offset, width)) in openings.indexed)
+            LayoutOpening(id: 'o$i', wallId: wall.id, type: type, offset: offset, width: width),
+        ],
+      );
+    }
+
+    test('Given a wall opened along its whole length, when asking whether it is open, then it is', () {
+      final layout = wallWith([(DoorType.open, 150, 300)]);
+      expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isTrue);
+    });
+
+    test('Given a wall opened in two parts that meet, when asking whether it is open, then it is', () {
+      final layout = wallWith([(DoorType.open, 75, 150), (DoorType.open, 225, 150)]);
+      expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isTrue);
+    });
+
+    test('Given a wall with a 10 cm piece left standing, when asking whether it is open, then it is not', () {
+      final layout = wallWith([(DoorType.open, 145, 290)]);
+      expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isFalse);
+    });
+
+    test('Given a wall with a door as wide as the wall, when asking whether it is open, then it is not', () {
+      final layout = wallWith([(DoorType.door, 150, 300)]);
+      expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isFalse);
+    });
+  });
+
   group('LayoutGraphUtil.removeWalls', () {
     test('Given a line with a wall branching off, when removing the branch and the first part of the line together, '
         'then only the second part is left (the parts are not merged before the first one is gone)', () {

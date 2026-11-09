@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
@@ -172,6 +173,23 @@ abstract final class LayoutGraphUtil {
   }
 
   /// Both ends of [wall].
+  /// Whether [wall] is open along its whole length: the wall is gone, only the line between its rooms is left.
+  static bool isOpen(HomeLayout layout, LayoutWall wall) {
+    final (a, b) = endsOf(layout, wall);
+    final length = a.distanceTo(b);
+    final spans = [
+      for (final opening in layout.openings)
+        if (opening.wallId == wall.id && opening.type == DoorType.open)
+          (opening.offset - opening.width / 2, opening.offset + opening.width / 2),
+    ]..sort((x, y) => x.$1.compareTo(y.$1));
+    var reached = 0.0;
+    for (final (from, to) in spans) {
+      if (from > reached + 1) return false;
+      reached = math.max(reached, to);
+    }
+    return reached >= length - 1;
+  }
+
   static (PlanPoint, PlanPoint) endsOf(HomeLayout layout, LayoutWall wall) {
     PlanPoint at(String id) => layout.nodes.firstWhere((node) => node.id == id).position;
     return (at(wall.from), at(wall.to));

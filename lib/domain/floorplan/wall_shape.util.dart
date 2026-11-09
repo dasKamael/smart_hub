@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
@@ -22,6 +23,7 @@ final class WallShape {
     required this.outside,
     this.start,
     this.end,
+    this.open = false,
   });
 
   /// The wall's line, junction to junction.
@@ -39,6 +41,10 @@ final class WallShape {
   /// The cut ends at junctions with other walls; `null` for an end that stands free.
   final WallEnd? start;
   final WallEnd? end;
+
+  /// The wall is open along its whole length (see [LayoutGraphUtil.isOpen]): there is no wall to draw, only the line
+  /// between two rooms.
+  final bool open;
 
   /// Sides of a [section] that are its ends (by the index of their first corner).
   static const startSides = {4, 5};
@@ -108,9 +114,14 @@ abstract final class WallShapeUtil {
       }
     }
 
-    // One arm per wall end at a junction: which way the wall leaves it and how far it reaches to either side.
+    // One arm per wall end at a junction: which way the wall leaves it and how far it reaches to either side. Open
+    // walls are not there to meet, so the walls next to them end square instead of being cut against nothing.
+    final open = {
+      for (final wall in walls)
+        if (LayoutGraphUtil.isOpen(layout, wall)) wall.id,
+    };
     final arms = <String, List<_Arm>>{};
-    for (final wall in walls) {
+    for (final wall in walls.where((wall) => !open.contains(wall.id))) {
       final a = positions[wall.from]!;
       final b = positions[wall.to]!;
       final length = a.distanceTo(b);
@@ -150,6 +161,7 @@ abstract final class WallShapeUtil {
           outside: sides[wall.id]!.$3,
           start: ends[(wall.id, true)],
           end: ends[(wall.id, false)],
+          open: open.contains(wall.id),
         ),
     };
   }

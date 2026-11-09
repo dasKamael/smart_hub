@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/domain/floorplan/floorplan.service.dart';
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/presentation/screens/floorplan_editor/floorplan_editor.controller.dart';
@@ -79,6 +80,35 @@ void main() {
       // Then
       expect(state().furnitureKind, FurnitureKind.chair);
       expect(state().tool, EditorTool.furniture);
+    });
+  });
+
+  group('EditorSidePanel with a wall', () {
+    testWidgets('Given the wall between office and kitchen, when tapping Remove wall, then it is open along its whole '
+        'length and Merge rooms was offered for it', (tester) async {
+      // Given
+      container = createTestContainer(
+        overrides: [homeLayoutServiceProvider.overrideWith(() => FakeHomeLayoutService(editorTestLayout))],
+      );
+      await container.read(homeLayoutServiceProvider.future);
+      final wall = LayoutGraphUtil.wallAt(editorTestLayout, const PlanPoint(400, 150), radius: 2)!;
+      container.read(floorplanEditorControllerProvider.notifier).select(EditorSelection.wall(wall.id));
+      await loadWidgetTestApp(
+        tester: tester,
+        container: container,
+        underTestWidget: const Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(height: 760, child: EditorSidePanel()),
+        ),
+      );
+      expect(find.text('Merge rooms'), findsOneWidget);
+
+      // When
+      await tester.tap(find.text('Remove wall'));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(LayoutGraphUtil.isOpen(state().layout, wall), isTrue);
     });
   });
 }

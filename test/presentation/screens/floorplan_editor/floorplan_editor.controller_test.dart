@@ -259,6 +259,37 @@ void main() {
     });
   });
 
+  group('walls', () {
+    test('Given the wall between office and kitchen, when removing it, then it is open along its whole length and both '
+        'rooms stay', () {
+      // Given
+      final wall = LayoutGraphUtil.wallAt(state().layout, const PlanPoint(400, 150), radius: 2)!;
+      controller().select(EditorSelection.wall(wall.id));
+
+      // When
+      controller().removeWall();
+
+      // Then
+      expect(LayoutGraphUtil.isOpen(state().layout, wall), isTrue);
+      expect(state().layout.rooms.map((room) => room.id), containsAll(['office', 'kitchen']));
+      expect(state().selectedOpening?.type, DoorType.open);
+    });
+
+    test('Given a removed wall, when deleting the opening left, then the wall is back', () {
+      // Given
+      final wall = LayoutGraphUtil.wallAt(state().layout, const PlanPoint(400, 150), radius: 2)!;
+      controller()
+        ..select(EditorSelection.wall(wall.id))
+        ..removeWall();
+
+      // When
+      controller().deleteOpening();
+
+      // Then
+      expect(LayoutGraphUtil.isOpen(state().layout, wall), isFalse);
+    });
+  });
+
   group('furniture', () {
     test('Given the furniture tool with a bed, '
         'when tapping near the left wall of the office, '

@@ -336,24 +336,23 @@ class HomeScenePainter extends CustomPainter {
     final positions = <Offset>[];
     final colors = <Color>[];
     for (final (_, t) in visible) {
-      final corners = [mesh.triangles[t] * 3, mesh.triangles[t + 1] * 3, mesh.triangles[t + 2] * 3];
-      final cx = (p[corners[0]] + p[corners[1]] + p[corners[2]]) / 3;
-      final cy = (p[corners[0] + 1] + p[corners[1] + 1] + p[corners[2] + 1]) / 3;
-      final cz = (p[corners[0] + 2] + p[corners[1] + 2] + p[corners[2] + 2]) / 3;
-      final color = _shadeAt(
-        HomeSceneColorPalette.furniture(mesh.colors[t ~/ 3]),
-        normals[t]!,
-        cx,
-        cy,
-        cz,
-        room,
-        lightRooms,
-        outdoors: false,
-        sky: HomeSceneColorPalette.furnitureSky,
-      );
-      for (final corner in corners) {
+      final base = HomeSceneColorPalette.furniture(mesh.colors[t ~/ 3]);
+      // Lit at every corner, blended in between: the two halves of a flat face meet in the same color.
+      for (final corner in [mesh.triangles[t] * 3, mesh.triangles[t + 1] * 3, mesh.triangles[t + 2] * 3]) {
         positions.add(camera.project(p[corner], p[corner + 1], p[corner + 2]));
-        colors.add(color);
+        colors.add(
+          _shadeAt(
+            base,
+            normals[t]!,
+            p[corner],
+            p[corner + 1],
+            p[corner + 2],
+            room,
+            lightRooms,
+            outdoors: false,
+            sky: HomeSceneColorPalette.furnitureSky,
+          ),
+        );
       }
     }
     canvas.drawVertices(ui.Vertices(ui.VertexMode.triangles, positions, colors: colors), BlendMode.dst, Paint());

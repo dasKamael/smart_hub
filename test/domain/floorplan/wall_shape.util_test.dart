@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
+import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
@@ -75,6 +76,34 @@ void main() {
       final (firstRight, _, firstLeft) = first.end!;
       final (secondRight, _, secondLeft) = second.start!;
       expect({firstRight, firstLeft}, {secondRight, secondLeft});
+    });
+
+    test('Given the inner wall opened along its whole length, when shaping, then it is open and the outer wall it '
+        'stood on runs through without a cut for it', () {
+      // Given
+      final room = _room();
+      final inner = LayoutGraphUtil.wallAt(room, const PlanPoint(200, 100), radius: 2)!;
+      final layout = room.copyWith(
+        openings: [LayoutOpening(id: 'o', wallId: inner.id, type: DoorType.open, offset: 100, width: 200)],
+      );
+
+      // When
+      final shapes = WallShapeUtil.shapesOf(layout);
+
+      // Then
+      expect(shapes[inner.id]!.open, isTrue);
+      expect(shapes[inner.id]!.start, isNull);
+      expect(shapes[inner.id]!.end, isNull);
+      final top = shapes.values.where((shape) => !shape.open && shape.from.y == 0 && shape.to.y == 0);
+      for (final shape in top) {
+        // Where the inner wall met it, the top wall's pieces now end square (straight across).
+        for (final end in [shape.start, shape.end].nonNulls) {
+          final (right, center, left) = end;
+          if (center != const PlanPoint(200, 0)) continue;
+          expect(right.x, closeTo(200, 0.01));
+          expect(left.x, closeTo(200, 0.01));
+        }
+      }
     });
 
     test('Given an outer wall, when shaping it, then it knows which way is out', () {

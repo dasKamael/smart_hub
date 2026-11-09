@@ -334,6 +334,26 @@ class FloorplanEditorController extends _$FloorplanEditorController {
     );
   }
 
+  /// Takes the selected wall away but keeps the rooms on either side apart, e.g. a storage nook open to the hall. Its
+  /// doors and windows go with it; deleting the opening that is left puts the wall back.
+  void removeWall() {
+    final wall = state.selectedWall;
+    if (wall == null) return;
+    final (a, b) = LayoutGraphUtil.endsOf(_layout, wall);
+    final length = a.distanceTo(b);
+    final id = LayoutGraphUtil.nextId('open-', _layout.openings.map((opening) => opening.id));
+    _commit(
+      _layout.copyWith(
+        openings: [
+          for (final opening in _layout.openings)
+            if (opening.wallId != wall.id) opening,
+          LayoutOpening(id: id, wallId: wall.id, type: DoorType.open, offset: length / 2, width: length),
+        ],
+      ),
+      select: EditorSelection.opening(id),
+    );
+  }
+
   /// Removes the selected wall; the room it divided is one again and stays selected, ready for its type.
   void deleteWall() {
     final wall = state.selectedWall;

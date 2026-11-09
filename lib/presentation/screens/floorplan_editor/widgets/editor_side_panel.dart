@@ -9,6 +9,7 @@ import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/furniture_kind.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
+import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/model/room_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
 import 'package:smart_hub/presentation/design_system/atoms/hub_button.dart';
@@ -262,7 +263,13 @@ class _WallPanel extends ConsumerWidget {
         ),
         const Spacer(),
         HubButton(
-          label: 'Delete',
+          label: 'Remove wall',
+          glyph: HubGlyph.gap,
+          variant: HubButtonVariant.secondary,
+          onPressed: controller.removeWall,
+        ),
+        HubButton(
+          label: _dividesRooms(layout, a, b) ? 'Merge rooms' : 'Delete',
           glyph: HubGlyph.trash,
           variant: HubButtonVariant.destructive,
           onPressed: controller.deleteWall,
@@ -270,6 +277,16 @@ class _WallPanel extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// Whether the wall from [a] to [b] has a room on both sides: deleting it makes them one.
+bool _dividesRooms(HomeLayout layout, PlanPoint a, PlanPoint b) {
+  final length = a.distanceTo(b);
+  if (length == 0) return false;
+  final middle = PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2);
+  final reach = PlanPoint(-(b.y - a.y) / length * 20, (b.x - a.x) / length * 20);
+  return LayoutEditingUtil.roomAt(layout, middle + reach) != null &&
+      LayoutEditingUtil.roomAt(layout, middle - reach) != null;
 }
 
 class _OpeningPanel extends ConsumerWidget {
