@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
+import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
 import 'package:smart_hub/domain/floorplan/model/plan_point.dart';
 import 'package:smart_hub/domain/floorplan/plan_geometry.util.dart';
@@ -128,9 +129,13 @@ abstract final class WallShapeUtil {
       final d = PlanPoint((b.x - a.x) / length, (b.y - a.y) / length);
       final (left, right, _) = sides[wall.id]!;
       // Turning to larger angles is the wall's right when it leaves its first junction, its left when it leaves
-      // the second.
-      arms.putIfAbsent(wall.from, () => []).add(_Arm(wall.id, true, d, plus: right, minus: left));
-      arms.putIfAbsent(wall.to, () => []).add(_Arm(wall.id, false, PlanPoint(-d.x, -d.y), plus: left, minus: right));
+      // the second. An end that is only a sliver beside a passage is not built, so it does not meet anything.
+      if (_reaches(layout, wall, length, atStart: true)) {
+        arms.putIfAbsent(wall.from, () => []).add(_Arm(wall.id, true, d, plus: right, minus: left));
+      }
+      if (_reaches(layout, wall, length, atStart: false)) {
+        arms.putIfAbsent(wall.to, () => []).add(_Arm(wall.id, false, PlanPoint(-d.x, -d.y), plus: left, minus: right));
+      }
     }
 
     final ends = <(String, bool), WallEnd>{};
@@ -182,6 +187,18 @@ abstract final class WallShapeUtil {
     if (meet == null) return square;
     if (meet.distanceTo(center) > _maxCut * 2 * math.max(extent, neighborExtent)) return square;
     return meet;
+  }
+
+  /// Whether [wall] stands up to its first junction ([atStart]) or its last: not when a door or passage leaves less
+  /// than [LayoutGraphUtil.minPiece] of it there.
+  static bool _reaches(HomeLayout layout, LayoutWall wall, double length, {required bool atStart}) {
+    for (final opening in layout.openings) {
+      if (opening.wallId != wall.id || opening.type == DoorType.window) continue;
+      final from = opening.offset - opening.width / 2;
+      final to = opening.offset + opening.width / 2;
+      if (atStart ? from < LayoutGraphUtil.minPiece : to > length - LayoutGraphUtil.minPiece) return false;
+    }
+    return true;
   }
 
   /// Unit vector to the left of the way from [a] to [b] (on screen, y pointing down).

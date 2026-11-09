@@ -14,11 +14,15 @@ import 'package:smart_hub/presentation/design_system/organisms/home_scene/scene_
 
 /// The floor of one room.
 final class SceneFloor {
-  const SceneFloor({required this.roomId, required this.outline, required this.material});
+  const SceneFloor({required this.roomId, required this.outline, required this.material, this.openEdges = const {}});
 
   final String roomId;
   final List<PlanPoint> outline;
   final SceneMaterial material;
+
+  /// Edges of [outline] (by their first corner) where the wall is removed: the floor runs on into the next room
+  /// there, without the shade a wall casts.
+  final Set<int> openEdges;
 }
 
 /// A lamp shining into the 3D home: where it hangs, its color (0–1 per channel) and brightness (0–1).
@@ -114,13 +118,21 @@ final class HomeScene {
   /// The scene of [layout]; furniture with a model in [library] is drawn with it, the rest as blocks.
   static HomeScene of(HomeLayout layout, {FurnitureMeshLibrary? library}) {
     final outlines = LayoutRoomsUtil.outlines(layout);
+    final shapes = WallShapeUtil.shapesOf(layout);
     final floors = [
       for (final room in layout.rooms)
         if (outlines[room.id] case final outline?)
-          SceneFloor(roomId: room.id, outline: outline, material: _floorOf(room.type)),
+          SceneFloor(
+            roomId: room.id,
+            outline: outline,
+            material: _floorOf(room.type),
+            openEdges: {
+              for (var i = 0; i < outline.length; i++)
+                if (_isOpenEdge(layout, shapes, outline[i], outline[(i + 1) % outline.length])) i,
+            },
+          ),
     ];
     final walls = <SceneSolid>[];
-    final shapes = WallShapeUtil.shapesOf(layout);
     for (final wall in layout.walls) {
       if (shapes[wall.id] case final shape? when !shape.open) walls.addAll(_wallPieces(layout, wall, shape));
     }
@@ -143,6 +155,12 @@ final class HomeScene {
           if (!item.kind.isFlat) FurnishingUtil.cornersOf(item),
       ],
     );
+  }
+
+  /// Whether the edge from [a] to [b] of a room lies on a removed wall.
+  static bool _isOpenEdge(HomeLayout layout, Map<String, WallShape> shapes, PlanPoint a, PlanPoint b) {
+    final wall = LayoutGraphUtil.wallAt(layout, PlanPoint((a.x + b.x) / 2, (a.y + b.y) / 2), radius: 2);
+    return wall != null && (shapes[wall.id]?.open ?? false);
   }
 
   static SceneMaterial _floorOf(RoomType type) => switch (type) {

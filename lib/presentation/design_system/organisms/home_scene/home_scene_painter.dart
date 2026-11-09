@@ -63,13 +63,20 @@ class HomeScenePainter extends CustomPainter {
     final topLight = _skyLight(0, 0, 1) * HomeSceneColorPalette.indoors * 0.7;
     for (final floor in scene.floors) {
       final path = _floorPath(floor.outline);
-      canvas.drawPath(path, Paint()..color = _shade(HomeSceneColorPalette.of(floor.material), topLight));
-      canvas.save();
-      canvas.clipPath(path);
-      if (floor.material == SceneMaterial.floorWood) _paintPlanks(canvas, floor.outline);
-      // Darker along the walls, as light does not reach into the corners.
+      // Not smoothed: where a wall was removed two floors meet, and smoothed edges would leave a dark line between
+      // them. Their other edges lie under the walls.
       canvas.drawPath(
         path,
+        Paint()
+          ..isAntiAlias = false
+          ..color = _shade(HomeSceneColorPalette.of(floor.material), topLight),
+      );
+      canvas.save();
+      canvas.clipPath(path, doAntiAlias: false);
+      if (floor.material == SceneMaterial.floorWood) _paintPlanks(canvas, floor.outline);
+      // Darker along the walls, as light does not reach into the corners; not where a wall was removed.
+      canvas.drawPath(
+        _wallEdges(floor),
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 40 * camera.scale
@@ -105,6 +112,30 @@ class HomeScenePainter extends CustomPainter {
       }
       canvas.restore();
     }
+  }
+
+  /// The edges of [floor] that stand against a wall, on screen: one closed line when there are walls all around,
+  /// else a line for each run of walls between removed ones (joined at corners, so the shade turns them cleanly).
+  Path _wallEdges(SceneFloor floor) {
+    final points = [for (final point in floor.outline) camera.projectPoint(point)];
+    final count = points.length;
+    if (floor.openEdges.isEmpty) return Path()..addPolygon(points, true);
+    final path = Path();
+    // Start right after a removed wall, so every run is drawn in one piece.
+    final start = (floor.openEdges.first + 1) % count;
+    var drawing = false;
+    for (var k = 0; k < count; k++) {
+      final i = (start + k) % count;
+      if (floor.openEdges.contains(i)) {
+        drawing = false;
+        continue;
+      }
+      if (!drawing) path.moveTo(points[i].dx, points[i].dy);
+      final next = points[(i + 1) % count];
+      path.lineTo(next.dx, next.dy);
+      drawing = true;
+    }
+    return path;
   }
 
   /// Joints of floorboards: along the boards every [_board] cm, across them staggered every [_boardLength] cm.

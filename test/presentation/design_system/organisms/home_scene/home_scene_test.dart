@@ -81,6 +81,35 @@ void main() {
       expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(195, 0))), isNotEmpty);
     });
 
+    test('Given two rooms whose shared wall was removed, when building the scene, then that wall is not built and '
+        'both floors know the edge is open', () {
+      // Given
+      var layout = LayoutGraphUtil.addRectangle(const HomeLayout(), PlanPoint.zero, const PlanPoint(200, 200));
+      layout = LayoutGraphUtil.addRectangle(layout, const PlanPoint(200, 0), const PlanPoint(400, 200));
+      layout = layout.copyWith(
+        rooms: const [
+          LayoutRoom(id: 'a', name: 'A', type: RoomType.hall, anchor: PlanPoint(100, 100)),
+          LayoutRoom(id: 'b', name: 'B', type: RoomType.storage, anchor: PlanPoint(300, 100)),
+        ],
+      );
+      final shared = LayoutGraphUtil.wallAt(layout, const PlanPoint(200, 100), radius: 2)!;
+      layout = layout.copyWith(
+        openings: [LayoutOpening(id: 'o', wallId: shared.id, type: DoorType.open, offset: 100, width: 200)],
+      );
+
+      // When
+      final scene = HomeScene.of(layout);
+
+      // Then
+      expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(200, 100))), isEmpty);
+      for (final floor in scene.floors) {
+        final open = [
+          for (final i in floor.openEdges) (floor.outline[i].x, floor.outline[(i + 1) % floor.outline.length].x),
+        ];
+        expect(open, [(200.0, 200.0)], reason: floor.roomId);
+      }
+    });
+
     test('Given a window, when building the scene, then there is a sill, glass and a lintel', () {
       // When
       final scene = HomeScene.of(_room());

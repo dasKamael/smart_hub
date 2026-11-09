@@ -106,6 +106,31 @@ void main() {
       }
     });
 
+    test('Given a door leaving only 10 cm of the inner wall at the top wall, when shaping, then that end does not '
+        'meet the top wall and the top wall runs through square', () {
+      // Given
+      final room = _room();
+      final inner = LayoutGraphUtil.wallAt(room, const PlanPoint(200, 100), radius: 2)!;
+      final (a, _) = LayoutGraphUtil.endsOf(room, inner);
+      final atTop = a == const PlanPoint(200, 0);
+      final layout = room.copyWith(
+        openings: [LayoutOpening(id: 'd', wallId: inner.id, type: DoorType.door, offset: atTop ? 50 : 150, width: 80)],
+      );
+
+      // When
+      final shapes = WallShapeUtil.shapesOf(layout);
+
+      // Then
+      expect(atTop ? shapes[inner.id]!.start : shapes[inner.id]!.end, isNull);
+      for (final shape in shapes.values.where((shape) => shape.from.y == 0 && shape.to.y == 0)) {
+        for (final (right, center, left) in [shape.start, shape.end].nonNulls) {
+          if (center != const PlanPoint(200, 0)) continue;
+          expect(right.x, closeTo(200, 0.01));
+          expect(left.x, closeTo(200, 0.01));
+        }
+      }
+    });
+
     test('Given an outer wall, when shaping it, then it knows which way is out', () {
       // When
       final shapes = WallShapeUtil.shapesOf(_room());
