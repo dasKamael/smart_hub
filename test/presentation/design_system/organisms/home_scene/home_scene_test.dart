@@ -64,6 +64,23 @@ void main() {
       expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(200, 0))), isNotEmpty);
     });
 
+    test('Given a passage leaving 10 cm of wall at its start, when building the scene, then that sliver is left out '
+        'instead of standing as a post', () {
+      // Given
+      final layout = LayoutGraphUtil.addWall(const HomeLayout(), PlanPoint.zero, const PlanPoint(200, 0));
+      final wall = layout.walls.single;
+      final open = layout.copyWith(
+        openings: [LayoutOpening(id: 'o', wallId: wall.id, type: DoorType.open, offset: 85, width: 150)],
+      );
+
+      // When
+      final scene = HomeScene.of(open);
+
+      // Then
+      expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(5, 0))), isEmpty);
+      expect(scene.walls.where((solid) => _covers(solid, const PlanPoint(195, 0))), isNotEmpty);
+    });
+
     test('Given a window, when building the scene, then there is a sill, glass and a lintel', () {
       // When
       final scene = HomeScene.of(_room());

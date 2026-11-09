@@ -140,9 +140,15 @@ void main() {
       expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isTrue);
     });
 
-    test('Given a wall with a 10 cm piece left standing, when asking whether it is open, then it is not', () {
-      final layout = wallWith([(DoorType.open, 145, 290)]);
+    test('Given a wall with a 20 cm piece left standing, when asking whether it is open, then it is not', () {
+      final layout = wallWith([(DoorType.open, 140, 280)]);
       expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isFalse);
+    });
+
+    test('Given a wall opened but for slivers of 17.5 and 7.5 cm, when asking whether it is open, then it is (slivers '
+        'would only stand as posts)', () {
+      final layout = wallWith([(DoorType.open, 155, 275)]);
+      expect(LayoutGraphUtil.isOpen(layout, layout.walls.single), isTrue);
     });
 
     test('Given a wall with a door as wide as the wall, when asking whether it is open, then it is not', () {

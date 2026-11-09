@@ -26,9 +26,6 @@ class HomeScenePainter extends CustomPainter {
   /// Height of the lamps in cm.
   static const lampHeight = 200.0;
 
-  /// Inner wall pieces shorter than this come down with a lowered corner they end at, in cm.
-  static const _stub = 30.0;
-
   /// How much of a lamp's own color a lit surface takes on, whatever its color: walls glow in the lamp's color.
   static const _tint = 0.36;
 
@@ -159,11 +156,9 @@ class HomeScenePainter extends CustomPainter {
           if (_facesViewer(solid.outside)) ...solid.nodeEnds.values,
     };
     for (final solid in scene.solids) {
-      final isLowered = switch (solid) {
-        SceneSolid(:final outside?) => lowered > 0 && _facesViewer(outside),
-        // A short stub of an inner wall at a lowered junction would stand up as a thin post.
-        _ => solid.nodeEnds.values.any(loweredNodes.contains) && solid.base[0].distanceTo(solid.base[1]) < _stub,
-      };
+      // Only the outer walls facing the viewer come down; inner walls keep their height and show their end where
+      // they meet a lowered wall.
+      final isLowered = lowered > 0 && _facesViewer(solid.outside);
       final top = isLowered
           ? ui.lerpDouble(solid.top, math.min(solid.top, HomeScene.loweredHeight), lowered)!
           : solid.top;
@@ -295,68 +290,52 @@ class HomeScenePainter extends CustomPainter {
     return Color.from(alpha: color.a, red: color.r * keep, green: color.g * keep, blue: color.b * keep);
   }
 
-  /// A furniture model: its triangles facing the viewer, back to front, each lit on its own.
+  /// A furniture model: its triangles facing the viewer, back to front, lit at every corner. What does not change from
+  /// frame to frame is kept with the mesh (see [_MeshCache]): only projecting the corners happens every time.
   void _paintMesh(Canvas canvas, SceneMesh mesh, List<String?> lightRooms) {
-    final room = _roomAt(mesh.item.position);
+    final cache = _meshCaches[mesh] ??= _MeshCache.of(mesh);
+    final order = cache.orderFor(camera);
+    if (order.isEmpty) return;
+    final colors = cache.colorsFor(
+      (_quantized(camera.yaw), lights),
+      (t, corner) => _shadeAt(
+        HomeSceneColorPalette.furniture(mesh.colors[t]),
+        cache.normalOf(t),
+        mesh.positions[corner * 3],
+        mesh.positions[corner * 3 + 1],
+        mesh.positions[corner * 3 + 2],
+        _roomAt(mesh.item.position),
+        lightRooms,
+        outdoors: false,
+        sky: HomeSceneColorPalette.furnitureSky,
+      ),
+    );
     final p = mesh.positions;
-    final cosPitch = math.cos(camera.pitch);
-    final sinPitch = math.sin(camera.pitch);
-    final visible = <(double, int)>[];
-    final normals = <int, (double, double, double)>{};
-    for (var t = 0; t < mesh.triangles.length; t += 3) {
-      final a = mesh.triangles[t] * 3;
-      final b = mesh.triangles[t + 1] * 3;
-      final c = mesh.triangles[t + 2] * 3;
-      final ux = p[b] - p[a];
-      final uy = p[b + 1] - p[a + 1];
-      final uz = p[b + 2] - p[a + 2];
-      final vx = p[c] - p[a];
-      final vy = p[c + 1] - p[a + 1];
-      final vz = p[c + 2] - p[a + 2];
-      var nx = uy * vz - uz * vy;
-      var ny = uz * vx - ux * vz;
-      var nz = ux * vy - uy * vx;
-      final length = math.sqrt(nx * nx + ny * ny + nz * nz);
-      if (length < 1e-6) continue;
-      nx /= length;
-      ny /= length;
-      nz /= length;
-      final (_, towards) = camera.turn(nx, ny);
-      if (towards * cosPitch + nz * sinPitch <= 0) continue;
-      normals[t] = (nx, ny, nz);
-      final depth = camera.depth(
-        (p[a] + p[b] + p[c]) / 3,
-        (p[a + 1] + p[b + 1] + p[c + 1]) / 3,
-        (p[a + 2] + p[b + 2] + p[c + 2]) / 3,
-      );
-      visible.add((depth, t));
+    final projected = Float32List(p.length ~/ 3 * 2);
+    for (var v = 0; v < p.length ~/ 3; v++) {
+      final at = camera.project(p[v * 3], p[v * 3 + 1], p[v * 3 + 2]);
+      projected[v * 2] = at.dx;
+      projected[v * 2 + 1] = at.dy;
     }
-    if (visible.isEmpty) return;
-    visible.sort((x, y) => x.$1.compareTo(y.$1));
-    final positions = <Offset>[];
-    final colors = <Color>[];
-    for (final (_, t) in visible) {
-      final base = HomeSceneColorPalette.furniture(mesh.colors[t ~/ 3]);
-      // Lit at every corner, blended in between: the two halves of a flat face meet in the same color.
-      for (final corner in [mesh.triangles[t] * 3, mesh.triangles[t + 1] * 3, mesh.triangles[t + 2] * 3]) {
-        positions.add(camera.project(p[corner], p[corner + 1], p[corner + 2]));
-        colors.add(
-          _shadeAt(
-            base,
-            normals[t]!,
-            p[corner],
-            p[corner + 1],
-            p[corner + 2],
-            room,
-            lightRooms,
-            outdoors: false,
-            sky: HomeSceneColorPalette.furnitureSky,
-          ),
-        );
+    final positions = Float32List(order.length * 6);
+    final vertexColors = Int32List(order.length * 3);
+    for (var i = 0; i < order.length; i++) {
+      final t = order[i];
+      for (var k = 0; k < 3; k++) {
+        final v = mesh.triangles[t * 3 + k];
+        positions[i * 6 + k * 2] = projected[v * 2];
+        positions[i * 6 + k * 2 + 1] = projected[v * 2 + 1];
+        vertexColors[i * 3 + k] = colors[t * 3 + k];
       }
     }
-    canvas.drawVertices(ui.Vertices(ui.VertexMode.triangles, positions, colors: colors), BlendMode.dst, Paint());
+    canvas.drawVertices(
+      ui.Vertices.raw(ui.VertexMode.triangles, positions, colors: vertexColors),
+      BlendMode.dst,
+      Paint(),
+    );
   }
+
+  static final _meshCaches = Expando<_MeshCache>();
 
   /// [points] pushed out by half a pixel, so neighboring faces meet without a hairline gap.
   static List<Offset> _grown(List<Offset> points) {
@@ -471,4 +450,92 @@ class _Face {
 
   /// The outer side or top of an outer wall: in the night sky's light, not in a room.
   bool get isOutdoors => isWall && room == null;
+}
+
+/// Steps in which the camera's angles count for what is kept per mesh, in radians (about a degree).
+double _quantized(double angle) => (angle / 0.02).roundToDouble();
+
+/// What is kept for a furniture model between frames: the normal of every triangle; the triangles facing the viewer,
+/// back to front, for the last camera angles; the color of every triangle corner for the last lamps.
+final class _MeshCache {
+  _MeshCache(this.mesh, this.normals);
+
+  factory _MeshCache.of(SceneMesh mesh) {
+    final p = mesh.positions;
+    final count = mesh.triangles.length ~/ 3;
+    final normals = Float32List(count * 3);
+    for (var t = 0; t < count; t++) {
+      final a = mesh.triangles[t * 3] * 3;
+      final b = mesh.triangles[t * 3 + 1] * 3;
+      final c = mesh.triangles[t * 3 + 2] * 3;
+      final ux = p[b] - p[a];
+      final uy = p[b + 1] - p[a + 1];
+      final uz = p[b + 2] - p[a + 2];
+      final vx = p[c] - p[a];
+      final vy = p[c + 1] - p[a + 1];
+      final vz = p[c + 2] - p[a + 2];
+      final nx = uy * vz - uz * vy;
+      final ny = uz * vx - ux * vz;
+      final nz = ux * vy - uy * vx;
+      final length = math.sqrt(nx * nx + ny * ny + nz * nz);
+      if (length < 1e-6) continue;
+      normals
+        ..[t * 3] = nx / length
+        ..[t * 3 + 1] = ny / length
+        ..[t * 3 + 2] = nz / length;
+    }
+    return _MeshCache(mesh, normals);
+  }
+
+  final SceneMesh mesh;
+  final Float32List normals;
+
+  (double, double)? _orderKey;
+  Int32List _order = Int32List(0);
+
+  (double, List<SceneLight>)? _colorKey;
+  Int32List _colors = Int32List(0);
+
+  (double, double, double) normalOf(int t) => (normals[t * 3], normals[t * 3 + 1], normals[t * 3 + 2]);
+
+  /// The triangles facing [camera], back to front.
+  Int32List orderFor(SceneCamera camera) {
+    final key = (_quantized(camera.yaw), _quantized(camera.pitch));
+    if (key == _orderKey) return _order;
+    final p = mesh.positions;
+    final cosPitch = math.cos(camera.pitch);
+    final sinPitch = math.sin(camera.pitch);
+    final visible = <(double, int)>[];
+    for (var t = 0; t < mesh.triangles.length ~/ 3; t++) {
+      final (nx, ny, nz) = normalOf(t);
+      if (nx == 0 && ny == 0 && nz == 0) continue;
+      final (_, towards) = camera.turn(nx, ny);
+      if (towards * cosPitch + nz * sinPitch <= 0) continue;
+      final a = mesh.triangles[t * 3] * 3;
+      final b = mesh.triangles[t * 3 + 1] * 3;
+      final c = mesh.triangles[t * 3 + 2] * 3;
+      visible.add((
+        camera.depth(
+          (p[a] + p[b] + p[c]) / 3,
+          (p[a + 1] + p[b + 1] + p[c + 1]) / 3,
+          (p[a + 2] + p[b + 2] + p[c + 2]) / 3,
+        ),
+        t,
+      ));
+    }
+    visible.sort((x, y) => x.$1.compareTo(y.$1));
+    _orderKey = key;
+    return _order = Int32List.fromList([for (final (_, t) in visible) t]);
+  }
+
+  /// The color of every triangle corner (ARGB), from [shade] (triangle, vertex), kept until [key] changes.
+  Int32List colorsFor((double, List<SceneLight>) key, Color Function(int t, int vertex) shade) {
+    if (_colorKey case (final yaw, final lights) when yaw == key.$1 && listEquals(lights, key.$2)) return _colors;
+    final colors = Int32List(mesh.triangles.length);
+    for (var i = 0; i < mesh.triangles.length; i++) {
+      colors[i] = shade(i ~/ 3, mesh.triangles[i]).toARGB32();
+    }
+    _colorKey = key;
+    return _colors = colors;
+  }
 }

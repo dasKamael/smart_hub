@@ -163,12 +163,79 @@ final class FurnitureMeshLibrary {
       triangles.addAll([for (final index in mesh.triangles) index + offset]);
       colors.addAll(mesh.triangleColors);
     }
+    _subdivide(positions, triangles, colors);
     return SceneMesh(
       item: item,
       positions: Float32List.fromList(positions),
       triangles: Uint16List.fromList(triangles),
       colors: colors,
     );
+  }
+}
+
+/// Triangles are drawn back to front by their middle, which goes wrong where large flat ones lie over each other or
+/// under small ones (sheet, duvet and pillows of a bed). Such triangles facing up with an edge longer than this are
+/// split into four until they are not, in cm; upright ones go wrong less and are split less ([_maxUprightEdge]).
+const _maxEdge = 18.0;
+const _maxUprightEdge = 35.0;
+
+/// Whether the triangle a, b, c lies (nearly) flat, facing up or down.
+bool _facesUp(List<double> p, int a, int b, int c) {
+  final ux = p[b * 3] - p[a * 3];
+  final uy = p[b * 3 + 1] - p[a * 3 + 1];
+  final uz = p[b * 3 + 2] - p[a * 3 + 2];
+  final vx = p[c * 3] - p[a * 3];
+  final vy = p[c * 3 + 1] - p[a * 3 + 1];
+  final vz = p[c * 3 + 2] - p[a * 3 + 2];
+  final nx = uy * vz - uz * vy;
+  final ny = uz * vx - ux * vz;
+  final nz = ux * vy - uy * vx;
+  final length = math.sqrt(nx * nx + ny * ny + nz * nz);
+  return length > 0 && nz.abs() / length > 0.7;
+}
+
+/// Splits long triangles in place (see [_maxEdge]); [colors] keeps one color per triangle.
+void _subdivide(List<double> positions, List<int> triangles, List<Color> colors) {
+  double edge(int i, int j) {
+    final dx = positions[i * 3] - positions[j * 3];
+    final dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+    final dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  int middle(int i, int j) {
+    positions
+      ..add((positions[i * 3] + positions[j * 3]) / 2)
+      ..add((positions[i * 3 + 1] + positions[j * 3 + 1]) / 2)
+      ..add((positions[i * 3 + 2] + positions[j * 3 + 2]) / 2);
+    return positions.length ~/ 3 - 1;
+  }
+
+  final input = List.of(triangles);
+  final inputColors = List.of(colors);
+  triangles.clear();
+  colors.clear();
+  final pending = [
+    for (var t = 0; t < input.length; t += 3) (input[t], input[t + 1], input[t + 2], inputColors[t ~/ 3]),
+  ];
+  while (pending.isNotEmpty) {
+    final (a, b, c, color) = pending.removeLast();
+    final limit = _facesUp(positions, a, b, c) ? _maxEdge : _maxUprightEdge;
+    final longest = math.max(edge(a, b), math.max(edge(b, c), edge(c, a)));
+    // Uint16 indices: stop splitting rather than run out of them.
+    if (longest <= limit * limit || positions.length ~/ 3 > 65000) {
+      triangles.addAll([a, b, c]);
+      colors.add(color);
+      continue;
+    }
+    final ab = middle(a, b);
+    final bc = middle(b, c);
+    final ca = middle(c, a);
+    pending
+      ..add((a, ab, ca, color))
+      ..add((ab, b, bc, color))
+      ..add((ca, bc, c, color))
+      ..add((ab, bc, ca, color));
   }
 }
 

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:smart_hub/domain/floorplan/furnishing.util.dart';
+import 'package:smart_hub/domain/floorplan/layout_graph.util.dart';
 import 'package:smart_hub/domain/floorplan/layout_rooms.util.dart';
 import 'package:smart_hub/domain/floorplan/model/door_type.enum.dart';
 import 'package:smart_hub/domain/floorplan/model/home_layout.dart';
@@ -200,11 +201,20 @@ final class HomeScene {
       }
     }
 
+    // A sliver of wall beside a door or passage would stand as a thin post; it is left out (see minPiece).
+    void addWall(double from, double to, {required bool besidePassage}) {
+      if (besidePassage && to - from < LayoutGraphUtil.minPiece) return;
+      add(from, to, 0, wallHeight, SceneMaterial.wall);
+    }
+
     var cursor = 0.0;
+    var afterPassage = false;
     for (final opening in openings) {
       final from = (opening.offset - opening.width / 2).clamp(0.0, length);
       final to = (opening.offset + opening.width / 2).clamp(0.0, length);
-      add(cursor, from, 0, wallHeight, SceneMaterial.wall);
+      final passage = opening.type != DoorType.window;
+      addWall(cursor, from, besidePassage: afterPassage || passage);
+      afterPassage = passage;
       if (opening.type == DoorType.window) {
         add(from, to, 0, sillHeight, SceneMaterial.wall, jambs: false);
         add(from, to, windowTop, wallHeight, SceneMaterial.wall, jambs: false);
@@ -212,7 +222,7 @@ final class HomeScene {
       }
       cursor = math.max(cursor, to);
     }
-    add(cursor, length, 0, wallHeight, SceneMaterial.wall);
+    addWall(cursor, length, besidePassage: afterPassage);
     if (shape.outside != null) add(0, length, -slabDepth, 0, SceneMaterial.slab, jambs: false);
     return pieces;
   }

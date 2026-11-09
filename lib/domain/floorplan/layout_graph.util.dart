@@ -173,7 +173,11 @@ abstract final class LayoutGraphUtil {
   }
 
   /// Both ends of [wall].
-  /// Whether [wall] is open along its whole length: the wall is gone, only the line between its rooms is left.
+  /// Pieces of wall narrower than this beside a door or passage are not built: they would only stand as thin posts.
+  static const minPiece = 20.0;
+
+  /// Whether [wall] is open along its whole length (pieces narrower than [minPiece] left between or beside its
+  /// passages do not count): the wall is gone, only the line between its rooms is left.
   static bool isOpen(HomeLayout layout, LayoutWall wall) {
     final (a, b) = endsOf(layout, wall);
     final length = a.distanceTo(b);
@@ -184,10 +188,10 @@ abstract final class LayoutGraphUtil {
     ]..sort((x, y) => x.$1.compareTo(y.$1));
     var reached = 0.0;
     for (final (from, to) in spans) {
-      if (from > reached + 1) return false;
+      if (from > reached + minPiece - 0.01) return false;
       reached = math.max(reached, to);
     }
-    return reached >= length - 1;
+    return reached >= length - minPiece + 0.01;
   }
 
   static (PlanPoint, PlanPoint) endsOf(HomeLayout layout, LayoutWall wall) {

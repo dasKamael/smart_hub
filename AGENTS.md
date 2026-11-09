@@ -155,7 +155,9 @@ furnished once (`LayoutConversionUtil`, `FurnishingUtil`). Wall logic: `LayoutGr
 Editor (Plan → pencil, `HubPage.floorplanEditor`), built for few steps and measured
 (`test/.../floorplan_editor/editor_steps.benchmark_test.dart`, table in `build/editor_steps.md`): drag outside the rooms
 draws a room, a stroke inside a room splits it, the room's type is one chip (names it), "Furnish" fills a room by its
-type. Tools stay picked: wall (tap corners; a wall ending on the drawing ends the line), door / window / opening (tap a
+type. A selected wall can be removed while its rooms stay apart ("Remove wall" = open along its whole length; such
+walls are not drawn and the walls next to them end square) or deleted, merging the rooms. Wall pieces under 20 cm
+beside a passage are not built (`LayoutGraphUtil.minPiece`), so no thin posts are left standing. Tools stay picked: wall (tap corners; a wall ending on the drawing ends the line), door / window / opening (tap a
 wall, or drag along it for its width; ends snap to the wall's ends), furniture (tap in a room; pieces snap against the
 nearest wall and are kept out of walls; drag to move; a selected piece has size handles on its side and front and a
 turn handle in front, 15° steps; the panel has size steps, turn, copy and keeps the palette). Select: drag a junction, a wall (the neighbor's wall follows, with a jog where it
@@ -172,7 +174,9 @@ Furniture Kit (CC0, `assets/furniture/`, license file next to it), converted onc
 (normalized triangles + colors); without them the block models in `furniture_models.dart` are used. Wall sides are
 drawn as vertex-colored triangles (no seams between pieces); light was tuned by measuring crops of the reference
 (unlit rooms stay dark, lamps tint nearby walls in their color). Markers look like the reference on the plan and in 3D
-(dark glass, lit cream with glow); a plant's ring shows when it needs water.
+(dark glass, lit cream with glow); a plant's ring shows when it needs water. Lowering only takes down outer walls
+facing the viewer. Furniture triangles are split (flat ones finer) so drawing back to front stays right; their order
+and colors are kept per mesh and only redone when the view angle or the lamps change.
 
 ## Kiosk
 
