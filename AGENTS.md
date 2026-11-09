@@ -169,7 +169,10 @@ short pieces and drawn back to front with the furniture, lit by the night sky an
 own projection (markers stay exact); the cube button tilts it into the reference angle, lamps become `SceneMarker`s
 (tap switches, long press selects), the wall button lowers the outer walls facing the viewer. Furniture models: Kenney
 Furniture Kit (CC0, `assets/furniture/`, license file next to it), converted once into `furniture_models.json`
-(normalized triangles + colors); without them the block models in `furniture_models.dart` are used.
+(normalized triangles + colors); without them the block models in `furniture_models.dart` are used. Wall sides are
+drawn as vertex-colored triangles (no seams between pieces); light was tuned by measuring crops of the reference
+(unlit rooms stay dark, lamps tint nearby walls in their color). Markers look like the reference on the plan and in 3D
+(dark glass, lit cream with glow); a plant's ring shows when it needs water.
 
 ## Kiosk
 
